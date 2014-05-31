@@ -182,36 +182,84 @@ not_angel:
 		.text
 
 #ifdef CONFIG_AUTO_ZRELADDR
+@ ZRE Address = TEXTADDR의 실질적인 물리주소
+@ TEXTADDR = 커널의 가상 시작주소, 일반적으로 PAGE_OFFSET + 0x8000
+@ 결론 : 
+@ 참고 : http://www.iamroot.org/xe/Kernel_10_ARM/186592#comment_186806
+@ 참고2 : http://www.iamroot.org/xe/index.php?mid=Kernel_10_ARM&document_srl=180812#comment_181518
 		@ determine final kernel image address
 		mov	r4, pc
-		and	r4, r4, #0xf8000000			@ 압축되지 않은 커널 이미지 위치
+		and	r4, r4, #0xf8000000		@ 압축되지 않은 커널 이미지 위치
 		add	r4, r4, #TEXT_OFFSET		@ arm makefile 참고(0x8000),  kernel의 시작지점  r4 = kernel start adress in ram 
+		@ #PAGE_OFFSET + #TEXT_OFFSET = 가상주소
 #else
 		ldr	r4, =zreladdr				@ CONFIG_AUTO_ZRELADDR이 정의되지 않았을 때, arch/arm/mach-exynos/Makefile.boot 참고
 #endif
 
+		@@@@@ 다시 정리하기 @@@@@
 		/*
 		 * Set up a page table only if it won't overwrite ourself.
 		 * That means r4 < pc && r4 - 16k page directory > &_end.
 		 * Given that r4 > &_end is most unfrequent, we add a rough
 		 * additional 1MB of room for a possible appended DTB(device tree binary).
 		 */
-		mov	r0, pc				@ r0 = pc
-		cmp	r0, r4				@ r0 r4 비교(pc와 r4 비교) 
-		ldrcc	r0, LC0+32		@ r0 < r4 일 때 LC0+32 = _end - restart + 0x104000
+		@ 참고 : http://www.iamroot.org/xe/Kernel_10_ARM/173174
+		mov	r0, pc			@ r0 = pc
+		cmp	r0, r4			@ r0 r4 비교(pc와 r4 비교) (r4 = kernel image addr)
+						@ r0 - r4 >= 0 이면 Carry Set, 아니면 Clear
+
+		@ @1 현 실행 위치(pc) 보다 Image 위치가 크다면 재배치 불필요
+		@ @2 아니면 남은 실행 코드와 다시 위치 비교
+
+		@1
+		@ r0 < r4 => pc가 Image보다 작다
+		@ if r0 < r4 {
+		ldrcc	r0, LC0+32		@ r0 < r4 일 때 (LC0+32 = _end - restart + 16K + 1M)
+			@ r0 <= (LC0+32 = restart부터 코드 끝까지의 크기 + PageTable 총 크기 + DTB영역)
+			@ 1M는 위의 영문 주석처럼 DTB의 확장에 대비한 크기
 		addcc	r0, r0, pc		@ r0 < r4 일 때 r0 = r0 + pc
-		cmpcc	r4, r0
+			@ 현 pc에서 zImage를 저장할 상대위치를 r0에 더해서 저장
+			@ 여기서 zImage는 restart부터 코드 마지막까지 즉, 아직 실행 X 고 앞으로 실행할 영역
+
+		@2
+		@ adds와 다르게 add는 State를 update하지 않는다.
+		cmpcc	r4, r0			@
+		@ }
+
+		@if r4 < r0 {
+		@ cache_on하라는 flag하는 것으로 보임 - not_relocated 부분에서 판단함
 		orrcc	r4, r4, #1		@ remember we skipped cache_on
+		@ }
+
+		@else if r4 >= r0 {
+		@ 재배치가 필요하지 않음
+		@ Carry가 Set이면 lr(Link Register)에 리턴할 현 위치를 저장하고 cache_on으로 Branch
 		blcs	cache_on
+		@ }
 
 restart:	adr	r0, LC0
-		ldmia	r0, {r1, r2, r3, r6, r10, r11, r12}
-		ldr	sp, [r0, #28]
+		/*
+		 * LC0:            .word   LC0                     @ r1
+		 *                 .word   __bss_start             @ r2
+		 *                 .word   _end                    @ r3
+		 *                 .word   _edata                  @ r6
+		 *                 .word   input_data_end - 4      @ r10 (inflated size location)
+		 *                 .word   _got_start              @ r11
+		 *                 .word   _got_end                @ ip 내부 프로시저 호출 스크래치 레지스터, r12
+		 *                 .word   .L_user_stack_end       @ sp, r13
+		 *                 .word   _end - restart + 16384 + 1024*1024
+		 */
+		@ ARM 레지스터의 이름 : http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0204ik/ch03s03s01.html
+		@ r0 (LC0)에서 {}로 순서대로 넣는다.
+		ldmia	r0, {r1, r2, r3, r6, r10, r11, r12}	@ LoadMultiIncrementAfter? 한번에 최대 7개
+		ldr	sp, [r0, #28]		@ r0(LC0)의 8번째 요소를 Load (28/4 + 1 = 8)
 
 		/*
 		 * We might be running at a different address.  We need
 		 * to fix up various pointers.
 		 */
+		@ 이동한 LC0의 위치를 보정하기 위한 코드
+		@ r1은 LC0의 초기 위치, r0은 현재의 LC0 위치 (후술된 코드에서 재배치 후 Restart 호출함)
 		sub	r0, r0, r1		@ calculate the delta offset
 		add	r6, r6, r0		@ _edata
 		add	r10, r10, r0		@ inflated kernel size location
@@ -536,7 +584,9 @@ not_relocated:	mov	r0, #0
 
 		.align	2
 		.type	LC0, #object
-LC0:		.word	LC0			@ r1
+@ Line of Code?
+		@ (.word LC0)는 LC0의 주소를 지님
+LC0:		.word	LC0			@ r1 추후에 restart 에서 Load함 r1로 (아래도)
 		.word	__bss_start		@ r2
 		.word	_end			@ r3
 		.word	_edata			@ r6
@@ -545,6 +595,10 @@ LC0:		.word	LC0			@ r1
 		.word	_got_end		@ ip
 		.word	.L_user_stack_end	@ sp
 		.word	_end - restart + 16384 + 1024*1024
+	       	@ 16384 = 16K (PageTable의 크기), 1024*1024 = 1M 완충공간
+		@ _end = 이 실행 중인 코드의 끝 주소(추측), -> _end - restart = 실행할 남은 코드의 길이
+		@ (*부가설명) PageTable의 크기가 16K인 이유는 PageTable 크기인 4byte가 4096개로
+		@ 4GB를 커버하기 위함이다.
 		.size	LC0, . - LC0
 
 #ifdef CONFIG_ARCH_RPC
@@ -573,8 +627,9 @@ params:		ldr	r0, =0x10000100		@ params_phys for RPC
  *  r4, r7, r8
  */
 		.align	5
+@ cache_on 시작, r3에 8 의미는 0, 1, 2 -> 세번째 함수 즉, cach_on 함수
 cache_on:	mov	r3, #8			@ cache_on function
-		b	call_cache_fn
+		b	call_cache_fn		@ 현 Proc에 해당하는 cache_on 함수를 찾는 루틴
 
 /*
  * Initialize the highest priority protection region, PR7
@@ -801,8 +856,11 @@ __common_mmu_cache_on:
  *  r12 = corrupted
  */
 
+		@ adr : 해당 라벨의 주소값을 저장
 call_cache_fn:	adr	r12, proc_types
+		@ proc_types는 Process ID, Mask와 해당하는 cache 함수가 있는 Table
 #ifdef CONFIG_CPU_CP15
+		@ mrc : Co Processor용 Mov
 		mrc	p15, 0, r9, c0, c0	@ get processor ID
 #else
 		ldr	r9, =CONFIG_PROCESSOR_ID
@@ -836,7 +894,7 @@ call_cache_fn:	adr	r12, proc_types
 proc_types:
 		.word	0x41000000		@ old ARM ID
 		.word	0xff00f000
-		mov	pc, lr
+		mov	pc, lr			@ Return 위치로 복귀 (Cache가 없는 듯)
  THUMB(		nop				)
 		mov	pc, lr
  THUMB(		nop				)
