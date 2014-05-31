@@ -272,12 +272,12 @@
 .macro safe_svcmode_maskall reg:req
 #if __LINUX_ARM_ARCH__ >= 6
 	mrs	\reg , cpsr
-	eor	\reg, \reg, #HYP_MODE
-	tst	\reg, #MODE_MASK
-	bic	\reg , \reg , #MODE_MASK
-	orr	\reg , \reg , #PSR_I_BIT | PSR_F_BIT | SVC_MODE
+	eor	\reg, \reg, #HYP_MODE	@ HYP_MODE == 0x1a
+	tst	\reg, #MODE_MASK		@ reg&MODE_MASK @ MODE_MASK == 0x1f
+	bic	\reg , \reg , #MODE_MASK	@ reg = reg & !MODE_MASK @ reg의 모드비트 클리어
+	orr	\reg , \reg , #PSR_I_BIT | PSR_F_BIT | SVC_MODE	@ 0x80|0x40|defined(__KERNEL__) && defined(CONFIG_CPU_V7M)?0x00:0X13 @ 모드를 svc모드로 셋팅, I와 F는 
 THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
-	bne	1f
+	bne	1f 						@ tst의 결과로 1로 점프
 	orr	\reg, \reg, #PSR_A_BIT
 	adr	lr, BSYM(2f)
 	msr	spsr_cxsf, \reg

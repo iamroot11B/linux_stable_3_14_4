@@ -113,7 +113,13 @@
 		bl	memdump		/* dump 256 bytes at start of kernel */
 #endif
 		.endm
-
+ /* 
+  * 2014/5/17
+  * start 섹션 시작 부분 윗부분은 전부 macro 정의
+  * .section: start section의 시작부분으로 vmlinux.lds 의  .start과 연결된다. 섹션의 시작 부분으로 정의한다.
+  * #alloc: allocatable
+  * #execinstr: excutable 
+  */
 		.section ".start", #alloc, #execinstr
 /*
  * sort out different calling conventions
@@ -121,12 +127,12 @@
 		.align
 		.arm				@ Always enter in ARM state
 start:
-		.type	start,#function
-		.rept	7
-		mov	r0, r0
+		.type	start,#function		@
+		.rept	7					@ .rept n: .rept부터 .endr까지 n번 반복
+		mov	r0, r0					@ 리누즈 할아버지께서 말하시길 다른 아키텍처에서 시작 부분이 0으로 셋팅 안될 경우가 있어 넣으셨다고 답변을 받았다고함. 
 		.endr
-   ARM(		mov	r0, r0		)
-   ARM(		b	1f		)
+   ARM(		mov	r0, r0		)		@ ARM()와 같은 부분은 컴파일 과정에서 설정된 아키텍처에 해당하는 경우만 컴파일 되는 부분.
+   ARM(		b	1f		)			@ b (label)f/b: 브랜치 명령어로 f의 경우 아래에 존재하는 label로 b의 경우 위에 존재하는 라벨로 이동.
  THUMB(		adr	r12, BSYM(1f)	)
  THUMB(		bx	r12		)
 
@@ -136,28 +142,33 @@ start:
  THUMB(		.thumb			)
 1:
  ARM_BE8(	setend	be )			@ go BE8 if compiled for BE8
-		mrs	r9, cpsr
+		mrs	r9, cpsr			@ cpsr : current program status register
 #ifdef CONFIG_ARM_VIRT_EXT
+/*
+ * 하이퍼 바이저 초기화
+ * 
+ */
 		bl	__hyp_stub_install	@ get into SVC mode, reversibly
 #endif
-		mov	r7, r1			@ save architecture ID
-		mov	r8, r2			@ save atags pointer
+		mov	r7, r1			@ save architecture ID  	/* ARM sys. Dev.  guide p.137참고*/
+		mov	r8, r2			@ save atags pointer	/* 커널 부팅시 넘겨준 파라미터(atags)들의 주소를 r2에 넣어서 전달해준다. */
 
 		/*
 		 * Booting from Angel - need to enter SVC mode and disable
 		 * FIQs/IRQs (numeric definitions from angel arm.h source).
 		 * We only do this if we were in user mode on entry.
+		 * angel과 swi 0x123456에 대한 설명은 http://www.iamroot.org/xe/Kernel_8_ARM/57324 참고
 		 */
 		mrs	r2, cpsr		@ get current mode
-		tst	r2, #3			@ not user?
-		bne	not_angel
+		tst	r2, #3			@ not user? r2 & #3	@ tst: arm.arch.p.716 참고
+		bne	not_angel		@ if SVC mode, go to not_angel
 		mov	r0, #0x17		@ angel_SWIreason_EnterSVC
- ARM(		swi	0x123456	)	@ angel_SWI_ARM
- THUMB(		svc	0xab		)	@ angel_SWI_THUMB
+ ARM(		swi	0x123456	)	@ angel_SWI_ARM		@ swi=소프트웨어 인터럽트 명령어 amr.arch.p.713 참고
+ THUMB(		svc	0xab		)	@ angel_SWI_THUMB	@ angel debugging 모드로 동작을 위한 동작?
 not_angel:
-		safe_svcmode_maskall r0
+		safe_svcmode_maskall r0	@ /arch/arm/include/asm/assembler.h 에 존재
 		msr	spsr_cxsf, r9		@ Save the CPU boot mode in
-						@ SPSR
+						@ SPSR	@모드가 바뀌기 전의 cpsr을 저장해둔 레지스터
 		/*
 		 * Note that some cache flushing and other stuff may
 		 * be needed here - is there an Angel SWI call for this?
@@ -173,22 +184,22 @@ not_angel:
 #ifdef CONFIG_AUTO_ZRELADDR
 		@ determine final kernel image address
 		mov	r4, pc
-		and	r4, r4, #0xf8000000
-		add	r4, r4, #TEXT_OFFSET
+		and	r4, r4, #0xf8000000			@ 압축되지 않은 커널 이미지 위치
+		add	r4, r4, #TEXT_OFFSET		@ arm makefile 참고(0x8000),  kernel의 시작지점  r4 = kernel start adress in ram 
 #else
-		ldr	r4, =zreladdr
+		ldr	r4, =zreladdr				@ CONFIG_AUTO_ZRELADDR이 정의되지 않았을 때, arch/arm/mach-exynos/Makefile.boot 참고
 #endif
 
 		/*
 		 * Set up a page table only if it won't overwrite ourself.
 		 * That means r4 < pc && r4 - 16k page directory > &_end.
 		 * Given that r4 > &_end is most unfrequent, we add a rough
-		 * additional 1MB of room for a possible appended DTB.
+		 * additional 1MB of room for a possible appended DTB(device tree binary).
 		 */
-		mov	r0, pc
-		cmp	r0, r4
-		ldrcc	r0, LC0+32
-		addcc	r0, r0, pc
+		mov	r0, pc				@ r0 = pc
+		cmp	r0, r4				@ r0 r4 비교(pc와 r4 비교) 
+		ldrcc	r0, LC0+32		@ r0 < r4 일 때 LC0+32 = _end - restart + 0x104000
+		addcc	r0, r0, pc		@ r0 < r4 일 때 r0 = r0 + pc
 		cmpcc	r4, r0
 		orrcc	r4, r4, #1		@ remember we skipped cache_on
 		blcs	cache_on
