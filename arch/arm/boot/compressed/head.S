@@ -260,34 +260,44 @@ restart:	adr	r0, LC0
 		 */
 		@ 이동한 LC0의 위치를 보정하기 위한 코드
 		@ r1은 LC0의 초기 위치, r0은 현재의 LC0 위치 (후술된 코드에서 재배치 후 Restart 호출함)
+		@ r0= pc(c8) + 0x208      r1 = 0x2d8
 		sub	r0, r0, r1		@ calculate the delta offset
 		add	r6, r6, r0		@ _edata
 		add	r10, r10, r0		@ inflated kernel size location
 
+		@@! 2014/06/14 start
+		
 		/*
 		 * The kernel build system appends the size of the
 		 * decompressed kernel at the end of the compressed data
 		 * in little-endian form.
 		 */
-		ldrb	r9, [r10, #0]
-		ldrb	lr, [r10, #1]
-		orr	r9, r9, lr, lsl #8
-		ldrb	lr, [r10, #2]
-		ldrb	r10, [r10, #3]
-		orr	r9, r9, lr, lsl #16
-		orr	r9, r9, r10, lsl #24
+		/*!
+		 * 압축 풀린 커널 사이즈가 압축된 커널의 뒤에 저장되어있다.
+		 * 예를 들어 커널 사이즈가 0x12345678 일 경우
+		 */
+		ldrb	r9, [r10, #0]	@ r9 = 0x0000_0078
+		ldrb	lr, [r10, #1]	@ lr = 0x0000_0056
+		orr	r9, r9, lr, lsl #8	@ r9 = 0x0000_5678
+		ldrb	lr, [r10, #2]	@ lr = 0x0000_0034
+		ldrb	r10, [r10, #3]	@ r10 = 0x0000_0012
+		orr	r9, r9, lr, lsl #16	@ r9 = 0x0034_5678
+		orr	r9, r9, r10, lsl #24	@ r9 = 0x1234_5678
 
 #ifndef CONFIG_ZBOOT_ROM
 		/* malloc space is above the relocated stack (64k max) */
 		add	sp, sp, r0
+			/*! r0 = delta offset */
 		add	r10, sp, #0x10000
+			/*! r10 = malloc space */
 #else
 		/*
 		 * With ZBOOT_ROM the bss/stack is non relocatable,
 		 * but someone could still run this code from RAM,
 		 * in which case our reference is _edata.
 		 */
-		mov	r10, r6
+		mov	r10, r6		
+			/*! r10 = r6 = _edata(.bss시작 주소)
 #endif
 
 		mov	r5, #0			@ init dtb size to 0
@@ -311,15 +321,25 @@ restart:	adr	r0, LC0
  * dtb data will get relocated along with the kernel if necessary.
  */
 
+		/*!
+		 * DTB를 사용할지 결정하기 위해 매직넘버 검사.
+		 */
 		ldr	lr, [r6, #0]
+			/*! 이미지의 끝(_edata) 에는 DTB를 사용할지 결정할
+			 * 매직넘버가 들어 있다. */
 #ifndef __ARMEB__
 		ldr	r1, =0xedfe0dd0		@ sig is 0xd00dfeed big endian
+			/*! 
+			 * r1 = DTB 매직넘버(sig)
+			 */
 #else
 		ldr	r1, =0xd00dfeed
 #endif
 		cmp	lr, r1
+		@ if lr != r1	dtb를 사용 안하면  dtb_check_done으로 점프
 		bne	dtb_check_done		@ not found
 
+	@ 추후 확인 dtb_check_done으로
 #ifdef CONFIG_ARM_ATAG_DTB_COMPAT
 		/*
 		 * OK... Let's do some funky business here.
@@ -330,11 +350,16 @@ restart:	adr	r0, LC0
 		 * area.  No GOT fixup has occurred yet, but none of the
 		 * code we're about to call uses any global variable.
 		*/
+		/*!
+		 * r6 = _edata
+		 * r8 = atags pointer
+		 */
 		add	sp, sp, #0x10000
 		stmfd	sp!, {r0-r3, ip, lr}
 		mov	r0, r8
 		mov	r1, r6
 		sub	r2, sp, r6
+		 /*! stack + heap - 사용한 양 */
 		bl	atags_to_fdt
 
 		/*
@@ -399,13 +424,19 @@ dtb_check_done:
  *   r4 + image length <= address of wont_overwrite -> OK
  * Note: the possible LSB in r4 is harmless here.
  */
-		add	r10, r10, #16384
+		add	r10, r10, #16384	@ 0x4000
+		@ r4 >= r10 + 16k page directory
 		cmp	r4, r10
 		bhs	wont_overwrite
+			/*! hs -> c = 1 in cpsr */
 		add	r10, r4, r9
+			/*! r10 = 압축 풀린 커널이 위치할 주소 + 압축 풀린 커널 사이즈 */
 		adr	r9, wont_overwrite
+			/*! r9 = wont_overwrite 라벨의 주소 */
 		cmp	r10, r9
+		@ r4 * 압축 풀린 image length <= adress of wont_overwrite
 		bls	wont_overwrite
+			/*! ls -> c = 0 in cpsr */
 
 /*
  * Relocate ourselves past the end of the decompressed kernel.
@@ -420,17 +451,31 @@ dtb_check_done:
 		 * ourself when the offset is small.
 		 */
 		add	r10, r10, #((reloc_code_end - restart + 256) & ~255)
+			/*! r10 = r10 + (restart 이 후 코드 크기 + 0x100 ) & 0xffff_ff00 */
+			/*! 주 목적은 얼라인 맞추기 */
 		bic	r10, r10, #255
+			/*! r10 = r10 & !(0xff) */
 
 		/* Get start of code we want to copy and align it down. */
 		adr	r5, restart
+			/*! r5 = &restart */
 		bic	r5, r5, #31
+			/*! 하위 5비트 클리어 */
+			/*! 8byte 얼라인을 위한 비트 클리어 */
 
 /* Relocate the hyp vector base if necessary */
 #ifdef CONFIG_ARM_VIRT_EXT
+	/*! 
+	 * v7이상에서 부터 지원
+	 * 후기 때 더한뒤
+	 */
 		mrs	r0, spsr
+			/*! r0 = spsr */
 		and	r0, r0, #MODE_MASK
+			/*! r0 = spsr의 모드 비트 */
 		cmp	r0, #HYP_MODE
+			/*! r0이 하이퍼바이저 모드인지 검사 */
+		@ 하이퍼바이저 아닐경우 1로
 		bne	1f
 
 		bl	__hyp_get_vectors
@@ -439,32 +484,68 @@ dtb_check_done:
 		bl	__hyp_set_vectors
 1:
 #endif
+		/*!
+		 * r5 = restart 주소
+		 * r6 = _edata 주소
+		 * r10 = malloc end
+		 */
 
 		sub	r9, r6, r5		@ size to copy
-		add	r9, r9, #31		@ rounded up to a multiple
-		bic	r9, r9, #31		@ ... of 32 bytes
+			/*! r9 = _edata - (restart addr)&!0x1f */
+			add	r9, r9, #31		@ rounded up to a multiple
+			bic	r9, r9, #31		@ ... of 32 bytes
+				/*! 5비트 단위 올림 for 얼라인 */
+				/*! restart ~ _edata 까지 32bytes 얼라인 */
+		/*!
+		 * r9 = restart ~ _edata(복사할 영역 사이즈)
+		 */
 		add	r6, r9, r5
 		add	r9, r9, r10
-
+		/*! 
+		 * r6 = restart + 복사할 영역 사이즈(정렬된 _edata)
+		 * r9 = malloc end + 복사할 영역 사이즈(정렬된 restart)
+		 */
+		/*!
+		 * 재배치 루프(1: ldmdb ~ bhi 1b)
+		 * r6(edata)부터 복사해서 r9(재배치할 영역 끝 주소) 붙여넣기
+		 * 자세한 설명은 후기 + wiki 참고
+		 */
 1:		ldmdb	r6!, {r0 - r3, r10 - r12, lr}
+			/*! ldm : arm architecture p. 95 참고 */
 		cmp	r6, r5
 		stmdb	r9!, {r0 - r3, r10 - r12, lr}
 		bhi	1b
 
+		@ 참고 : http://www.iamroot.org/xe/Kernel_10_ARM/179812 중간쯤
 		/* Preserve offset to relocated code. */
 		sub	r6, r9, r6
+			/*! r6 = 재배치 영역까지 오프셋 */
 
 #ifndef CONFIG_ZBOOT_ROM
 		/* cache_clean_flush may use the stack, so relocate it */
 		add	sp, sp, r6
+			/*! sp 위치 조절 */
 #endif
 
 		tst	r4, #1
+			/*! 
+			 * not_angel의 재배치 검사 과정에서 cache_on을 안 해줬을 때
+			 * r4에 1이 세트되어있음. 이 경우 z bit에 셋이 되어있지 않으므로
+			 * eq 실행 안됨.
+			 */
+		/*!
+		 * 현재 아키텍처에 맞는 캐쉬 플러쉬 함수 콜
+		 * cache_on이 실행 되었을 경우 cache_clean_flush 실행
+		 */
 		bleq	cache_clean_flush
 
 		adr	r0, BSYM(restart)
 		add	r0, r0, r6
 		mov	pc, r0
+			/*! pc = restart + offset */
+/*******************/
+/*! 2014/06/14 end */
+/*******************/
 
 wont_overwrite:
 /*
@@ -862,6 +943,7 @@ call_cache_fn:	adr	r12, proc_types
 #ifdef CONFIG_CPU_CP15
 		@ mrc : Co Processor용 Mov
 		mrc	p15, 0, r9, c0, c0	@ get processor ID
+		/*! r9 = cp15의 값중 processor ID*/
 #else
 		ldr	r9, =CONFIG_PROCESSOR_ID
 #endif
@@ -1022,7 +1104,7 @@ proc_types:
 		W(b)	__armv7_mmu_cache_on
 		W(b)	__armv7_mmu_cache_off
 		W(b)	__armv7_mmu_cache_flush
-
+					
 		.word	0			@ unrecognised type
 		.word	0
 		mov	pc, lr
@@ -1152,6 +1234,7 @@ __armv6_mmu_cache_flush:
 
 __armv7_mmu_cache_flush:
 		mrc	p15, 0, r10, c0, c1, 5	@ read ID_MMFR1
+			/*! MMFR1 = 메모리 특성을 가진 코프로세서의 */
 		tst	r10, #0xf << 16		@ hierarchical cache (ARMv7)
 		mov	r10, #0
 		beq	hierarchical
