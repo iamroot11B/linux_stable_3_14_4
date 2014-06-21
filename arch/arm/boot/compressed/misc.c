@@ -141,7 +141,12 @@ void __stack_chk_fail(void)
 
 extern int do_decompress(u8 *input, int len, u8 *output, void (*error)(char *x));
 
-
+/*!
+ * r0 = 압축 풀린 커널의 시작할 위치
+ * r1 = sp(malloc start)
+ * r2 = sp + 0x10000(64k, malloc end)
+ * r3 = 아키텍처 id
+ */
 void
 decompress_kernel(unsigned long output_start, unsigned long free_mem_ptr_p,
 		unsigned long free_mem_ptr_end_p,
@@ -156,9 +161,20 @@ decompress_kernel(unsigned long output_start, unsigned long free_mem_ptr_p,
 	free_mem_end_ptr	= free_mem_ptr_end_p;
 	__machine_arch_type	= arch_id;
 
+/*!
+ * cpu detect and uart 초기화
+ */
 	arch_decomp_setup();
-
+/*!
+ * uart 통신을 통해 버퍼 없이 칩에 바로 씀(putstr)
+ */
 	putstr("Uncompressing Linux...");
+	/*!
+	 * input_data: 압축된 데이터
+	 * 2: 사이즈 
+	 * 3: 출력할 위치
+	 * 4: 에러
+	 */
 	ret = do_decompress(input_data, input_data_end - input_data,
 			    output_data, error);
 	if (ret)

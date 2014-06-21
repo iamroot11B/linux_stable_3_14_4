@@ -103,6 +103,8 @@ static void merge_fdt_bootargs(void *fdt, const char *fdt_cmdline)
  *    = 1 -> bad ATAG (may retry with another possible ATAG pointer)
  *    < 0 -> error from libfdt
  */
+/*!
+ */
 int atags_to_fdt(void *atag_list, void *fdt, int total_space)
 {
 	struct tag *atag = atag_list;
@@ -113,14 +115,20 @@ int atags_to_fdt(void *atag_list, void *fdt, int total_space)
 	int ret, memsize;
 
 	/* make sure we've got an aligned pointer */
+	/*! 하위 두비트 체크용 */
 	if ((u32)atag_list & 0x3)
 		return 1;
 
 	/* if we get a DTB here we're done already */
+	/*!
+	 * atag_list에 있는 분이 이미 fdt일 경우 변환 불필요
+	 * 받아온 atag_list에서 매직넘버를 체크
+	 */
 	if (*(u32 *)atag_list == fdt32_to_cpu(FDT_MAGIC))
 	       return 0;
 
 	/* validate the ATAG */
+	/*! 부트로더에서 받은 atag_list가 사용 가능한 atag 인지 확인 */
 	if (atag->hdr.tag != ATAG_CORE ||
 	    (atag->hdr.size != tag_size(tag_core) &&
 	     atag->hdr.size != 2))

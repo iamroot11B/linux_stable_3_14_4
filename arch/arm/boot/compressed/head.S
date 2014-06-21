@@ -354,7 +354,9 @@ restart:	adr	r0, LC0
 			/*!  if lr != r1	dtb를 사용 안하면  dtb_check_done으로 점프 */
 		bne	dtb_check_done		@ not found
 
-	@ 추후 확인 dtb_check_done으로
+/********************************************************
+ *			 14/06/21 start								*
+ ********************************************************/
 #ifdef CONFIG_ARM_ATAG_DTB_COMPAT
 		/*
 		 * OK... Let's do some funky business here.
@@ -370,11 +372,20 @@ restart:	adr	r0, LC0
 		 * r8 = atags pointer
 		 */
 		add	sp, sp, #0x10000
+			/*! malloc space 설정 */
 		stmfd	sp!, {r0-r3, ip, lr}
+			/*!
+			 * 함수 콜을 위해 레지스터를 스택에 저장
+			 * r0~r3(인자 잔달용 레지스터), ip(got_end), lr(링크 레지스터 저장) 
+			 * got: 프로그램에 상주하는 모든 심볼에 대한 실제 주소
+			 * 참고: http://devrok.tistory.com/2
+			 */
 		mov	r0, r8
+			/*! 첫번째 인자: atags pointer */
 		mov	r1, r6
+			/*! 두번째 인자: _edata */
 		sub	r2, sp, r6
-		 /*! stack + heap - 사용한 양 */
+			/*! stack + heap - 사용한 양 */
 		bl	atags_to_fdt
 
 		/*
@@ -382,16 +393,23 @@ restart:	adr	r0, LC0
 		 * pointed by r8.  Try the typical 0x100 offset from start
 		 * of RAM and hope for the best.
 		 */
+		/*! return value(r0) == 1 -> 다시 할 필요가 있음. */
 		cmp	r0, #1
 		sub	r0, r4, #TEXT_OFFSET
 		bic	r0, r0, #1
 		add	r0, r0, #0x100
+			/*! 첫번째 인자: (압축 풀린 커널 위치 - 0x8000) & ~1 + 100 */
 		mov	r1, r6
+			/*! 두번째 인자: _edata */
 		sub	r2, sp, r6
+			/*! 세번째 인자: 사용 가능한 메모리 양 */
+		@! if(r0 == 1) {
 		bleq	atags_to_fdt
+		@! }
 
 		ldmfd	sp!, {r0-r3, ip, lr}
 		sub	sp, sp, #0x10000
+			/*! 스택에서 r0~r3, ip, lr 복원 */
 #endif
 
 		mov	r8, r6			@ use the appended device tree
@@ -405,11 +423,23 @@ restart:	adr	r0, LC0
 		ldr	r5, =_kernel_bss_size
 		adr	r1, wont_overwrite
 		sub	r1, r6, r1
+			/*! r1 = wont_overwrite ~ _edata 사이즈 */
 		subs	r1, r5, r1
+		@! if(r5 > r1 (c =1 & z = 0 in cpsr)) {
 		addhi	r9, r9, r1
+		@! }
+		/*!
+		 * r8 = _edata 
+		 * r5 = 압축풀린 커널의 bss_size
+		 * r1 = r5 - (wont_overwrite ~ _edata 사이즈)
+		 * r9 = if -> 압축풀린 커널 사이즈 - r1
+		 *    = else -> 압축풀린 커널 사이즈
+		 */
 
 		/* Get the dtb's size */
 		ldr	r5, [r6, #4]
+		/*! r5 = fdt_header->dt_total_size(dtb size) */
+
 #ifndef __ARMEB__
 		/* convert r5 (dtb size) to little endian */
 		eor	r1, r5, r5, ror #16
@@ -423,6 +453,7 @@ restart:	adr	r0, LC0
 		bic	r5, r5, #7
 
 		/* relocate some pointers past the appended dtb */
+		/*! dtb 보상을 위한 위치 조절 */
 		add	r6, r6, r5
 		add	r10, r10, r5
 		add	sp, sp, r5
@@ -579,8 +610,9 @@ wont_overwrite:
  *   sp  = stack pointer
  */
 		orrs	r1, r0, r5
+		@! if(재비치 안함(r0 == 0), dtb없음(dtb == 0)) {
 		beq	not_relocated
-
+		@! }
 		add	r11, r11, r0
 		add	r12, r12, r0
 
@@ -592,24 +624,37 @@ wont_overwrite:
 		 */
 		add	r2, r2, r0
 		add	r3, r3, r0
+			/*! bss 재배치 */
 
 		/*
 		 * Relocate all entries in the GOT table.
 		 * Bump bss entries to _edata + dtb size
 		 */
+		/*!
+		 * 1:
+		 * got 엔트리가 bss start ~ end 사이에 존재하면
+		 * DTB 사이즈만큼 더해서 got 엔트리를 옮긴다.
+		 */
 1:		ldr	r1, [r11, #0]		@ relocate entries in the GOT
+			/*! r1 = r11[0] */
 		add	r1, r1, r0		@ This fixes up C references
 		cmp	r1, r2			@ if entry >= bss_start &&
+		@! if( c == 1) {
 		cmphs	r3, r1			@       bss_end > entry
+		@! if( c == 1 & z == 0) {
 		addhi	r1, r1, r5		@    entry += dtb size
+		@! } }
 		str	r1, [r11], #4		@ next entry
+			/*! r11 = r1, r11 += 4(포스트 인덱스, arm 책 p.91) */
 		cmp	r11, r12
+		@! if(c == 0 ){
 		blo	1b
-
+		@! }
 		/* bump our bss pointers too */
 		add	r2, r2, r5
 		add	r3, r3, r5
-
+			/*! bss 위치도 dtb 사이즈만큼 증가 */
+		/*! bss, got 차이 참고: https://kldp.org/node/127967 */
 #else
 
 		/*
@@ -626,6 +671,10 @@ wont_overwrite:
 #endif
 
 not_relocated:	mov	r0, #0
+/*!
+ * 1:
+ * 비에스에스 스타트(r2)~ 엔드(r3) 초기화
+ */
 1:		str	r0, [r2], #4		@ clear bss
 		str	r0, [r2], #4
 		str	r0, [r2], #4
@@ -638,9 +687,11 @@ not_relocated:	mov	r0, #0
 		 * That is indicated by the LSB in r4.
 		 * Do it now if so.
 		 */
-		tst	r4, #1
+		tst	r4, #1 
 		bic	r4, r4, #1
+		@! if( r4의 첫번째 비트 == 1 ) {
 		blne	cache_on
+		@! }
 
 /*
  * The C runtime environment should now be setup sufficiently.
@@ -653,7 +704,19 @@ not_relocated:	mov	r0, #0
 		mov	r1, sp			@ malloc space above stack
 		add	r2, sp, #0x10000	@ 64k max
 		mov	r3, r7
+			/*!
+			 * r0 = 압축 풀린 커널의 시작할 위치
+			 * r1 = sp(malloc start)
+			 * r2 = sp + 0x10000(64k, malloc end)
+			 * r3 = 아키텍처 id
+			 * void
+			 * decompress_kernel(unsigned long output_start, unsigned long free_mem_ptr_p,
+			 * unsigned long free_mem_ptr_end_p, int arch_id)
+		 	 */
 		bl	decompress_kernel
+/********************************************************
+ *		14/06/21 end									*
+ ********************************************************/
 		bl	cache_clean_flush
 		bl	cache_off
 		mov	r1, r7			@ restore architecture number
