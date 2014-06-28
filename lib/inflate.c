@@ -249,16 +249,20 @@ static void *malloc(int size)
 		error("Malloc error");
        if (!malloc_ptr)
 		malloc_ptr = free_mem_ptr;
-
+			/*! malloc_ptr = free_mem_ptr(heap_start address) */
+			/*! free_mem_end_ptr(heap_end address) */
        malloc_ptr = (malloc_ptr + 3) & ~3;     /* Align */
-
+			/*!
+			 * 4byte 얼라인 (주소값)
+			 */
        p = (void *)malloc_ptr;
        malloc_ptr += size;
 
        if (free_mem_end_ptr && malloc_ptr >= free_mem_end_ptr)
 		error("Out of memory");
-
+	
        malloc_count++;
+	   	/*! malloc_count = */
        return p;
 }
 
@@ -267,6 +271,12 @@ static void free(void *where)
        malloc_count--;
        if (!malloc_count)
 		malloc_ptr = free_mem_ptr;
+			/*! 
+			 * malloc_count == 0 -> 할당된 영역이  없으면 malloc_ptr = heap_start_address 
+			 * 의문점 -> 힙 할당이 하나라도 되있는 상태에서
+			 * 말록을 사용하면 malloc_ptr이 커지기만 해서 결국 메모리 사이즈를 벗어남
+			 * 질문.
+			 */
 }
 #else
 #define malloc(a) kmalloc(a, GFP_KERNEL)

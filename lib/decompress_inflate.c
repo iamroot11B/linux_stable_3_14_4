@@ -31,6 +31,14 @@ static int INIT nofill(void *buffer, unsigned int len)
 	return -1;
 }
 
+
+	/*!
+	 * input_data: 압축된 데이터
+	 * 2: 사이즈 
+	 * 3: 출력할 위치 -> out_buf
+	 * 4: 에러
+	 */
+/*! decompress(input, len, NULL, NULL, output, NULL, error); */
 /* Included from initramfs et al code */
 STATIC int INIT gunzip(unsigned char *buf, int len,
 		       int(*fill)(void*, unsigned int),
@@ -100,12 +108,16 @@ STATIC int INIT gunzip(unsigned char *buf, int len,
 	strm->next_in = zbuf + 10;
 	strm->avail_in = len - 10;
 	/* skip over asciz filename */
+	/*! asciz -> 인자 끝에 자동으로 NULL을 삽입해줌 */
 	if (zbuf[3] & 0x8) {
 		do {
 			/*
 			 * If the filename doesn't fit into the buffer,
 			 * the file is very probably corrupt. Don't try
 			 * to read more data.
+			 */
+			/*!
+			 * zbuf[3] = 0x8가 셋일경우 파일이름이 셋팅된 경우이다.
 			 */
 			if (strm->avail_in == 0) {
 				error("header error");
@@ -117,7 +129,12 @@ STATIC int INIT gunzip(unsigned char *buf, int len,
 
 	strm->next_out = out_buf;
 	strm->avail_out = out_len;
-
+		/*!
+		 * strm->next_in = 압축된 파일 시작 위치
+		 * strm->next_out = 압축 풀 주소 시작 위치
+		 * strm->avail_in = 압축된 파일 크기
+		 * strm->avail_out = 압축 풀 위치부터 최대한 사용가능한 메모리 양
+		 */
 	rc = zlib_inflateInit2(strm, -MAX_WBITS);
 
 	if (!flush) {
@@ -138,6 +155,7 @@ STATIC int INIT gunzip(unsigned char *buf, int len,
 			strm->avail_in = len;
 		}
 		rc = zlib_inflate(strm, 0);
+			/*! gzip 압축푸는 함수 */
 
 		/* Write any data generated */
 		if (flush && strm->next_out > out_buf) {

@@ -45,12 +45,15 @@
  */
 __vet_atags:
 	tst	r2, #0x3			@ aligned?
+	@ if(r2 != 0x3){
 	bne	1f
+	@! }
 
 	ldr	r5, [r2, #0]
 #ifdef CONFIG_OF_FLATTREE
 	ldr	r6, =OF_DT_MAGIC		@ is it a DTB?
 	cmp	r5, r6
+		/*! dtb를 사용했는지 체크 */
 	beq	2f
 #endif
 	cmp	r5, #ATAG_CORE_SIZE		@ is first tag ATAG_CORE?
@@ -152,13 +155,28 @@ ENDPROC(lookup_processor_type)
 __lookup_processor_type:
 	adr	r3, __lookup_processor_type_data
 	ldmia	r3, {r4 - r6}
+		/*! 
+		 * r4~r6에 r3에서부터 받은 값을 넣어준다. (ldm)
+		 * r4 = .(해당 라벨의 주소)
+		 * r5 = __proc_info_begin
+		 * r6 = __proc_info_end	
+		 */
 	sub	r3, r3, r4			@ get offset between virt&phys
+		/*! r3 = 물리주소 가상주소의 차이 */
 	add	r5, r5, r3			@ convert virt addresses to
 	add	r6, r6, r3			@ physical address space
+		/*!
+		 * r5 = 보정된 r5
+		 * r6 = 보정된 r6
+		 */
 1:	ldmia	r5, {r3, r4}			@ value, mask
+		/*! r3, r4에 r5에서 프로세서 정보(value, mask) 를 가져옴 */
 	and	r4, r4, r9			@ mask wanted bits
+		/*! 프로세서 id(r9) & value(r4) */
+	@! if(프로세서 정보가 맞을경우) {
 	teq	r3, r4
 	beq	2f
+	@! }
 	add	r5, r5, #PROC_INFO_SZ		@ sizeof(proc_info_list)
 	cmp	r5, r6
 	blo	1b

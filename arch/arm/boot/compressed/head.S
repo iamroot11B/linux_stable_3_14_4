@@ -716,9 +716,16 @@ not_relocated:	mov	r0, #0
 		bl	decompress_kernel
 /********************************************************
  *		14/06/21 end									*
+ *		14/06/28 start									*
  ********************************************************/
 		bl	cache_clean_flush
+			/*! 
+			 * cache_clean 더티 비트가 1로 셋된 캐쉬를 메모리로 업데이트
+			 * caxhe_flush 캐쉬라인의 더티비트를 0으로 리셋
+			 * 참고: arm arch p.499
+			 */
 		bl	cache_off
+			/*! 현재 이미지에서 캐쉬를 사용 다 했으므로  캐쉬 오프 */
 		mov	r1, r7			@ restore architecture number
 		mov	r2, r8			@ restore atags pointer
 
@@ -726,7 +733,9 @@ not_relocated:	mov	r0, #0
 		mrs	r0, spsr		@ Get saved CPU boot mode
 		and	r0, r0, #MODE_MASK
 		cmp	r0, #HYP_MODE		@ if not booted in HYP mode...
+		@! if(!HYP_MODE) {
 		bne	__enter_kernel		@ boot kernel directly
+		@! }
 
 		adr	r12, .L__hyp_reentry_vectors_offset
 		ldr	r0, [r12]
@@ -1513,6 +1522,7 @@ __hyp_reentry_vectors:
 __enter_kernel:
 		mov	r0, #0			@ must be 0
  ARM(		mov	pc, r4	)		@ call kernel
+ 		/*! 압축풀린 커널로 점프 */
  THUMB(		bx	r4	)		@ entry point is always ARM
 
 reloc_code_end:

@@ -76,6 +76,8 @@
  */
 	.arm
 
+/*! start point */
+
 	__HEAD
 ENTRY(stext)
  ARM_BE8(setend	be )			@ ensure we are in BE8 mode
@@ -91,6 +93,7 @@ ENTRY(stext)
 	@ ensure svc mode and all interrupts masked
 	safe_svcmode_maskall r9
 
+	/*! 프로세서 확인 과정 */
 	mrc	p15, 0, r9, c0, c0		@ get processor id
 	bl	__lookup_processor_type		@ r5=procinfo r9=cpuid
 	movs	r10, r5				@ invalid processor (r5=0)?
@@ -108,8 +111,16 @@ ENTRY(stext)
 #ifndef CONFIG_XIP_KERNEL
 	adr	r3, 2f
 	ldmia	r3, {r4, r8}
+		/*!
+		 * r4 = .
+		 * r8 = PAGE_OFFSET
+		 */
 	sub	r4, r3, r4			@ (PHYS_OFFSET - PAGE_OFFSET)
 	add	r8, r8, r4			@ PHYS_OFFSET
+		/*!
+		 * r4 = PHYS_OFFSET - PAGEOFFSET
+		 * r8 = PHYS_OFFSET
+		 */
 #else
 	ldr	r8, =PLAT_PHYS_OFFSET		@ always constant in this case
 #endif
@@ -118,11 +129,15 @@ ENTRY(stext)
 	 * r1 = machine no, r2 = atags or dtb,
 	 * r8 = phys_offset, r9 = cpuid, r10 = procinfo
 	 */
+	/*! atag, dtb를 사용하는 확인 */
 	bl	__vet_atags
 #ifdef CONFIG_SMP_ON_UP
 	bl	__fixup_smp
 #endif
 #ifdef CONFIG_ARM_PATCH_PHYS_VIRT
+/********************************************************
+ *		14/06/28 end									*
+ ********************************************************/
 	bl	__fixup_pv_table
 #endif
 	bl	__create_page_tables
@@ -479,10 +494,14 @@ ENDPROC(__turn_mmu_on)
 __fixup_smp:
 	and	r3, r9, #0x000f0000	@ architecture version
 	teq	r3, #0x000f0000		@ CPU ID supported?
+	@! if(smp not support) {
 	bne	__fixup_smp_on_up	@ no, assume UP
+	@! }
 
 	bic	r3, r9, #0x00ff0000
+		/*! r3 = r9(cpuid) & 0xff00ffff */
 	bic	r3, r3, #0x0000000f	@ mask 0xff00fff0
+		/*! r3 = r9 & 0xff00ffff & 0xfffffff0 */
 	mov	r4, #0x41000000
 	orr	r4, r4, #0x0000b000
 	orr	r4, r4, #0x00000020	@ val 0x4100b020
@@ -539,9 +558,17 @@ smp_on_up:
 	.text
 __do_fixup_smp_on_up:
 	cmp	r4, r5
+	@! if( r4 >= r5(c == 1)) {
 	movhs	pc, lr
+	@! }
 	ldmia	r4!, {r0, r6}
  ARM(	str	r6, [r0, r3]	)
+ 	/*!
+	 * r0 = r4[0]
+	 * r3 = offset
+	 * r4 = smpalt -begin
+	 * r6 = r4[0+r3]
+	 */
  THUMB(	add	r0, r0, r3	)
 #ifdef __ARMEB__
  THUMB(	mov	r6, r6, ror #16	)	@ Convert word order for big-endian.
@@ -587,11 +614,15 @@ __fixup_pv_table:
 	add	r6, r6, r3	@ adjust __pv_phys_offset address
 	add	r7, r7, r3	@ adjust __pv_offset address
 	str	r8, [r6, #LOW_OFFSET]	@ save computed PHYS_OFFSET to __pv_phys_offset
+	@! if(r0 < r3) {
 	strcc	ip, [r7, #HIGH_OFFSET]	@ save to __pv_offset high bits
+	@! }
 	mov	r6, r3, lsr #24	@ constant for add/sub instructions
 	teq	r3, r6, lsl #24 @ must be 16MiB aligned
 THUMB(	it	ne		@ cross section branch )
+	@! if( r3 xor r6(r3의 상위 8비트)) {
 	bne	__error
+	@! }
 	str	r3, [r7, #LOW_OFFSET]	@ save to __pv_offset low bits
 	b	__fixup_a_pv_table
 ENDPROC(__fixup_pv_table)
