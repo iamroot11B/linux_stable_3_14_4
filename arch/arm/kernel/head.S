@@ -137,6 +137,7 @@ ENTRY(stext)
 #ifdef CONFIG_ARM_PATCH_PHYS_VIRT
 /********************************************************
  *		14/06/28 end									*
+ *		14/07/05 start									*
  ********************************************************/
 	bl	__fixup_pv_table
 #endif
@@ -162,6 +163,7 @@ ENDPROC(stext)
 #ifndef CONFIG_XIP_KERNEL
 2:	.long	.
 	.long	PAGE_OFFSET
+		/*! PAGE_OFFSET - the virtual address of the start of the kernel image */
 #endif
 
 /*
@@ -643,6 +645,7 @@ __fixup_a_pv_table:
 	ldr	r6, [r6, #LOW_OFFSET]	@ pv_offset low word
 	mov	r6, r6, lsr #24
 	cmn	r0, #1
+		/*! r0 + 1 */
 #ifdef CONFIG_THUMB2_KERNEL
 	moveq	r0, #0x200000	@ set bit 21, mov to mvn instruction
 	lsls	r6, #24
@@ -694,14 +697,19 @@ ARM_BE8(rev16	ip, ip)
 #else
 	bic	ip, ip, #0x000000ff
 	tst	ip, #0xf00	@ check the rotation field
+	@! if(ip의 9~12번째 비트중 하나라도 셋팅되었을 경우( 0xf00)){
 	orrne	ip, ip, r6	@ mask in offset bits 31-24
+	@! } else {
 	biceq	ip, ip, #0x400000	@ clear bit 22
 	orreq	ip, ip, r0	@ mask in offset bits 7-0
+	@! }
 #endif
 	str	ip, [r7, r3]
 2:	cmp	r4, r5
+	@! if( r4 < r5 ) {
 	ldrcc	r7, [r4], #4	@ use branch for delay slot
 	bcc	1b
+	@! }
 	mov	pc, lr
 #endif
 ENDPROC(__fixup_a_pv_table)
