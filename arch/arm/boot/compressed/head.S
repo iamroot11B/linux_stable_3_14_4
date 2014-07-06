@@ -144,15 +144,13 @@ start:
  ARM_BE8(	setend	be )			@ go BE8 if compiled for BE8
 		mrs	r9, cpsr			@ cpsr : current program status register
 #ifdef CONFIG_ARM_VIRT_EXT
-/*
- * 하이퍼 바이저 초기화
- * 
- */
 		bl	__hyp_stub_install	@ get into SVC mode, reversibly
+			/*! 하이퍼 바이저 익스텐션을 위한 초기화 */
 #endif
-		mov	r7, r1			@ save architecture ID  	/* ARM sys. Dev.  guide p.137참고*/
-		mov	r8, r2			@ save atags pointer	/* 커널 부팅시 넘겨준 파라미터(atags)들의 주소를 r2에 넣어서 전달해준다. */
-
+		mov	r7, r1			@ save architecture ID 	
+		mov	r8, r2			@ save atags pointer
+			/* 커널 부팅시 넘겨준 파라미터(atags)들의 주소를 r0부터 차례로 넣어서 전달 */
+			/* ARM sys. Dev.  guide p.137참고 */
 		/*
 		 * Booting from Angel - need to enter SVC mode and disable
 		 * FIQs/IRQs (numeric definitions from angel arm.h source).
@@ -160,15 +158,20 @@ start:
 		 * angel과 swi 0x123456에 대한 설명은 http://www.iamroot.org/xe/Kernel_8_ARM/57324 참고
 		 */
 		mrs	r2, cpsr		@ get current mode
-		tst	r2, #3			@ not user? r2 & #3	@ tst: arm.arch.p.716 참고
+		tst	r2, #3			@ not user?
+			/*! r2 & #3 */
+			/*! tst: arm.arch.p.716 참고 */
 		bne	not_angel		@ if SVC mode, go to not_angel
 		mov	r0, #0x17		@ angel_SWIreason_EnterSVC
- ARM(		swi	0x123456	)	@ angel_SWI_ARM		@ swi=소프트웨어 인터럽트 명령어 amr.arch.p.713 참고
- THUMB(		svc	0xab		)	@ angel_SWI_THUMB	@ angel debugging 모드로 동작을 위한 동작?
+ ARM(		swi	0x123456	)	@ angel_SWI_ARM	
+ 			/*! swi=소프트웨어 인터럽트 명령어 amr.arch.p.713 참고 */
+			/*! angel debugging 모드로 동작을 위한 동작? */
+ THUMB(		svc	0xab		)	@ angel_SWI_THUMB
 not_angel:
-		safe_svcmode_maskall r0	@ /arch/arm/include/asm/assembler.h 에 존재
+		safe_svcmode_maskall r0
+			/*! /arch/arm/include/asm/assembler.h 에 존재 */
 		msr	spsr_cxsf, r9		@ Save the CPU boot mode in
-						@ SPSR	@모드가 바뀌기 전의 cpsr을 저장해둔 레지스터
+			/*! SPSR = 모드가 바뀌기 전의 cpsr을 저장해둔 레지스터 */
 		/*
 		 * Note that some cache flushing and other stuff may
 		 * be needed here - is there an Angel SWI call for this?
@@ -196,7 +199,7 @@ not_angel:
 		ldr	r4, =zreladdr				@ CONFIG_AUTO_ZRELADDR이 정의되지 않았을 때, arch/arm/mach-exynos/Makefile.boot 참고
 #endif
 
-		@@@@@ 다시 정리하기 @@@@@
+		
 		/*
 		 * Set up a page table only if it won't overwrite ourself.
 		 * That means r4 < pc && r4 - 16k page directory > &_end.
@@ -208,12 +211,12 @@ not_angel:
 		cmp	r0, r4			@ r0 r4 비교(pc와 r4 비교) (r4 = kernel image addr)
 						@ r0 - r4 >= 0 이면 Carry Set, 아니면 Clear
 
-		@ @1 현 실행 위치(pc) 보다 Image 위치가 크다면 재배치 불필요
-		@ @2 아니면 남은 실행 코드와 다시 위치 비교
+		@! @1 현 실행 위치(pc) 보다 Image 위치가 크다면 재배치 불필요
+		@! @2 아니면 남은 실행 코드와 다시 위치 비교
 
 		@1
 		@ r0 < r4 => pc가 Image보다 작다
-		@ if r0 < r4 {
+		@ if (r0 < r4) {
 		ldrcc	r0, LC0+32		@ r0 < r4 일 때 (LC0+32 = _end - restart + 16K + 1M)
 			@ r0 <= (LC0+32 = restart부터 코드 끝까지의 크기 + PageTable 총 크기 + DTB영역)
 			@ 1M는 위의 영문 주석처럼 DTB의 확장에 대비한 크기
@@ -222,8 +225,7 @@ not_angel:
 			@ 여기서 zImage는 restart부터 코드 마지막까지 즉, 아직 실행 X 고 앞으로 실행할 영역
 
 		@2
-		@ adds와 다르게 add는 State를 update하지 않는다.
-		cmpcc	r4, r0			@
+		cmpcc	r4, r0
 		@ }
 
 		@if r4 < r0 {
@@ -481,7 +483,7 @@ dtb_check_done:
 			/*! r10 = 압축 풀린 커널이 위치할 주소 + 압축 풀린 커널 사이즈 */
 		adr	r9, wont_overwrite
 			/*! r9 = wont_overwrite 라벨의 주소 */
-		@! if(r4 * 압축 풀린 image length <= adress of wont_overwrite) {
+		@! if(r4 + 압축 풀린 kernel size <= adress of wont_overwrite) {
 		cmp	r10, r9	
 		bls	wont_overwrite
 			/*! ls -> c = 0 in cpsr */
