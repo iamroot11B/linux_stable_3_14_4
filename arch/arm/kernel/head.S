@@ -123,6 +123,7 @@ ENTRY(stext)
 		 */
 #else
 	ldr	r8, =PLAT_PHYS_OFFSET		@ always constant in this case
+    /*! PLAT_PHYS_OFFSET = (0x40000000) 물리 RAM, 주소? */
 #endif
 
 	/*
@@ -143,6 +144,10 @@ ENTRY(stext)
 #endif
 	bl	__create_page_tables
 
+/********************************************************
+ *		14/07/12 end
+ ********************************************************/
+
 	/*
 	 * The following calls CPU specific code in a position independent
 	 * manner.  See arch/arm/mm/proc-*.S for details.  r10 = base of
@@ -159,13 +164,26 @@ ENTRY(stext)
  THUMB(	mov	pc, r12				)
 1:	b	__enable_mmu
 ENDPROC(stext)
+/*! stext 끝, global로 지정 */
+
 	.ltorg
+    /*! ldr에 저장된 주소가 32비트를 넘을경우, 임시보관.
+     * = 에는 32비트 상수값.
+     * # 에는 8(?12 확인 필요) 비트 상수값.
+     *  cf) 명령어 ltorg - 4K가 채워지지 않더라도 기계어로 변경
+     */
+
 #ifndef CONFIG_XIP_KERNEL
 2:	.long	.
 	.long	PAGE_OFFSET
 		/*! PAGE_OFFSET - the virtual address of the start of the kernel image */
+        /*! 0xc0000000 */
 #endif
 
+
+/********************************************************
+    2014/07/12/ 시작
+ ********************************************************/
 /*
  * Setup the initial page tables.  We only setup the barest
  * amount which are required to get the kernel running, which
@@ -179,6 +197,11 @@ ENDPROC(stext)
  */
 __create_page_tables:
 	pgtbl	r4, r8				@ page table address
+    /*! pgtbl => macro
+     *  r8 : RAM의 물리시작주소는 0x40000000
+     *  r4 : 페이지 테이블을 생성할 물리주소: 0x40004000 
+     *  4000~8000 : 4K, 
+     */
 
 	/*
 	 * Clear the swapper page table
@@ -186,10 +209,13 @@ __create_page_tables:
 	mov	r0, r4
 	mov	r3, #0
 	add	r6, r0, #PG_DIR_SIZE
+    /*! r6 0x40008000 */
 1:	str	r3, [r0], #4
 	str	r3, [r0], #4
 	str	r3, [r0], #4
-	str	r3, [r0], #4
+	str	r3, [r0], #4 
+    /*! 0 으로 초기화 */
+
 	teq	r0, r6
 	bne	1b
 
@@ -221,6 +247,9 @@ __create_page_tables:
 #endif
 #endif
 
+    /*! PROCINFO_MM_MMUFLAGS=8, r10=processor info address
+     *  주소값을 8더한다.
+     */
 	ldr	r7, [r10, #PROCINFO_MM_MMUFLAGS] @ mm_mmuflags
 
 	/*
@@ -232,10 +261,20 @@ __create_page_tables:
 	sub	r0, r0, r3			@ virt->phys offset
 	add	r5, r5, r0			@ phys __turn_mmu_on
 	add	r6, r6, r0			@ phys __turn_mmu_on_end
+    /*! SECTION_SHIFT=20 (단위는 2^20=1MB)
+     *  상위 12비트[31:20]가 중요.
+     */
 	mov	r5, r5, lsr #SECTION_SHIFT
 	mov	r6, r6, lsr #SECTION_SHIFT
 
 1:	orr	r3, r7, r5, lsl #SECTION_SHIFT	@ flags + kernel base
+    /*! 
+     * PMD_ORDER=2,
+     * http://www.iamroot.org/xe/Kernel_10_ARM/181264
+     * r4 : pgtable start address
+     * r5 : (turn_mmu_on >> 20)
+     * r4 + (r5<<PMD_ORDER)의 주소에 r3를 넣는다. 
+     */
 	str	r3, [r4, r5, lsl #PMD_ORDER]	@ identity mapping
 	cmp	r5, r6
 	addlo	r5, r5, #1			@ next section
@@ -245,7 +284,18 @@ __create_page_tables:
 	 * Map our RAM from the start to the end of the kernel .bss section.
 	 */
 	add	r0, r4, #PAGE_OFFSET >> (SECTION_SHIFT - PMD_ORDER)
+
+    /*! bss 마지막. 
+     *  _end = 0xc0528e80 + 0x041fb4 ( by readelf)
+     * 0xc0528e80 + 0x041fb4 - 1 = 0xc056ae33
+     */
 	ldr	r6, =(_end - 1)
+
+    /*! r8 = 0x40004000
+     *  r7 = mmuflag
+     *
+     *  r8부터 bss 끝까지 1MB 단위 page table 구성. 루프
+     */
 	orr	r3, r8, r7
 	add	r6, r4, r6, lsr #(SECTION_SHIFT - PMD_ORDER)
 1:	str	r3, [r0], #1 << PMD_ORDER
