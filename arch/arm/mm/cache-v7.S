@@ -89,14 +89,28 @@ ENDPROC(v7_flush_icache_all)
 
 ENTRY(v7_flush_dcache_louis)
 	dmb					@ ensure ordering with previous memory accesses
+	/*!
+	 * DMB : DMB 이후의 명시적인 메모리 액세스를 시작하기 전에,
+	 *       DMB 이전의 모든 명시적인 메모리 액세스를 완료하도록 한다.
+	 * DSB : DSB 이전의 모든 명령들을 완료하도록 한다.
+	 * ISB : 파이프라인을 비워서, ISB 이후의 모든 명령들이 캐시나 메모리로부터 새로 펫치되도록 한다.
+	 * 참고: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka14041.html
+	 */
 	mrc	p15, 1, r0, c0, c0, 1		@ read clidr, r0 = clidr
 	ALT_SMP(ands	r3, r0, #(7 << 21))	@ extract LoUIS from clidr
+		/*! clidr[7<<21] = 001
+		 * Indicates the Level of Unification Inner Shareable for the cache hierarchy
+		 */
 	ALT_UP(ands	r3, r0, #(7 << 27))	@ extract LoUU from clidr
 #ifdef CONFIG_ARM_ERRATA_643719
+		/*! 제조시 오류 처리 */
 	ALT_SMP(mrceq	p15, 0, r2, c0, c0, 0)	@ read main ID register
 	ALT_UP(moveq	pc, lr)			@ LoUU is zero, so nothing to do
 	ldreq	r1, =0x410fc090                 @ ID of ARM Cortex A9 r0p?
 	biceq	r2, r2, #0x0000000f             @ clear minor revision number
+		/*! 직접 레지스터 셋팅 
+		 * clidr[7<<21] = 001
+		 */
 	teqeq	r2, r1                          @ test for errata affected core and if so...
 	orreqs	r3, #(1 << 21)			@   fix LoUIS value (and set flags state to 'ne')
 #endif
@@ -104,6 +118,11 @@ ENTRY(v7_flush_dcache_louis)
 	ALT_UP(mov	r3, r3, lsr #26)	@ r3 = LoUU * 2
 	moveq	pc, lr				@ return if level == 0
 	mov	r10, #0				@ r10 (starting level) = 0
+		/*!
+		 * r0 = clidr
+		 * r3 = b010
+		 * r10 = 0
+		 */
 	b	flush_levels			@ start flushing cache levels
 ENDPROC(v7_flush_dcache_louis)
 
@@ -119,7 +138,7 @@ ENDPROC(v7_flush_dcache_louis)
 ENTRY(v7_flush_dcache_all)
 	dmb					@ ensure ordering with previous memory accesses
 	mrc	p15, 1, r0, c0, c0, 1		@ read clidr
-	ands	r3, r0, #0x7000000		@ extract loc from clidr
+	ands	r3, r0, #0x7000000		@ extract loc from clidr	
 	mov	r3, r3, lsr #23			@ left align loc bit field
 	beq	finished			@ if loc is 0, then no need to clean
 	mov	r10, #0				@ start clean at cache level 0
@@ -128,13 +147,28 @@ flush_levels:
 	mov	r1, r0, lsr r2			@ extract cache type bits from clidr
 	and	r1, r1, #7			@ mask of the bits for current cache only
 	cmp	r1, #2				@ see what cache we have at this level
+		/*!
+		 * r2 = 0
+		 * r1 = b011(Ctype1: Indicates the type of cache implemented at level 1:)
+		 					Separate instruction and data caches
+		 */
+	@! if(r1 < #2)
 	blt	skip				@ skip if no cache, or just i-cache
 #ifdef CONFIG_PREEMPT
 	save_and_disable_irqs_notrace r9	@ make cssr&csidr read atomic
 #endif
 	mcr	p15, 2, r10, c0, c0, 0		@ select current cache level in cssr
+		/*! csselr = 0 
+		 * Cache Size Selection Register
+		 */
 	isb					@ isb to sych the new cssr&csidr
+	/*! ISB : 파이프라인을 비워서, ISB 이후의
+	 * 모든 명령들이 캐시나 메모리로부터 새로 펫치되도록 한다.
+	 */
 	mrc	p15, 1, r1, c0, c0, 0		@ read the new csidr
+		/*! r1 = csidr(level 1)
+		 * Cache Size ID Register
+		 */
 #ifdef CONFIG_PREEMPT
 	restore_irqs_notrace r9
 #endif
@@ -142,9 +176,12 @@ flush_levels:
 	add	r2, r2, #4			@ add 4 (line length offset)
 	ldr	r4, =0x3ff
 	ands	r4, r4, r1, lsr #3		@ find maximum number on the way size
+		/*! r4 = cache way */
 	clz	r5, r4				@ find bit position of way size increment
+		/*! r5 = r4안의 msb의 0 패딩 개수 */
 	ldr	r7, =0x7fff
 	ands	r7, r7, r1, lsr #13		@ extract max number of the index size
+		/*! r7 = numset */
 loop1:
 	mov	r9, r7				@ create working copy of max index
 loop2:
@@ -159,14 +196,17 @@ loop2:
 	bge	loop2
 	subs	r4, r4, #1			@ decrement the way
 	bge	loop1
+		/*! index, way clean & invalidate */
 skip:
 	add	r10, r10, #2			@ increment cache number
 	cmp	r3, r10
 	bgt	flush_levels
+		/*! 레벨마다 플러쉬 */
 finished:
 	mov	r10, #0				@ swith back to cache level 0
 	mcr	p15, 2, r10, c0, c0, 0		@ select current cache level in cssr
 	dsb
+		/*! DSB : DSB 이전의 모든 명령들을 완료하도록 한다. */
 	isb
 	mov	pc, lr
 ENDPROC(v7_flush_dcache_all)

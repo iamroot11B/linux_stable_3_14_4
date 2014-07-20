@@ -90,6 +90,8 @@
 #if __LINUX_ARM_ARCH__ >= 6
 	.macro	disable_irq_notrace
 	cpsid	i
+		/*! 
+		 * 참고: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/BABHBAAB.html */
 	.endm
 
 	.macro	enable_irq_notrace
@@ -191,9 +193,14 @@
  */
 #define ALT_UP(instr...)					\
 	.pushsection ".alt.smp.init", "a"			;\
+		/*!
+		 * 참고: https://github.com/x86-8/linux-3.2/blob/master/study/QnA.org
+		 */
 	.long	9998b						;\
 9997:	instr							;\
 	.if . - 9997b != 4					;\
+		/*! arm(32)모드인지 thumb(16) 모드인지 검사
+		 */
 		.error "ALT_UP() content must assemble to exactly 4 bytes";\
 	.endif							;\
 	.popsection
@@ -203,6 +210,7 @@
 	.long	9998b						;\
 	W(b)	. + up_b_offset					;\
 	.popsection
+		/*! */
 #else
 #define ALT_SMP(instr...)
 #define ALT_UP(instr...) instr

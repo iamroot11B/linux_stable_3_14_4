@@ -197,11 +197,18 @@ __v7_ca15mp_setup:
 1:
 #ifdef CONFIG_SMP
 	ALT_SMP(mrc	p15, 0, r0, c1, c0, 1)
+	 /*! r0 = cp15 ACTLR */
 	ALT_UP(mov	r0, #(1 << 6))		@ fake it for UP
 	tst	r0, #(1 << 6)			@ SMP/nAMP mode enabled?
 	orreq	r0, r0, #(1 << 6)		@ Enable SMP/nAMP mode
 	orreq	r0, r0, r10			@ Enable CPU-specific SMP bits
 	mcreq	p15, 0, r0, c1, c0, 1
+		/*! ACTLR[6]은 smp 관련비트로
+		 * the caches and MMU, or performing any cache and TLB maintenance operations
+		 * 를 위한 코프로세서의 레지스터의 비트이다.
+		 * 사용하기 위해선 무조건 set해줘야 하므로 셋 되어있을 경우 넘어가고
+		 * 셋되어있지 않다면 셋해주고 넘어간다.
+		 */
 #endif
 	b	__v7_setup
 
@@ -265,6 +272,10 @@ __v7_setup:
 	adr	r12, __v7_setup_stack		@ the local stack
 	stmia	r12, {r0-r5, r7, r9, r11, lr}
 	bl      v7_flush_dcache_louis
+		/*! arm reference p. 1269
+		 * Behavior of the caches at reset
+		 */
+		/*! arch/arm/mm/cache-v7.S */
 	ldmia	r12, {r0-r5, r7, r9, r11, lr}
 
 	mrc	p15, 0, r0, c0, c0, 0		@ read main ID register
@@ -275,7 +286,7 @@ __v7_setup:
 	and	r6, r0, #0x0000000f		@ revision
 	orr	r6, r6, r5, lsr #20-4		@ combine variant and revision
 	ubfx	r0, r0, #4, #12			@ primary part number
-
+		/*! 4~12 LSB로 옮기고 나머지 0 셋 */
 	/* Cortex-A8 Errata */
 	ldr	r10, =0x00000c08		@ Cortex-A8 primary part number
 	teq	r0, r10
@@ -341,6 +352,7 @@ __v7_setup:
 3:	ldr	r10, =0x00000c0f		@ Cortex-A15 primary part number
 	teq	r0, r10
 	bne	4f
+		/*! 에러 검사 */
 
 #ifdef CONFIG_ARM_ERRATA_773022
 	cmp	r6, #0x4			@ only present up to r0p4
@@ -358,6 +370,7 @@ __v7_setup:
 	ldr	r6, =NMRR			@ NMRR
 	mcr	p15, 0, r5, c10, c2, 0		@ write PRRR
 	mcr	p15, 0, r6, c10, c2, 1		@ write NMRR
+		/*! 메모리 특성 설정 */
 #endif
 	dsb					@ Complete invalidations
 #ifndef CONFIG_ARM_THUMBEE
@@ -373,6 +386,7 @@ __v7_setup:
 1:
 #endif
 	adr	r5, v7_crval
+		/*! crval   clear=0x2120c302, mmuset=0x10c03c7d, ucset=0x00c01c7c */
 	ldmia	r5, {r5, r6}
  ARM_BE8(orr	r6, r6, #1 << 25)		@ big-endian page tables
 #ifdef CONFIG_SWP_EMULATE
