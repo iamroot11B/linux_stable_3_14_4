@@ -146,6 +146,7 @@ ENTRY(stext)
 
 /********************************************************
  *		14/07/12 end
+ *		14/07/19 start
  ********************************************************/
 
 	/*
@@ -161,6 +162,9 @@ ENTRY(stext)
 	mov	r8, r4				@ set TTBR1 to swapper_pg_dir
  ARM(	add	pc, r10, #PROCINFO_INITFUNC	)
  	/*! arch/arm/mm/proc-v7.S 의 __v7_ca15mp_setup: 라벨 */
+/********************************************************
+ *		14/07/19 end
+ ********************************************************/
  THUMB(	add	r12, r10, #PROCINFO_INITFUNC	)
  THUMB(	mov	pc, r12				)
 1:	b	__enable_mmu
