@@ -83,11 +83,16 @@ extern unsigned int processor_id;
 #define read_cpuid(reg)							\
 	({								\
 		unsigned int __val;					\
-		asm("mrc	p15, 0, %0, c0, c0, " __stringify(reg)	\
+      /*!
+       * asm ( code : output operand list : input operand list : clobber list );
+       * clobber list: clobber는 asm를 실행 시, 값이 변하는 것을 적어준다. 
+	   * http://codecat.tistory.com/entry/%EC%9D%B8%EB%9D%BC%EC%9D%B8-%EC%96%B4%EC%85%88%EB%B8%94%EB%A6%AC
+       */
+     asm("mrc	p15, 0, %0, c0, c0, " __stringify(reg)	\
 		    : "=r" (__val)					\
 		    :							\
 		    : "cc");						\
-		__val;							\
+            __val;							\
 	})
 
 /*

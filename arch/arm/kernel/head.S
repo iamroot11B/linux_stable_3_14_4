@@ -490,10 +490,14 @@ __secondary_data:
  *  r9  = processor ID
  *  r13 = *virtual* address to jump to upon completion
  */
+/****************************************
+ *		2014/08/02 study start			*
+ ****************************************/
 __enable_mmu:
 #if defined(CONFIG_ALIGNMENT_TRAP) && __LINUX_ARM_ARCH__ < 6
 	orr	r0, r0, #CR_A
 #else
+	/*! Alignment abort disable */
 	bic	r0, r0, #CR_A
 #endif
 #ifdef CONFIG_CPU_DCACHE_DISABLE
@@ -506,11 +510,14 @@ __enable_mmu:
 	bic	r0, r0, #CR_I
 #endif
 #ifndef CONFIG_ARM_LPAE
+	/*! mmu 셋팅을 위한 도메인 설정 
+	 *  ARM 파란책 한글판 p.598 참고 */
 	mov	r5, #(domain_val(DOMAIN_USER, DOMAIN_MANAGER) | \
 		      domain_val(DOMAIN_KERNEL, DOMAIN_MANAGER) | \
 		      domain_val(DOMAIN_TABLE, DOMAIN_MANAGER) | \
 		      domain_val(DOMAIN_IO, DOMAIN_CLIENT))
 	mcr	p15, 0, r5, c3, c0, 0		@ load domain access register
+	/*! TTBR 설정(page table) */
 	mcr	p15, 0, r4, c2, c0, 0		@ load page table pointer
 #endif
 	b	__turn_mmu_on
@@ -533,6 +540,10 @@ ENDPROC(__enable_mmu)
 	.align	5
 	.pushsection	.idmap.text, "ax"
 ENTRY(__turn_mmu_on)
+	/*! mov r0 r0 한 이유? 
+	 *  러셀 킹 형님에게 질문 
+	 *  http://www.iamroot.org/xe/Kernel_8_ARM/58427
+	 *  */
 	mov	r0, r0
 	instr_sync
 	mcr	p15, 0, r0, c1, c0, 0		@ write control reg

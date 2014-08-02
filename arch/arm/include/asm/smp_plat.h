@@ -19,6 +19,8 @@ static inline bool is_smp(void)
 	return false;
 #elif defined(CONFIG_SMP_ON_UP)
 	extern unsigned int smp_on_up;
+    /*! !! = ! 두번 쓴것
+     * 결과를 bool(0, 1)로 반환, 그리고 코드 최적화 */
 	return !!smp_on_up;
 #else
 	return true;

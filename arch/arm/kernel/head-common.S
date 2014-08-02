@@ -82,8 +82,17 @@ ENDPROC(__vet_atags)
 	__INIT
 __mmap_switched:
 	adr	r3, __mmap_switched_data
-
+	
+/*! __mmap_switched_data:
+	.long	__data_loc			@ r4
+	.long	_sdata				@ r5
+	.long	__bss_start			@ r6
+	.long	_end				@ r7
+*/
 	ldmia	r3!, {r4, r5, r6, r7}
+	/*!XIP가 설정되어 있지 않다면 r4,r5 가 같으므로 아래 루프는 넘어간다. 
+	 * data_loc = 빌드되었을 때 바이너리에서의 데이터 섹션의 주소 
+	 * sdata = 메모리에 로드되었을 때 메모리의 주소 */
 	cmp	r4, r5				@ Copy data segment if needed
 1:	cmpne	r5, r6
 	ldrne	fp, [r4], #4
@@ -94,7 +103,18 @@ __mmap_switched:
 1:	cmp	r6, r7
 	strcc	fp, [r6],#4
 	bcc	1b
-
+/*!
+	.long	processor_id			@ r4
+	.long	__machine_arch_type		@ r5
+	.long	__atags_pointer			@ r6
+#ifdef CONFIG_CPU_CP15
+	.long	cr_alignment			@ r7
+#else
+	.long	0				@ r7
+#endif
+	.long	init_thread_union + THREAD_START_SP @ sp
+	.size	__mmap_switched_data, . - __mmap_switched_data
+*/
  ARM(	ldmia	r3, {r4, r5, r6, r7, sp})
  THUMB(	ldmia	r3, {r4, r5, r6, r7}	)
  THUMB(	ldr	sp, [r3, #16]		)
@@ -102,8 +122,10 @@ __mmap_switched:
 	str	r1, [r5]			@ Save machine type
 	str	r2, [r6]			@ Save atags pointer
 	cmp	r7, #0
+	/*! CP15일 때 실행 */
 	bicne	r4, r0, #CR_A			@ Clear 'A' bit
 	stmneia	r7, {r0, r4}			@ Save control register values
+	/*!*/
 	b	start_kernel
 ENDPROC(__mmap_switched)
 

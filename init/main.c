@@ -476,6 +476,10 @@ static void __init mm_init(void)
 	vmalloc_init();
 }
 
+/*! __init : 초기화 과정에서 사용 
+ * __cold : 잘 불리는 함수나 잘 안불리 함수의 구분
+ * notrace : no_instrument_function 속성을 지정해주는 매크로입니다. 
+ * http://www.iamroot.org/xe/index.php?mid=FreeBoard&document_srl=218773&act=dispBoardReplyComment&comment_srl=219033 */
 asmlinkage void __init start_kernel(void)
 {
 	char * command_line;
@@ -485,7 +489,19 @@ asmlinkage void __init start_kernel(void)
 	 * Need to run as early as possible, to initialize the
 	 * lockdep hash:
 	 */
+	/*! http://studyfoss.egloos.com/5342153 
+	 * CONFIG_LOCKDEP 는 현재 셋팅 안되있음 */
+	/*!do while(0) 의 이유
+	 * http://kernelnewbies.org/FAQ/DoWhile0
+	 * https://kldp.org/node/45597
+	 */
 	lockdep_init();
+	/*! weak 애트리뷰트가 지정되지 않은 smp_setup_processor_id( ) 함수가 존재한다면 수
+	 * 행되지 않는 함수다.
+	 */
+/****************************************
+ *	2014/08/02  study end
+ **************************************/
 	smp_setup_processor_id();
 	debug_objects_early_init();
 
