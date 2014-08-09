@@ -83,12 +83,18 @@ extern unsigned int processor_id;
  * asm ( code : output operand list : input operand list : clobber list );  
  * clobber list: clobber는 asm를 실행 시, 값이 변하는 것을 적어준다.
  * http://codecat.tistory.com/entry/%EC%9D%B8%EB%9D%BC%EC%9D%B8-%EC%96%B4%EC%85%88%EB%B8%94%EB%A6%AC
+ * "cc" 는 condition code 의 줄임말입니다.
+ *     "CC는 cpu status flags 의 수정이 발생되는 명령어(ex. adds, strex)가 있을경우 clobbered list 에 “cc” 를 명시하며,
+ *      memory 의 내용을 수정하는 명령이 있을경우(ex. str) clobbered list 에 “memory”를 명시한다."
+ *      CPUID_MPIDR 의 경우 "cc" 영향력 없음.  
+ *      http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html#ss5.3
  */
+
 #ifdef CONFIG_CPU_CP15
 #define read_cpuid(reg)							\
 	({								\
 		unsigned int __val;					\
-     asm("mrc	p15, 0, %0, c0, c0, " __stringify(reg)	\
+        asm("mrc	p15, 0, %0, c0, c0, " __stringify(reg)	\
 		    : "=r" (__val)					\
 		    :							\
 		    : "cc");						\

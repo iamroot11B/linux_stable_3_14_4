@@ -1006,10 +1006,11 @@ static inline void debug_objects_selftest(void) { }
 void __init debug_objects_early_init(void)
 {
 	int i;
-
+    /*! ODEBUG_HASH_SIZE = 0x4000(16384)  */
 	for (i = 0; i < ODEBUG_HASH_SIZE; i++)
 		raw_spin_lock_init(&obj_hash[i].lock);
-
+    /*! ODEBUG_POOL_SIZE = 512  */
+    /*! obj_static_pool 구조체 초기화  */
 	for (i = 0; i < ODEBUG_POOL_SIZE; i++)
 		hlist_add_head(&obj_static_pool[i].node, &obj_pool);
 }

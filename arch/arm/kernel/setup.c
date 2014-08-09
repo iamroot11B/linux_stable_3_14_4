@@ -465,15 +465,37 @@ void notrace cpu_init(void)
 #endif
 }
 
+/*! ex) array[3] = { [0 ... 2] = 1}; -> 0 ~ 2 배열을 모두 1로 초기화
+ *  http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Designated-Inits.html  
+ *  CONFIG_NR_CPUS=8 (exynos_defconfig)
+ *  MPIDR_INVALID = 0xFF000000
+ */
 u32 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = MPIDR_INVALID };
 
 void __init smp_setup_processor_id(void)
 {
 	int i;
+    /*! is_smp = 1 */
+    /*! MPIDR_HWID_BITMASK = 하위 24bit 만 체크.  */
 	u32 mpidr = is_smp() ? read_cpuid_mpidr() & MPIDR_HWID_BITMASK : 0;
+    /*! mpidr 레지스터에서 CPU ID Read.(0x0, 0x01, 0x02, 0x03 중 하나)  */
 	u32 cpu = MPIDR_AFFINITY_LEVEL(mpidr, 0);
 
+    /*! __cpu_logical_map[0] = cpu   
+     * 현재 core(boot core) 의 CPU ID
+     */
 	cpu_logical_map(0) = cpu;
+    /*! nr_cpu_ids = 8  */
+    /*! example. 아래 for 문의 결과로 변경된 cpu_logical_map 배열 값
+     * ( cpu_logical_map 가 4 배열일때의 예)
+     * 그림 1)
+     *         0   1   2   3
+     *       +---------------+
+     *       |   |   |   |   |
+     *       +---------------+
+     * cpu=0  [ 0  1  2  3]
+     * cpu=2  [ 2  1  0  3]  
+     */
 	for (i = 1; i < nr_cpu_ids; ++i)
 		cpu_logical_map(i) = i == cpu ? 0 : i;
 
@@ -482,6 +504,9 @@ void __init smp_setup_processor_id(void)
 	 * using percpu variable early, for example, lockdep will
 	 * access percpu variable inside lock_release
 	 */
+    /*! 현재 쓰지 않는 TPIDRPRW 레지스터를 percpu 용도로 사용 
+     * 그림 1 참조 cpu_logical_map에서 자신의 index를 offset으로 설정(?) 
+     */
 	set_my_cpu_offset(0);
 
 	pr_info("Booting Linux on physical CPU 0x%x\n", mpidr);

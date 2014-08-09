@@ -477,6 +477,7 @@ static int __init maxcpus(char *str)
 early_param("maxcpus", maxcpus);
 
 /* Setup number of possible processor ids */
+/*! __read_mostly를 사용한 data는 cache에 올라간다.  */
 int nr_cpu_ids __read_mostly = NR_CPUS;
 EXPORT_SYMBOL(nr_cpu_ids);
 

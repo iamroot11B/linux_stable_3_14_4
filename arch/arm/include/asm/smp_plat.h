@@ -55,6 +55,8 @@ static inline int cache_ops_need_broadcast(void)
 /*
  * Logical CPU mapping.
  */
+
+/*! __cpu_logical_map[] -> arch/arm/kernel/setup.c로 돌아가면 있음  */
 extern u32 __cpu_logical_map[];
 #define cpu_logical_map(cpu)	__cpu_logical_map[cpu]
 /*
