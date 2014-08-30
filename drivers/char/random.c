@@ -1088,6 +1088,7 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
 
 	/* if last_data isn't primed, we need EXTRACT_SIZE extra bytes */
 	if (fips_enabled) {
+		/*!  */
 		spin_lock_irqsave(&r->lock, flags);
 		if (!r->last_data_init) {
 			r->last_data_init = 1;

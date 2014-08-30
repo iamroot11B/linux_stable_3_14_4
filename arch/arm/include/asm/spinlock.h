@@ -62,6 +62,13 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 	arch_spinlock_t lockval;
 
 	prefetchw(&lock->slock);
+    /*!
+     * = 쓰기 전용, r = 레지스터
+     * & = 
+     * I = 데이터 프로세싱 명령에서 유효한 immediate 정수 값 오퍼랜드. 0에서 255사이의 2의 배수 값을 나타낸다.
+     * http://www.joinc.co.kr/modules/moniwiki/wiki.php/Site/Embedded/Documents/LinuxKernelStudyForSystemenginer/app3.basic.html
+     * 
+     */
 	__asm__ __volatile__(
 "1:	ldrex	%0, [%3]\n"
 "	add	%1, %0, %4\n"
@@ -72,11 +79,18 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 	: "r" (&lock->slock), "I" (1 << TICKET_SHIFT)
 	: "cc");
 
+    /*! spining */
 	while (lockval.tickets.next != lockval.tickets.owner) {
-		wfe();
+		/*!
+         * wfe() 이벤트 대기, spin_lock의 경우 sev 신호를 기다림
+         * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0204ik/Cjafcggi.html */
+        wfe();
+        /*! 
+         * spin_lock.h dsb_sev()
+         */
 		lockval.tickets.owner = ACCESS_ONCE(lock->tickets.owner);
 	}
-
+    /*! 배리어 */
 	smp_mb();
 }
 
@@ -108,6 +122,7 @@ static inline int arch_spin_trylock(arch_spinlock_t *lock)
 
 static inline void arch_spin_unlock(arch_spinlock_t *lock)
 {
+    /*! 메모리 배리어 */
 	smp_mb();
 	lock->tickets.owner++;
 	dsb_sev();

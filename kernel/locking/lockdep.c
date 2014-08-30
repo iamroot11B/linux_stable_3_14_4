@@ -3042,6 +3042,16 @@ static int __lock_is_held(struct lockdep_map *lock);
  * This gets called for every mutex_lock*()/spin_lock*() operation.
  * We maintain the dependency maps and validate the locking attempt:
  */
+/*!
+ *해당 lock에 대한 class가 등록되지 않았다면 이를 등록
+ lock class의 ops 필드 값 증가
+ 현재 프로세스(current)의 lockdep_depth 필드 값 증가
+ 해당 lockdep_depth 위치에 held_lock 구조체 정보 기록
+ lock class에 interrupt context에 따른 접근 정보 갱신
+ 현재 접근한 lock을 이용하여 lock_chain 구성 (추가 갱신)
+ 새로 생성된 chain인 경우 현재 접근한 lock에 대한 dead-lock 조건 검사
+ 문제가 없다면 lock class의 의존성 목록에 추가
+ */
 static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
 			  int trylock, int read, int check, int hardirqs_off,
 			  struct lockdep_map *nest_lock, unsigned long ip,
@@ -3586,6 +3596,10 @@ EXPORT_SYMBOL_GPL(lock_set_class);
  * We are not always called with irqs disabled - do that here,
  * and also avoid lockdep recursion:
  */
+
+ /*!
+  * #define lock_acquire_exclusive(l, s, t, n, i)		lock_acquire(l, s, t, 0, 2, n, i)
+  */
 void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
 			  int trylock, int read, int check,
 			  struct lockdep_map *nest_lock, unsigned long ip)
@@ -3600,6 +3614,7 @@ void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
 
 	current->lockdep_recursion = 1;
 	trace_lock_acquire(lock, subclass, trylock, read, check, nest_lock, ip);
+	/*! lock 과정 및 아래 acquire 동작 설명: http://studyfoss.egloos.com/viewer/5342153 */
 	__lock_acquire(lock, subclass, trylock, read, check,
 		       irqs_disabled_flags(flags), nest_lock, ip, 0);
 	current->lockdep_recursion = 0;
