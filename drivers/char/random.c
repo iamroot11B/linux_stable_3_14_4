@@ -1186,6 +1186,9 @@ void get_random_bytes(void *buf, int nbytes)
 	/*!
 	 * 함수 이름 앞에 trace가 붙으면 디버깅 용도로 쓰이는 듯함
 	 */
+	/*!
+	 * nonblocking_pool을 통해 랜던값 획득
+	 */
 	trace_get_random_bytes(nbytes, _RET_IP_);
 	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
 }

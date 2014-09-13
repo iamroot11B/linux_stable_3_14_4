@@ -512,10 +512,18 @@ asmlinkage void __init start_kernel(void)
 	 * Set up the the initial canary ASAP:
 	 */
 	boot_init_stack_canary();
-
+	/*
+	 * cgroup 소개 및 구성 방법: https://access.redhat.com/documentation/ko-KR/Red_Hat_Enterprise_Linux/6/html/Resource_Management_Guide/ch01.html
+	 * cgroups wiki: http://en.wikipedia.org/wiki/cgroups
+	 * systemd 소개 및 토론: https://kldp.org/node/141175(cgroup을 사용한 초기화 데몬, 현재 많은 리눅스에서 채택 중)
+	 * 11차 A조 cgroup 링크(18차): http://www.iamroot.org/xe/FreeBoard/223244
+	 */
 	cgroup_init_early();
 
 	local_irq_disable();
+	/*! early = 순서 상 init 보다 앞설 경우
+	 * 
+	 */
 	early_boot_irqs_disabled = true;
 
 /*

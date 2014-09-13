@@ -4756,13 +4756,28 @@ int __init cgroup_init_early(void)
 	struct cgroup_subsys *ss;
 	int i;
 
+	/*! (1)
+	 * init_css_set을 초기화 하고 refcount를 1 로 설정한다.
+	 */
+	/*!
+	 * #define atomic_set(v,i)	(((v)->counter) = (i))
+	 * atomic_set패치 이유(ldrex -> str로 바뀐 이유): http://www.iamroot.org/xe/FreeBoard/223244#comment_225762
+	 *   http://www.iamroot.org/xe/Kernel_8_ARM/66152
+	 * RCU: http://www.makelinux.net/ldd3/chp-5-sect-7#chp-5-sect-7.5
+	 * pprev이유: http://stackoverflow.com/questions/3058592/use-of-double-pointer-in-linux-kernel-hash-list-implementation
+	 */
 	atomic_set(&init_css_set.refcount, 1);
 	INIT_LIST_HEAD(&init_css_set.cgrp_links);
 	INIT_LIST_HEAD(&init_css_set.tasks);
 	INIT_HLIST_NODE(&init_css_set.hlist);
 	css_set_count = 1;
+	/*! (1) */
+	/*! (2)
+	 * cgroupfs_root 구조체 변수인 rootnode를 초기화한다.
+	 */
 	init_cgroup_root(&cgroup_dummy_root);
 	cgroup_root_count = 1;
+	/*! (2) */
 	RCU_INIT_POINTER(init_task.cgroups, &init_css_set);
 
 	init_cgrp_cset_link.cset = &init_css_set;
