@@ -116,10 +116,27 @@ static inline void prefetch(const void *ptr)
 #define ARCH_HAS_PREFETCHW
 static inline void prefetchw(const void *ptr)
 {
+    /*! 
+     * .arch_extension mp
+     *       "9998:  pldw	\t%a0 \n"                      \
+     *       "   .pushsection \".alt.smp.init\", \"a\"\n"        \
+     *       "   .long   9998b\n"                    \
+     *       "    pld		\t%a0 \n"                       \
+     *       "   .popsection\n"
+     *
+     * pld - 프리로드 명령어
+     * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0204ik/CJADCFDC.html
+     *
+     * __arm__ 
+     * %a0 ~ %a4 - r0~ r4매칭
+     * http://bel.gsi.de/scripts/gnu-arm-assy-quick-ref.pdf
+     * http://www.nongnu.org/avr-libc/user-manual/inline_asm.html
+     * "p" (ptr) = p옵션, ptr이 주소값임을 알려줌
+     */
 	__asm__ __volatile__(
 		".arch_extension	mp\n"
 		__ALT_SMP_ASM(
-			WASM(pldw)		"\t%a0",
+			WASM(pldw)		"\t%a0",  
 			WASM(pld)		"\t%a0"
 		)
 		:: "p" (ptr));

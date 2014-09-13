@@ -250,6 +250,7 @@ struct held_lock {
 	 */
 	unsigned int irq_context:2; /* bit 0 - soft, bit 1 - hard */
 	unsigned int trylock:1;						/* 16 bits */
+                                                /*! class_idx ~ trylock = 16bits */
 
 	unsigned int read:2;        /* see lock_acquire() comment */
 	unsigned int check:2;       /* see lock_acquire() comment */
