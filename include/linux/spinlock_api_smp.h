@@ -105,7 +105,15 @@ static inline unsigned long __raw_spin_lock_irqsave(raw_spinlock_t *lock)
 {
 	unsigned long flags;
 
+	/*!
+	 * cpsr을 flags에 저장하고 IRQ disable
+	 */
 	local_irq_save(flags);
+	/*!
+	 * 스케줄링을 안하도록 함
+	 * thread_info 구조체의 preempt_count를 1증가시키고
+	 * barrier()로 컴파일러가 실행순서를 변경하지 못하돌고 함
+	 */
 	preempt_disable();
 	spin_acquire(&lock->dep_map, 0, 0, _RET_IP_);
 	/*

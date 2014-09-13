@@ -102,10 +102,22 @@ struct thread_info {
 /*
  * how to get the thread information struct from C
  */
+/*!  
+ * __attribute_const__ 해당 함수를 const로 선언하면 함수의 리턴값은 전역 변수를 사용하지 않고,
+ * 함수 내의 변수만 사용하여 결과를 내기 때문에 이 함수는 결과 값이 항상 같을 것이므로
+ * 이 함수를 계속 call하지 않고 처음 call되었을 때의 함수의 결과를 캐싱해놓고 캐시에서 불러와서 사용함으로써
+ * 성능을 최적화할 수 있음
+ */
 static inline struct thread_info *current_thread_info(void) __attribute_const__;
 
 static inline struct thread_info *current_thread_info(void)
 {
+	/*!
+	 * sp변수가 stact pointer 역활을 하게 됨
+	 * https://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Global-Reg-Vars.html
+	 * 스택 포인터 시작 위치가 8k로 align되있으므로 하위 13비트를 클리어하면 thread_info 시작 위치를 얻을 수 있음
+	 * https://jon.oberheide.org/blog/2010/11/29/exploiting-stack-overflows-in-the-linux-kernel/
+	 */
 	register unsigned long sp asm ("sp");
 	return (struct thread_info *)(sp & ~(THREAD_SIZE - 1));
 }

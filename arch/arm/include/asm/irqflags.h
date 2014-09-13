@@ -19,7 +19,10 @@
 #endif
 
 #if __LINUX_ARM_ARCH__ >= 6
-
+/*!
+ * cpsr값을 사용하지 않는 레지스터에 할당하여 flags 변수에 저장하고 IRQ disable
+ * cpsid i -> irq disable (i비트를 disable)
+ */
 static inline unsigned long arch_local_irq_save(void)
 {
 	unsigned long flags;

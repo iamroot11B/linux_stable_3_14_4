@@ -35,6 +35,9 @@ extern void preempt_count_sub(int val);
 
 #ifdef CONFIG_PREEMPT_COUNT
 
+/*! 
+ * http://studyfoss.egloos.com/5128961
+ */ 
 #define preempt_disable() \
 do { \
 	preempt_count_inc(); \

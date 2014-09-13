@@ -28,6 +28,9 @@ static __always_inline void boot_init_stack_canary(void)
 	unsigned long canary;
 
 	/* Try to get a semi random initial value. */
+	/*!
+	 * random한 값을 얻어옴
+	 */
 	get_random_bytes(&canary, sizeof(canary));
 	canary ^= LINUX_VERSION_CODE;
 

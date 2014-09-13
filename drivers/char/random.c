@@ -1180,8 +1180,11 @@ void get_random_bytes(void *buf, int nbytes)
 		printk(KERN_NOTICE "random: %pF get_random_bytes called "
 		       "with %d bits of entropy available\n",
 		       (void *) _RET_IP_,
-		       nonblocking_pool.entropy_total);
+			   nonblocking_pool.entropy_total);
 #endif
+	/*!
+	 * 함수 이름 앞에 trace가 붙으면 디버깅 용도로 쓰이는 듯함
+	 */
 	trace_get_random_bytes(nbytes, _RET_IP_);
 	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
 }
