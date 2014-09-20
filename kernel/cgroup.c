@@ -128,6 +128,10 @@ static struct workqueue_struct *cgroup_pidlist_destroy_wq;
  */
 #define SUBSYS(_x) [_x ## _subsys_id] = &_x ## _subsys,
 #define IS_SUBSYS_ENABLED(option) IS_BUILTIN(option)
+/*!
+ * 배열 초기화 문법
+ * struct footype *foo[foo_no] = { [0] = &foo1, [1] = &foo2, ...};
+ */
 static struct cgroup_subsys *cgroup_subsys[CGROUP_SUBSYS_COUNT] = {
 #include <linux/cgroup_subsys.h>
 };
@@ -1363,7 +1367,19 @@ static void init_cgroup_root(struct cgroupfs_root *root)
 	INIT_LIST_HEAD(&root->root_list);
 	root->number_of_cgroups = 1;
 	cgrp->root = root;
+
+	/*!
+	 * RCU(Read Copy Update)
+	 * 기존 락과는 다르게 읽기 쓰기를 동시에 할 수 있도록 하는 동기화 메커니즘
+	 * 모기향 p.322
+	 */
+	/*! cgrp->name = RCU_INITIALIZER(&root_cgroup_name)
+	 *               포인터 타입으로 타입 캐스팅(root_cgroup_name)
+	 */
 	RCU_INIT_POINTER(cgrp->name, &root_cgroup_name);
+	/*!
+	 * cgroup을 초기화하고 dummy_css.cgroup 에 넣음
+	 */
 	init_cgroup_housekeeping(cgrp);
 	idr_init(&root->cgroup_idr);
 }
@@ -4765,6 +4781,9 @@ int __init cgroup_init_early(void)
 	 *   http://www.iamroot.org/xe/Kernel_8_ARM/66152
 	 * RCU: http://www.makelinux.net/ldd3/chp-5-sect-7#chp-5-sect-7.5
 	 * pprev이유: http://stackoverflow.com/questions/3058592/use-of-double-pointer-in-linux-kernel-hash-list-implementation
+	 * 만약 하나 이상의 cgroup에 속하게 된다면 태스크가 속한
+	 * cgroup과 관련된 cgroup_subsys_state 개수도 늘어나게 된다.
+	 * (css_set은 tast에 귀속)
 	 */
 	atomic_set(&init_css_set.refcount, 1);
 	INIT_LIST_HEAD(&init_css_set.cgrp_links);
@@ -4773,14 +4792,22 @@ int __init cgroup_init_early(void)
 	css_set_count = 1;
 	/*! (1) */
 	/*! (2)
-	 * cgroupfs_root 구조체 변수인 rootnode를 초기화한다.
+	 * cgroupfs_root 구조체 변수인 rootnode(cgroup_dummy_root)를 초기화한다.
+	 * cgroup_dummy_root = 초기화 되지 않은 cgroupfs_root 변수 
 	 */
 	init_cgroup_root(&cgroup_dummy_root);
 	cgroup_root_count = 1;
 	/*! (2) */
+	/*! (3) 
+	 * initcss set을 init 태스크의 css_set으로 지정한다.
+	 * 태스크의 css_set을 cgroup과 연결.
+	 */
 	RCU_INIT_POINTER(init_task.cgroups, &init_css_set);
 
+	/*! static struct cgrp_cset_link init_cgrp_cset_link; */
 	init_cgrp_cset_link.cset = &init_css_set;
+	/*! static struct cgroup * const cgroup_dummy_top = &cgroup_dummy_root.top_cgroup; */
+	/*! init 태스크가 사용하는 css_set을 cgroup 에 연결하는 일을 수행한다 */
 	init_cgrp_cset_link.cgrp = cgroup_dummy_top;
 	list_add(&init_cgrp_cset_link.cset_link, &cgroup_dummy_top->cset_links);
 	list_add(&init_cgrp_cset_link.cgrp_link, &init_css_set.cgrp_links);

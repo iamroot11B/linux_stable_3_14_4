@@ -407,6 +407,10 @@ ww_mutex_set_context_fastpath(struct ww_mutex *lock,
 /*
  * Lock a mutex (possibly interruptible), slowpath:
  */
+/*!
+ * __mutex_lock_common(lock, TASK_UNINTERRUPTIBLE, 0,
+			    NULL, _RET_IP_, NULL, 0);
+ */
 static __always_inline int __sched
 __mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
 		    struct lockdep_map *nest_lock, unsigned long ip,

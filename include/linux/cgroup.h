@@ -49,6 +49,8 @@ extern int proc_cgroup_show(struct seq_file *, void *);
  */
 #define SUBSYS(_x) _x ## _subsys_id,
 enum cgroup_subsys_id {
+    /*! 디파인 퍼즐 
+     * 디파인을 잘 쓰는법 */
 #define IS_SUBSYS_ENABLED(option) IS_BUILTIN(option)
 #include <linux/cgroup_subsys.h>
 #undef IS_SUBSYS_ENABLED
