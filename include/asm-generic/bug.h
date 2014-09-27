@@ -45,6 +45,9 @@ struct bug_entry {
  * users don't need to reboot ASAP and can mostly shut down cleanly.
  */
 #ifndef HAVE_ARCH_BUG
+/*! __func__: c99 표준
+ *  __FUNC__: 이전 표준
+ */
 #define BUG() do { \
 	printk("BUG: failure at %s:%d/%s()!\n", __FILE__, __LINE__, __func__); \
 	panic("BUG!"); \

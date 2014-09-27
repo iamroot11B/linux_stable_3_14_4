@@ -6223,7 +6223,9 @@ out_kfree:
 
 	return ret;
 }
-
+/*!
+ * cft용 초기화 배열
+ */
 static struct cftype mem_cgroup_files[] = {
 	{
 		.name = "usage_in_bytes",
@@ -7271,7 +7273,9 @@ static void mem_cgroup_bind(struct cgroup_subsys_state *root_css)
 	if (cgroup_sane_behavior(root_css->cgroup))
 		mem_cgroup_from_css(root_css)->use_hierarchy = true;
 }
-
+/*! 
+ * subsystem 초기화용 구조체
+ */
 struct cgroup_subsys mem_cgroup_subsys = {
 	.name = "memory",
 	.subsys_id = mem_cgroup_subsys_id,

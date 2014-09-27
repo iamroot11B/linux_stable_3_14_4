@@ -85,7 +85,13 @@
  * breaks it.
  */
 #ifdef CONFIG_PROVE_RCU
+/*! mutex 구조체 생성과 동시에 초기화 */
 DEFINE_MUTEX(cgroup_mutex);
+/*! gpl 섹션에 mutex 구조체 변수 추가 
+ * http://blog.naver.com/dregon1312/40089773529
+ * extern 쉬운 설명: http://sfixer.tistory.com/entry/extern-%EC%84%A0%EC%96%B8%EC%97%90-%EB%8C%80%ED%95%9C-%EC%89%AC%EC%9A%B4%EC%84%A4%EB%AA%85
+ * 모듈은 같은 프로세스인가?: https://kldp.org/node/103647
+ */
 EXPORT_SYMBOL_GPL(cgroup_mutex);	/* only for lockdep */
 #else
 static DEFINE_MUTEX(cgroup_mutex);
@@ -131,6 +137,8 @@ static struct workqueue_struct *cgroup_pidlist_destroy_wq;
 /*!
  * 배열 초기화 문법
  * struct footype *foo[foo_no] = { [0] = &foo1, [1] = &foo2, ...};
+ * +ex. mm/memcontrol.c 를 같이 참조해야 함
+ *      -mem_cgroup_subsys 구조체 참고
  */
 static struct cgroup_subsys *cgroup_subsys[CGROUP_SUBSYS_COUNT] = {
 #include <linux/cgroup_subsys.h>
@@ -4540,6 +4548,11 @@ static void __init_or_module cgroup_init_cftsets(struct cgroup_subsys *ss)
 	if (ss->base_cftypes) {
 		struct cftype *cft;
 
+/*!
+ * cft++ 참고사항
+ * +ex. mm/memcontrol.c 를 같이 참조해야 함
+ *      -mem_cgroup_files 구조체 참고
+ */
 		for (cft = ss->base_cftypes; cft->name[0] != '\0'; cft++)
 			cft->ss = ss;
 
@@ -4557,6 +4570,7 @@ static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 	mutex_lock(&cgroup_mutex);
 
 	/* init base cftset */
+	/*! https://github.com/torvalds/linux/commit/ddbcc7e8e50aefe467c01cac3dec71f118cd8ac2#diff-54e26b6ddd83c1405f62e995526ed7c8R99 */
 	cgroup_init_cftsets(ss);
 
 	/* Create the top cgroup state for this subsystem */
@@ -4813,7 +4827,11 @@ int __init cgroup_init_early(void)
 	list_add(&init_cgrp_cset_link.cgrp_link, &init_css_set.cgrp_links);
 
 	/* at bootup time, we don't worry about modular subsystems */
+	/*! ss = subsystem
+	 *  i = 그냥 숫자
+	 */
 	for_each_builtin_subsys(ss, i) {
+		/*! subsystem 버그 확인 */
 		BUG_ON(!ss->name);
 		BUG_ON(strlen(ss->name) > MAX_CGROUP_TYPE_NAMELEN);
 		BUG_ON(!ss->css_alloc);
@@ -4823,7 +4841,7 @@ int __init cgroup_init_early(void)
 			       ss->name, ss->subsys_id);
 			BUG();
 		}
-
+		
 		if (ss->early_init)
 			cgroup_init_subsys(ss);
 	}

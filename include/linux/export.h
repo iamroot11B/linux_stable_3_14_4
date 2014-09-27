@@ -53,6 +53,13 @@ extern struct module __this_module;
 #endif
 
 /* For every exported symbol, place a struct in the __ksymtab section */
+/*!
+ * __used: 컴파일 시 최적화 금지
+ * __unused: 해당 부분을 쓰지 않아도 워닝메세지를 띄우지 않도록하는 매크로
+ * unused: 어트리뷰트 내에서 __attribute__( ~, unued)
+ * 참고 url: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0348bk/Cacbgief.html
+ * 참고 url: http://sunjinyang.wordpress.com/2006/01/20/using-gcc-extensions/
+ */ 
 #define __EXPORT_SYMBOL(sym, sec)				\
 	extern typeof(sym) sym;					\
 	__CRC_SYMBOL(sym, sec)					\

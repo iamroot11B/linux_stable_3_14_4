@@ -105,7 +105,9 @@ static inline void mutex_destroy(struct mutex *lock) {}
 #else
 # define __DEP_MAP_MUTEX_INITIALIZER(lockname)
 #endif
-
+/*!
+ * 뮤텍스 구조체(mutext_) 초기화
+ */
 #define __MUTEX_INITIALIZER(lockname) \
 		{ .count = ATOMIC_INIT(1) \
 		, .wait_lock = __SPIN_LOCK_UNLOCKED(lockname.wait_lock) \
