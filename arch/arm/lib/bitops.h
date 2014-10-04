@@ -1,10 +1,24 @@
 #include <asm/unwind.h>
 
 #if __LINUX_ARM_ARCH__ >= 6
+
+@! set_bit(CS_SCHED_LOAD_BALANCE, &cs->flags);
+@! unsigned long flags
+@! name = _set_bit
+@! instr = orr
 	.macro	bitop, name, instr
 ENTRY(	\name		)
+/*! 
+ * UNWIND : unwind table에 등록해서 exeption이
+ * 발생했을 때 backtrace할 수 있는 정보를 제공하는 듯 ???
+ * 참고1: http://sourceware.org/binutils/docs/as/ARM-Unwinding-Tutorial.html
+ * 참고2: https://wiki.linaro.org/KenWerner/Sandbox/libunwind#exception_index_table_entry
+ */
 UNWIND(	.fnstart	)
 	ands	ip, r1, #3
+    /*!
+     * strneb = str + not equal(ne) + 바이트(b) 저장
+     */
 	strneb	r1, [ip]		@ assert word-aligned
 	mov	r2, #1
 	and	r3, r0, #31		@ Get bit offset

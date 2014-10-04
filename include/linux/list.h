@@ -62,6 +62,8 @@ static inline void list_add(struct list_head *new, struct list_head *head)
 	__list_add(new, head, head->next);
 }
 
+/*! list_add 와 list_add_tail의 차이점
+ * 쉬운 stack queue 구현을 위해 */
 
 /**
  * list_add_tail - add a new entry
@@ -70,6 +72,9 @@ static inline void list_add(struct list_head *new, struct list_head *head)
  *
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
+ */
+/*!
+ * list_add_tail(&ss->base_cftset.node, &ss->cftsets);
  */
 static inline void list_add_tail(struct list_head *new, struct list_head *head)
 {

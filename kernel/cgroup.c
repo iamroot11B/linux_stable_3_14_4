@@ -4553,9 +4553,18 @@ static void __init_or_module cgroup_init_cftsets(struct cgroup_subsys *ss)
  * +ex. mm/memcontrol.c 를 같이 참조해야 함
  *      -mem_cgroup_files 구조체 참고
  */
+		/*! 
+		 * base_cftypes = cftype 배열 시작 주소
+		 * 
+		 * struct cftype *base_cftypes;
+		 * struct cftype_set base_cftset;
+		 */
 		for (cft = ss->base_cftypes; cft->name[0] != '\0'; cft++)
 			cft->ss = ss;
-
+		/*!  
+		 * struct cftype *cfts 
+		 * struct list_head cftsets
+		 */
 		ss->base_cftset.cfts = ss->base_cftypes;
 		list_add_tail(&ss->base_cftset.node, &ss->cftsets);
 	}
@@ -4570,7 +4579,10 @@ static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 	mutex_lock(&cgroup_mutex);
 
 	/* init base cftset */
-	/*! https://github.com/torvalds/linux/commit/ddbcc7e8e50aefe467c01cac3dec71f118cd8ac2#diff-54e26b6ddd83c1405f62e995526ed7c8R99 */
+	/*! https://github.com/torvalds/linux/commit/ddbcc7e8e50aefe467c01cac3dec71f118cd8ac2#diff-54e26b6ddd83c1405f62e995526ed7c8R99 
+	 * http://thread.gmane.org/gmane.linux.kernel.containers/22623
+	 */
+	
 	cgroup_init_cftsets(ss);
 
 	/* Create the top cgroup state for this subsystem */
@@ -4586,6 +4598,7 @@ static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 	 * init_css_set is in the subsystem's top cgroup. */
 	init_css_set.subsys[ss->subsys_id] = css;
 
+	/*! fork*/
 	need_forkexit_callback |= ss->fork || ss->exit;
 
 	/* At system boot, before all subsystems have been
@@ -4841,7 +4854,7 @@ int __init cgroup_init_early(void)
 			       ss->name, ss->subsys_id);
 			BUG();
 		}
-		
+		/*! subsystem 초기화 */
 		if (ss->early_init)
 			cgroup_init_subsys(ss);
 	}
@@ -5098,6 +5111,7 @@ void cgroup_post_fork(struct task_struct *child)
 	 * css_set; otherwise, @child might change state between ->fork()
 	 * and addition to css_set.
 	 */
+	/*! call ss->fork() */
 	if (need_forkexit_callback) {
 		/*
 		 * fork/exit callbacks are supported only for builtin

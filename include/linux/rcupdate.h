@@ -515,6 +515,12 @@ static inline void rcu_preempt_sleep_check(void)
 		rcu_dereference_sparse(p, space); \
 		((typeof(*p) __force __kernel *)(_________p1)); \
 	})
+/*! 
+ * 참고1: http://studyfoss.egloos.com/viewer/5375570 
+ * 참고2:http://www.quora.com/What-is-the-significance-of-__user-__kernel-__force-macros-for-ARM-platform 
+ */
+/*! typeof(*p) = 역참조 *
+ */
 #define __rcu_dereference_check(p, c, space) \
 	({ \
 		typeof(*p) *_________p1 = (typeof(*p)*__force )ACCESS_ONCE(p); \
@@ -645,6 +651,10 @@ static inline void rcu_preempt_sleep_check(void)
  * (and from merging fetches), and, more importantly, documents exactly
  * which pointers are protected by RCU and checks that the pointer is
  * annotated as __rcu.
+ */
+
+/*! return rcu_dereference_check(cgrp->subsys[ss->subsys_id],
+ * lockdep_is_held(&cgroup_mutex));
  */
 #define rcu_dereference_check(p, c) \
 	__rcu_dereference_check((p), rcu_read_lock_held() || (c), __rcu)

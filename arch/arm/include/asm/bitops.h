@@ -181,6 +181,7 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
 #define ATOMIC_BITOP(name,nr,p)			\
 	(__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
 #else
+/*! _set_bit */
 #define ATOMIC_BITOP(name,nr,p)		_##name(nr,p)
 #endif
 

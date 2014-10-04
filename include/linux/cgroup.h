@@ -622,7 +622,11 @@ struct cgroup_subsys {
 	struct list_head cftsets;
 
 	/* base cftypes, automatically [de]registered with subsys itself */
-	struct cftype *base_cftypes;
+	/*! 
+     * base_cftypes = cftype 배열 시작 주소
+     * 
+     */
+    struct cftype *base_cftypes;
 	struct cftype_set base_cftset;
 
 	/* should be defined only by modular subsystems */
