@@ -11,6 +11,10 @@
 #include <linux/bitmap.h>
 #include <linux/bug.h>
 
+/*!
+ * DECLARE_BITMAP(bits, NR_CPUS)
+ * => unsigned long bits[1]   (NR_CPUS=8일경우)
+ */
 typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
 
 /**
@@ -251,6 +255,9 @@ int cpumask_any_but(const struct cpumask *mask, unsigned int cpu);
  * cpumask_set_cpu - set a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
  * @dstp: the cpumask pointer
+ */
+/*!
+ * dstp의 cpu번째 비트를 셋
  */
 static inline void cpumask_set_cpu(unsigned int cpu, struct cpumask *dstp)
 {

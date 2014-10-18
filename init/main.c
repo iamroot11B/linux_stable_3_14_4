@@ -441,8 +441,26 @@ void __init parse_early_param(void)
 
 static void __init boot_cpu_init(void)
 {
+	/*!
+	 * 현재 태스크가 수행 중인 CPU 번호를 얻어옴
+	 */
 	int cpu = smp_processor_id();
 	/* Mark the boot cpu "present", "online" etc for SMP and UP case */
+	/*!
+	 * 얻어온 CPU에 대응하는 비트를 cpu_online_map, cpu_presenCmap, cpu_possible_map에 셋팅
+	 * 해당 맵들은 CPU에 대한 상태 정보를 유지하는 비트맵들이다.
+	 * online - online 상태이고, 스케쥴 되는 상태인 cpu 집합. present cpu 들 중 cpu_up() 호출되었을 때 추가됨.
+	 * possible - 시스템에 존재할 수 있는 cpu 집합. config 최대값 이하.
+	               boot time에 결정되어(per_cpu 변수 공간에 사용) static 하게 유지되고, 존재한다면 online 상태가 됨.
+	 * present - 현재 시스템에 존재하는 cpu 집합. possible의 부분집합이며, online 또는 offline 일 수 있음.
+	 * active - runqueue migration 등에 사용되는 cpu 집합.
+	 *
+	 * 핫플러그 참고: http://bonegineer.blogspot.kr/2014/01/cpu-onoff-cpu-hotplug.html
+	 * cpu map 참고: 모기향 p.144
+	 * 설명 참고: http://www.iamroot.org/xe/Kernel_9_ARM/172038
+	 * Documentation/cpu-hotplug.txt
+	 * Documentation/cputopology.txt
+	 */
 	set_cpu_online(cpu, true);
 	set_cpu_active(cpu, true);
 	set_cpu_present(cpu, true);
@@ -520,10 +538,13 @@ asmlinkage void __init start_kernel(void)
 	 */
 	cgroup_init_early();
 
-	local_irq_disable();
-	/*! early = 순서 상 init 보다 앞설 경우
-	 * 
+	/*!
+	 * 이전 상태플래그 저장하고 irq disable 
 	 */
+	/*! 
+	 * early = 순서 상 init 보다 앞설 경우
+	 */
+	local_irq_disable();
 	early_boot_irqs_disabled = true;
 
 /*
@@ -531,9 +552,20 @@ asmlinkage void __init start_kernel(void)
  * enable them
  */
 	boot_cpu_init();
+	/*!
+	 * highmem 초기화
+	 * zone 조사 필요
+	 */
 	page_address_init();
+	/*!
+	 * printk() - 수준을 맞추어줌
+	 * linux 버전, 컴파일러 등 정보 출력
+	 */
 	pr_notice("%s", linux_banner);
+	/*!
+	 */
 	setup_arch(&command_line);
+	
 	mm_init_owner(&init_mm, &init_task);
 	mm_init_cpumask(&init_mm);
 	setup_command_line(command_line);

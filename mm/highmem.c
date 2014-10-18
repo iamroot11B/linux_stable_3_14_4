@@ -415,6 +415,10 @@ void __init page_address_init(void)
 {
 	int i;
 
+	/*!
+	 * HIGHMEM 초기화 배열 크기는 128개
+	 * 펭귄책 HIGHMEM 검색
+	 */
 	for (i = 0; i < ARRAY_SIZE(page_address_htable); i++) {
 		INIT_LIST_HEAD(&page_address_htable[i].lh);
 		spin_lock_init(&page_address_htable[i].lock);

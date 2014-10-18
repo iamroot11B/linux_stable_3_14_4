@@ -587,6 +587,11 @@ static void __init setup_processor(void)
 	 * types.  The linker builds this table for us from the
 	 * entries in arch/arm/mm/proc-*.S
 	 */
+	/*!
+	 * arch/arm/kernel/head-common.S
+	 * 프로세서 proc_info_list 초기화
+	 * proc-v7.S의  __proc_info_begin 와 __proc_info_end 사이의 table entry 참고
+	 */
 	list = lookup_processor_type(read_cpuid_id());
 	if (!list) {
 		pr_err("CPU configuration botched (ID %08x), unable to continue.\n",
@@ -595,6 +600,7 @@ static void __init setup_processor(void)
 	}
 
 	cpu_name = list->cpu_name;
+	/*! cpuid를 읽어 아키텍처 번호 알려줌 */
 	__cpu_architecture = __get_cpu_architecture();
 
 #ifdef MULTI_CPU
@@ -614,22 +620,33 @@ static void __init setup_processor(void)
 		cpu_name, read_cpuid_id(), read_cpuid_id() & 15,
 		proc_arch[cpu_architecture()], cr_alignment);
 
+	/*! snprintf(버퍼, 버퍼사이즈, 포맷, ...) */
+	/*! init_utsname->macine에 아키텍처 이름과 엔디안 기록  */
 	snprintf(init_utsname()->machine, __NEW_UTS_LEN + 1, "%s%c",
 		 list->arch_name, ENDIANNESS);
+	/*! elf_platform 에 elf_name과 엔디안 기록 */
 	snprintf(elf_platform, ELF_PLATFORM_SIZE, "%s%c",
 		 list->elf_name, ENDIANNESS);
 	elf_hwcap = list->elf_hwcap;
 
+	/*!
+	 * hwcap(Hardware Capability)은 말 그대로 하드웨어 지원사항을 나타내는 것입니다.
+	 *
+	 * divider는 정수형 나눗셈을 지원하는 명령어로, 하드웨어적으로 divider를 지원하는 것인지 체크하는 것입니다.
+	 * 보통 하드웨어 divider는 10사이클 정도가 걸리며, 소프트웨어는 100사이클 이상 걸린다고 보면 됩니다.
+	 */
 	cpuid_init_hwcaps();
 
 #ifndef CONFIG_ARM_THUMB
 	elf_hwcap &= ~(HWCAP_THUMB | HWCAP_IDIVT);
 #endif
 
+	/*! 에러 처리 */
 	erratum_a15_798181_init();
-
+	/*! v6 관련 */
 	feat_v6_fixup();
 
+	/*! 캐쉬타입확인 후 출력  */
 	cacheid_init();
 	cpu_init();
 }
