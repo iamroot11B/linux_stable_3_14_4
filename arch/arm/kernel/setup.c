@@ -590,7 +590,7 @@ static void __init setup_processor(void)
 	/*!
 	 * arch/arm/kernel/head-common.S
 	 * 프로세서 proc_info_list 초기화
-	 * proc-v7.S의  __proc_info_begin 와 __proc_info_end 사이의 table entry 참고
+	 * arch/arm/mm/proc-v7.S의  __proc_info_begin 와 __proc_info_end 사이의 table entry 참고
 	 */
 	list = lookup_processor_type(read_cpuid_id());
 	if (!list) {
@@ -643,7 +643,7 @@ static void __init setup_processor(void)
 
 	/*! 에러 처리 */
 	erratum_a15_798181_init();
-	/*! v6 관련 */
+	/*! v6 관련 에러 처리 */
 	feat_v6_fixup();
 
 	/*! 캐쉬타입확인 후 출력  */
@@ -920,8 +920,15 @@ void __init hyp_mode_check(void)
 void __init setup_arch(char **cmdline_p)
 {
 	const struct machine_desc *mdesc;
-
+	
+	/*! 
+	 * lookup_processor_type 으로 받아온 proc_info_list를 통해 구조체들 초기화 
+	 * cpu_name, processor, cpu_tlb, cpu_user, cpu_cache */
+	 */
 	setup_processor();
+	/*!
+	 *
+	 */
 	mdesc = setup_machine_fdt(__atags_pointer);
 	if (!mdesc)
 		mdesc = setup_machine_tags(__atags_pointer, __machine_arch_type);

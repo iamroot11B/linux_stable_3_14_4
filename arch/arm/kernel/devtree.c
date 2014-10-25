@@ -205,6 +205,9 @@ const struct machine_desc * __init setup_machine_fdt(unsigned int dt_phys)
 	mdesc_best = &__mach_desc_GENERIC_DT;
 #endif
 
+	/*!
+	 * early_init_dt_scan - dt에서 chosen, root, memory node 초기화
+	 */
 	if (!dt_phys || !early_init_dt_scan(phys_to_virt(dt_phys)))
 		return NULL;
 

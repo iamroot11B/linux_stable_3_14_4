@@ -453,6 +453,10 @@ int __init of_scan_flat_dt(int (*it)(unsigned long node,
 				     void *data),
 			   void *data)
 {
+	/*!
+	 * p = initial_boot_params + off_dt_struct
+	 * p = dt_struct 의 주소값
+	 */
 	unsigned long p = ((unsigned long)initial_boot_params) +
 		be32_to_cpu(initial_boot_params->off_dt_struct);
 	int rc = 0;
@@ -722,9 +726,16 @@ int __init early_init_dt_scan_root(unsigned long node, const char *uname,
 {
 	__be32 *prop;
 
+	/*! 
+	 * 루트 노드의 depth는 0
+	 */
 	if (depth != 0)
 		return 0;
 
+	/*!
+	 * init section에 선언 되어 있음.
+	 * 루트 사이즈와 주소의 기본값
+	 */
 	dt_root_size_cells = OF_ROOT_NODE_SIZE_CELLS_DEFAULT;
 	dt_root_addr_cells = OF_ROOT_NODE_ADDR_CELLS_DEFAULT;
 
@@ -771,6 +782,10 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 	} else if (strcmp(type, "memory") != 0)
 		return 0;
 
+	/*! 
+	 *
+	 * device mapping 참고: http://linuxfactory.or.kr/dokuwiki/doku.php?id=fdt#device_mapping
+	 */
 	reg = of_get_flat_dt_prop(node, "linux,usable-memory", &l);
 	if (reg == NULL)
 		reg = of_get_flat_dt_prop(node, "reg", &l);
@@ -782,6 +797,17 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 	pr_debug("memory scan node %s, reg size %ld, data: %x %x %x %x,\n",
 	    uname, l, reg[0], reg[1], reg[2], reg[3]);
 
+	/*!
+	 * dt_mem_next_cell
+	 * if address cell = 2자리, size cell = 1 
+	 * reg = 1111 2222 4444 1111 2222 4444
+	 *       --------- ---- --------- ----
+	 *        address  size  address  size
+	 *
+	 * value   = 0x12345678
+	 * little  = 0x78 56 34 12
+	 * big     = 0x12 34 56 78
+	 */
 	while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {
 		u64 base, size;
 
@@ -880,12 +906,31 @@ bool __init early_init_dt_scan(void *params)
 		return false;
 	}
 
+	/*! 
+	 * 오픈 펌웨어(of): http://ko.wikipedia.org/wiki/%EC%98%A4%ED%94%88_%ED%8E%8C%EC%9B%A8%EC%96%B4
+	 * 디바이스 트리 작성법
+	 * 디바이스 트리 사용법 영문: http://www.devicetree.org/Device_Tree_Usage
+	 * 디바이스 트리 사용법 3편 한글: http://forum.falinux.com/zbxe/index.php?document_srl=784693&mid=lecture_tip
+	 */
+	/*!
+	 * of_scan_flat_dt : dt의 노드  스캔, 뒤에 콜백 함수를 통해 찾은 노드에 작업 수행
+	 * 참고: http://devicetree.org/Linux 
+	 */
 	/* Retrieve various information from the /chosen node */
 	of_scan_flat_dt(early_init_dt_scan_chosen, boot_command_line);
-
+	/*!
+	 * 셀(cell) 	
+	 * 주소나 길이를 나타내기 위해서는 32비트 정수값을 사용합니다. 			
+	 * 예를 들면 0x12345678 또는 0 처럼 표현할 수 있습니다. 
+	 * 이런 값 하나를 셀이라고 합니다. 
+	 * 디바이스 트리 사용법 2편: http://forum.falinux.com/zbxe/index.php?document_srl=784583&mid=lecture_tip
+	 */
 	/* Initialize {size,address}-cells info */
 	of_scan_flat_dt(early_init_dt_scan_root, NULL);
 
+	/*!
+	 * bank
+	 */
 	/* Setup memory, calling early_init_dt_add_memory_arch */
 	of_scan_flat_dt(early_init_dt_scan_memory, NULL);
 
