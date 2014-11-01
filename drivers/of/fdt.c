@@ -772,6 +772,7 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 	unsigned long l;
 
 	/* We are scanning "memory" nodes only */
+	/*! memory 노드만 확인 */
 	if (type == NULL) {
 		/*
 		 * The longtrail doesn't have a device_type on the
@@ -783,6 +784,12 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 		return 0;
 
 	/*! 
+	 * Device mapping
+	 *
+	 * 각 디바이스는 전체 시스템의 메모리영역의 일정 부분에 unique하게 할당되어 있고, 
+	 * 동일한 동작을 하는 디바이스라고 하더라도 주소영역을 통해서 각각의 기능을 독립적으로 수행할 수 있다.
+	 * 이러한 디바이스가 할당되어 있는 메모리 영역을 명시하기 위해서 특정 property를 사용하게 되는데, 
+	 * 이 때 사용되는 property는 reg이며 아래의 형식을 갖는다.
 	 *
 	 * device mapping 참고: http://linuxfactory.or.kr/dokuwiki/doku.php?id=fdt#device_mapping
 	 */

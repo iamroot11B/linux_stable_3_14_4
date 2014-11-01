@@ -130,6 +130,9 @@ struct stack {
 	u32 abt[3];
 	u32 und[3];
 } ____cacheline_aligned;
+/*! 
+ * L1캐쉬 크기에 맞게 구조체 정렬
+ * #define ____cacheline_aligned __ attribute _ ( C_aligned _ (SMP_CACHE_BYTES))) */
 
 #ifndef CONFIG_CPU_V7M
 static struct stack stacks[NR_CPUS];
@@ -409,10 +412,25 @@ static void __init feat_v6_fixup(void)
  *
  * cpu_init sets up the per-CPU stacks.
  */
+/*!
+ * notrace
+ * no_instrument_function 으로 지정, 프로파일링에서 제외한다. 프로파일용 툴인 gprof를 통해 프로파일링 가능.
+ * notrace 참고 : http://www.iamroot.org/xe/index.php?_filter=search&mid=FreeBoard&search_keyword=%EA%B5%AC%EB%A6%84%EA%B3%BC%EB%B9%84&search_target=nick_name&document_srl=218773
+ * finstrument-functions 참고: https://gcc.gnu.org/onlinedocs/gcc-4.5.1/gcc/Code-Gen-Options.html#index-finstrument_002dfunctions-2114
+ * 프로파일링 예제: http://balau82.wordpress.com/2010/10/06/trace-and-profile-function-calls-with-gcc/
+ */
 void notrace cpu_init(void)
 {
 #ifndef CONFIG_CPU_V7M
+	/*!
+	 * 사용중인 프로세서 id를 받아와서 stack 설정.
+	 * NR_CPUS = 시스템이 지원할 수 있는 최대 CPU 개수
+	 */
 	unsigned int cpu = smp_processor_id();
+	/*!
+	 * cpu 모드에 따른 stack의 구분
+	 * 참고: 모기향 p.167
+	 */
 	struct stack *stk = &stacks[cpu];
 
 	if (cpu >= NR_CPUS) {
@@ -424,8 +442,26 @@ void notrace cpu_init(void)
 	 * This only works on resume and secondary cores. For booting on the
 	 * boot cpu, smp_prepare_boot_cpu is called after percpu area setup.
 	 */
+	/*!
+	 * cpu번호를 기준으로 자신의 per_cpu_offset을 가져와 CP15 - TPIDRPRW 레지스터에 저장
+	 *  - per_cpu란?
+	 * cpu마다 가지는 데이터 공간으로 해당 공간을 사용하면 동기화를 위해 lock을 걸 필요가 없어져서
+	 * 성능향상을 가져올 수 있다.
+	 * 부팅 과정에서는 0으로 만들어져 있고, 추 후 다시 불러질 때 새롭게 cpu_offset을 설정한다.
+	 * 부팅과정에서는 조금 뒤 per_cpu_area 설정에서 per_cpu_offset을 새롭게 설정.
+	 * percpu 변수 참고: http://nix102guri.blog.me/90098904482
+	 * percpu 참고: http://thinkiii.blogspot.kr/2014/05/a-brief-introduction-to-per-cpu.html
+	 * percpu 참고: http://www.iamroot.org/xe/Kernel_10_ARM/184082
+	 * percpu 참고: http://studyfoss.egloos.com/5375570
+	 *
+	 */
 	set_my_cpu_offset(per_cpu_offset(cpu));
 
+	/*! 
+	 * #define cpu_proc_init	__glue(CPU_NAME,_proc_init)
+	 * -> cpu_v7_proc_init
+	 * mv pc, lr;
+	 */
 	cpu_proc_init();
 
 	/*
@@ -441,6 +477,23 @@ void notrace cpu_init(void)
 	/*
 	 * setup stacks for re-entrant exception handlers
 	 */
+	/*!
+	 * IRQ 모드일 때의 스택 포인터는 irq[O],
+	 * ABORT 모드일 때의 스택 포인터는 abt[O] , UND(undefined) 모드일 때의 스택 포인터는
+	 * und[O]으로 설정을 해주고， SVC 모드로 복귀한 다음에 반환된다.
+	 * 여기서 스택안의 모드별 스택이 3개만 선언된 이유는 모드별로 가지는 자신만의 레지스터가 3개이기 때문에
+	 * irq[3], abr[3], und[3]으로 잡혀있는 것 같습니다.
+	 * 뱅크 레지스터 그림 참고.
+	 */
+	/*! 
+	 * cpsr_c cpsr의 하위 8bit 
+	 ***
+	 * PLC의 차이: thumb모드일 경우 32비트의 상수값을 한번에 옮길 수 없기 때문에 r로 지정하여 두번에 나눠 넣어준다.
+	 ***
+	 * r = register로 대체할 필요가 있는 변수
+	 * I = 상수값들(thumb의 경우 16비트 상수만 가능)
+	 * cc = 값이 변하는 레지스터 명시
+	 */
 	__asm__ (
 	"msr	cpsr_c, %1\n\t"
 	"add	r14, %0, %2\n\t"
@@ -453,15 +506,15 @@ void notrace cpu_init(void)
 	"mov	sp, r14\n\t"
 	"msr	cpsr_c, %7"
 	    :
-	    : "r" (stk),
-	      PLC (PSR_F_BIT | PSR_I_BIT | IRQ_MODE),
-	      "I" (offsetof(struct stack, irq[0])),
-	      PLC (PSR_F_BIT | PSR_I_BIT | ABT_MODE),
-	      "I" (offsetof(struct stack, abt[0])),
-	      PLC (PSR_F_BIT | PSR_I_BIT | UND_MODE),
-	      "I" (offsetof(struct stack, und[0])),
-	      PLC (PSR_F_BIT | PSR_I_BIT | SVC_MODE)
-	    : "r14");
+	    : "r" (stk),				/*! %0 */
+	      PLC (PSR_F_BIT | PSR_I_BIT | IRQ_MODE),	/*! %1 */
+	      "I" (offsetof(struct stack, irq[0])),	/*! %2 */
+	      PLC (PSR_F_BIT | PSR_I_BIT | ABT_MODE),	/*! %3 */
+	      "I" (offsetof(struct stack, abt[0])),	/*! %4 */
+	      PLC (PSR_F_BIT | PSR_I_BIT | UND_MODE),	/*! %5 */
+	      "I" (offsetof(struct stack, und[0])),	/*! %6 */
+	      PLC (PSR_F_BIT | PSR_I_BIT | SVC_MODE)	/*! %7 */
+	    : "r14");					/* r14 ->lr */
 #endif
 }
 
@@ -648,6 +701,7 @@ static void __init setup_processor(void)
 
 	/*! 캐쉬타입확인 후 출력  */
 	cacheid_init();
+	/*! percpu 셋팅 및 각 모드에 맞는 스택 주소 설정 */
 	cpu_init();
 }
 
@@ -667,6 +721,14 @@ void __init dump_machine_table(void)
 
 int __init arm_add_memory(u64 start, u64 size)
 {
+	/*! 
+	 * bank: 접근 속도가 같은 메모리의 집합 
+	 * meminfo는 struct meminfo 타입의 전역 변수로, 메모리 초기화 함수에서 사용되는 설정 정보를 가지고 있다.
+	 * struct meminfo {
+	 *	int nr_banks;
+	 *	struct membank bank[NR_BANKS];
+	 * };
+	 */
 	struct membank *bank = &meminfo.bank[meminfo.nr_banks];
 	u64 aligned_start;
 
@@ -680,7 +742,30 @@ int __init arm_add_memory(u64 start, u64 size)
 	 * Ensure that start/size are aligned to a page boundary.
 	 * Size is appropriately rounded down, start is rounded up.
 	 */
+	/*!
+	 * #define PAGE_MASK (~((1 << PAGE_SHIFT) - 1))
+	 * PAGE_MASK = ~((1 << 12) - 1) = 0xffff_f000
+	 * size = size - start & 0x0000_0fff
+	 *  - start = base = dt_mem_next_cell(dt_root_addr_cells, &reg);
+	 *  - size = size = dt_mem_next_cell(dt_root_size_cells, &reg);
+	 * 
+	 * ex)
+	 */
 	size -= start & ~PAGE_MASK;
+	/*!
+	 * 0   4096     8k   12k 
+	 * |-----|--&&&-|-----|
+	 * PAGE_ALIGN -->
+	 * |-----|------|&&&--|
+	 *
+	 * #define PAGE_ALIGN(addr) ALIGN(addr, PAGE_SIZE) 
+	 * #define ALIGN(x, a) __ALIGN_KERNEL((x), (a))
+	 * #define __ALIGN_KERNEL(x, a)        __ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
+	 * #define __ALIGN_KERNEL_MASK(x, mask)    (((x) + (mask)) & ~(mask)) : 올림 연산
+	 * = (x + 0x0fff) & 0xf000
+	 *
+	 * 즉 4096 단위 얼라인
+	 */
 	aligned_start = PAGE_ALIGN(start);
 
 #ifndef CONFIG_ARCH_PHYS_ADDR_T_64BIT
@@ -923,11 +1008,11 @@ void __init setup_arch(char **cmdline_p)
 	
 	/*! 
 	 * lookup_processor_type 으로 받아온 proc_info_list를 통해 구조체들 초기화 
-	 * cpu_name, processor, cpu_tlb, cpu_user, cpu_cache */
+	 * cpu_name, processor, cpu_tlb, cpu_user, cpu_cache 
 	 */
 	setup_processor();
 	/*!
-	 *
+	 * fdt에서 chosen, root, memory 노드들 초기화
 	 */
 	mdesc = setup_machine_fdt(__atags_pointer);
 	if (!mdesc)
