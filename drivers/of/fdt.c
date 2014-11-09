@@ -511,6 +511,9 @@ unsigned long __init of_get_flat_dt_root(void)
 
 	while (be32_to_cpup((__be32 *)p) == OF_DT_NOP)
 		p += 4;
+	/*!
+	 * BUG_ON = 버그 발생 위치 출력 버그일 경우 커널 패닉 발생 
+	 */
 	BUG_ON(be32_to_cpup((__be32 *)p) != OF_DT_BEGIN_NODE);
 	p += 4;
 	return ALIGN(p + strlen((char *)p) + 1, 4);
@@ -642,10 +645,15 @@ const char * __init of_flat_dt_get_machine_name(void)
  * Iterate through machine match tables to find the best match for the machine
  * compatible string in the FDT.
  */
+/*!
+ * mdesc_best = NULL
+ * mdesc = of_flat_dt_match_machine(mdesc_best, arch_get_next_mach);
+ */
 const void * __init of_flat_dt_match_machine(const void *default_match,
 		const void * (*get_next_compat)(const char * const**))
 {
 	const void *data = NULL;
+	/*! best_data = NULL */
 	const void *best_data = default_match;
 	const char *const *compat;
 	unsigned long dt_root;
@@ -793,12 +801,20 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 	 *
 	 * device mapping 참고: http://linuxfactory.or.kr/dokuwiki/doku.php?id=fdt#device_mapping
 	 */
+	/*!
+	 * l = 프로퍼티의 길이
+	 * reg = 프로퍼티 시작 주소
+	 */
 	reg = of_get_flat_dt_prop(node, "linux,usable-memory", &l);
 	if (reg == NULL)
 		reg = of_get_flat_dt_prop(node, "reg", &l);
 	if (reg == NULL)
 		return 0;
 
+	/*!
+	 * 포인터 자료형으로 변환
+	 * endp = 프로퍼티의 끝주소
+	 */
 	endp = reg + (l / sizeof(__be32));
 
 	pr_debug("memory scan node %s, reg size %ld, data: %x %x %x %x,\n",
@@ -814,10 +830,23 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 	 * value   = 0x12345678
 	 * little  = 0x78 56 34 12
 	 * big     = 0x12 34 56 78
+	 ***
+	 * ex. exynos5420-smdk5420.dts
+	 *  19     memory {
+	 *  20         reg = <0x20000000 0x80000000>;
+	 *  21     };
+	 ***
+	 *  dt_root_size_cells = OF_ROOT_NODE_SIZE_CELLS_DEFAULT = 1;
+	 *  dt_root_addr_cells = OF_ROOT_NODE_ADDR_CELLS_DEFAULT = 1;
+	 *
 	 */
 	while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {
 		u64 base, size;
 
+		/*!
+		 * 셀하나 진행해서 해당 셀의 값을 리턴
+		 * reg는 셀한칸만큼 진행
+		 */
 		base = dt_mem_next_cell(dt_root_addr_cells, &reg);
 		size = dt_mem_next_cell(dt_root_size_cells, &reg);
 
@@ -937,6 +966,7 @@ bool __init early_init_dt_scan(void *params)
 
 	/*!
 	 * bank
+	 * fdt에서 memory노드를 찾아서 뱅크 설정
 	 */
 	/* Setup memory, calling early_init_dt_add_memory_arch */
 	of_scan_flat_dt(early_init_dt_scan_memory, NULL);

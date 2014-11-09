@@ -207,6 +207,7 @@ const struct machine_desc * __init setup_machine_fdt(unsigned int dt_phys)
 
 	/*!
 	 * early_init_dt_scan - dt에서 chosen, root, memory node 초기화
+	 * initial_boot_params = dt_phys -> initial_boot_params에 fdt 주소를 넣어줌
 	 */
 	if (!dt_phys || !early_init_dt_scan(phys_to_virt(dt_phys)))
 		return NULL;

@@ -728,6 +728,7 @@ int __init arm_add_memory(u64 start, u64 size)
 	 *	int nr_banks;
 	 *	struct membank bank[NR_BANKS];
 	 * };
+	 * NR_BANKS = 8
 	 */
 	struct membank *bank = &meminfo.bank[meminfo.nr_banks];
 	u64 aligned_start;
@@ -748,8 +749,10 @@ int __init arm_add_memory(u64 start, u64 size)
 	 * size = size - start & 0x0000_0fff
 	 *  - start = base = dt_mem_next_cell(dt_root_addr_cells, &reg);
 	 *  - size = size = dt_mem_next_cell(dt_root_size_cells, &reg);
-	 * 
-	 * ex)
+	 ****
+	 * ex) 0x20000000 0x80000000
+	 * size = size - start(0x0000_0fff mask)
+	 * size = 0x80000000 - 0x00000000 = 0x80000000
 	 */
 	size -= start & ~PAGE_MASK;
 	/*!
@@ -765,16 +768,27 @@ int __init arm_add_memory(u64 start, u64 size)
 	 * = (x + 0x0fff) & 0xf000
 	 *
 	 * 즉 4096 단위 얼라인
+	 ***
+	 * aligned_start = 0x20000000
+	 * size = 0x80000000
 	 */
 	aligned_start = PAGE_ALIGN(start);
 
 #ifndef CONFIG_ARCH_PHYS_ADDR_T_64BIT
+	/*! 
+	 * ULONG_MAX = 0xffff_ffff
+	 * aligned_start 가 32bit 넘어가는지 체크
+	 *
+	 */
 	if (aligned_start > ULONG_MAX) {
 		pr_crit("Ignoring memory at 0x%08llx outside 32-bit physical address space\n",
 			(long long)start);
 		return -EINVAL;
 	}
-
+	
+	/*!
+	 * aligned_start + size 가 32bit 넘어가는지 체크
+	 */
 	if (aligned_start + size > ULONG_MAX) {
 		pr_crit("Truncating memory at 0x%08llx to fit in 32-bit physical address space\n",
 			(long long)start);
@@ -783,12 +797,27 @@ int __init arm_add_memory(u64 start, u64 size)
 		 * 32 bits, we use ULONG_MAX as the upper limit rather than 4GB.
 		 * This means we lose a page after masking.
 		 */
+		/*!
+		 * size가 32bit를 넘어가면 넘어가는 부분 버림
+		 */
 		size = ULONG_MAX - aligned_start;
 	}
 #endif
 
+	/*!
+	 * PHYS_OFFSET = vmlinux 끝 
+	 */
 	if (aligned_start < PHYS_OFFSET) {
 		if (aligned_start + size <= PHYS_OFFSET) {
+			/*!
+			 * bank해둘려는 범위가 vmlinux안쪽이여서 뱅크안하고 지나감
+			 *
+			 * as = aligned_start
+			 *              PHYS_OFFSET
+			 * |----------------|
+			 *         |------|
+			 *	   as   as+size
+			 */
 			pr_info("Ignoring memory below PHYS_OFFSET: 0x%08llx-0x%08llx\n",
 				aligned_start, aligned_start + size);
 			return -EINVAL;
@@ -796,11 +825,26 @@ int __init arm_add_memory(u64 start, u64 size)
 
 		pr_info("Ignoring memory below PHYS_OFFSET: 0x%08llx-0x%08llx\n",
 			aligned_start, (u64)PHYS_OFFSET);
-
+		
+		/*!
+		 * 뱅크할려는 범위가 vmlinux 범위를 넘어갈 경우 넘어가는 부분만 뱅크 구성
+		 *
+		 * as = aligned_start
+		 *             PHYS_OFFSET
+		 * |---------------| - vmlinux 범위
+		 *       |--------------|
+		 *      as            as+size
+		 * ->
+		 *                 |----|
+		 *                as  as+size
+		 */
 		size -= PHYS_OFFSET - aligned_start;
 		aligned_start = PHYS_OFFSET;
 	}
 
+	/*!
+	 * bank 구성
+	 */
 	bank->start = aligned_start;
 	bank->size = size & ~(phys_addr_t)(PAGE_SIZE - 1);
 
@@ -1013,6 +1057,7 @@ void __init setup_arch(char **cmdline_p)
 	setup_processor();
 	/*!
 	 * fdt에서 chosen, root, memory 노드들 초기화
+	 * 머신 정보 구조체(machine_desc) 가져오기
 	 */
 	mdesc = setup_machine_fdt(__atags_pointer);
 	if (!mdesc)
