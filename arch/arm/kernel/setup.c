@@ -358,10 +358,19 @@ void __init early_print(const char *str, ...)
 {
 	extern void printascii(const char *);
 	char buf[256];
+	/*! char *va_list */
 	va_list ap;
 
+	/*!
+	 * #define va_start(ap, A)         (void) ((ap) = (((char *) &(A)) + (_bnd (A,_AUPBND))))
+	 * #define _bnd(X, bnd)            (((sizeof (X)) + (bnd)) & (~(bnd)))
+	 * #define _AUPBND                (sizeof (acpi_native_int) - 1)
+	 */
 	va_start(ap, str);
 	vsnprintf(buf, sizeof(buf), str, ap);
+	/*!
+	 * #define va_end(ap) (ap = (va_list) NULL)
+	 */
 	va_end(ap);
 
 #ifdef CONFIG_DEBUG_LL

@@ -179,9 +179,19 @@ static const void * __init arch_get_next_mach(const char *const **match)
 	static const struct machine_desc *mdesc = __arch_info_begin;
 	const struct machine_desc *m = mdesc;
 
+	/*! 
+	 * arch/arm/mach-exynos/mach-exynos5-dt.c
+	 * -각 머신의 machine_desc 선언, 해당 선언과 함께 arch.info.init 섹션에 삽입
+	 * vmlinux.lds.S
+	 * -arch.info.init
+	 */
 	if (m >= __arch_info_end)
 		return NULL;
 
+	/*! 
+	 * const int *i -> i 변경 가능, *i 변경 불가
+	 * int *const i -> i 변경 불가, *i 변경 가능
+	 */
 	mdesc++;
 	*match = m->dt_compat;
 	return m;
@@ -212,6 +222,10 @@ const struct machine_desc * __init setup_machine_fdt(unsigned int dt_phys)
 	if (!dt_phys || !early_init_dt_scan(phys_to_virt(dt_phys)))
 		return NULL;
 
+	/*!
+	 * of_flat_dt_match_machine()
+	 * 최적의 machine_desc 구조체를 가져옴
+	 */
 	mdesc = of_flat_dt_match_machine(mdesc_best, arch_get_next_mach);
 
 	if (!mdesc) {

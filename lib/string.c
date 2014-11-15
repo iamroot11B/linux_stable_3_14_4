@@ -65,6 +65,9 @@ int strcasecmp(const char *s1, const char *s2)
 	int c1, c2;
 
 	do {
+		/*!
+		 * tolower() = 소문자로 변환
+		 */
 		c1 = tolower(*s1++);
 		c2 = tolower(*s2++);
 	} while (c1 == c2 && c1 != 0);

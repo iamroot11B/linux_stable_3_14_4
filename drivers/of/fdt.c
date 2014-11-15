@@ -42,6 +42,13 @@ void *of_fdt_get_property(struct boot_param_header *blob,
 {
 	unsigned long p = node;
 
+	/*!
+	 * dts 기본 구조: arch/arm/boot/dts/skeleton.dtsi
+	 * dtb파일 경로: arch/arm/boot/dts/exynos5420-smdk5420.dtb
+	 ***
+	 * dtb에서 프로퍼티 표현
+	 * OF_DT_PROP(0x03)|프로퍼티 크기|프로퍼티 이름까지의 오프셋|프로퍼티 내용|
+	 */
 	do {
 		u32 tag = be32_to_cpup((__be32 *)p);
 		u32 sz, noff;
@@ -90,6 +97,12 @@ int of_fdt_is_compatible(struct boot_param_header *blob,
 	const char *cp;
 	unsigned long cplen, l, score = 0;
 
+	/*!
+	 * of_fdt_get_property()
+	 * compatible 프로퍼티 시작 주소 가져오기
+	 * cp = compatible 내용 시작 주소
+	 * cplen = 프로퍼티 길이
+	 */
 	cp = of_fdt_get_property(blob, node, "compatible", &cplen);
 	if (cp == NULL)
 		return 0;
@@ -504,11 +517,22 @@ int __init of_scan_flat_dt(int (*it)(unsigned long node,
 /**
  * of_get_flat_dt_root - find the root node in the flat blob
  */
+/*!
+ * http://iamroot.org/wiki/doku.php?id=%EC%8A%A4%ED%84%B0%EB%94%94:arm_kernel_%EC%8A%A4%ED%84%B0%EB%94%94_10%EC%B0%A8_full_%EB%B0%94%EB%A1%9C%EA%B0%80%EA%B8%B0 에서 검색
+ */
 unsigned long __init of_get_flat_dt_root(void)
 {
 	unsigned long p = ((unsigned long)initial_boot_params) +
 		be32_to_cpu(initial_boot_params->off_dt_struct);
 
+	/*!
+	 * be32_to_cpu(x): x를 be32에서 cpu에 맞는 데이터 형식으로 바꿔준다.
+	 * be32_to_cpup(x): *x를 be32에서 cpu에 맞는 데이터 형식으로 바꿔준다.
+	 */
+	/*!
+	 * dtb 앞에 NOP이 있을 경우 포인터 진행
+	 * OF_DT_NOP: 오픈펌웨어 참고 
+	 */
 	while (be32_to_cpup((__be32 *)p) == OF_DT_NOP)
 		p += 4;
 	/*!
@@ -516,6 +540,15 @@ unsigned long __init of_get_flat_dt_root(void)
 	 */
 	BUG_ON(be32_to_cpup((__be32 *)p) != OF_DT_BEGIN_NODE);
 	p += 4;
+	/*!
+	 *
+	 *  0        4        8  
+	 *  |--------|----_---|
+	 *  p           (p+len)
+	 *  ->
+	 *  |--------|--------|
+	 *                  (p+len) = p
+	 */
 	return ALIGN(p + strlen((char *)p) + 1, 4);
 }
 
@@ -659,8 +692,24 @@ const void * __init of_flat_dt_match_machine(const void *default_match,
 	unsigned long dt_root;
 	unsigned int best_score = ~1, score = 0;
 
+	/*!
+	 * of_get_flat_dt_root(): root노드를 찾아서 해당 주소 리턴
+	 */
 	dt_root = of_get_flat_dt_root();
+	/*!
+	 * __arch_info_begin ~ end 까지 저장된 머신 정보 구조체를 찾아서 가져옴 
+	 * arch_get_next_mach() = get_next_compat (iterator)
+	 * - compat = 유사 머신들 리스트
+	 * - data = machine_desc 
+	 */
 	while ((data = get_next_compat(&compat))) {
+		/*!
+		 * dtb내부의 compat과 이터레이터를 통해 가져온 compat을 비교해서 가장 좋은 score의
+		 * machine_desc를 가져온다.
+		 * compat = "Machine1", "Machine2", "Machine3"
+		 * score =      1           2           3
+		 * 이 중 가장 좋은 스코어의 machine_desc를 선택한다.(낮을수록 좋음)
+		 */
 		score = of_flat_dt_match(dt_root, compat);
 		if (score > 0 && score < best_score) {
 			best_data = data;
