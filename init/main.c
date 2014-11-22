@@ -402,6 +402,14 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 {
 	const struct obs_kernel_param *p;
 
+	/*!
+	 * setup_start, setup_end사이의 .init.section의 등록은
+	 * drivers/tty/serial/8250/8250_early.c 마지막 줄
+	 * early_param("earlycon", setup_early_serial8250_console);
+	 * early_param에 의해 __setup_param이 호출되고, setup_func가 등록된지만,
+	 * 엑시노스 5420의 경우 console 의 내용에 earlycon이 없어 do_early_param에서
+	 * 해주는 정확한 일이 없다. 
+	 */
 	for (p = __setup_start; p < __setup_end; p++) {
 		if ((p->early && parameq(param, p->str)) ||
 		    (strcmp(param, "console") == 0 &&
@@ -431,6 +439,9 @@ void __init parse_early_param(void)
 
 	/* All fall through to do_early_param. */
 	strlcpy(tmp_cmdline, boot_command_line, COMMAND_LINE_SIZE);
+	/*!
+	 * do_early_param을 위한 코드지만, 엑시노스 5420의 경우 do_early_param가 해주는 일이 없음.
+	 */
 	parse_early_options(tmp_cmdline);
 	done = 1;
 }

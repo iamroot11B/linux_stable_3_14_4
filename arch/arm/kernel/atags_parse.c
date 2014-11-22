@@ -208,6 +208,9 @@ setup_machine_tags(phys_addr_t __atags_pointer, unsigned int machine_nr)
 	else if (mdesc->atag_offset)
 		tags = (void *)(PAGE_OFFSET + mdesc->atag_offset);
 
+	/*!
+	 * 모기향 책 p.154 참고
+	 */
 #if defined(CONFIG_DEPRECATED_PARAM_STRUCT)
 	/*
 	 * If we have the old style parameters, convert them to

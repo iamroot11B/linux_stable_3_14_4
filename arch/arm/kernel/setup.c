@@ -1069,11 +1069,32 @@ void __init setup_arch(char **cmdline_p)
 	 * 머신 정보 구조체(machine_desc) 가져오기
 	 */
 	mdesc = setup_machine_fdt(__atags_pointer);
+	/*!
+	 * setup_machine_fdt()에서 fdt를 사용하지 않는다면 NULL 리턴
+	 * __machine_arch_type -> compressed/misc.c 의 decompress_kernel 에서 초기화 해줌
+	 */
 	if (!mdesc)
 		mdesc = setup_machine_tags(__atags_pointer, __machine_arch_type);
 	machine_desc = mdesc;
 	machine_name = mdesc->name;
 
+	/*!
+	 * reboot_mode 모드 셋팅
+	 * reboot_mode에 대해 찾아보기( 10차 25주차 )
+	 * 실제 하드웨어 디자인 할때 리셋방법이 여러가지 방법이 존재합니다.
+	 *
+	 * HARD는 hardware적으로 reset 시그널이 있고, 소프트리셋 시그널이 따로 있습니다.
+	 * 결국 HARD reset은 칩 전체 reset, SOFT는 칩중 일부분만 reset입니다.
+	 * SOFT의 경우 이렇게 하는 이유는, 일부 IP의 경우 reset을 안하는 경우가 있어서 그렇습니다.
+	 *
+	 * - REBOOT_COLD: 일반적으로 power on/off
+	 *   - REBOOT_HARD: chip에 연결된 HW reset (PC에서 reset 버튼)
+	 *   - REBOOT_WARM: chip에 연결된 HW reset (PLL, test logic 등의 일부 HW를 reset에서 제외, 주로 watchdog과 연결)
+	 *   - REBOOT_SOFT: software에 의한 reset (ctrl+alt+reset 키)
+	 *   - REBOOT_GPIO: GPIO signal에 의한 reset
+	 *
+	 *   개념적으로는 구분이 있으나 실제 chip에서 SOFT, WARM등의 경계가 모호하다.
+	 */
 	if (mdesc->reboot_mode != REBOOT_HARD)
 		reboot_mode = mdesc->reboot_mode;
 
@@ -1088,9 +1109,31 @@ void __init setup_arch(char **cmdline_p)
 
 	parse_early_param();
 
+	/*!
+	 * lib/sort.c
+	 * meminfo sort
+	 * sort(정렬할 배열 시작 주소(뱅크 배열), 정렬할 크기(만들어진 뱅크 수),
+	 *        배열 하나의 크기(뱅크 크기), 비교 함수, 스왑 함수)
+	 */
 	sort(&meminfo.bank, meminfo.nr_banks, sizeof(meminfo.bank[0]), meminfo_cmp, NULL);
 
+	/*!
+	 * exynos에서 mdesc->init_meminfo() 가 정의되지 않았기 때문에 해주는 일이 없음.
+	 */
 	early_paging_init(mdesc, lookup_processor_type(read_cpuid_id()));
+	/*!
+	 * 커널 영역과 사용자 영역은 1GB와 3GB로 나누어지는데,
+	 * 이 경우 1GB의 공간만 직접 접근할 수 있고 그 이상의
+	 * 공간은 직접 접근할 수가 없다. 이 때문에 128MB의 공간을 
+	 * 896MB ~ 1024MB 사이에 두고 1GB 이상의 영역을 매핑하는
+	 * 방식으로 사용하고 있다. 이 896MB ~ 4GB에 해당하는 영역을 
+	 * 하이 메모리 (high memory) 라고한다.
+	 *
+	 * zone = node를 구간별로 나누어 관리
+	 * zone_highmem = 896MB 이상의 메모리 영역
+	 * zone_nomal = 16MB부터 896MB 까지의 메모리 영역 
+	 * zone_dma = ISA 장치를 위한 16MB 아래의 메모리 영역
+	 */
 	setup_dma_zone(mdesc);
 	sanity_check_meminfo();
 	arm_memblock_init(&meminfo, mdesc);
