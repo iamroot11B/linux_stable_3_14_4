@@ -669,6 +669,7 @@ ENDPROC(fixup_smp)
 /* __fixup_pv_table - patch the stub instructions with the delta between
  * PHYS_OFFSET and PAGE_OFFSET, which is assumed to be 16MiB aligned and
  * can be expressed by an immediate shifter operand. The stub instruction
+		sleep(1);
  * has a form of '(add|sub) rd, rn, #imm'.
  */
 	__HEAD
@@ -704,12 +705,19 @@ ENDPROC(__fixup_pv_table)
 
 	.text
 __fixup_a_pv_table:
+	/*!
+	 * 3f: pv_offset
+	 */
 	adr	r0, 3f
 	ldr	r6, [r0]
 	add	r6, r6, r3
+	/*! r0 = pv_offset high_word */
 	ldr	r0, [r6, #HIGH_OFFSET]	@ pv_offset high word
+	/*! r6 = pv_offset low word */
 	ldr	r6, [r6, #LOW_OFFSET]	@ pv_offset low word
+	/*! r6 = r6 >> 24 */
 	mov	r6, r6, lsr #24
+	/*! */
 	cmn	r0, #1
 		/*! r0 + 1 */
 #ifdef CONFIG_THUMB2_KERNEL
@@ -752,6 +760,7 @@ ARM_BE8(rev16	ip, ip)
 	moveq	r0, #0x400000	@ set bit 22, mov to mvn instruction
 #endif
 	b	2f
+	/*! r7 = pv_offset addr*/
 1:	ldr	ip, [r7, r3]
 #ifdef CONFIG_CPU_ENDIAN_BE8
 	@ in BE8, we load data in BE, but instructions still in LE
@@ -761,6 +770,7 @@ ARM_BE8(rev16	ip, ip)
 	biceq	ip, ip, #0x00004000 @ clear bit 22
 	orreq	ip, ip, r0      @ mask in offset bits 7-0
 #else
+	/*! bic ip = ip & !0x000000ff */
 	bic	ip, ip, #0x000000ff
 	tst	ip, #0xf00	@ check the rotation field
 	@! if(ip의 9~12번째 비트중 하나라도 셋팅되었을 경우( 0xf00)){

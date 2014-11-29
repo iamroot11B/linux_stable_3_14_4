@@ -218,6 +218,10 @@ static inline phys_addr_t __virt_to_phys(unsigned long x)
 	phys_addr_t t;
 
 	if (sizeof(phys_addr_t) == 4) {
+        /*!
+         * #define __PV_BITS_31_24	0x81000000
+         * add t, x, __PV_BITS_31_24(PHYS_OFFSET - PAGE_OFFSET)
+         */
 		__pv_stub(x, t, "add", __PV_BITS_31_24);
 	} else {
 		__pv_stub_mov_hi(t);
@@ -285,6 +289,9 @@ static inline void *phys_to_virt(phys_addr_t x)
 
 /*
  * Drivers should NOT use these either.
+ */
+/*!
+ * pv_table을 이용한 가상/물리 주소 변환 : http://stackcanary.com/?p=616
  */
 #define __pa(x)			__virt_to_phys((unsigned long)(x))
 #define __va(x)			((void *)__phys_to_virt((phys_addr_t)(x)))

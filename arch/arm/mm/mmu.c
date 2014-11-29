@@ -1058,10 +1058,35 @@ early_param("vmalloc", early_vmalloc);
 
 phys_addr_t arm_lowmem_limit __initdata = 0;
 
+/*!
+ * test 종류
+ * 새너티 테스팅(Sanity testing)
+ *  - 새로운 소프트웨어 버전이 주요 테스팅 업무를 수행하기에 충분히 적합한가를 판단하기 위해 수행하는 테스트. 만약 애플리케이션에서 사용 초기에 크래시(Crash)가 발생한다면, 시스템은 더 이상의 테스팅을 수행할 정도로 충분히 안정적이라고 말할 수 없으며, 빌드 혹은 애플리케이션은 이 부분을 수정해야 한다.
+ * http://angel927.tistory.com/77
+ *
+ */
 void __init sanity_check_meminfo(void)
 {
 	phys_addr_t memblock_limit = 0;
 	int i, j, highmem = 0;
+	/*!
+	 * mmu는 on 되어 있는가?
+	 *  - kernel/head.S에서 on시켰음
+	 ***
+	 * 물리 / 가상주소 변환 방법(fixup_pv_table 확인할 필요가 있음)
+	 *  - 
+	 * pv_table을 이용한 물리 / 가상주소 변환 방법 참고: http://stackcanary.com/?p=616
+	 ***
+	 * vmlinux 덤프파일의 addr은?
+	 *  - 커널의 가상주소이며, 실제 물리 주소는 pc로 계산
+	 * (compressed/head.S 에서 커널의 압축을 풀어줄 때도 pc로 계산, r4계산 참고)
+	 ***
+	 * 
+	 */
+	/*!
+	 * 물리주소를 저장하는 이유
+	 *  - 아래에서 뱅크와 비교를 위해서
+	 */
 	phys_addr_t vmalloc_limit = __pa(vmalloc_min - 1) + 1;
 
 	for (i = 0, j = 0; i < meminfo.nr_banks; i++) {

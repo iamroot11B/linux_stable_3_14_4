@@ -1107,6 +1107,9 @@ void __init setup_arch(char **cmdline_p)
 	strlcpy(cmd_line, boot_command_line, COMMAND_LINE_SIZE);
 	*cmdline_p = cmd_line;
 
+	/*!
+	 * do_early_param을 위한 코드지만, 엑시노스 5420의 경우 do_early_param가 해주는 일이 없음.
+	 */
 	parse_early_param();
 
 	/*!
@@ -1122,6 +1125,8 @@ void __init setup_arch(char **cmdline_p)
 	 */
 	early_paging_init(mdesc, lookup_processor_type(read_cpuid_id()));
 	/*!
+	 * linux_memory_관리
+	 *
 	 * 커널 영역과 사용자 영역은 1GB와 3GB로 나누어지는데,
 	 * 이 경우 1GB의 공간만 직접 접근할 수 있고 그 이상의
 	 * 공간은 직접 접근할 수가 없다. 이 때문에 128MB의 공간을 
@@ -1133,6 +1138,9 @@ void __init setup_arch(char **cmdline_p)
 	 * zone_highmem = 896MB 이상의 메모리 영역
 	 * zone_nomal = 16MB부터 896MB 까지의 메모리 영역 
 	 * zone_dma = ISA 장치를 위한 16MB 아래의 메모리 영역
+	 */
+	/*!
+	 * dma_limit 설정
 	 */
 	setup_dma_zone(mdesc);
 	sanity_check_meminfo();
