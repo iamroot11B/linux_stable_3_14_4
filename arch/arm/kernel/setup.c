@@ -1088,12 +1088,12 @@ void __init setup_arch(char **cmdline_p)
 	 * SOFT의 경우 이렇게 하는 이유는, 일부 IP의 경우 reset을 안하는 경우가 있어서 그렇습니다.
 	 *
 	 * - REBOOT_COLD: 일반적으로 power on/off
-	 *   - REBOOT_HARD: chip에 연결된 HW reset (PC에서 reset 버튼)
-	 *   - REBOOT_WARM: chip에 연결된 HW reset (PLL, test logic 등의 일부 HW를 reset에서 제외, 주로 watchdog과 연결)
-	 *   - REBOOT_SOFT: software에 의한 reset (ctrl+alt+reset 키)
-	 *   - REBOOT_GPIO: GPIO signal에 의한 reset
+	 * - REBOOT_HARD: chip에 연결된 HW reset (PC에서 reset 버튼)
+	 * - REBOOT_WARM: chip에 연결된 HW reset (PLL, test logic 등의 일부 HW를 reset에서 제외, 주로 watchdog과 연결)
+	 * - REBOOT_SOFT: software에 의한 reset (ctrl+alt+reset 키)
+	 * - REBOOT_GPIO: GPIO signal에 의한 reset
 	 *
-	 *   개념적으로는 구분이 있으나 실제 chip에서 SOFT, WARM등의 경계가 모호하다.
+	 * 개념적으로는 구분이 있으나 실제 chip에서 SOFT, WARM등의 경계가 모호하다.
 	 */
 	if (mdesc->reboot_mode != REBOOT_HARD)
 		reboot_mode = mdesc->reboot_mode;
@@ -1143,6 +1143,9 @@ void __init setup_arch(char **cmdline_p)
 	 * dma_limit 설정
 	 */
 	setup_dma_zone(mdesc);
+	/*!
+	 * meminfo 구조체에 값이 제대로 들어 있는지 정상성 (sanity) 검사를 수행하는 작업이 이루어진다.
+	 */
 	sanity_check_meminfo();
 	arm_memblock_init(&meminfo, mdesc);
 

@@ -1086,16 +1086,50 @@ void __init sanity_check_meminfo(void)
 	/*!
 	 * 물리주소를 저장하는 이유
 	 *  - 아래에서 뱅크와 비교를 위해서
+	 *****
+	 * static void * __initdata vmalloc_min =
+	 *	(void *)(VMALLOC_END - (240 << 20) - VMALLOC_OFFSET);
+	 * #define VMALLOC_END 0xff000000UL
+	 * #define VMALLOC_OFFSET	(8*1024*1024)
+	 * VMALLOC의 사이즈는 240MB
+	 * VMALLOC_OFFSET = 8MB는 high memory와 normal memory사이의 보호를 위한 완충지대
+	 *
+	 * vmalloc_min  = 0xff00_0000UL - (240<<20) - (8*1024*1024)
+	 *		= 0xff00_0000UL - 0x0f00_0000 - 0x0080_0000
+	 * vmalloc_min의 정체는?
+	 *  - vmlloc 시작주소 - VMALLOC_OFFSET(0xef800000)
+	 *****
+	 * 물리메모리와 가상메모리 관계 정리 필요.
+	 *  - zone_normal은 커널과 직접맵핑
+	 *  - zone_highmem의 128은 커널 데이터 구조체(메모리 맵, 페이지 테이블 정보)를 저장
+	 *****
+	 * vmalloc, kmallc 참고: http://embedded21.egloos.com/viewer/530514
+	 * vmalloc의 메모리 할당 및 해제에 대해서.. : https://kldp.org/node/92167
+	 * zone-가상메모리 관계_1 : http://cesl.tistory.com/archive/20120301 
+	 * zone-가상메모리 관계_2 : http://blog.nlogn.cn/why-does-x86_64-not-have-zone_highmem/
+	 * zone_normal 사이즈 이유_stackoverflow답변 : http://stackoverflow.com/questions/8252785/why-linux-kernel-zone-normal-is-limited-to-896-mb
+	 */
+	/*!
+	 * vmalloc_limit => vmalloc의 제일 아랫 부분
 	 */
 	phys_addr_t vmalloc_limit = __pa(vmalloc_min - 1) + 1;
 
 	for (i = 0, j = 0; i < meminfo.nr_banks; i++) {
+		/*!
+		 * i, j따로쓰는 이유.(하이메모리 사용 여부에 따른 뱅크 조정)
+		 * highmem을 쓰지 않을 경우 j값 증가 안하게됨. 즉 하이메모리부분의 뱅크는 날려버림.
+		 * -> 예를 들어 nr_banks가 4이고 3번 뱅크부터 하이메모리뱅크라면 3, 4뱅크는 그대로 둠.
+		 *  뒤에서 nr_banks 조절
+		 */
 		struct membank *bank = &meminfo.bank[j];
 		phys_addr_t size_limit;
 
 		*bank = meminfo.bank[i];
 		size_limit = bank->size;
 
+		/*!
+		 * 뱅크의 시작 주소가 vmalloc_limit(vmalloc제일 아래)보다 크다면 하이메모리 표시
+		 */
 		if (bank->start >= vmalloc_limit)
 			highmem = 1;
 		else
@@ -1149,6 +1183,10 @@ void __init sanity_check_meminfo(void)
 			bank->size = size_limit;
 		}
 #endif
+		/*!
+		 * lowmem 의 끝 설정.
+		 * arm_lowmem_limit = bank_end
+		 */
 		if (!bank->highmem) {
 			phys_addr_t bank_end = bank->start + bank->size;
 
@@ -1168,6 +1206,9 @@ void __init sanity_check_meminfo(void)
 			 * allocated when mapping the start of bank 0, which
 			 * occurs before any free memory is mapped.
 			 */
+			/*!
+			 *  
+			 */
 			if (!memblock_limit) {
 				if (!IS_ALIGNED(bank->start, SECTION_SIZE))
 					memblock_limit = bank->start;
@@ -1181,6 +1222,10 @@ void __init sanity_check_meminfo(void)
 	if (highmem) {
 		const char *reason = NULL;
 
+		/*!
+		 * VIPT일 경우 highmem 사용 안함.
+		 * caching 방법과 arm 버전에 따라 highmem사용 결정.
+		 */
 		if (cache_is_vipt_aliasing()) {
 			/*
 			 * Interactions between kmap and other mappings
@@ -1198,6 +1243,9 @@ void __init sanity_check_meminfo(void)
 	}
 #endif
 	meminfo.nr_banks = j;
+	/*!
+	 * 하이 메모리시작부분의 가상주소
+	 */
 	high_memory = __va(arm_lowmem_limit - 1) + 1;
 
 	/*
@@ -1206,10 +1254,18 @@ void __init sanity_check_meminfo(void)
 	 * last full section, which should be mapped.
 	 */
 	if (memblock_limit)
+		/*!
+		 * #define round_down(x, y) ((x) & ~__round_mask(x, y))
+		 * #define __round_mask(x, y) ((__typeof__(x))((y)-1))
+		 * -> 섹션단위 얼라인(버림으로 얼라인)
+		 * */
 		memblock_limit = round_down(memblock_limit, SECTION_SIZE);
 	if (!memblock_limit)
 		memblock_limit = arm_lowmem_limit;
 
+	/*!
+	 * memblock.limit = memblock_limit
+	 */
 	memblock_set_current_limit(memblock_limit);
 }
 

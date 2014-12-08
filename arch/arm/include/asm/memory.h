@@ -220,7 +220,7 @@ static inline phys_addr_t __virt_to_phys(unsigned long x)
 	if (sizeof(phys_addr_t) == 4) {
         /*!
          * #define __PV_BITS_31_24	0x81000000
-         * add t, x, __PV_BITS_31_24(PHYS_OFFSET - PAGE_OFFSET)
+         * add t, x, __PV_BITS_31_24( _PV_BITS_31_24 = PHYS_OFFSET - PAGE_OFFSET)
          */
 		__pv_stub(x, t, "add", __PV_BITS_31_24);
 	} else {
