@@ -17,6 +17,8 @@ this document may reserve more VM space over time.
 
 Start		End		Use
 --------------------------------------------------------------------------
+
+--------------------------------------------------------------
 ffff8000	ffffffff	copy_user_page / clear_user_page use.
 				For SA11xx and Xscale, this is used to
 				setup a minicache mapping.
@@ -26,7 +28,7 @@ ffff4000	ffffffff	cache aliasing on ARMv6 and later CPUs.
 ffff1000	ffff7fff	Reserved.
 				Platforms must not use this address range.
 
-ffff0000	ffff0fff	CPU vector page.
+ffff0000	ffff0fff	CPU vector page.  ( 4K ?)
 				The CPU vectors are mapped here if the
 				CPU supports vector relocation (control
 				register V bit.)
@@ -51,8 +53,12 @@ ffc00000	ffefffff	DMA memory mapping region.  Memory returned
 ff000000	ffbfffff	Reserved for future expansion of DMA
 				mapping region.
 
+ ^
+ |  16M
+--------------------------------------------------------------
+
 fee00000	feffffff	Mapping of PCI I/O space. This is a static
-				mapping within the vmalloc space.
+				mapping within the vmalloc space.   ( 2M )
 
 VMALLOC_START	VMALLOC_END-1	vmalloc() / ioremap() space.
 				Memory returned by vmalloc/ioremap will
@@ -61,7 +67,9 @@ VMALLOC_START	VMALLOC_END-1	vmalloc() / ioremap() space.
 				located here through iotable_init().
 				VMALLOC_START is based upon the value
 				of the high_memory variable, and VMALLOC_END
+                   --------------------
 				is equal to 0xff000000.
+                        ----------
 
 PAGE_OFFSET	high_memory-1	Kernel direct-mapped RAM region.
 				This maps the platforms RAM, and typically

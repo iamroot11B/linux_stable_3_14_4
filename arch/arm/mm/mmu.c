@@ -1089,6 +1089,24 @@ void __init sanity_check_meminfo(void)
 	 *****
 	 * static void * __initdata vmalloc_min =
 	 *	(void *)(VMALLOC_END - (240 << 20) - VMALLOC_OFFSET);
+    *
+    *       Virtual Addr (4G)
+    *    +-------------------+ 
+    *    |                   | 16M
+    *    +-------------------+ <-----------+    <---- VMALLOC_END (0xff000000)
+    *    |                   | 240M (ARM)  |    cf) x86=128M 
+    *    +-------------------+             +--  High memory area <---- VMALLOC_START
+    *    |                   | 8M          |
+    *    +-------------------+ <-----------+  <--- high_memory
+    *    |                   | 
+    *    |                   | Kernel Direct Mapping (768M)
+    *    |                   | 
+    *    +-------------------+ <---- 0xC0000000
+    *    |                   | App...
+    *    +-------------------+
+    *
+    *   참고자료 : ./Documentation/arm/memory.txt
+    *
 	 * #define VMALLOC_END 0xff000000UL
 	 * #define VMALLOC_OFFSET	(8*1024*1024)
 	 * VMALLOC의 사이즈는 240MB
@@ -1265,8 +1283,8 @@ void __init sanity_check_meminfo(void)
 
 	/*!
 	 * memblock.limit = memblock_limit
-	 */
-	memblock_set_current_limit(memblock_limit);
+    */
+   memblock_set_current_limit(memblock_limit);
 }
 
 static inline void prepare_page_table(void)

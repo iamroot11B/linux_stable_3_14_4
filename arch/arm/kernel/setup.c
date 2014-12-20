@@ -1143,8 +1143,13 @@ void __init setup_arch(char **cmdline_p)
 	 * dma_limit 설정
 	 */
 	setup_dma_zone(mdesc);
+
 	/*!
 	 * meminfo 구조체에 값이 제대로 들어 있는지 정상성 (sanity) 검사를 수행하는 작업이 이루어진다.
+	 */
+   /*! 20141220, study start */
+	/*!
+    * low memory(memblock) limit 설정
 	 */
 	sanity_check_meminfo();
 	arm_memblock_init(&meminfo, mdesc);

@@ -25,6 +25,17 @@
 
 #include "internal.h"
 
+/*
+	struct memblock_region {
+		phys_addr_t base;
+		phys_addr_t size;
+		unsigned long flags;
+      #ifdef CONFIG_HAVE_MEMBLOCK_NODE_MAP
+		int nid;
+      #endif
+	};
+*/
+
 static struct memblock_region memblock_memory_init_regions[INIT_MEMBLOCK_REGIONS] __initdata_memblock;
 static struct memblock_region memblock_reserved_init_regions[INIT_MEMBLOCK_REGIONS] __initdata_memblock;
 
@@ -37,6 +48,8 @@ struct memblock memblock __initdata_memblock = {
 	.reserved.cnt		= 1,	/* empty dummy entry */
 	.reserved.max		= INIT_MEMBLOCK_REGIONS,
 
+	/*   INIT_MEMBLOCK_REGIONS = 128 									*/
+	/*  #define MEMBLOCK_ALLOC_ANYWHERE	(~(phys_addr_t)0) 	*/
 	.bottom_up		= false,
 	.current_limit		= MEMBLOCK_ALLOC_ANYWHERE,
 };
