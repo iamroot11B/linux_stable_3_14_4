@@ -1089,7 +1089,7 @@ void __init sanity_check_meminfo(void)
 	 *****
 	 * static void * __initdata vmalloc_min =
 	 *	(void *)(VMALLOC_END - (240 << 20) - VMALLOC_OFFSET);
-    *
+	 *
     *       Virtual Addr (4G)
     *    +-------------------+ 
     *    |                   | 16M
@@ -1105,8 +1105,8 @@ void __init sanity_check_meminfo(void)
     *    |                   | App...
     *    +-------------------+
     *
-    *   참고자료 : ./Documentation/arm/memory.txt
-    *
+	 *   참고자료 : ./Documentation/arm/memory.txt
+	 *****
 	 * #define VMALLOC_END 0xff000000UL
 	 * #define VMALLOC_OFFSET	(8*1024*1024)
 	 * VMALLOC의 사이즈는 240MB
@@ -1224,9 +1224,6 @@ void __init sanity_check_meminfo(void)
 			 * allocated when mapping the start of bank 0, which
 			 * occurs before any free memory is mapped.
 			 */
-			/*!
-			 *  
-			 */
 			if (!memblock_limit) {
 				if (!IS_ALIGNED(bank->start, SECTION_SIZE))
 					memblock_limit = bank->start;
@@ -1283,7 +1280,7 @@ void __init sanity_check_meminfo(void)
 
 	/*!
 	 * memblock.limit = memblock_limit
-    */
+	 */
    memblock_set_current_limit(memblock_limit);
 }
 
