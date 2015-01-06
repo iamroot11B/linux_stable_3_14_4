@@ -499,12 +499,21 @@ static int __init_memblock memblock_add_region(struct memblock_type *type,
 	if (!size)
 		return 0;
 
+	/*!
+	 * 첫번째 뱅크일경우 아래 size==0에 걸려 memblock초기화 해준 뒤 나감
+	 * 두번째 뱅크부터 repeat구간으로
+	 * 참고 : http://iamroot.org/wiki/doku.php?id=%EC%8A%A4%ED%84%B0%EB%94%94:arm_kernel_%EC%8A%A4%ED%84%B0%EB%94%94_10%EC%B0%A8_full_%EB%B0%94%EB%A1%9C%EA%B0%80%EA%B8%B0#%EC%A3%BC%EC%B0%A8_20131026
+	 */
 	/* special case for empty array */
 	if (type->regions[0].size == 0) {
 		WARN_ON(type->cnt != 1 || type->total_size);
 		type->regions[0].base = base;
 		type->regions[0].size = size;
 		type->regions[0].flags = flags;
+		/*!
+		 * regions->nid = nid
+		 * nid 메모리 블럭 노드의 id로 설정되어있을경우만 초기화
+		 */
 		memblock_set_region_node(&type->regions[0], nid);
 		type->total_size = size;
 		return 0;
@@ -519,10 +528,19 @@ repeat:
 	nr_new = 0;
 
 	for (i = 0; i < type->cnt; i++) {
+		/*!
+		 * rbase = 현재까지 추가된(0~cnt) regions의 base
+		 * rend =  현재까지 추가된(0~cnt) regions의 end
+		 * base = 추가할 뱅크의 base
+		 * end = 추가할 뱅크의 end
+		 */
 		struct memblock_region *rgn = &type->regions[i];
 		phys_addr_t rbase = rgn->base;
 		phys_addr_t rend = rbase + rgn->size;
 
+		/*!
+		 * 
+		 */
 		if (rbase >= end)
 			break;
 		if (rend <= base)
@@ -556,6 +574,11 @@ repeat:
 	 */
 	if (!insert) {
 		while (type->cnt + nr_new > type->max)
+			/*!
+			 * max는 현재 128로 선언되어 있습니다.
+			 * regions를 카운트 하여 128을 넘어 가게 되면 doubling을 통해 memblock을 추가로 잡습니다. 
+			 * nr_new 변수가 128을 넘어가는지 체크하는 변수입니다
+			 */
 			if (memblock_double_array(type, obase, size) < 0)
 				return -ENOMEM;
 		insert = true;

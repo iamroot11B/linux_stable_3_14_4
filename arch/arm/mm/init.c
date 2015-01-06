@@ -280,6 +280,10 @@ void __init arm_memblock_init(struct meminfo *mi,
 {
 	int i;
 
+	/*!
+	 * memblock 구조체
+	 *  - 전체 메모리(memory) 앞으로 사용할 메모리(reserved)들의 집합 
+	 */
 	for (i = 0; i < mi->nr_banks; i++)
 		memblock_add(mi->bank[i].start, mi->bank[i].size);
 
