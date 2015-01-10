@@ -123,7 +123,9 @@ void __init dma_contiguous_reserve(phys_addr_t limit)
 		selected_size = max(size_bytes, cma_early_percent_memory());
 #endif
 	}
-
+	/*
+	 * 참고: http://gurugio.blogspot.kr/2014/05/cma-contiguous-memory-allocation.html
+	 * */
 	if (selected_size && !dma_contiguous_default_area) {
 		pr_debug("%s: reserving %ld MiB for global area\n", __func__,
 			 (unsigned long)selected_size / SZ_1M);

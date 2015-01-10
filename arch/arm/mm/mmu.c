@@ -1318,6 +1318,8 @@ static inline void prepare_page_table(void)
 		pmd_clear(pmd_off_k(addr));
 }
 
+/* CONFIG_ARM_LPAE is not set
+ * */
 #ifdef CONFIG_ARM_LPAE
 /* the first page is reserved for pgd */
 #define SWAPPER_PG_DIR_SIZE	(PAGE_SIZE + \
@@ -1335,8 +1337,17 @@ void __init arm_mm_memblock_reserve(void)
 	 * Reserve the page tables.  These are already in use,
 	 * and can only be in node 0.
 	 */
+	
+	/* swapper_pg_dir : 페이지 테이블 주소
+	 * SWAPPER_PG_DIR_SIZE = PTRS_PER_PGD * sizeof(pgd_t) 
+	 *                     = 2048 EA      * 8 bytes
+	 *                     
+	 * swapper_pg_dir
+	 * ===> .globl	swapper_pg_dir
+	 * ===> .equ	swapper_pg_dir, KERNEL_RAM_VADDR - PG_DIR_SIZE
+	 * 참고 : arch/arm/kernel/head.S
+     */
 	memblock_reserve(__pa(swapper_pg_dir), SWAPPER_PG_DIR_SIZE);
-
 #ifdef CONFIG_SA1111
 	/*
 	 * Because of the SA1111 DMA bug, we want to preserve our

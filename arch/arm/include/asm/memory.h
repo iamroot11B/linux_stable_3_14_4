@@ -177,6 +177,9 @@
 #define __PV_BITS_31_24	0x81000000
 #define __PV_BITS_7_0	0x81
 
+/*
+ * __pv_phys_offset: stext의 끝부분 (0xc000807c)
+ * */
 extern u64 __pv_phys_offset;
 extern u64 __pv_offset;
 extern void fixup_pv_table(const void *, unsigned long);

@@ -48,6 +48,9 @@
 #define PMD_ORDER	2
 #endif
 
+	/* .equ <symbol name>, <value>
+	 * 이 지시어는 심볼값을 설정한다. gnu asm (arm asm의 EQU 와 유사함)
+	 * */
 	.globl	swapper_pg_dir
 	.equ	swapper_pg_dir, KERNEL_RAM_VADDR - PG_DIR_SIZE
 

@@ -55,6 +55,18 @@ static int __init early_initrd(char *p)
 	return 0;
 }
 early_param("initrd", early_initrd);
+/* 
+ * 참고: http://egloos.zum.com/furmuwon/v/10646725
+ *
+ *  #define early_param(str, fn)  __setup_param(str, fn, fn, 1)
+ *  #define __setup_param(str, unique_id, fn, early)			\
+ *	   static const char __setup_str_early_initrd[] __initconst	\
+ *	     	__aligned(1) = str; \
+ *	   static struct obs_kernel_param __setup_early_initrd \
+ *	    	__used __section(.init.setup)			\
+ *		    __attribute__((aligned((sizeof(long)))))	\
+ *		    = { __setup_str_early_initrd, fn, early }
+ * */
 
 static int __init parse_tag_initrd(const struct tag *tag)
 {
@@ -176,7 +188,7 @@ void __init setup_dma_zone(const struct machine_desc *mdesc)
 		arm_dma_zone_size = mdesc->dma_zone_size;
 		arm_dma_limit = PHYS_OFFSET + arm_dma_zone_size - 1;
 	} else
-		arm_dma_limit = 0xffffffff;
+		_dma_limit = 0xffffffff;
 	/*! arm_dma_pfn_limit = page 갯수*/
 	arm_dma_pfn_limit = arm_dma_limit >> PAGE_SHIFT;
 #endif
@@ -287,31 +299,57 @@ void __init arm_memblock_init(struct meminfo *mi,
 	for (i = 0; i < mi->nr_banks; i++)
 		memblock_add(mi->bank[i].start, mi->bank[i].size);
 
+	/*! 2015-01-10 study */
 	/* Register the kernel text, kernel data and initrd with memblock. */
 #ifdef CONFIG_XIP_KERNEL
 	memblock_reserve(__pa(_sdata), _end - _sdata);
 #else
+	/* 커널 이미지 영역을 reserve에 등록
+	 * _stext = vmlinux 시작주소
+	 * _end   = vmlinux 끝부분
+	 * */
 	memblock_reserve(__pa(_stext), _end - _stext);
 #endif
+	/*
+	 * CONFIG_BLK_DEV_INITRD = y
+	 * */
 #ifdef CONFIG_BLK_DEV_INITRD
 	/* FDT scan will populate initrd_start */
+
+	/* initrd_start = 램디스크 시작 부분
+	 * ==> atags 및 FDT 에서 시작 주소 및 크기를 설정
+	 * ==> arch/arm/boot/compressed/atags_to_fdt.c의 atags_to_fdt() 함수에서 ATAG_INITRD2 참고
+     *
+     * initrd_start, initrd_end 초기화
+	 * ==> drivers/of/fdt.c의 early_init_dt_check_for_initrd 함수 에서 초기화함.
+	 * */
 	if (initrd_start && !phys_initrd_size) {
 		phys_initrd_start = __virt_to_phys(initrd_start);
 		phys_initrd_size = initrd_end - initrd_start;
 	}
 	initrd_start = initrd_end = 0;
+
+
+	/* initrd 범위가 물리메모리 안에 있는지 검사
+	 * */
 	if (phys_initrd_size &&
 	    !memblock_is_region_memory(phys_initrd_start, phys_initrd_size)) {
 		pr_err("INITRD: 0x%08llx+0x%08lx is not a memory region - disabling initrd\n",
 		       (u64)phys_initrd_start, phys_initrd_size);
 		phys_initrd_start = phys_initrd_size = 0;
 	}
+
+	/* initrd 범위가 사용중인지 검사
+	 * */
 	if (phys_initrd_size &&
 	    memblock_is_region_reserved(phys_initrd_start, phys_initrd_size)) {
 		pr_err("INITRD: 0x%08llx+0x%08lx overlaps in-use memory region - disabling initrd\n",
 		       (u64)phys_initrd_start, phys_initrd_size);
 		phys_initrd_start = phys_initrd_size = 0;
 	}
+
+	/* initrd 영역을 사용중으로 변경
+	 * */
 	if (phys_initrd_size) {
 		memblock_reserve(phys_initrd_start, phys_initrd_size);
 
@@ -321,7 +359,12 @@ void __init arm_memblock_init(struct meminfo *mi,
 	}
 #endif
 
+	/* 페이지 테이블 영역을 reserve에 추가
+	 * */
 	arm_mm_memblock_reserve();
+
+	/* dtb 영역을 reserve에 추가
+	 * */
 	arm_dt_memblock_reserve();
 
 	/* reserve any platform specific memblock areas */
