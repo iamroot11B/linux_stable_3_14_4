@@ -188,7 +188,7 @@ void __init setup_dma_zone(const struct machine_desc *mdesc)
 		arm_dma_zone_size = mdesc->dma_zone_size;
 		arm_dma_limit = PHYS_OFFSET + arm_dma_zone_size - 1;
 	} else
-		_dma_limit = 0xffffffff;
+		arm_dma_limit = 0xffffffff;
 	/*! arm_dma_pfn_limit = page 갯수*/
 	arm_dma_pfn_limit = arm_dma_limit >> PAGE_SHIFT;
 #endif
