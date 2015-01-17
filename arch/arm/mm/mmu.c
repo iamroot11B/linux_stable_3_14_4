@@ -235,6 +235,11 @@ __setup("noalign", noalign_setup);
 #define PROT_PTE_S2_DEVICE	PROT_PTE_DEVICE
 #define PROT_SECT_DEVICE	PMD_TYPE_SECT|PMD_SECT_AP_WRITE
 
+	/*!
+	 * build_mem_type_table()에서 많은 설정 변경함.
+	 * CR_XP(23) = set, CR_TRE(28) = set
+	 * 자세히 확인할 필요가 있을 경우 위 함수에서 화인 필요.
+	 */
 static struct mem_type mem_types[] = {
 	[MT_DEVICE] = {		  /* Strongly ordered / ARMv6 shared device */
 		.prot_pte	= PROT_PTE_DEVICE | L_PTE_MT_DEV_SHARED |
@@ -395,6 +400,9 @@ static void __init build_mem_type_table(void)
 {
 	struct cachepolicy *cp;
 	unsigned int cr = get_cr();
+	/*!
+	 * pgprot = protection관련 플래그들 모음
+	 */
 	pteval_t user_pgprot, kern_pgprot, vecs_pgprot;
 	pteval_t hyp_device_pgprot, s2_pgprot, s2_device_pgprot;
 	int cpu_arch = cpu_architecture();
@@ -414,6 +422,17 @@ static void __init build_mem_type_table(void)
 			cachepolicy = CPOLICY_WRITEBACK;
 		ecc_mask = 0;
 	}
+	/*!
+	 * WRITE BACK 
+	 *   캐시에 우선 적용하고, 캐시 교체(cache replacement) 정책에 의해
+	 * 데이터가 캐시 영역에서 나가야 할 경우 메모리에 반영한다.
+	 *
+	 * WRITE ALLOC 
+	 *   캐시 미스가 발생하였을 때 캐시 컨트롤러가 캐시 라인을 할당하기
+	 * 위한 방법으로 두가지가있다.
+	 * 1. read-allocate 방식: 데이터를 메모리에서 읽었을 때 캐시 라인 할당
+	 * 2. write-allocate 방식: 메모리에 데이터를 쓸 때 캐시 라인할당
+	 */
 	if (is_smp())
 		cachepolicy = CPOLICY_WRITEALLOC;
 
@@ -509,9 +528,26 @@ static void __init build_mem_type_table(void)
 	/*
 	 * Now deal with the memory-type mappings
 	 */
+	/*!
+	 * .policy	= "writealloc",
+	 * .cr_mask	= 0,
+	 * .pmd		= PMD_SECT_WBWA,
+	 * .pte		= L_PTE_MT_WRITEALLOC,
+	 * .pte_s2	= s2_policy(L_PTE_S2_MT_WRITEBACK),
+	 */
 	cp = &cache_policies[cachepolicy];
 	vecs_pgprot = kern_pgprot = user_pgprot = cp->pte;
+	/*!
+	 * pte_s2 = LPAE 정책으로 현재 사용안함 -> 0
+	 */
 	s2_pgprot = cp->pte_s2;
+	/*!
+	 * .prot_pte	= PROT_PTE_DEVICE | L_PTE_MT_DEV_SHARED |
+				  L_PTE_SHARED,
+	 * .prot_pte_s2	= s2_policy(PROT_PTE_S2_DEVICE) |
+				  s2_policy(L_PTE_S2_MT_DEV_SHARED) |
+				  L_PTE_SHARED,
+	 */
 	hyp_device_pgprot = mem_types[MT_DEVICE].prot_pte;
 	s2_device_pgprot = mem_types[MT_DEVICE].prot_pte_s2;
 
@@ -1292,6 +1328,10 @@ static inline void prepare_page_table(void)
 	/*
 	 * Clear out all the mappings below the kernel image.
 	 */
+	/*!
+	 * 0 ~ (0xC0000000 - 0x100000)만큼 pmd table Clear, mmu dcache Clear
+	 * pgd_t 엔트리가 엔트리(1MB) 배열 2개이므로 2MB 단위(PMD_SIZE)로 증가 
+	 */
 	for (addr = 0; addr < MODULES_VADDR; addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
 
@@ -1306,12 +1346,19 @@ static inline void prepare_page_table(void)
 	 * Find the end of the first block of lowmem.
 	 */
 	end = memblock.memory.regions[0].base + memblock.memory.regions[0].size;
+	/*! 
+	 * arm_lowmem_limit = high_memory 시작주소 - 1
+	 * high_memory = high_memory 시작주소
+	 */
 	if (end >= arm_lowmem_limit)
 		end = arm_lowmem_limit;
 
 	/*
 	 * Clear out all the kernel space mappings, except for the first
 	 * memory bank, up to the vmalloc region.
+	 */
+	/*!
+	 * VMALLOC 더미(highmem 시작부터 +8Mb까지) 지움
 	 */
 	for (addr = __phys_to_virt(end);
 	     addr < VMALLOC_START; addr += PMD_SIZE)
@@ -1611,7 +1658,16 @@ void __init paging_init(const struct machine_desc *mdesc)
 {
 	void *zero_page;
 
+	/*! build_mem_type_table()
+	 * mem_types 배열 초기화
+	 * - arm 버전과, 메모리 타입에 따라 mem_types의 캐시 정책 설정.
+	 * - 메모리 타입에 따라서 섹션(Section 또는 L1 또는 PMD) , 태이블 엔트리 (L2 또는 PTE)
+	 *    그리고 도메인(domain) 에 대한 보호 설정을 해줌.
+	 * 
+	 */
 	build_mem_type_table();
+	/*!
+	 */
 	prepare_page_table();
 	map_lowmem();
 	dma_contiguous_remap();

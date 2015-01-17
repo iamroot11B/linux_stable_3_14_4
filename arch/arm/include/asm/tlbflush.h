@@ -588,6 +588,14 @@ static inline void clean_pmd_entry(void *pmd)
 {
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
 
+    /*!
+     * if (tlb_flag(TLB_DCLEAN))
+     *   asm("mcr p15 , 0, %0 , c7, c10 , 1 @ flush_pmd" "r" (pmd) "cc");
+     * if (tlb_flag(TLB_L2CLEAN_FR))
+     *   asm("mcr p15 , 1, %0, c15 , c9, 1 @ L2 flush_pmd" "r" (pmd) "cc");
+     * 가상 주소인 pmd에 해당하는 MMU의 D-Cache 라인을 클린(clean)시킨다.
+     * tlb_l2_op 실행안함(L2 캐쉬가 있을 경우에만 실행)
+     */
 	tlb_op(TLB_DCLEAN, "c7, c10, 1	@ flush_pmd", pmd);
 	tlb_l2_op(TLB_L2CLEAN_FR, "c15, c9, 1  @ L2 flush_pmd", pmd);
 }

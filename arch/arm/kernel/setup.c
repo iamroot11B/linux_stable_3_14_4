@@ -1152,8 +1152,14 @@ void __init setup_arch(char **cmdline_p)
 	 * low memory(memblock) limit 설정
 	 */
 	sanity_check_meminfo();
+	/*!
+	 * memblock 구조체 초기화
+	 *  - memory: 뱅크 저장
+	 *  - reserved: 커널이미지, 페이지테이블, DTB, CMA, initrd 저장
+	 */
 	arm_memblock_init(&meminfo, mdesc);
 
+	/*! 20150117, study start */
 	paging_init(mdesc);
 	request_standard_resources(mdesc);
 
