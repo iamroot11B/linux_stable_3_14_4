@@ -1329,7 +1329,7 @@ static inline void prepare_page_table(void)
 	 * Clear out all the mappings below the kernel image.
 	 */
 	/*!
-	 * 0 ~ (0xC0000000 - 0x100000)만큼 pmd table Clear, mmu dcache Clear
+	 * 0 ~ (0xC0000000 - 0x1000000)만큼 pmd table Clear, mmu dcache Clear
 	 * pgd_t 엔트리가 엔트리(1MB) 배열 2개이므로 2MB 단위(PMD_SIZE)로 증가 
 	 */
 	for (addr = 0; addr < MODULES_VADDR; addr += PMD_SIZE)
@@ -1363,6 +1363,10 @@ static inline void prepare_page_table(void)
 	for (addr = __phys_to_virt(end);
 	     addr < VMALLOC_START; addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
+	/*! ARM11B 20150124 start
+	 * 현 시점에 Dcache and Icache 및 TLB는 ON 되어있는 상태임. 
+	 * 때문에 pmd_clear 는pgd 가 가리키는 pmd의 값을 0으로 바꿔주고 Dcache clean 
+	 */
 }
 
 /* CONFIG_ARM_LPAE is not set
@@ -1519,10 +1523,16 @@ static void __init kmap_init(void)
 static void __init map_lowmem(void)
 {
 	struct memblock_region *reg;
+	/*! ARM11B 20150124 
+	 * SECTION_SIZE(1MB) 단위로 align 
+	 */
 	unsigned long kernel_x_start = round_down(__pa(_stext), SECTION_SIZE);
 	unsigned long kernel_x_end = round_up(__pa(__init_end), SECTION_SIZE);
 
 	/* Map all the lowmem memory banks. */
+	/*! ARM11B 20150124 
+	 * start = 
+	 */
 	for_each_memblock(memory, reg) {
 		phys_addr_t start = reg->base;
 		phys_addr_t end = start + reg->size;
@@ -1669,6 +1679,9 @@ void __init paging_init(const struct machine_desc *mdesc)
 	/*!
 	 */
 	prepare_page_table();
+	/*! ARM11B 20150124
+	 *
+	 */
 	map_lowmem();
 	dma_contiguous_remap();
 	devicemaps_init(mdesc);

@@ -59,6 +59,10 @@
  * as wide as the result!), and we want to evaluate the macro
  * arguments just once each.
  */
+/*! ARM11B 20150124 
+ * round_up - 올림연산
+ * round_down - 내림연산
+ */
 #define __round_mask(x, y) ((__typeof__(x))((y)-1))
 #define round_up(x, y) ((((x)-1) | __round_mask(x, y))+1)
 #define round_down(x, y) ((x) & ~__round_mask(x, y))

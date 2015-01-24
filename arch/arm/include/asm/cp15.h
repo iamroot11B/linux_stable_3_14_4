@@ -38,7 +38,10 @@
 #define CR_TRE	(1 << 28)	/* TEX remap enable			*/
 #define CR_AFE	(1 << 29)	/* Access flag enable			*/
 #define CR_TE	(1 << 30)	/* Thumb exception enable		*/
-
+/*! ARM11B 20150124 
+ * __ASSEMBLY__ 정의에 대해 설명되어있는 사이트  
+ * http://permalink.gmane.org/gmane.linux.ports.arm.kernel/15693
+ */
 #ifndef __ASSEMBLY__
 
 #if __LINUX_ARM_ARCH__ >= 4

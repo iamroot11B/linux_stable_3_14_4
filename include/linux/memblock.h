@@ -38,6 +38,10 @@ struct memblock_type {
 	struct memblock_region *regions;
 };
 
+/*! ARM11B 20150124 
+ * memory - 전체 메모리
+ * reserved - 사용되고 있거나 앞으로 사용될 메모리
+ */
 struct memblock {
 	bool bottom_up;  /* is bottom up direction? */
 	phys_addr_t current_limit;
