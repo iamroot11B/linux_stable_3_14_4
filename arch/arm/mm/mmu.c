@@ -687,7 +687,12 @@ pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
 }
 EXPORT_SYMBOL(phys_mem_access_prot);
 #endif
-
+/*! ARM11B 20150131 
+ * NAND 는 보통 high vector 를 사용
+ * NOR는 보통 low vector 를 사용
+ * vectors_high() 는 cr_alignment (control register values) 의
+ * 13(CR_V)bit setting 여부
+ */
 #define vectors_base()	(vectors_high() ? 0xffff0000 : 0)
 
 static void __init *early_alloc_aligned(unsigned long sz, unsigned long align)
@@ -871,6 +876,11 @@ static void __init create_mapping(struct map_desc *md)
 	const struct mem_type *type;
 	pgd_t *pgd;
 
+    /*! ARM11B 20150131 
+	 *  만약 vectors_base() 가 high 이면 TASK_SIZE(user 영역)
+	 *   를 제외한 영역만 create_mapping 하고
+	 *   low 이면 md->vitual(start) 이 0인 경우도 허용
+     */
 	if (md->virtual != vectors_base() && md->virtual < TASK_SIZE) {
 		printk(KERN_WARNING "BUG: not creating mapping for 0x%08llx"
 		       " at 0x%08lx in user region\n",
@@ -892,23 +902,37 @@ static void __init create_mapping(struct map_desc *md)
 	/*
 	 * Catch 36-bit addresses
 	 */
+	/*! ARM11B 20150131 
+	 * LPAE 가 꺼져있어도 phys_addr 이 32bit 보다 크면은 
+	 * create_36bit_mapping 을 수행
+	 */
 	if (md->pfn >= 0x100000) {
 		create_36bit_mapping(md, type);
 		return;
 	}
 #endif
-
+	/*! ARM11B 20150131 
+	 * PAGE_MASK ==> 0xFFFF F000
+	 * ~PAGE_MASK ==> 0x0000 0FFF
+	 * PAGE_ALIGN(x) ==> 1뺀것을 더하고 쳐낸 값
+	 */
 	addr = md->virtual & PAGE_MASK;
 	phys = __pfn_to_phys(md->pfn);
 	length = PAGE_ALIGN(md->length + (md->virtual & ~PAGE_MASK));
 
+	/*! ARM11B 20150131 
+	 * SECTION_MASK = 0xFFF0 0000 
+	 * ~SECTION_MASK = 0x000F FFFF
+	 */
 	if (type->prot_l1 == 0 && ((addr | phys | length) & ~SECTION_MASK)) {
 		printk(KERN_WARNING "BUG: map for 0x%08llx at 0x%08lx can not "
 		       "be mapped using pages, ignoring.\n",
 		       (long long)__pfn_to_phys(md->pfn), addr);
 		return;
 	}
-
+		/*! ARM11B 20150131 end
+		 * 
+		 */
 	pgd = pgd_offset_k(addr);
 	end = addr + length;
 	do {
@@ -1530,9 +1554,10 @@ static void __init map_lowmem(void)
 	unsigned long kernel_x_end = round_up(__pa(__init_end), SECTION_SIZE);
 
 	/* Map all the lowmem memory banks. */
-	/*! ARM11B 20150124 
-	 * start = 
-	 */
+		/*! ARM11B 20150131 start
+		 * 각 regions 을 돌아가면서 kernel의 init_section 을 제외한 영역을 
+		 * create_mapping 함.
+		 */
 	for_each_memblock(memory, reg) {
 		phys_addr_t start = reg->base;
 		phys_addr_t end = start + reg->size;
@@ -1542,15 +1567,64 @@ static void __init map_lowmem(void)
 			end = arm_lowmem_limit;
 		if (start >= end)
 			break;
-
+		
 		if (end < kernel_x_start || start >= kernel_x_end) {
 			map.pfn = __phys_to_pfn(start);
 			map.virtual = __phys_to_virt(start);
 			map.length = end - start;
 			map.type = MT_MEMORY_RWX;
-
+			/*! ARM11B 20150131
+			 * kernel code 영역이 memory region 과 겹치지 않는경우는
+			 * memory region 을 MT_MEMORY_RWX로  create_mapping 함
+			 *
+			 *                      ********   <---- end
+			 *                      |memory |
+			 *                      |region |
+			 *                      |       |
+			 *                      ********   <---- start
+			 *
+			 *
+			 *	 kernel_x_end ---->  *********
+			 *                       |kernel  |
+			 *                       |code    |
+			 *   kernel_x_start -->  *********
+			 * 
+			 *                      ********   <---- end
+			 *                      |memory |
+			 *                      |region |
+			 *                      |       |
+			 *                      ********   <---- start
+			 * .
+			 */
+			
+			 
 			create_mapping(&map);
 		} else {
+
+			/*! ARM11B 20150131
+			 * kernel code 영역이 memory region 과 겹치는 경우는
+			 * memory region 을 MT_MEMORY_RW로  create_mapping 하고
+			 * kernel code 영역은 MT_MEMORY_RWX로 create_mapping 함. 
+			 *
+			 *                      ************   <---- end
+			 *                      |memory     |
+			 *                      |region     |
+			 *                      |           |
+			 *                      |           |
+			 *
+			 *	 kernel_x_end ---->   *********
+			 *                        |kernel  |
+			 *                        |code    |
+			 *   kernel_x_start -->   *********
+			 *
+			 *                      |           |
+			 *                      |memory     |
+			 *                      |region     |
+			 *                      |           |
+			 *                      ************   <---- start
+			 * .
+			 */
+
 			/* This better cover the entire kernel */
 			if (start < kernel_x_start) {
 				map.pfn = __phys_to_pfn(start);

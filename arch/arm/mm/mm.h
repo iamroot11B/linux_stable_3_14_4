@@ -40,7 +40,10 @@ static inline pmd_t *pmd_off_k(unsigned long virt)
      */
 	return pmd_offset(pud_offset(pgd_offset_k(virt), virt), virt);
 }
-
+/*! ARM11B 20150131 
+ * typedef u32 pteval_t;
+ * typedef u32 pmdval_t;
+ */
 struct mem_type {
 	pteval_t prot_pte;
 	pteval_t prot_pte_s2;

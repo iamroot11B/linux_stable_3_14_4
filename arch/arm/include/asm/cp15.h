@@ -42,8 +42,17 @@
  * __ASSEMBLY__ 정의에 대해 설명되어있는 사이트  
  * http://permalink.gmane.org/gmane.linux.ports.arm.kernel/15693
  */
+/*! ARM11B 20150131 
+ * __ASSEMBLY__ 는 assembler 가 동작할때 define 되어있고 C 를 컴파일
+ * 할때는 define 되어있지 않음. 
+ */
 #ifndef __ASSEMBLY__
 
+/*! ARM11B 20150131 
+ * 우리꺼는  __LINUX_ARM_ARCH__ == 7
+ * __mmap_switched 에서 cr_alignment 에 Save contorl register values 을
+ * 저장한다. (CONFIG_CPU_CP15 = y 일경우)
+ */
 #if __LINUX_ARM_ARCH__ >= 4
 #define vectors_high()	(cr_alignment & CR_V)
 #else
@@ -53,6 +62,10 @@
 #ifdef CONFIG_CPU_CP15
 
 extern unsigned long cr_no_alignment;	/* defined in entry-armv.S */
+/*! ARM11B 20150131 
+ * __mmap_switched 에서 cr_alignment 에 Save contorl register values 을
+ * 저장한다. (CONFIG_CPU_CP15 = y 일경우)
+ */
 extern unsigned long cr_alignment;	/* defined in entry-armv.S */
 
 static inline unsigned int get_cr(void)
