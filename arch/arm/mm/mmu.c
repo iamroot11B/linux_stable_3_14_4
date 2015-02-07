@@ -747,11 +747,18 @@ static void __init __map_init_section(pmd_t *pmd, unsigned long addr,
 	if (addr & SECTION_SIZE)
 		pmd++;
 #endif
+	/*! ARM11B 20150207 
+	 * pmd에 해당 주소의 물리주소와 플래그를 넣어주고,
+	 * 섹션단위로 루프(2번)를 돌아 페이지 테이블을 채워준다.
+	 */
 	do {
 		*pmd = __pmd(phys | type->prot_sect);
 		phys += SECTION_SIZE;
 	} while (pmd++, addr += SECTION_SIZE, addr != end);
 
+	/*! ARM11B 20150207 
+	 * d캐쉬 플러쉬
+	 */
 	flush_pmd_entry(p);
 }
 
@@ -761,7 +768,10 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
 {
 	pmd_t *pmd = pmd_offset(pud, addr);
 	unsigned long next;
-
+ 
+	/*! ARM11B 20150207 
+	 * 2mb 단위(pgd)로 페이지테이블 작성
+	 */
 	do {
 		/*
 		 * With LPAE, we must loop over to map
@@ -773,6 +783,10 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
 		 * Try a section mapping - addr, next and phys must all be
 		 * aligned to a section boundary.
 		 */
+	/*! ARM11B 20150207 
+	 * 프로텍션 타입과 넘겨받은 인자들 중 addr,next,phys들이 섹션단위로 정렬되어 있다면 __map_init_section()실행
+	 * 섹션단위로 정렬되지 않았다면 alloc_init_pte() 실행
+	 */
 		if (type->prot_sect &&
 				((addr | next | phys) & ~SECTION_MASK) == 0) {
 			__map_init_section(pmd, addr, next, phys, type);
@@ -795,6 +809,9 @@ static void __init alloc_init_pud(pgd_t *pgd, unsigned long addr,
 
 	do {
 		next = pud_addr_end(addr, end);
+	/*! ARM11B 20150207 
+	 * 2레벨 페이징을 사용하고 있으므로 바로 alloc_init_pmd()로 넘어간다.
+	 */
 		alloc_init_pmd(pud, addr, next, phys, type);
 		phys += next - addr;
 	} while (pud++, addr = next, addr != end);
@@ -921,8 +938,11 @@ static void __init create_mapping(struct map_desc *md)
 	length = PAGE_ALIGN(md->length + (md->virtual & ~PAGE_MASK));
 
 	/*! ARM11B 20150131 
-	 * SECTION_MASK = 0xFFF0 0000 
+	 * SECTION_MASK = 0xFFF0 0000
 	 * ~SECTION_MASK = 0x000F FFFF
+	 * 사용중인 페이지를 맵핑하려하므로 오류메시지 발생 후 맵핑하지 않음
+	 * 타입이 MT_CACHECLEAN 혹은 MT_ROM 혹은 정의되지 않은 타입일 경우에만 prot_l1이 0으로 셋팅된다.
+	 * 이 경우 두번째 조건은 섹션단위로 정렬되어있는지 확인함
 	 */
 	if (type->prot_l1 == 0 && ((addr | phys | length) & ~SECTION_MASK)) {
 		printk(KERN_WARNING "BUG: map for 0x%08llx at 0x%08lx can not "
@@ -930,18 +950,30 @@ static void __init create_mapping(struct map_desc *md)
 		       (long long)__pfn_to_phys(md->pfn), addr);
 		return;
 	}
-		/*! ARM11B 20150131 end
-		 * 
-		 */
+	/*! ARM11B 20150131 end */
+	/*! ARM11B 20150207 start */
+
+	/*! ARM11B 20150207 
+	 */
+
 	pgd = pgd_offset_k(addr);
 	end = addr + length;
 	do {
+	/*! ARM11B 20150207 
+	 * pgd_addr_end()
+	 * pgd섹션 단위(2mb)로 addr의 다음 섹션(addr + 2mb)을 가져오기
+	 * 만약 end가 addr 다음 섹션의 경계(addr + 2mb)를 넘어가지 못 할 경우 end를 반환
+	 */
 		unsigned long next = pgd_addr_end(addr, end);
 
 		alloc_init_pud(pgd, addr, next, phys, type);
 
 		phys += next - addr;
 		addr = next;
+	/*! ARM11B 20150207
+	 * while(1,2)
+	 * -> 1번 수행 뒤 2번 조건 판별 
+	 */
 	} while (pgd++, addr != end);
 }
 
@@ -1745,7 +1777,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	/*! build_mem_type_table()
 	 * mem_types 배열 초기화
 	 * - arm 버전과, 메모리 타입에 따라 mem_types의 캐시 정책 설정.
-	 * - 메모리 타입에 따라서 섹션(Section 또는 L1 또는 PMD) , 태이블 엔트리 (L2 또는 PTE)
+	 * - 메모리 타입에 따라서 섹션(Section 또는 L1 또는 PMD) , 테이블 엔트리 (L2 또는 PTE)
 	 *    그리고 도메인(domain) 에 대한 보호 설정을 해줌.
 	 * 
 	 */
@@ -1754,9 +1786,15 @@ void __init paging_init(const struct machine_desc *mdesc)
 	 */
 	prepare_page_table();
 	/*! ARM11B 20150124
-	 *
+	 * lowmem 영역의 페이지테이블디렉토리(pgd) 초기화
 	 */
 	map_lowmem();
+	/*! ARM11B 20150207 
+	 * cma를 쓰지않음. 그러므로 생략?
+	 * 간단한 요약으론 reserve된 dma영역을 맵핑함(iotable_init)
+	 * 여기서 알아볼것은 static_vm, vmalloc 과 관련된것이 나옴.
+	 * 참고: http://www.iamroot.org/xe/index.php?_filter=search&mid=Kernel_10_ARM&search_keyword=29%EC%A3%BC&search_target=title&document_srl=186592
+	 */
 	dma_contiguous_remap();
 	devicemaps_init(mdesc);
 	kmap_init();

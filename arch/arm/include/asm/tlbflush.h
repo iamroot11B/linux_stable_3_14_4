@@ -577,9 +577,36 @@ static inline void flush_pmd_entry(void *pmd)
 {
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
 
+	/*! ARM11B 20150207 
+     * if (tlb_flag(TLB_DCLEAN))
+     *   asm("mcr p15 , 0, %0 , c7, c10 , 1 @ flush_pmd" "r" (pmd) "cc");
+     * if (tlb_flag(TLB_L2CLEAN_FR))
+     *   asm("mcr p15 , 1, %0, c15 , c9, 1 @ L2 flush_pmd" "r" (pmd) "cc");
+	 */
 	tlb_op(TLB_DCLEAN, "c7, c10, 1	@ flush_pmd", pmd);
 	tlb_l2_op(TLB_L2CLEAN_FR, "c15, c9, 1  @ L2 flush_pmd", pmd);
 
+	/*! ARM11B 20150207 
+     * DSB명령을 통해서 ” write buffer에 있는 값을 다 내보내겠다” 라는 의미이다.
+     * 이 동작을 하는 이유는 1) bootloader가 cache에 값을 기록했을수도 있고,
+     * 2) cache가 off되어 있더라도, write buffer 상에 남아 있을 수 가 있어서 drain을 통해 write buffer를 내보내는 동작이다.
+     *****
+     * 용어
+     * flush : dirty 비트를 0으로 초기화(일반적인 의미의 clean에 가까움)
+     * clean : dirty 비트가 1인 데이터를 메모리에 반영
+     * drain : 클린을 위해 캐시 버퍼에 있는 내용을 메모리에 반영
+     *
+     * DMB - data memory barrier operation
+     * (DMB 이후의 명시적인 메모리 액세스를 시작하기 전에, DMB 이전의 모든 명시적인 메모리 액세스를 완료하도록 한다.)
+     *
+     * DSB - data synchronization barrier operation
+     * (DSB 이전의 모든 명령들을 완료하도록 한다.)
+     *
+     * ISB - Instruction synchronization barrier operation
+     * (파이프라인을 비워서, ISB 이후의 모든 명령들이 캐시나 메모리로부터 새로 fetch되도록 한다.
+	 *****
+     * ishst = 저장이 완료될때까지만 기다리고 공유 가능한 내부 도메인까지만 수행.
+     */
 	if (tlb_flag(TLB_WB))
 		dsb(ishst);
 }

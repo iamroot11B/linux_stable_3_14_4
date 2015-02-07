@@ -206,11 +206,18 @@ phys_addr_t __init_memblock memblock_find_in_range_node(phys_addr_t size,
 	/* avoid allocating the first page */
 	start = max_t(phys_addr_t, start, PAGE_SIZE);
 	end = max(start, end);
+	/* 20150207
+	 * 해당심볼의 물리주소를 가져옴
+	 */
 	kernel_end = __pa_symbol(_end);
 
 	/*
 	 * try bottom-up allocation only when bottom-up mode
 	 * is set and @end is above the kernel image.
+	 */
+
+	/* 20150207
+	 * memblock_bottom_up은 false
 	 */
 	if (memblock_bottom_up() && end > kernel_end) {
 		phys_addr_t bottom_up_start;
@@ -238,6 +245,7 @@ phys_addr_t __init_memblock memblock_find_in_range_node(phys_addr_t size,
 			     "memory hotunplug may be affected\n");
 	}
 
+	/* 20150207 end */
 	return __memblock_find_range_top_down(start, end, size, align, nid);
 }
 
