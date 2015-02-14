@@ -1480,6 +1480,9 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	/*
 	 * Allocate the vector page early.
 	 */
+	/*
+	 * 8K만큼 memblock reserved 영역에 등록
+	 */
 	vectors = early_alloc(PAGE_SIZE * 2);
 
 	early_trap_init(vectors);

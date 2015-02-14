@@ -928,6 +928,11 @@ void __init_memblock __next_free_mem_range_rev(u64 *idx, int nid,
 		/* scan areas before each reservation for intersection */
 		for ( ; ri >= 0; ri--) {
 			struct memblock_region *r = &rsv->regions[ri];
+			/*
+			 * r_start : 이전 reserved 영역의 base+size로
+			 * r_end : 현재 reserved 영역의 base로 셋팅
+			 * reserved 들의 사이에 있는 영역의 start와 end
+			 */
 			phys_addr_t r_start = ri ? r[-1].base + r[-1].size : 0;
 			phys_addr_t r_end = ri < rsv->cnt ? r->base : ULLONG_MAX;
 
@@ -943,6 +948,9 @@ void __init_memblock __next_free_mem_range_rev(u64 *idx, int nid,
 				if (out_nid)
 					*out_nid = memblock_get_region_node(m);
 
+				/*
+				 * m_start가 크거나 같은 경우는 다음 memory 영역으로
+				 */
 				if (m_start >= r_start)
 					mi--;
 				else
@@ -1028,6 +1036,9 @@ static phys_addr_t __init memblock_alloc_base_nid(phys_addr_t size,
 	if (!align)
 		align = SMP_CACHE_BYTES;
 
+	/*
+	 * reserved에 등록되지 않은 메모리 공간을 찾아서 reserved에 등록 (해당 공간의 끝에서 사이즈만큼 뺀 주소를 시작점으로)
+	 */
 	found = memblock_find_in_range_node(size, align, 0, max_addr, nid);
 	if (found && !memblock_reserve(found, size))
 		return found;

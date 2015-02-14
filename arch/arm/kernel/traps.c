@@ -860,6 +860,14 @@ static void __init kuser_init(void *vectors)
 	 * vectors + 0xfe0 = __kuser_get_tls
 	 * vectors + 0xfe8 = hardware TLS instruction at 0xffff0fe8
 	 */
+	/*
+	 * tls란 각 스레드별로 다른 값을 가지는 전역 변수를 말한다.
+	 * http://egloos.zum.com/studyfoss/v/5259841
+	 * hardware tls를 지원하지 않는 경우에는 해당 변수를 가져오기 위해서는 __kuser_get_tls 함수를 사용하지만,
+	 * hardware tls를 지원하는 경우(mrc p15, 0, c13, c0, 3)에는 0xffff0fe8위치에 hardware tls 명령어가 위치하므로
+	 * __kuser_get_tls함수가 위치하는 vectors+0xfe0 위치에 hardware TLS 명령어를 복사
+	 * 현재 tls_emu:0, has_tls_reg:1
+	 */
 	if (tls_emu || has_tls_reg)
 		memcpy(vectors + 0xfe0, vectors + 0xfe8, 4);
 }
@@ -898,8 +906,12 @@ void __init early_trap_init(void *vectors_base)
 
 	kuser_init(vectors_base);
 
+	/*
+	 * I-Cache flush 함수는 어디에???
+	 */
 	flush_icache_range(vectors, vectors + PAGE_SIZE * 2);
 	modify_domain(DOMAIN_USER, DOMAIN_CLIENT);
+	/* 20150214 end */
 #else /* ifndef CONFIG_CPU_V7M */
 	/*
 	 * on V7-M there is no need to copy the vector table to a dedicated
