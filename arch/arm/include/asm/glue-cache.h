@@ -147,7 +147,15 @@ extern inline void nop_dma_flush_range(const void *a, const void *b) { }
 extern inline void nop_dma_map_area(const void *s, size_t l, int f) { }
 extern inline void nop_dma_unmap_area(const void *s, size_t l, int f) { }
 #endif
-
+/*! 20150228
+ * _CACHE 는 각 아키텍처에 따라 결정. 현재 우리는 v7
+ * 멀티캐쉬일 경우 _CACHE는 그대로 두고 MULTI_CACHE만 1로 define된다.
+ *
+ * 아래 함수는 다음과 같이 변경됨.
+ * v7_flush_user_cache_range()
+ * v7_coherent_user_range()
+ * v7_coherent_kern_range()
+ */
 #ifndef MULTI_CACHE
 #define __cpuc_flush_icache_all		__glue(_CACHE,_flush_icache_all)
 #define __cpuc_flush_kern_all		__glue(_CACHE,_flush_kern_cache_all)

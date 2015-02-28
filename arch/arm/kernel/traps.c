@@ -910,6 +910,9 @@ void __init early_trap_init(void *vectors_base)
 	 * I-Cache flush 함수는 어디에???
 	 */
 	flush_icache_range(vectors, vectors + PAGE_SIZE * 2);
+	/*!
+	 * CPU의 도메인을 설정
+	 */
 	modify_domain(DOMAIN_USER, DOMAIN_CLIENT);
 	/* 20150214 end */
 #else /* ifndef CONFIG_CPU_V7M */

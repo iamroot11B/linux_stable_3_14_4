@@ -1487,6 +1487,9 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 
 	early_trap_init(vectors);
 
+	/*! 20150228 study start */
+	/*! 20150228 study end 
+	 */
 	for (addr = VMALLOC_START; addr; addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
 

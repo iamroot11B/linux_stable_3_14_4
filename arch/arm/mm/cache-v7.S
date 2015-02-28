@@ -292,6 +292,9 @@ ENDPROC(v7_flush_user_cache_range)
  *	It is assumed that:
  *	- the Icache does not read data from the write buffer
  */
+/*! 20150228
+ * coherent 유지
+ */
 ENTRY(v7_coherent_kern_range)
 	/* FALLTHROUGH */
 
@@ -309,14 +312,34 @@ ENTRY(v7_coherent_kern_range)
  *	- the Icache does not read data from the write buffer
  */
 ENTRY(v7_coherent_user_range)
+/*!
+ * linux 예외처리(Unwinding, fnstart ??)
+ * ex_table에 주소를 등록할 때 fnstart, fnend로 감싸준다.
+ * 참고 : https://sourceware.org/binutils/docs-2.22/as/ARM-Unwinding-Tutorial.html
+ * 참고(예외처리) : http://egloos.zum.com/studyfoss/v/5361614
+ * 참고(10-c-30주차) : http://www.iamroot.org/xe/Kernel_10_ARM/187023
+ */
  UNWIND(.fnstart		)
+	/*! r2 = 캐쉬라인사이즈(64 = 0x40 =  */
 	dcache_line_size r2, r3
+	/*! r3 = r2 - 1 (0x3f)*/
 	sub	r3, r2, #1
+	/*!
+	 * r1 = vectors + PAGE_SIZE * 2 
+	 * r0 = 플러쉬할 주소
+	 * r12 =  r0를 캐쉬라인사이즈 얼라인 */
 	bic	r12, r0, r3
 #ifdef CONFIG_ARM_ERRATA_764369
 	ALT_SMP(W(dsb))
 	ALT_UP(W(nop))
 #endif
+/*!
+ * USER() : ex_table에 예외처리 주소 등록
+ * 해당 동작을 위해 __ex_table은 exception이 발생하는 주소와
+ * exception 처리후 돌아갈 PC를 저장하고 나중에 fixup_exception()에 
+ * 의해 리턴시 PC를 변경하는 용도로 사용된다.
+ * 참고: http://www.iamroot.org/xe/Kernel_10_ARM/187023
+ */
 1:
  USER(	mcr	p15, 0, r12, c7, c11, 1	)	@ clean D line to the point of unification
 	add	r12, r12, r2

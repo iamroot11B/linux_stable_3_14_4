@@ -69,6 +69,11 @@
  * dcache_line_size - get the minimum D-cache line size from the CTR register
  * on ARMv7.
  */
+	/*!
+	 * reg에 캐쉬 라인 사이즈를 넣어준다.
+	 * ctr - cache type register
+	 * 19~16은 DminLine 으로 캐쉬 라인 사이즈를 나타낸다.
+	 */
 	.macro	dcache_line_size, reg, tmp
 	mrc	p15, 0, \tmp, c0, c0, 1		@ read ctr
 	lsr	\tmp, \tmp, #16
