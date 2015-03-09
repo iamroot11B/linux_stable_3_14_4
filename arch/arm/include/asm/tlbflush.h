@@ -166,6 +166,17 @@
 # define v6wbi_always_flags	(-1UL)
 #endif
 
+/*!
+ *                            v7wbi_tlb_flags_smp   v7wbi_tlb_flags_up		
+ * -------------------------------------------------------------------------                              
+ * TLB_V7_UIS_PAGE  (1 << 20)           O               O
+ * TLB_V7_UIS_FULL  (1 << 21)           O               O
+ * TLB_V7_UIS_ASID  (1 << 22)           O               O
+ * TLB_V7_UIS_BP    (1 << 23)           O               O
+ * TLB_BARRIER      (1 << 28)           O               O
+ * TLB_DCLEAN       (1 << 30)           X               O
+ * TLB_WB           (1 << 31)           O               O
+ */
 #define v7wbi_tlb_flags_smp	(TLB_WB | TLB_BARRIER | \
 				 TLB_V7_UIS_FULL | TLB_V7_UIS_PAGE | \
 				 TLB_V7_UIS_ASID | TLB_V7_UIS_BP)
@@ -173,6 +184,10 @@
 				 TLB_V6_U_FULL | TLB_V6_U_PAGE | \
 				 TLB_V6_U_ASID | TLB_V6_BP)
 
+/*!
+ * CCONFIG_CPU_TLB_V7 = y
+ * ONFIG_SMP_ON_UP = y
+ */
 #ifdef CONFIG_CPU_TLB_V7
 
 # ifdef CONFIG_SMP_ON_UP
@@ -618,8 +633,10 @@ static inline void clean_pmd_entry(void *pmd)
     /*!
      * if (tlb_flag(TLB_DCLEAN))
      *   asm("mcr p15 , 0, %0 , c7, c10 , 1 @ flush_pmd" "r" (pmd) "cc");
+     *
      * if (tlb_flag(TLB_L2CLEAN_FR))
      *   asm("mcr p15 , 1, %0, c15 , c9, 1 @ L2 flush_pmd" "r" (pmd) "cc");
+     *
      * 가상 주소인 pmd에 해당하는 MMU의 D-Cache 라인을 클린(clean)시킨다.
      * tlb_l2_op 실행안함(L2 캐쉬가 있을 경우에만 실행)
      */

@@ -723,6 +723,10 @@ static void __init alloc_init_pte(pmd_t *pmd, unsigned long addr,
 {
 	pte_t *pte = early_pte_alloc(pmd, addr, type->prot_l1);
 	do {
+        /*!
+         * set_pte_ext = cpu_set_pte_ext = cpu_v7_set_pte_ext
+         * cpu_v7_set_pte_ext(ptep, pte) ==> arch/arm/mm/proc-v7-2level.S 참조
+         */
 		set_pte_ext(pte, pfn_pte(pfn, __pgprot(type->prot_pte)), 0);
 		pfn++;
 	} while (pte++, addr += PAGE_SIZE, addr != end);
@@ -785,7 +789,7 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
 		 */
 	/*! ARM11B 20150207 
 	 * 프로텍션 타입과 넘겨받은 인자들 중 addr,next,phys들이 섹션단위로 정렬되어 있다면 __map_init_section()실행
-	 * 섹션단위로 정렬되지 않았다면 alloc_init_pte() 실행
+	 * 섹션단위(PMD,1MB)로 정렬되지 않았다면 alloc_init_pte() 실행
 	 */
 		if (type->prot_sect &&
 				((addr | next | phys) & ~SECTION_MASK) == 0) {
@@ -898,6 +902,8 @@ static void __init create_mapping(struct map_desc *md)
 	 *   를 제외한 영역만 create_mapping 하고
 	 *   low 이면 md->vitual(start) 이 0인 경우도 허용
      */
+
+	/*! 유효성 확인 */
 	if (md->virtual != vectors_base() && md->virtual < TASK_SIZE) {
 		printk(KERN_WARNING "BUG: not creating mapping for 0x%08llx"
 		       " at 0x%08lx in user region\n",
@@ -905,6 +911,7 @@ static void __init create_mapping(struct map_desc *md)
 		return;
 	}
 
+	/*! 유효성 확인 */
 	if ((md->type == MT_DEVICE || md->type == MT_ROM) &&
 	    md->virtual >= PAGE_OFFSET &&
 	    (md->virtual < VMALLOC_START || md->virtual >= VMALLOC_END)) {
@@ -1490,8 +1497,20 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	/*! 20150228 study start */
 	/*! 20150228 study end 
 	 */
+
+	/*! 20150307 study start */
+	/*!
+     * VMALLOC_OFFSET		(8*1024*1024)
+     * VMALLOC_START		(((unsigned long)high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
+     *           ---->                       high_memory + 0x800000        & ~(7FFFFF)
+     *           ---->                       high_memory 를 8M 단위로 align 한 것 
+     * VMALLOC_END		0xff000000UL
+     * PMD_SIZE         2MB
+     */
 	for (addr = VMALLOC_START; addr; addr += PMD_SIZE)
+	{
 		pmd_clear(pmd_off_k(addr));
+	}
 
 	/*
 	 * Map the kernel if it is XIP.

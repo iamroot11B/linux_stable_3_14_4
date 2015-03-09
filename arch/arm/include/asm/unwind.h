@@ -50,6 +50,7 @@ extern struct unwind_table *unwind_table_add(unsigned long start,
 extern void unwind_table_del(struct unwind_table *tab);
 extern void unwind_backtrace(struct pt_regs *regs, struct task_struct *tsk);
 
+#else
 #endif	/* !__ASSEMBLY__ */
 
 #ifdef CONFIG_ARM_UNWIND

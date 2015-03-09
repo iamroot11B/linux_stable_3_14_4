@@ -76,6 +76,11 @@
 #define PTE_HWTABLE_OFF		(PTE_HWTABLE_PTRS * sizeof(pte_t))
 #define PTE_HWTABLE_SIZE	(PTRS_PER_PTE * sizeof(u32))
 
+/*!
+ *  PTE_HWTABLE_OFF  = 512 EA * 4 Byte = 2048 (2KB)
+ *  PTE_HWTABLE_SIZE = 512 EA * 4 Byte = 2048 (2KB)	
+ */
+
 /*
  * PMD_SHIFT determines the size of the area a second-level page table can map
  * PGDIR_SHIFT determines what a third-level page table entry can map
@@ -83,7 +88,11 @@
 #define PMD_SHIFT		21
 #define PGDIR_SHIFT		21
 
-#define PMD_SIZE		(1UL << PMD_SHIFT)
+/*!
+ * 1 << 20 == 1M
+ * 1 << 21 == 2M
+ */
+#define PMD_SIZE		(1UL << PMD_SHIFT)  
 #define PMD_MASK		(~(PMD_SIZE-1))
 #define PGDIR_SIZE		(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK		(~(PGDIR_SIZE-1))
@@ -181,6 +190,9 @@ static inline pmd_t *pmd_offset(pud_t *pud, unsigned long addr)
 /* we don't need complex calculations here as the pmd is folded into the pgd */
 #define pmd_addr_end(addr,end) (end)
 
+/*!
+ * cpu_set_pte_ext => cpu_v7_set_pte_ext
+ */
 #define set_pte_ext(ptep,pte,ext) cpu_set_pte_ext(ptep,pte,ext)
 
 /*
