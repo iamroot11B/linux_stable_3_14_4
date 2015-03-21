@@ -131,6 +131,9 @@ static inline void pte_free(struct mm_struct *mm, pgtable_t pte)
 static inline void __pmd_populate(pmd_t *pmdp, phys_addr_t pte,
 				  pmdval_t prot)
 {
+    /*! HW table / Linux table 두개가 있어서 PTE_HWTABLE_OFF 만큼 더 해 주는듯.
+     * PGD 1 <= PMD 2  / PMD 1 <= PTE 256 관리
+     */
 	pmdval_t pmdval = (pte + PTE_HWTABLE_OFF) | prot;
 	pmdp[0] = __pmd(pmdval);
 #ifndef CONFIG_ARM_LPAE

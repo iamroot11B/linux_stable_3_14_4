@@ -44,7 +44,7 @@
 struct list_head {
 	struct list_head *next, *prev;
 };
-
+/*! LIST 초기화. 자신의 previous 도 자신, 자신의 next도 자신인 원형 list */
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \

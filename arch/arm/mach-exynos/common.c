@@ -316,7 +316,9 @@ void __init exynos_init_late(void)
 
 	pm_genpd_poweroff_unused();
 }
-
+/*! it(p, pathp, depth, data);
+ * p = dt struct 주소, pathp = path 문자열, depth = depth(BEGIN_NODE가 아닐 때 +1), data = 여기선 NULL)
+ */
 static int __init exynos_fdt_map_chipid(unsigned long node, const char *uname,
 					int depth, void *data)
 {
@@ -324,14 +326,26 @@ static int __init exynos_fdt_map_chipid(unsigned long node, const char *uname,
 	__be32 *reg;
 	unsigned long len;
 
+    /*! exynos5420.dtsi 에서 exynos5.dtsi 를 include 하며, exynos5.dtsi 에
+     * compatible = "samsung,exynos4210-chipid"; 가 명시 되어 있음.
+     *
+     * 	chipid@10000000 {
+     *      compatible = "samsung,exynos4210-chipid";
+     *      reg = <0x10000000 0x100>;
+     *  };
+     */
 	if (!of_flat_dt_is_compatible(node, "samsung,exynos4210-chipid") &&
 		!of_flat_dt_is_compatible(node, "samsung,exynos5440-clock"))
 		return 0;
 
+    /*! reg = <0x10000000 0x100>;  ( <vale, size> )
+     * len = property 의 길이. 여기서는 8 byte
+     */
 	reg = of_get_flat_dt_prop(node, "reg", &len);
 	if (reg == NULL || len != (sizeof(unsigned long) * 2))
 		return 0;
 
+    /*! reg[0] = 0x10000000, reg[1] = 0x100 */
 	iodesc.pfn = __phys_to_pfn(be32_to_cpu(reg[0]));
 	iodesc.length = be32_to_cpu(reg[1]) - 1;
 	iodesc.virtual = (unsigned long)S5P_VA_CHIPID;
@@ -350,6 +364,10 @@ void __init exynos_init_io(void)
 {
 	debug_ll_io_init();
 
+    /*! of_scan_flat_dt(callback function, data)의 구조이며,
+     * callback function은 iterator로 동작하여, function 이 0 이 아닌 값을 반환 할 때까지 반복 하게 된다.
+     * IO Map 추가
+     */
 	of_scan_flat_dt(exynos_fdt_map_chipid, NULL);
 
 	/* detect cpu id and rev. */
@@ -375,8 +393,14 @@ static void __init exynos4_map_io(void)
 
 static void __init exynos5_map_io(void)
 {
+    /*! iotable_init(struct map_desc *io_desc, int nr)
+     *  io_desc 부터 nr 크기 만큼 loop를 돌면서 IO init 및 vm_list 에 추가.
+     */
 	iotable_init(exynos5_iodesc, ARRAY_SIZE(exynos5_iodesc));
 
+    /*! IS_SAMSUNG_CPU(exynos5250, EXYNOS5250_SOC_ID, EXYNOS5_SOC_MASK) from cpu.h
+     * exynos 5250 일때만 아래 exynos5250_iodesc IO init을 해 준다.
+     */
 	if (soc_is_exynos5250())
 		iotable_init(exynos5250_iodesc, ARRAY_SIZE(exynos5250_iodesc));
 }

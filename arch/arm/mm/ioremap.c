@@ -91,9 +91,11 @@ void __init add_static_vm_early(struct static_vm *svm)
 	void *vaddr;
 
 	vm = &svm->vm;
+    /*! struct vm_struct *vmlist 가 관리하는 linked list 에 vm을 넣어 준다.  */
 	vm_area_add_early(vm);
 	vaddr = vm->addr;
 
+    /*! head->next 부터 head로 돌아올때까지 list(원형 리스트)를 순차적으로 탐색  */
 	list_for_each_entry(curr_svm, &static_vmlist, list) {
 		vm = &curr_svm->vm;
 

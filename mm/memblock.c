@@ -1036,7 +1036,7 @@ static phys_addr_t __init memblock_alloc_base_nid(phys_addr_t size,
 	if (!align)
 		align = SMP_CACHE_BYTES;
 
-	/*
+	/*!
 	 * reserved에 등록되지 않은 메모리 공간을 찾아서 reserved에 등록 (해당 공간의 끝에서 사이즈만큼 뺀 주소를 시작점으로)
 	 */
 	found = memblock_find_in_range_node(size, align, 0, max_addr, nid);

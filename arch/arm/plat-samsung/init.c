@@ -52,12 +52,22 @@ static struct cpu_table * __init s3c_lookup_cpu(unsigned long idcode,
 void __init s3c_init_cpu(unsigned long idcode,
 			 struct cpu_table *cputab, unsigned int cputab_size)
 {
+    /*! cputab에서 ipcode가 일치하는 tab을 찾아 반환 */
 	cpu = s3c_lookup_cpu(idcode, cputab, cputab_size);
 
 	if (cpu == NULL) {
 		printk(KERN_ERR "Unknown CPU type 0x%08lx\n", idcode);
 		panic("Unknown S3C24XX CPU");
 	}
+    /*! cpuids[] =      (아래는 exynost 5420 part)
+     *    ....
+     * { 
+  	 *	.idcode		= EXYNOS5420_SOC_ID, 
+	 *	.idmask		= EXYNOS5_SOC_MASK, 
+	 *	.map_io		= exynos5_map_io, 
+	 *	.init		= exynos_init, 
+	 *	.name		= name_exynos5420, 
+	 * } */
 
 	printk("CPU %s (id 0x%08lx)\n", cpu->name, idcode);
 

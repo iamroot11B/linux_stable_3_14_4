@@ -75,6 +75,8 @@ static inline void list_add(struct list_head *new, struct list_head *head)
  */
 /*!
  * list_add_tail(&ss->base_cftset.node, &ss->cftsets);
+ * 원형 리스트의 tail(마지막)에 new를 추가한다.
+ * 원형 리스트이기 때문에 head 의 prev = list의 마지막 과 같다.
  */
 static inline void list_add_tail(struct list_head *new, struct list_head *head)
 {

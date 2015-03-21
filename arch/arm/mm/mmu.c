@@ -710,10 +710,14 @@ static void __init *early_alloc(unsigned long sz)
 static pte_t * __init early_pte_alloc(pmd_t *pmd, unsigned long addr, unsigned long prot)
 {
 	if (pmd_none(*pmd)) {
+    /*! *pmd 가 NULL 이라면, *pte = 4kb memory aloocation 한 후 pmd를 만들어 준다. */
 		pte_t *pte = early_alloc(PTE_HWTABLE_OFF + PTE_HWTABLE_SIZE);
 		__pmd_populate(pmd, __pa(pte), prot);
 	}
 	BUG_ON(pmd_bad(*pmd));
+    /*! pmd 에는 hwtable offset(2kb)가 더해진 값을 가지고, 아래 return은
+     * HW table offset을 더하기 전 값을 리턴한다.
+     */
 	return pte_offset_kernel(pmd, addr);
 }
 
@@ -721,6 +725,7 @@ static void __init alloc_init_pte(pmd_t *pmd, unsigned long addr,
 				  unsigned long end, unsigned long pfn,
 				  const struct mem_type *type)
 {
+    /*!   */
 	pte_t *pte = early_pte_alloc(pmd, addr, type->prot_l1);
 	do {
         /*!
@@ -791,6 +796,9 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
 	 * 프로텍션 타입과 넘겨받은 인자들 중 addr,next,phys들이 섹션단위로 정렬되어 있다면 __map_init_section()실행
 	 * 섹션단위(PMD,1MB)로 정렬되지 않았다면 alloc_init_pte() 실행
 	 */
+    /*! 20150321 Study Start
+     * 아래 if 문 else case부터
+     */
 		if (type->prot_sect &&
 				((addr | next | phys) & ~SECTION_MASK) == 0) {
 			__map_init_section(pmd, addr, next, phys, type);
@@ -996,6 +1004,10 @@ void __init iotable_init(struct map_desc *io_desc, int nr)
 	if (!nr)
 		return;
 
+    /*! __alignof__(x)  = x를 align 하기위한 size를 반환
+     * early_alloc_aligned(svm의 사이즈 * 1, 4);
+     * svm 사이즈 * 1 만큼의 크기만큼 memory alloc (필요 시 align 사이즈 단위로 align)
+     */
 	svm = early_alloc_aligned(sizeof(*svm) * nr, __alignof__(*svm));
 
 	for (md = io_desc; nr; md++, nr--) {
@@ -1055,6 +1067,7 @@ static void __init fill_pmd_gaps(void)
 	unsigned long addr, next = 0;
 	pmd_t *pmd;
 
+    /*! static_vmlist  리스트의 head->next 부터 head로 돌아올때까지 list   */
 	list_for_each_entry(svm, &static_vmlist, list) {
 		vm = &svm->vm;
 		addr = (unsigned long)vm->addr;
@@ -1068,6 +1081,10 @@ static void __init fill_pmd_gaps(void)
 		 */
 		if ((addr & ~PMD_MASK) == SECTION_SIZE) {
 			pmd = pmd_off_k(addr);
+            /*! addr 이 1MB align 되어 있고, addr가 포함되 pmd가 NULL 일 때,
+             * 1MB 크기로 vm_reserve_area_early 를 실행 해 준다.
+             * (memory alloc 하여 vm_struct 생성 및, vmlist list에 추가)
+             */
 			if (pmd_none(*pmd))
 				pmd_empty_section_gap(addr & PMD_MASK);
 		}
@@ -1108,6 +1125,7 @@ static void __init pci_reserve_io(void)
 #define pci_reserve_io() do { } while (0)
 #endif
 
+/*! CONFIG_DEBUG_LL은 not set  */
 #ifdef CONFIG_DEBUG_LL
 void __init debug_ll_io_init(void)
 {
@@ -1574,11 +1592,14 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	/*
 	 * Ask the machine support to map in the statically mapped devices.
 	 */
+    /*! mach-exynos5-dt.c 의 마지막 참조 */
 	if (mdesc->map_io)
 		mdesc->map_io();
 	else
 		debug_ll_io_init();
+    /*! pgd[2] 중에서 하나만 초기화 된 경우 나머지도 초기화 시켜 준다. */
 	fill_pmd_gaps();
+    /*! 20150321 end   */
 
 	/* Reserve fixed i/o space in VMALLOC region */
 	pci_reserve_io();

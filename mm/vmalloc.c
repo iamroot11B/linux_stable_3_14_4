@@ -1129,6 +1129,9 @@ void __init vm_area_add_early(struct vm_struct *vm)
 {
 	struct vm_struct *tmp, **p;
 
+    /*! vm을 Linked List 의 사이에 넣어 준다.
+     * 리스트의 끝에 들어갈 때는, 자신의 next 를 NULL 로 해 주고 linked list에 붙는다.
+     */
 	BUG_ON(vmap_initialized);
 	for (p = &vmlist; (tmp = *p) != NULL; p = &tmp->next) {
 		if (tmp->addr >= vm->addr) {
