@@ -169,13 +169,17 @@
 /*!
  *                            v7wbi_tlb_flags_smp   v7wbi_tlb_flags_up		
  * -------------------------------------------------------------------------                              
- * TLB_V7_UIS_PAGE  (1 << 20)           O               O
- * TLB_V7_UIS_FULL  (1 << 21)           O               O
- * TLB_V7_UIS_ASID  (1 << 22)           O               O
- * TLB_V7_UIS_BP    (1 << 23)           O               O
- * TLB_BARRIER      (1 << 28)           O               O
- * TLB_DCLEAN       (1 << 30)           X               O
  * TLB_WB           (1 << 31)           O               O
+ * TLB_BARRIER      (1 << 28)           O               O
+ * TLB_V7_UIS_PAGE  (1 << 20)           O               X
+ * TLB_V7_UIS_FULL  (1 << 21)           O               X
+ * TLB_V7_UIS_ASID  (1 << 22)           O               X
+ * TLB_V7_UIS_BP    (1 << 23)           O               X
+ * TLB_V6_U_FULL	(1 << 12)           X               O
+ * TLB_V6_U_PAGE	(1 << 4)            X               O
+ * TLB_V6_U_ASID	(1 << 16)           X               O
+ * TLB_V6_BP	    (1 << 19)           X               O
+ * TLB_DCLEAN       (1 << 30)           X               O
  */
 #define v7wbi_tlb_flags_smp	(TLB_WB | TLB_BARRIER | \
 				 TLB_V7_UIS_FULL | TLB_V7_UIS_PAGE | \
@@ -241,9 +245,19 @@ extern void __cpu_flush_user_tlb_range(unsigned long, unsigned long, struct vm_a
 extern void __cpu_flush_kern_tlb_range(unsigned long, unsigned long);
 
 #endif
-
+/*!
+ * arch/arm/kernel/setup.c 의
+ * setup_processor 에서 초기화 
+ */
 extern struct cpu_tlb_fns cpu_tlb;
 
+/*!
+ * __cpu_tlb_flags -> v7wbi_tlb_flags_smp
+ * cpu_tlb는 setup_processor에서 초기화되며
+ * cpu_tlb.tlb_flags는 arch/arm/mm/tlb-v7.S의 매크로를 통해 초기화 되므로
+ * tag로 검색 불가
+ * v7wbi_tlb_fns 참고: http://www.iamroot.org/xe/Kernel_9_ARM/92399
+ */
 #define __cpu_tlb_flags			cpu_tlb.tlb_flags
 
 /*
@@ -308,7 +322,9 @@ extern struct cpu_tlb_fns cpu_tlb;
 				 fa_possible_flags | \
 				 v6wbi_possible_flags | \
 				 v7wbi_possible_flags)
-
+/*!
+ * always_tlb_flags -> v7wbi_always_flags
+ */
 #define always_tlb_flags	(v4_always_flags & \
 				 v4wbi_always_flags & \
 				 fr_always_flags & \
@@ -319,6 +335,10 @@ extern struct cpu_tlb_fns cpu_tlb;
 
 #define tlb_flag(f)	((always_tlb_flags & (f)) || (__tlb_flag & possible_tlb_flags & (f)))
 
+/*!
+ * insnarg = p15, 0, %0, c8, c7, 0
+ * TLBIALL, Invalidate unified TLB
+ */
 #define __tlb_op(f, insnarg, arg)					\
 	do {								\
 		if (always_tlb_flags & (f))				\
@@ -338,7 +358,11 @@ static inline void __local_flush_tlb_all(void)
 {
 	const int zero = 0;
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
-
+/*!
+ * 아래 3가지 tlb_op들 중
+ * TLB_v6_U_FULL만 조건에 걸리므로 첫번째 tlb_op만 else if 구문에서 실행된다.
+ * Unified tlb invalidation 명령 수행
+ */
 	tlb_op(TLB_V4_U_FULL | TLB_V6_U_FULL, "c8, c7, 0", zero);
 	tlb_op(TLB_V4_D_FULL | TLB_V6_D_FULL, "c8, c6, 0", zero);
 	tlb_op(TLB_V4_I_FULL | TLB_V6_I_FULL, "c8, c5, 0", zero);
@@ -349,10 +373,21 @@ static inline void local_flush_tlb_all(void)
 	const int zero = 0;
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
 
+    /*!
+     * nshst: 저장이 완료될 때까지만 기다리고 통합 지점까지만 수행되는 DMB 작업
+     * 배리어 참고: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0204ik/CIHJFGFE.html
+     */
 	if (tlb_flag(TLB_WB))
 		dsb(nshst);
 
+    /*!
+     * Unified tlb invalidation
+     * http://infocenter.arm.com/help/topic/com.arm.doc.ddi0438i/DDI0438I_cortex_a15_r4p0_trm.pdf
+     */
 	__local_flush_tlb_all();
+    /*!
+     * Unified tlb invalidation
+     */
 	tlb_op(TLB_V7_UIS_FULL, "c8, c7, 0", zero);
 
 	if (tlb_flag(TLB_BARRIER)) {

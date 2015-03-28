@@ -155,6 +155,8 @@ extern inline void nop_dma_unmap_area(const void *s, size_t l, int f) { }
  * v7_flush_user_cache_range()
  * v7_coherent_user_range()
  * v7_coherent_kern_range()
+ * v7_flush_kern_cache_all()
+ *  - d-cache, i-cache(inner sharerable) flush
  */
 #ifndef MULTI_CACHE
 #define __cpuc_flush_icache_all		__glue(_CACHE,_flush_icache_all)

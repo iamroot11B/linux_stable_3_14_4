@@ -707,6 +707,9 @@ static void __init *early_alloc(unsigned long sz)
 	return early_alloc_aligned(sz, sz);
 }
 
+/*!
+ *
+ */
 static pte_t * __init early_pte_alloc(pmd_t *pmd, unsigned long addr, unsigned long prot)
 {
 	if (pmd_none(*pmd)) {
@@ -1518,13 +1521,13 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 
 	/*! 20150307 study start */
 	/*!
-     * VMALLOC_OFFSET		(8*1024*1024)
-     * VMALLOC_START		(((unsigned long)high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
-     *           ---->                       high_memory + 0x800000        & ~(7FFFFF)
-     *           ---->                       high_memory 를 8M 단위로 align 한 것 
-     * VMALLOC_END		0xff000000UL
-     * PMD_SIZE         2MB
-     */
+	 * VMALLOC_OFFSET		(8*1024*1024)
+	 * VMALLOC_START		(((unsigned long)high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
+	 *           ---->                       high_memory + 0x800000        & ~(7FFFFF)
+	 *           ---->                       high_memory 를 8M 단위로 align 한 것 
+	 * VMALLOC_END		0xff000000UL
+	 * PMD_SIZE         2MB
+	 */
 	for (addr = VMALLOC_START; addr; addr += PMD_SIZE)
 	{
 		pmd_clear(pmd_off_k(addr));
@@ -1592,16 +1595,18 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	/*
 	 * Ask the machine support to map in the statically mapped devices.
 	 */
-    /*! mach-exynos5-dt.c 의 마지막 참조 */
+	/*! mach-exynos5-dt.c 의 마지막 참조 */
 	if (mdesc->map_io)
 		mdesc->map_io();
 	else
 		debug_ll_io_init();
-    /*! pgd[2] 중에서 하나만 초기화 된 경우 나머지도 초기화 시켜 준다. */
+	/*! pgd[2] 중에서 하나만 초기화 된 경우 나머지도 초기화 시켜 준다. */
 	fill_pmd_gaps();
-    /*! 20150321 end   */
+	/*! 20150321 end   */
+	/*! 20150328 start */
 
 	/* Reserve fixed i/o space in VMALLOC region */
+	/*! 설정된 것 없음 */
 	pci_reserve_io();
 
 	/*
@@ -1611,6 +1616,7 @@ static void __init devicemaps_init(const struct machine_desc *mdesc)
 	 * back.  After this point, we can start to touch devices again.
 	 */
 	local_flush_tlb_all();
+	/* 멀티캐쉬 아닌 부분으로 확인 */
 	flush_cache_all();
 }
 
@@ -1845,6 +1851,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	devicemaps_init(mdesc);
 	kmap_init();
 	tcm_init();
+	/*! 20150328 end */
 
 	top_pmd = pmd_off_k(0xffff0000);
 

@@ -137,7 +137,9 @@ ENDPROC(v7_flush_dcache_louis)
  */
 ENTRY(v7_flush_dcache_all)
 	dmb					@ ensure ordering with previous memory accesses
+	/*! r0=clidr */
 	mrc	p15, 1, r0, c0, c0, 1		@ read clidr
+	/*! r3 = loc(clidr[26~24]) */
 	ands	r3, r0, #0x7000000		@ extract loc from clidr	
 	mov	r3, r3, lsr #23			@ left align loc bit field
 	beq	finished			@ if loc is 0, then no need to clean
@@ -225,6 +227,7 @@ ENDPROC(v7_flush_dcache_all)
 ENTRY(v7_flush_kern_cache_all)
  ARM(	stmfd	sp!, {r4-r5, r7, r9-r11, lr}	)
  THUMB(	stmfd	sp!, {r4-r7, r9-r11, lr}	)
+	/*! flush whole d-cache */
 	bl	v7_flush_dcache_all
 	mov	r0, #0
 	ALT_SMP(mcr	p15, 0, r0, c7, c1, 0)	@ invalidate I-cache inner shareable
