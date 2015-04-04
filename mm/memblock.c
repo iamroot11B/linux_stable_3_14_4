@@ -1131,7 +1131,7 @@ static void * __init memblock_virt_alloc_internal(
 
 	if (!align)
 		align = SMP_CACHE_BYTES;
-
+		/*! align = 1<<6 */
 	if (max_addr > memblock.current_limit)
 		max_addr = memblock.current_limit;
 
@@ -1233,6 +1233,7 @@ void * __init memblock_virt_alloc_try_nid(
 		     (u64)max_addr, (void *)_RET_IP_);
 	ptr = memblock_virt_alloc_internal(size, align,
 					   min_addr, max_addr, nid);
+	/*! alloc mem with memblock(size = size) */
 	if (ptr)
 		return ptr;
 

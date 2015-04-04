@@ -62,6 +62,7 @@ static struct mem_section noinline __init_refok *sparse_index_alloc(int nid)
 	struct mem_section *section = NULL;
 	unsigned long array_size = SECTIONS_PER_ROOT *
 				   sizeof(struct mem_section);
+	//array_size is (mem_section*n) and closed page_size */
 
 	if (slab_is_available()) {
 		if (node_state(nid, N_HIGH_MEMORY))
@@ -70,6 +71,7 @@ static struct mem_section noinline __init_refok *sparse_index_alloc(int nid)
 			section = kzalloc(array_size, GFP_KERNEL);
 	} else {
 		section = memblock_virt_alloc_node(array_size, nid);
+		/*! alloc mem with memblock(size = array_size) */
 	}
 
 	return section;
@@ -78,12 +80,14 @@ static struct mem_section noinline __init_refok *sparse_index_alloc(int nid)
 static int __meminit sparse_index_init(unsigned long section_nr, int nid)
 {
 	unsigned long root = SECTION_NR_TO_ROOT(section_nr);
+	/*! root is section-root number */
 	struct mem_section *section;
 
 	if (mem_section[root])
 		return -EEXIST;
 
 	section = sparse_index_alloc(nid);
+	/*! alloc mem as section array_size*/
 	if (!section)
 		return -ENOMEM;
 
@@ -143,7 +147,7 @@ void __meminit mminit_validate_memmodel_limits(unsigned long *start_pfn,
 						unsigned long *end_pfn)
 {
 	unsigned long max_sparsemem_pfn = 1UL << (MAX_PHYSMEM_BITS-PAGE_SHIFT);
-
+	/*! max_sparsemem_pfn : 32 -12 = 20 */
 	/*
 	 * Sanity checks - do not allow an architecture to pass
 	 * in larger pfns than the maximum scope of sparsemem:
@@ -162,6 +166,12 @@ void __meminit mminit_validate_memmodel_limits(unsigned long *start_pfn,
 		WARN_ON_ONCE(1);
 		*end_pfn = max_sparsemem_pfn;
 	}
+	/*!
+	 * if start_pfn is larger than max_sparsemem_pfn, 
+	 *	make start_pfn and end_pfn is max_sparse_pfn
+	 * if end_pfn is larger than max_sparsemem_pfn,
+	 *	make end_pfn is max_sparse_pfn.
+	 */
 }
 
 /* Record a memory area against a node. */
@@ -170,13 +180,17 @@ void __init memory_present(int nid, unsigned long start, unsigned long end)
 	unsigned long pfn;
 
 	start &= PAGE_SECTION_MASK;
+	/*! PAGE_SECTION_MASK = ~(bin : 0000 1111 1111 1111 1111 = hex 0x00 00 FF FF) */
 	mminit_validate_memmodel_limits(&start, &end);
+	/*! sanitizing 'start' and 'end' (cmp with max( := ~(1<<16 -1) ) ) */
+
 	for (pfn = start; pfn < end; pfn += PAGES_PER_SECTION) {
 		unsigned long section = pfn_to_section_nr(pfn);
 		struct mem_section *ms;
 
 		sparse_index_init(section, nid);
 		set_section_nid(section, nid);
+		/*! set section memory space */
 
 		ms = __nr_to_section(section);
 		if (!ms->section_mem_map)
@@ -532,7 +546,10 @@ void __init sparse_init(void)
 
 	/* see include/linux/mmzone.h 'struct mem_section' definition */
 	BUILD_BUG_ON(!is_power_of_2(sizeof(struct mem_section)));
-
+	/*! 
+	 * chk sizeof(mem_section) is power of 2 
+	 * for calculate used section root mask.
+	 */
 	/* Setup pageblock_order for HUGETLB_PAGE_SIZE_VARIABLE */
 	set_pageblock_order();
 
@@ -548,9 +565,11 @@ void __init sparse_init(void)
 	 * sparse_early_mem_map_alloc, so allocate usemap_map at first.
 	 */
 	size = sizeof(unsigned long *) * NR_MEM_SECTIONS;
+	/*! size = poinet_size(:=4) * 16(:= NR_MEM_SECTIONS) */
 	usemap_map = memblock_virt_alloc(size, 0);
 	if (!usemap_map)
 		panic("can not allocate usemap_map\n");
+	/*! 20150404 Study end */
 	alloc_usemap_and_memmap(sparse_early_usemaps_alloc_node,
 							(void *)usemap_map);
 

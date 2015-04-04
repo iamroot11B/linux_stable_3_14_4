@@ -1066,12 +1066,14 @@ static inline unsigned long early_pfn_to_nid(unsigned long pfn)
  */
 #define PA_SECTION_SHIFT	(SECTION_SIZE_BITS)
 #define PFN_SECTION_SHIFT	(SECTION_SIZE_BITS - PAGE_SHIFT)
-
+/*! PFN_SECTION_SHIFT = 28 - 12 = 16*/
 #define NR_MEM_SECTIONS		(1UL << SECTIONS_SHIFT)
-
+/*! NR_MEM_SECTIONS = 1 << 4
+ * is how many phy-address same sections-bits
+ */
 #define PAGES_PER_SECTION       (1UL << PFN_SECTION_SHIFT)
 #define PAGE_SECTION_MASK	(~(PAGES_PER_SECTION-1))
-
+/*! PAGE_SECTION_MASK = ~(bin : 0000 1111 1111 1111 1111) */
 #define SECTION_BLOCKFLAGS_BITS \
 	((1UL << (PFN_SECTION_SHIFT - pageblock_order)) * NR_PAGEBLOCK_BITS)
 
@@ -1139,6 +1141,10 @@ static inline struct mem_section *__nr_to_section(unsigned long nr)
 	if (!mem_section[SECTION_NR_TO_ROOT(nr)])
 		return NULL;
 	return &mem_section[SECTION_NR_TO_ROOT(nr)][nr & SECTION_ROOT_MASK];
+    /*!
+     * SECTION_NR_TO_ROOT   = find nr root-section number
+     * nr&SECTION_ROOT_MAKE = find nr offset in root-serction page
+     */
 }
 extern int __section_nr(struct mem_section* ms);
 extern unsigned long usemap_size(void);

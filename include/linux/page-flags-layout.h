@@ -26,7 +26,7 @@
 
 /* SECTION_SHIFT	#bits space required to store a section # */
 #define SECTIONS_SHIFT	(MAX_PHYSMEM_BITS - SECTION_SIZE_BITS)
-
+/*! SECTIONS_SHIFT = 32-28 =4 */
 #endif /* CONFIG_SPARSEMEM */
 
 /*

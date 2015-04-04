@@ -147,9 +147,15 @@ static void __init find_limits(unsigned long *min, unsigned long *max_low,
 
 	/* This assumes the meminfo array is properly sorted */
 	*min = bank_pfn_start(&mi->bank[0]);
+	/*! Do: get first pfn of phy-mem */
 	for_each_bank (i, mi)
 		if (mi->bank[i].highmem)
 				break;
+	/*! 
+	 * find highmem 
+	 * @max_low  : end pfn of normal-mem (:low-mem)
+	 * @max_high : end pfn of high-mem(maybe, last bank has pfn)
+	 */
 	*max_low = bank_pfn_end(&mi->bank[i - 1]);
 	*max_high = bank_pfn_end(&mi->bank[mi->nr_banks - 1]);
 }
@@ -269,6 +275,13 @@ static void __init arm_memory_present(void)
 	for_each_memblock(memory, reg)
 		memory_present(0, memblock_region_memory_base_pfn(reg),
 			       memblock_region_memory_end_pfn(reg));
+		/*!
+		 * for_loop when region is end.
+		 *	in loop
+		 *	1. pick section
+		 *	2. alloc section space
+		 *	3. set sections
+		 */
 }
 #endif
 
@@ -386,16 +399,22 @@ void __init bootmem_init(void)
 	unsigned long min, max_low, max_high;
 
 	memblock_allow_resize();
+	/*! Do: memblock_can_resize = 1; */
 	max_low = max_high = 0;
 
 	find_limits(&min, &max_low, &max_high);
-
+	/*! Do:
+	 * @min      : get first pfn of phy-mem  
+	 * @max_low  : end pfn of nomal-mem (:low-mem)
+	 * @max_high : end pfn of high-mem(maybe, last bank has pfn)
+	 */
+	/*! what is sparsemem? : https://github.com/x86-8/linux-3.2/issues/2 */
 	/*
 	 * Sparsemem tries to allocate bootmem in memory_present(),
 	 * so must be done after the fixed reservations
 	 */
 	arm_memory_present();
-
+	/*! Do : set sections for sparsemem */
 	/*
 	 * sparse_init() needs the bootmem allocator up and running.
 	 */

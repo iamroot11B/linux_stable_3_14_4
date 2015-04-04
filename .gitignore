@@ -95,3 +95,9 @@ x509.genkey
 
 # Kconfig presets
 all.config
+
+#
+tagging.c
+
+
+.gitignore
