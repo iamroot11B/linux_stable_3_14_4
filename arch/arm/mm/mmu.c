@@ -1853,6 +1853,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	tcm_init();
 	/*! 20150328 end */
 
+	/*! 20150404 start*/
 	top_pmd = pmd_off_k(0xffff0000);
 
 	/* allocate the zero page. */
@@ -1860,7 +1861,6 @@ void __init paging_init(const struct machine_desc *mdesc)
 	 * zero_page is "make memspace with size is PAGE_SIZE and fill 0"
 	 */
 	zero_page = early_alloc(PAGE_SIZE);
-
 	bootmem_init();
 
 	empty_zero_page = virt_to_page(zero_page);

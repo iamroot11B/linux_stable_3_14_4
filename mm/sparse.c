@@ -549,6 +549,20 @@ void __init sparse_init(void)
 	/*! 
 	 * chk sizeof(mem_section) is power of 2 
 	 * for calculate used section root mask.
+	 *
+	 * Why must do that??
+	 *	mem_section 의 크기가 2의 승수 라면, 
+	 *	bin : ....010..0 이 memsection 의 크기 일 것 이다.
+	 *	이를 통해 mem_section 이 몇 번째 인지 등을 쉽게 계산 가능하다.
+	 *
+	 *	ex)size: 0001 0000 일 때,
+	 *		 0번째 0000 0000
+	 *		 1번째 0001 0000
+	 *		 2번째 0010 0000
+	 *		 3번째 0011 0000
+	 *		 4번째 0100 0000
+	 *		이렇게, 시작 주소만으로도 몇번째 인지 알 수 있다. 또한,
+	 *		앞 부분만 지우면, 각 memsection 안에서의 offset 만 남는다.
 	 */
 	/* Setup pageblock_order for HUGETLB_PAGE_SIZE_VARIABLE */
 	set_pageblock_order();
