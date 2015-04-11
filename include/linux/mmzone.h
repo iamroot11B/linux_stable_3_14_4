@@ -1076,7 +1076,7 @@ static inline unsigned long early_pfn_to_nid(unsigned long pfn)
 /*! PAGE_SECTION_MASK = ~(bin : 0000 1111 1111 1111 1111) */
 #define SECTION_BLOCKFLAGS_BITS \
 	((1UL << (PFN_SECTION_SHIFT - pageblock_order)) * NR_PAGEBLOCK_BITS)
-
+/*! SECTION_BLOCKFLAGS_BITS = 1<<(16 -10)  * 4 */
 #if (MAX_ORDER - 1 + PAGE_SHIFT) > SECTION_SIZE_BITS
 #error Allocator MAX_ORDER exceeds SECTION_SIZE
 #endif
@@ -1106,6 +1106,7 @@ struct mem_section {
 
 	/* See declaration of similar field in struct zone */
 	unsigned long *pageblock_flags;
+    /*! in sparse_init_one_section, pageblock_flags = usemap*/
 #ifdef CONFIG_MEMCG
 	/*
 	 * If !SPARSEMEM, pgdat doesn't have page_cgroup pointer. We use
@@ -1169,6 +1170,7 @@ static inline struct page *__section_mem_map_addr(struct mem_section *section)
 
 static inline int present_section(struct mem_section *section)
 {
+    /*! if have section and section_mem_map flag is SECTION_MARKED_PRESENT*/
 	return (section && (section->section_mem_map & SECTION_MARKED_PRESENT));
 }
 

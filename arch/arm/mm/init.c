@@ -204,6 +204,7 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max_low,
 	unsigned long max_high)
 {
 	unsigned long zone_size[MAX_NR_ZONES], zhole_size[MAX_NR_ZONES];
+	/* MAX_NR_ZONES = 3*/
 	struct memblock_region *reg;
 
 	/*
@@ -217,8 +218,10 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max_low,
 	 * to the zones, now is the time to do it.
 	 */
 	zone_size[0] = max_low - min;
+	/*! low mem size */
 #ifdef CONFIG_HIGHMEM
 	zone_size[ZONE_HIGHMEM] = max_high - max_low;
+	/*! high mem size*/
 #endif
 
 	/*
@@ -251,7 +254,7 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max_low,
 		arm_adjust_dma_zone(zone_size, zhole_size,
 			arm_dma_zone_size >> PAGE_SHIFT);
 #endif
-
+/*! 20150411 Study end */
 	free_area_init_node(0, zone_size, min, zhole_size);
 }
 
