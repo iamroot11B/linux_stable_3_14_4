@@ -4304,6 +4304,10 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 	return 0;
 }
 
+/*!
+ * boot_pageset 주소 셋팅
+ * per_cpu 관련 복습 필요
+ */
 static __meminit void zone_pcp_init(struct zone *zone)
 {
 	/*
@@ -4637,6 +4641,11 @@ static inline unsigned long __meminit zone_absent_pages_in_node(int nid,
 
 #endif /* CONFIG_HAVE_MEMBLOCK_NODE_MAP */
 
+/*!
+ * calculate_node_totalpages()
+ * - hole을 제외한 모든 zone 의 크기를 더해서 pgdat에 설정 후
+ *   커널메세지를 남긴다.
+ */
 static void __meminit calculate_node_totalpages(struct pglist_data *pgdat,
 						unsigned long node_start_pfn,
 						unsigned long node_end_pfn,
@@ -4646,6 +4655,9 @@ static void __meminit calculate_node_totalpages(struct pglist_data *pgdat,
 	unsigned long realtotalpages, totalpages = 0;
 	enum zone_type i;
 
+	/*!
+	 * totalpages = 모든 zone의 크기를 합한것
+	 */
 	for (i = 0; i < MAX_NR_ZONES; i++)
 		totalpages += zone_spanned_pages_in_node(pgdat->node_id, i,
 							 node_start_pfn,
@@ -4653,6 +4665,9 @@ static void __meminit calculate_node_totalpages(struct pglist_data *pgdat,
 							 zones_size);
 	pgdat->node_spanned_pages = totalpages;
 
+	/*!
+	 * realtotalpages = totalpages에서 hole의 크기를 빼준것
+	 */
 	realtotalpages = totalpages;
 	for (i = 0; i < MAX_NR_ZONES; i++)
 		realtotalpages -=
@@ -4739,6 +4754,10 @@ void __paginginit set_pageblock_order(void)
 
 #endif /* CONFIG_HUGETLB_PAGE_SIZE_VARIABLE */
 
+/*!
+ * calc_memmap_size
+ * - memmap의 크기를 계산해서 반환 
+ */
 static unsigned long __paginginit calc_memmap_size(unsigned long spanned_pages,
 						   unsigned long present_pages)
 {
@@ -4756,6 +4775,11 @@ static unsigned long __paginginit calc_memmap_size(unsigned long spanned_pages,
 	    IS_ENABLED(CONFIG_SPARSEMEM))
 		pages = present_pages;
 
+	/*!
+	 * pages(zone의 페이지 갯수) * page를 관리하는 구조체의 크기
+	 * PAGE_ALIGN() -> PAGE_SIZE(4096)단위 얼라인
+	 * PAGE_SHIFT = 12 
+	 */
 	return PAGE_ALIGN(pages * sizeof(struct page)) >> PAGE_SHIFT;
 }
 
@@ -4790,8 +4814,15 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		struct zone *zone = pgdat->node_zones + j;
 		unsigned long size, realsize, freesize, memmap_pages;
 
+		/*!
+		 * size = zone_size
+		 */
 		size = zone_spanned_pages_in_node(nid, j, node_start_pfn,
 						  node_end_pfn, zones_size);
+		/*!
+		 * realsize = zone_size - hole_size
+		 * freesize = zone_size - hole_size
+		 */
 		realsize = freesize = size - zone_absent_pages_in_node(nid, j,
 								node_start_pfn,
 								node_end_pfn,
@@ -4801,6 +4832,9 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		 * Adjust freesize so that it accounts for how much memory
 		 * is used by this zone for memmap. This affects the watermark
 		 * and per-cpu initialisations
+		 */
+		/*!
+		 * memmap_pages = 현재 zone의 memmap의 크기
 		 */
 		memmap_pages = calc_memmap_size(size, realsize);
 		if (freesize >= memmap_pages) {
@@ -4821,11 +4855,18 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 					zone_names[0], dma_reserve);
 		}
 
+		/*!
+		 * ZONE_HIGHMEM이 아닐경우에만 nr_kernel_pages 에 현재 zone의 크기를
+		 * 더해준다.
+		 */
 		if (!is_highmem_idx(j))
 			nr_kernel_pages += freesize;
 		/* Charge for highmem memmap if there are enough kernel pages */
 		else if (nr_kernel_pages > memmap_pages * 2)
 			nr_kernel_pages -= memmap_pages;
+		/*!
+		 * nr_all_pages = 모든 zone의 크기
+		 */
 		nr_all_pages += freesize;
 
 		zone->spanned_pages = size;
@@ -4866,6 +4907,11 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 	}
 }
 
+/*!
+ * alloc_node_mem_map()
+ * - SPARSEMEM이 설정된 경우 아래 설정들이 꺼지게 된다.
+ *   현재설정으론 아무것도 하지 않음.
+ */
 static void __init_refok alloc_node_mem_map(struct pglist_data *pgdat)
 {
 	/* Skip empty nodes */
@@ -4907,7 +4953,11 @@ static void __init_refok alloc_node_mem_map(struct pglist_data *pgdat)
 #endif
 #endif /* CONFIG_FLAT_NODE_MEM_MAP */
 }
-
+/*!
+ * free_area_init_node
+ * 
+ *
+ */
 void __paginginit free_area_init_node(int nid, unsigned long *zones_size,
 		unsigned long node_start_pfn, unsigned long *zholes_size)
 {
@@ -4920,13 +4970,22 @@ void __paginginit free_area_init_node(int nid, unsigned long *zones_size,
 
 	pgdat->node_id = nid;
 	pgdat->node_start_pfn = node_start_pfn;
+	/*!
+	 * NUMA로 설정되지 않아 아무것도 하지 않음
+	 */
 	init_zone_allows_reclaim(nid);
 #ifdef CONFIG_HAVE_MEMBLOCK_NODE_MAP
 	get_pfn_range_for_nid(nid, &start_pfn, &end_pfn);
 #endif
+	/*!
+	 * hole을 제외한 모든 zone 의 크기를 더해서 pgdat에 설정 후 커널메세지를 남긴다.
+	 */
 	calculate_node_totalpages(pgdat, start_pfn, end_pfn,
 				  zones_size, zholes_size);
 
+	/*!
+	 * 현재 설정으론 아무것도 하지 않음
+	 */
 	alloc_node_mem_map(pgdat);
 #ifdef CONFIG_FLAT_NODE_MEM_MAP
 	printk(KERN_DEBUG "free_area_init_node: node %d, pgdat %08lx, node_mem_map %08lx\n",

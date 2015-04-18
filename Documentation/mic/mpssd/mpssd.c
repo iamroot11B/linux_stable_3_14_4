@@ -62,6 +62,9 @@ static struct mic_info mic_list;
 #define _ALIGN(addr, size)     _ALIGN_UP(addr, size)
 
 /* to align the pointer to the (next) page boundary */
+/*!
+ * page_size(4096) 단위 올림
+ */
 #define PAGE_ALIGN(addr)        _ALIGN(addr, PAGE_SIZE)
 
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))

@@ -26,6 +26,13 @@
  * + 0 is required in order to convert the pointer type from a
  * potential array type to a pointer to a single item of the array.
  */
+/*!
+ * 타입변환으로 percpu 인지 확인
+ * typeof((ptr) + 0) 배열의 첫번째 아이템의 주소를 가리키는 포인터 타입으로 변환
+ * vm_stat_diff[NR_VM_ZONE_STAT_ITEMS]
+ * ptr 형 = char 배열의 주소
+ * typeof((ptr) + 0) 형식 = char
+ */
 #define __verify_pcpu_ptr(ptr)	do {					\
 	const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;	\
 	(void)__vpp_verify;						\

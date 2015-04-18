@@ -255,6 +255,11 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max_low,
 			arm_dma_zone_size >> PAGE_SHIFT);
 #endif
 /*! 20150411 Study end */
+/*! 20150418 Study start */
+	/*!
+	 * zone_size: 각 존의 크기들
+	 * zhole_size: 물리적으로 빈 공간의 크기들
+	 */
 	free_area_init_node(0, zone_size, min, zhole_size);
 }
 
