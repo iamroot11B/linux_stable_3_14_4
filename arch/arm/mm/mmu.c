@@ -396,6 +396,13 @@ SET_MEMORY_FN(nx, pte_set_nx)
 /*
  * Adjust the PMD section entries according to the CPU in use.
  */
+/*! build_mem_type_table()
+ * mem_types 배열 초기화
+ * - arm 버전과, 메모리 타입에 따라 mem_types의 캐시 정책 설정.
+ * - 메모리 타입에 따라서 섹션(Section 또는 L1 또는 PMD) , 테이블 엔트리 (L2 또는 PTE)
+ *    그리고 도메인(domain) 에 대한 보호 설정을 해줌.
+ * 
+ */
 static void __init build_mem_type_table(void)
 {
 	struct cachepolicy *cp;
@@ -1627,7 +1634,9 @@ static void __init kmap_init(void)
 		PKMAP_BASE, _PAGE_KERNEL_TABLE);
 #endif
 }
-
+/*!
+ * lowmem 영역의 페이지테이블디렉토리(pgd) 초기화
+ */
 static void __init map_lowmem(void)
 {
 	struct memblock_region *reg;

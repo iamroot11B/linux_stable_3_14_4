@@ -3865,6 +3865,12 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 #define PAGES_PER_WAITQUEUE	256
 
 #ifndef CONFIG_MEMORY_HOTPLUG
+/*!
+ * wait_table_hash_nr_entries()
+ *
+ * - 4UL < size < 4096UL 인 size 선택
+ *   size = wait_queue의 사이즈
+ */
 static inline unsigned long wait_table_hash_nr_entries(unsigned long pages)
 {
 	unsigned long size = 1;
@@ -4106,6 +4112,12 @@ static void __meminit zone_init_free_lists(struct zone *zone)
 	memmap_init_zone((size), (nid), (zone), (start_pfn), MEMMAP_EARLY)
 #endif
 
+/*!
+ * zone_batchsize()
+ * @zone : noral or high zone 구조체 
+ * - 
+ * batch? : 
+ */
 static int __meminit zone_batchsize(struct zone *zone)
 {
 #ifdef CONFIG_MMU
@@ -4116,6 +4128,11 @@ static int __meminit zone_batchsize(struct zone *zone)
 	 * size of the zone.  But no more than 1/2 of a meg.
 	 *
 	 * OK, so we don't know how big the cache is.  So guess.
+	 */
+	/*!
+	 * 현재 지역 (zone) 에 존재하는 모든 페이지의 1/1024에 해당하는 페이지 개수를 구하고,
+	 * 그 크기가 512MB를 념지 않도록 한다. 이렇게 구한 값의 25%에 해당하는
+	 * 만큼의 페이지 개수를 batch 크기로 한다.
 	 */
 	batch = zone->managed_pages / 1024;
 	if (batch * PAGE_SIZE > 512 * 1024)
@@ -4133,6 +4150,11 @@ static int __meminit zone_batchsize(struct zone *zone)
 	 * batches of pages, one task can end up with a lot
 	 * of pages of one half of the possible page colors
 	 * and the other with pages of the other colors.
+	 */
+	/*!
+	 * 앞서 구한 batch 크기를 2^n-1 의 값에 정렬시키기 위해 rounddown_pow_of_two( ) 함수를 시용한다.
+	 * 이렇게 2^n-1 의 형태의 크기로 맞추는 것은 경험적으로 캐시 엘리어싱(cache aliasing)
+	 * 문제를 최소화하기 때문이다. batch 크기는 현재 지역 내에 존재하는 페이지의 개수(present_pages)의 양에 따라 결정된다.
 	 */
 	batch = rounddown_pow_of_two(batch + batch/2) - 1;
 
@@ -4271,8 +4293,10 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 	 * The per-page waitqueue mechanism uses hashed waitqueues
 	 * per zone.
 	 */
+	/*! zone->wait_table_hash_nr_entries = wait_queue의 개수 */
 	zone->wait_table_hash_nr_entries =
 		 wait_table_hash_nr_entries(zone_size_pages);
+	/*! 2015.05.02 study end */
 	zone->wait_table_bits =
 		wait_table_bits(zone->wait_table_hash_nr_entries);
 	alloc_size = zone->wait_table_hash_nr_entries
@@ -4305,7 +4329,8 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 }
 
 /*!
- * boot_pageset 주소 셋팅
+ * zone_pcp_init()
+ * - boot_pageset 주소 셋팅
  * per_cpu 관련 복습 필요
  */
 static __meminit void zone_pcp_init(struct zone *zone)
@@ -4323,6 +4348,11 @@ static __meminit void zone_pcp_init(struct zone *zone)
 					 zone_batchsize(zone));
 }
 
+/*!
+ * init_currently_empty_zone()
+ *
+ * - 
+ */
 int __meminit init_currently_empty_zone(struct zone *zone,
 					unsigned long zone_start_pfn,
 					unsigned long size,
@@ -4876,6 +4906,12 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		 * when the bootmem allocator frees pages into the buddy system.
 		 * And all highmem pages will be managed by the buddy system.
 		 */
+		/*!
+		 * high_mem
+		 *  - zone->managed_pages = realsize
+		 * else(maybe lowmem)
+		 *  - zone->managed_pages = freesize
+		 */
 		zone->managed_pages = is_highmem_idx(j) ? realsize : freesize;
 #ifdef CONFIG_NUMA
 		zone->node = nid;
@@ -4890,14 +4926,22 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		zone->zone_pgdat = pgdat;
 		zone_pcp_init(zone);
 
+		/*! 2015/04/18 study end */
+		/*! 2015/05/02 study start */
 		/* For bootup, initialized properly in watermark setup */
+		/*!
+		 * zone->vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset) 
+		 * vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset) 
+		 */
 		mod_zone_page_state(zone, NR_ALLOC_BATCH, zone->managed_pages);
 
 		lruvec_init(&zone->lruvec);
 		if (!size)
 			continue;
 
+		/*! not config */
 		set_pageblock_order();
+		/*! not config */
 		setup_usemap(pgdat, zone, zone_start_pfn, size);
 		ret = init_currently_empty_zone(zone, zone_start_pfn,
 						size, MEMMAP_EARLY);

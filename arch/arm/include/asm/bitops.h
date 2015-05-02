@@ -260,6 +260,9 @@ static inline int constant_fls(int x)
  * the number of leading zeros, zero input will return 32, and
  * 0x80000000 will return 0.
  */
+/*!
+ * MSB부터 LSB로 가면서 1로 설정된 첫번째 bit까지 0이 몇개인가 헤아린다.
+ */
 static inline unsigned int __clz(unsigned int x)
 {
 	unsigned int ret;
@@ -275,6 +278,10 @@ static inline unsigned int __clz(unsigned int x)
  */
 static inline int fls(int x)
 {
+    /*!
+     * __builtin_constant_p
+     *  - 컴파일 타임에 x를 상수로 만들 수 있으면 1 아니면 0
+     */
 	if (__builtin_constant_p(x))
 	       return constant_fls(x);
 
@@ -302,6 +309,9 @@ static inline int ffs(int x)
 /*
  * __ffs() returns the bit position of the first bit set, where the
  * LSB is 0 and MSB is 31.  Zero input is undefined.
+ */
+/*!
+ * find First set bit
  */
 static inline unsigned long __ffs(unsigned long x)
 {

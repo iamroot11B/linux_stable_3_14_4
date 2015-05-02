@@ -531,6 +531,24 @@ do {									\
 # ifndef __this_cpu_read_8
 #  define __this_cpu_read_8(pcp)	(*__this_cpu_ptr(&(pcp)))
 # endif
+/*!
+ * __pcpu_size_call_return(--, pcp) -> __this_cpu_read_*(pcp) - (pcp값에 따라 1,2,4,8 결정)
+ * __this_cpu_read_*(pcp) -> __this_cpu_ptr(pcp)
+ * __this_cpu_ptr(ptr) -> SHIFT_PERCPU_PTR(ptr, __my_cpu_offset)
+ *  __my_cpu_offset : TPIDRPRW 값 불러오기
+ **********************************************
+ * #define SHIFT_PERCPU_PTR(__p, __offset)	({				\
+ *	// 타입확인으로 중요하지 않음 - __verify_pcpu_ptr((__p)); \
+ *	RELOC_HIDE((typeof(*(__p)) __kernel __force *)(__p), (__offset)); \
+ *  })
+ **********************************************
+ * # define RELOC_HIDE(ptr, off)					\
+ *  ({ unsigned long __ptr;					\
+ *     __ptr = (unsigned long) (ptr);				\
+ *    (typeof(ptr)) (__ptr + (off)); })
+ ****************************************************** 
+ * - this_cpu_read(pcp) = *(&pcp + __my_cpu_offset)
+ */
 # define __this_cpu_read(pcp)	__pcpu_size_call_return(__this_cpu_read_, (pcp))
 #endif
 
@@ -552,6 +570,23 @@ do {									\
 # ifndef __this_cpu_write_8
 #  define __this_cpu_write_8(pcp, val)	__this_cpu_generic_to_op((pcp), (val), =)
 # endif
+/*!
+ * __pcpu_size_call(--,pcp,val) -> __this_cpu_generic_to_op(pcp, val, =)
+ * __this_cpu_generic_to_op(pcp, val, op) -> *__this_cpu_ptr(&(pcp)) op val;
+ *****************************************
+ * __this_cpu_ptr(ptr) -> SHIFT_PERCPU_PTR(ptr, __my_cpu_offset)
+ *  __my_cpu_offset : TPIDRPRW 값 불러오기
+ **********************************************
+ * #define SHIFT_PERCPU_PTR(__p, __offset)	({				\
+ *	RELOC_HIDE((typeof(*(__p)) __kernel __force *)(__p), (__offset));  })
+ **********************************************
+ * # define RELOC_HIDE(ptr, off)					\
+ *  ({ unsigned long __ptr;					\
+ *     __ptr = (unsigned long) (ptr);				\
+ *    (typeof(ptr)) (__ptr + (off)); })
+ ****************************************************** 
+ * *(&pcp + _my_cpu_offset) = val
+ */
 # define __this_cpu_write(pcp, val)	__pcpu_size_call(__this_cpu_write_, (pcp), (val))
 #endif
 

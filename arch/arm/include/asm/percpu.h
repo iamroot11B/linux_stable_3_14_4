@@ -21,6 +21,10 @@
  * in the TPIDRPRW. TPIDRPRW only exists on V6K and V7
  */
 #if defined(CONFIG_SMP) && !defined(CONFIG_CPU_V6)
+/*
+ * set_my_cpu_offset()
+ * - cpu번호를 기준으로 자신의 per_cpu_offset을 가져와 CP15 - TPIDRPRW 레지스터에 저장
+ */
 static inline void set_my_cpu_offset(unsigned long off)
 {
 	/* Set TPIDRPRW */

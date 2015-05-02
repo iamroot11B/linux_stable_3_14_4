@@ -209,9 +209,18 @@ void set_pgdat_percpu_threshold(pg_data_t *pgdat,
 /*
  * For use when we know that interrupts are disabled.
  */
+/*!
+ * __mod_zone_page_state()
+ * @ zone : 
+ * @ item :  
+ * @ delta :  
+ * - zone->vmstat[item] += delta + __this_cpu_read(zone->pageset)
+ * - vmstat[item] += delta + __this_cpu_read(zone->pageset)
+ */
 void __mod_zone_page_state(struct zone *zone, enum zone_stat_item item,
 				int delta)
 {
+	/*! zone->pageset == &boot_pageset */
 	struct per_cpu_pageset __percpu *pcp = zone->pageset;
 	s8 __percpu *p = pcp->vm_stat_diff + item;
 	long x;
@@ -219,12 +228,24 @@ void __mod_zone_page_state(struct zone *zone, enum zone_stat_item item,
 
 	x = delta + __this_cpu_read(*p);
 
+	/*!
+	 * -paging_init 내부
+	 * --boot_pageset 초기화 진행 전 0
+	 *
+	 */
 	t = __this_cpu_read(pcp->stat_threshold);
 
+	/*!
+	 * x가 pcp->stat_threshold를 넘길경우 zone->vmstat[item]에 x값을 더하고
+	 * x = 0
+	 */
 	if (unlikely(x > t || x < -t)) {
 		zone_page_state_add(x, zone, item);
 		x = 0;
 	}
+	/*!
+	 * x가 pcp->stat_threshold 넘겼다면 x=0 
+	 * p = x */
 	__this_cpu_write(*p, x);
 }
 EXPORT_SYMBOL(__mod_zone_page_state);

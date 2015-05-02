@@ -20,7 +20,10 @@
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
-
+/*!
+ * INIT_LIST_HEAD()
+ * list head의 전 후에 list 대입하여 list 초기화
+ */
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;

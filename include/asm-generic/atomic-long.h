@@ -169,6 +169,9 @@ static inline void atomic_long_dec(atomic_long_t *l)
 	atomic_dec(v);
 }
 
+/*!
+ * 6버전 이상일 경우에만 하드웨어적으로 atomic 연산 지원
+ */
 static inline void atomic_long_add(long i, atomic_long_t *l)
 {
 	atomic_t *v = (atomic_t *)l;

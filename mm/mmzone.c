@@ -93,6 +93,10 @@ void lruvec_init(struct lruvec *lruvec)
 
 	memset(lruvec, 0, sizeof(struct lruvec));
 
+	/*!
+	 * #define for_each_lru(lru) 
+	 * -> for (lru = 0; lru < NR_LRU_LISTS; lru++)
+	*/
 	for_each_lru(lru)
 		INIT_LIST_HEAD(&lruvec->lists[lru]);
 }
