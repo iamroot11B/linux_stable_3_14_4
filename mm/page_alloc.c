@@ -3868,7 +3868,7 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 /*!
  * wait_table_hash_nr_entries()
  *
- * - 4UL < size < 4096UL 인 size 선택
+ * - 4UL < size < 4096UL 인 size 선택해서 반환(waitqueue의 개수)
  *   size = wait_queue의 사이즈
  */
 static inline unsigned long wait_table_hash_nr_entries(unsigned long pages)
@@ -4039,6 +4039,11 @@ static void setup_zone_migrate_reserve(struct zone *zone)
  * up by free_all_bootmem() once the early boot process is
  * done. Non-atomic initialization, single-pass.
  */
+/*!
+ * memmap_init_zone()
+ * - 페이지 프레임과 1:1 매핑 관계를 가지고 있는 페이지 배열(page arr째)에서
+ *   해당 페이지 프레임에 대한 page 구조체의 flags 멤버에 PG_reserved 비트를 설정한다.
+ */
 void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		unsigned long start_pfn, enum memmap_context context)
 {
@@ -4047,9 +4052,16 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 	unsigned long pfn;
 	struct zone *z;
 
+	/*!
+	 * highest_memmap_pfn이 end_pfn - 1 로 업데이트
+	 */
 	if (highest_memmap_pfn < end_pfn - 1)
 		highest_memmap_pfn = end_pfn - 1;
 
+	/*!
+	 * NODE_DATA() 매크로를 이용해서 현재 노드에 대한 노드 디스크립터(NODE_DATA(nid))에
+	 * 접근한 후 해당 존의 주소를 가져온다.
+	 */
 	z = &NODE_DATA(nid)->node_zones[zone];
 	for (pfn = start_pfn; pfn < end_pfn; pfn++) {
 		/*
@@ -4057,18 +4069,48 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		 * handed to this function.  They do not
 		 * exist on hotplugged memory.
 		 */
+		/*!
+		 * context 는 MEMMAP_EARLY로 받아오지만 early_pfn_valid, early_pfn_in_nid가 1
+		 */
 		if (context == MEMMAP_EARLY) {
 			if (!early_pfn_valid(pfn))
 				continue;
 			if (!early_pfn_in_nid(pfn, nid))
 				continue;
 		}
+		/*!
+		 * pfn_to_page 를 통해 page 구조체의 주소를 가져옴
+		 ***********************************************
+		 * #define pfn_to_page __pfn_to_page
+		 * #define __pfn_to_page(pfn)				\
+		 * ({	unsigned long __pfn = (pfn);			\
+		 *	struct mem_section *__sec = __pfn_to_section(__pfn);	\
+		 *	__section_mem_map_addr(__sec) + __pfn;		\
+		 * })
+		 */
 		page = pfn_to_page(pfn);
+		/*! page->flags 설정 */
 		set_page_links(page, zone, nid, pfn);
 		mminit_verify_page_links(page, zone, nid, pfn);
+		/*! page->count  = 1*/
 		init_page_count(page);
+		/*! page->_mapcount = -1*/
 		page_mapcount_reset(page);
 		page_cpupid_reset_last(page);
+		/*! 
+		 * PAGEFLAG 매크로 이용해서 SetPageReserved 함수가 만들어짐
+		 * PAGEFLAG(Reserved, reserved) __CLEARPAGEFLAG(Reserved, reserved)
+		 * #define PAGEFLAG(uname, lname) TESTPAGEFLAG(uname, lname)		\
+		 *    SETPAGEFLAG(uname, lname) CLEARPAGEFLAG(uname, lname)
+		 * ->
+		 * #define SETPAGEFLAG(uname, lname)					\
+		 * static inline void SetPage##uname(struct page *page)			\
+		 *	{ set_bit(PG_##lname, &page->flags); }
+		 * -> SetPageReserved(struct page *page)
+		 *    { set_bit(PG_rserved, &page->flags); }
+		 **********
+		 * page->flags PG_reserved번째 비트를 셋한다. 
+		 */
 		SetPageReserved(page);
 		/*
 		 * Mark the block movable so that blocks are reserved for
@@ -4084,6 +4126,11 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		 * check here not to call set_pageblock_migratetype() against
 		 * pfn out of zone.
 		 */
+		/*! 
+		 * pfn이 zone영역 사이에 있으면서 1024의 배수일때 MIGRATE_MOVABLE로 셋팅 
+		 * !(pfn & (pageblock_nr_pages - 1)) -> pfn의 하위 10개 비트가 0일때 1(true) -> 1024 단위
+		 */
+		/*! 2015.05.09 study end */
 		if ((z->zone_start_pfn <= pfn)
 		    && (pfn < zone_end_pfn(z))
 		    && !(pfn & (pageblock_nr_pages - 1)))
@@ -4098,9 +4145,21 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 	}
 }
 
+/*!
+ * zone_init_free_lists()
+ * - zone->free_area 초기화
+ */
 static void __meminit zone_init_free_lists(struct zone *zone)
 {
 	int order, t;
+	/*!
+	 * #define for_each_migratetype_order(order, type) \
+	 *	for (order = 0; order < MAX_ORDER; order++) \
+	 *		for (type = 0; type < MIGRATE_TYPES; type++)
+	 *
+	 * 	INIT_LIST_HEAD(&zone->free_area[order].free_list[t]);
+	 *	zone->free_area[order].nr_free = 0;
+	 */
 	for_each_migratetype_order(order, t) {
 		INIT_LIST_HEAD(&zone->free_area[order].free_list[t]);
 		zone->free_area[order].nr_free = 0;
@@ -4284,6 +4343,14 @@ void __init setup_per_cpu_pageset(void)
 }
 
 static noinline __init_refok
+/*!
+ * zone_wait_table_init()
+ * @zone: zone 구조체 
+ * @zone_size_pages: 존의 사이즈(페이지단위)
+ * - zone->wait_table 생성
+ *   zone->wait_table_hash_nr_entries: zone_size_pages를 이용해(웨이트큐의 갯수를 구함)
+ *   zone->wait_table_bits 초기화(사이즈 ex) 001000 -> wait_table_bits = 3)
+ */
 int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 {
 	int i;
@@ -4293,15 +4360,30 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 	 * The per-page waitqueue mechanism uses hashed waitqueues
 	 * per zone.
 	 */
-	/*! zone->wait_table_hash_nr_entries = wait_queue의 개수 */
+	/*! 
+	 * wait_queue당 page 개수 = 256
+	 * zone->wait_table_hash_nr_entries = wait_queue의 개수
+	 */
 	zone->wait_table_hash_nr_entries =
 		 wait_table_hash_nr_entries(zone_size_pages);
 	/*! 2015.05.02 study end */
+	/*! 2015.05.09 study start */
+	/*!
+	 * wait_table			-- the array holding the hash table
+	 * wait_table_hash_nr_entries	-- the size of the hash table array
+	 * wait_table_bits		-- wait_table_size == (1 << wait_table_bits)
+	 ******************************************************
+	 * wait_table_bits(zone->wait_table_hash_nr_entries)
+	 *  -> ffz(!(zone->wait_table_hash_nr_entries))
+	 */
 	zone->wait_table_bits =
 		wait_table_bits(zone->wait_table_hash_nr_entries);
 	alloc_size = zone->wait_table_hash_nr_entries
 					* sizeof(wait_queue_head_t);
 
+	/*!
+	 * wait_queue 개수만큼 메모리 할당
+	 */
 	if (!slab_is_available()) {
 		zone->wait_table = (wait_queue_head_t *)
 			memblock_virt_alloc_node_nopanic(
@@ -4322,6 +4404,9 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 	if (!zone->wait_table)
 		return -ENOMEM;
 
+	/*!
+	 * wait_queue 초기화
+	 */
 	for (i = 0; i < zone->wait_table_hash_nr_entries; ++i)
 		init_waitqueue_head(zone->wait_table + i);
 
@@ -4350,8 +4435,7 @@ static __meminit void zone_pcp_init(struct zone *zone)
 
 /*!
  * init_currently_empty_zone()
- *
- * - 
+ * -wait_table, free_area 초기화 
  */
 int __meminit init_currently_empty_zone(struct zone *zone,
 					unsigned long zone_start_pfn,
@@ -4360,9 +4444,16 @@ int __meminit init_currently_empty_zone(struct zone *zone,
 {
 	struct pglist_data *pgdat = zone->zone_pgdat;
 	int ret;
+	/*! 
+	 * parameters : 현재 zone과 홀이 포함된 존의 size
+	 * wait_table 초기화
+	 */
 	ret = zone_wait_table_init(zone, size);
 	if (ret)
 		return ret;
+	/*!
+	 * #define zone_idx(zone)	((zone) - (zone)->zone_pgdat->node_zones)
+	 */
 	pgdat->nr_zones = zone_idx(zone) + 1;
 
 	zone->zone_start_pfn = zone_start_pfn;
@@ -4373,6 +4464,7 @@ int __meminit init_currently_empty_zone(struct zone *zone,
 			(unsigned long)zone_idx(zone),
 			zone_start_pfn, (zone_start_pfn + size));
 
+	/*! zone->free_area: 버디 시스템의 근간이 되는 구조체， 가용 페이지들을 관리 */
 	zone_init_free_lists(zone);
 
 	return 0;
@@ -4845,7 +4937,7 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		unsigned long size, realsize, freesize, memmap_pages;
 
 		/*!
-		 * size = zone_size
+		 * size = zone_size(page단위)
 		 */
 		size = zone_spanned_pages_in_node(nid, j, node_start_pfn,
 						  node_end_pfn, zones_size);
@@ -4943,9 +5035,16 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		set_pageblock_order();
 		/*! not config */
 		setup_usemap(pgdat, zone, zone_start_pfn, size);
+		/*!
+		 * -wait_table, free_area 초기화 
+		 */
 		ret = init_currently_empty_zone(zone, zone_start_pfn,
 						size, MEMMAP_EARLY);
 		BUG_ON(ret);
+		/*!
+		 * #define memmap_init(size, nid, zone, start_pfn) \
+		 *	memmap_init_zone((size), (nid), (zone), (start_pfn), MEMMAP_EARLY)
+		 */
 		memmap_init(size, nid, j, zone_start_pfn);
 		zone_start_pfn += size;
 	}
@@ -6095,6 +6194,7 @@ static inline unsigned long *get_pageblock_bitmap(struct zone *zone,
 static inline int pfn_to_bitidx(struct zone *zone, unsigned long pfn)
 {
 #ifdef CONFIG_SPARSEMEM
+	/*! pfn의 하위 16비트만 남김 */
 	pfn &= (PAGES_PER_SECTION-1);
 	return (pfn >> pageblock_order) * NR_PAGEBLOCK_BITS;
 #else
@@ -6148,6 +6248,7 @@ void set_pageblock_flags_group(struct page *page, unsigned long flags,
 
 	zone = page_zone(page);
 	pfn = page_to_pfn(page);
+	/*! bitmap = mem_section->pageblock_flags 의 주소*/
 	bitmap = get_pageblock_bitmap(zone, pfn);
 	bitidx = pfn_to_bitidx(zone, pfn);
 	VM_BUG_ON_PAGE(!zone_spans_pfn(zone, pfn), page);

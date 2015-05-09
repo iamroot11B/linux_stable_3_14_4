@@ -45,13 +45,19 @@
  * classic sparse no space for node:  | SECTION |     ZONE    | ... | FLAGS |
  */
 #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+/*! SECTIONS_WIDTH  4 */
 #define SECTIONS_WIDTH		SECTIONS_SHIFT
 #else
 #define SECTIONS_WIDTH		0
 #endif
 
+/*! ZONES_WIDTH = 2 */
 #define ZONES_WIDTH		ZONES_SHIFT
 
+/*! 4 + 2 + 0 <= 32 - 21
+ * 6<=11
+ * NODES_WIDTH = 0
+ */
 #if SECTIONS_WIDTH+ZONES_WIDTH+NODES_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
 #define NODES_WIDTH		NODES_SHIFT
 #else

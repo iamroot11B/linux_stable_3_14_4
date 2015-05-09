@@ -649,8 +649,11 @@ static inline pte_t maybe_mkwrite(pte_t pte, struct vm_area_struct *vma)
  */
 
 /* Page flags: | [SECTION] | [NODE] | ZONE | [LAST_CPUPID] | ... | FLAGS | */
+/*! SECTIONS_PGOFF = 32 - 4 = 28 */
 #define SECTIONS_PGOFF		((sizeof(unsigned long)*8) - SECTIONS_WIDTH)
+/*! NODES_PGOFF = 28 - 0 = 28 */
 #define NODES_PGOFF		(SECTIONS_PGOFF - NODES_WIDTH)
+/*! ZONES_PGOFF = 28 - 2 = 26 */
 #define ZONES_PGOFF		(NODES_PGOFF - ZONES_WIDTH)
 #define LAST_CPUPID_PGOFF	(ZONES_PGOFF - LAST_CPUPID_WIDTH)
 
@@ -661,6 +664,7 @@ static inline pte_t maybe_mkwrite(pte_t pte, struct vm_area_struct *vma)
  */
 #define SECTIONS_PGSHIFT	(SECTIONS_PGOFF * (SECTIONS_WIDTH != 0))
 #define NODES_PGSHIFT		(NODES_PGOFF * (NODES_WIDTH != 0))
+/*! ZONES_PGSHIFT = 26 * (2 != 0) = 26 */
 #define ZONES_PGSHIFT		(ZONES_PGOFF * (ZONES_WIDTH != 0))
 #define LAST_CPUPID_PGSHIFT	(LAST_CPUPID_PGOFF * (LAST_CPUPID_WIDTH != 0))
 
@@ -681,6 +685,7 @@ static inline pte_t maybe_mkwrite(pte_t pte, struct vm_area_struct *vma)
 #error SECTIONS_WIDTH+NODES_WIDTH+ZONES_WIDTH > BITS_PER_LONG - NR_PAGEFLAGS
 #endif
 
+/*! ZONES_MASK = (1<<2) -1 = 4 - 1 = 3 */
 #define ZONES_MASK		((1UL << ZONES_WIDTH) - 1)
 #define NODES_MASK		((1UL << NODES_WIDTH) - 1)
 #define SECTIONS_MASK		((1UL << SECTIONS_WIDTH) - 1)
@@ -788,8 +793,15 @@ extern int page_cpupid_xchg_last(struct page *page, int cpupid);
 
 static inline void page_cpupid_reset_last(struct page *page)
 {
+    /*! 
+     * LAST_CPUPID_SHIFT = 0
+     * cpupid = 0
+     */
 	int cpupid = (1 << LAST_CPUPID_SHIFT) - 1;
 
+    /*!
+     * flags의 LAST_CPUPID를 클리어
+     */
 	page->flags &= ~(LAST_CPUPID_MASK << LAST_CPUPID_PGSHIFT);
 	page->flags |= (cpupid & LAST_CPUPID_MASK) << LAST_CPUPID_PGSHIFT;
 }
@@ -860,7 +872,22 @@ static inline unsigned long page_to_section(const struct page *page)
 
 static inline void set_page_zone(struct page *page, enum zone_type zone)
 {
+    
+    /*! Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS | 
+     *              |  31 ~ 28  |    x   |  27,26 |        
+     *                    4          0        2
+     */
+    /*!
+     * ~(ZONES_MASK << ZONES_PGSHIFT) = ~(3<<26)
+     * = ~((0b11)<<26)
+     * = 0b1111 0011 1111 1111 1111 1111 1111 1111
+     * page->flags 의 26, 27번 비트(zone) 클리어
+     */
 	page->flags &= ~(ZONES_MASK << ZONES_PGSHIFT);
+    /*!
+     * ZONES_MASK = 3 = 0b11 
+     * ZONES_PGSHIFT = 26
+     */
 	page->flags |= (zone & ZONES_MASK) << ZONES_PGSHIFT;
 }
 
@@ -870,6 +897,13 @@ static inline void set_page_node(struct page *page, unsigned long node)
 	page->flags |= (node & NODES_MASK) << NODES_PGSHIFT;
 }
 
+/*!
+ * set_page_links
+ * - page->flags의 section, node, zone 영역을 셋팅한다.
+ * Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS | 
+ *             |  31 ~ 28  |    x   |  27,26 |        
+ *                   4          0        2
+ */
 static inline void set_page_links(struct page *page, enum zone_type zone,
 	unsigned long node, unsigned long pfn)
 {

@@ -64,6 +64,9 @@ extern arch_spinlock_t __atomic_hash[ATOMIC_HASH_SIZE] __lock_aligned;
  */
 static inline void set_bit(int nr, volatile unsigned long *addr)
 {
+    /*!
+     * #define BIT_MASK(nr)		(1UL << ((nr) % BITS_PER_LONG))
+     */
 	unsigned long mask = BIT_MASK(nr);
 	unsigned long *p = ((unsigned long *)addr) + BIT_WORD(nr);
 	unsigned long flags;

@@ -130,6 +130,10 @@ void __init mminit_verify_pageflags_layout(void)
 	BUG_ON(or_mask != add_mask);
 }
 
+/*!
+ * mminit_verify_page_links()
+ * - page->flags 의 nid, zone, pfn이 인자로 넘어온 값들과 일치하는지 확인
+ */
 void __meminit mminit_verify_page_links(struct page *page, enum zone_type zone,
 			unsigned long nid, unsigned long pfn)
 {

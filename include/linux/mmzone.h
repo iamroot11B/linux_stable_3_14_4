@@ -1065,12 +1065,17 @@ static inline unsigned long early_pfn_to_nid(unsigned long pfn)
  * PFN_SECTION_SHIFT		pfn to/from section number
  */
 #define PA_SECTION_SHIFT	(SECTION_SIZE_BITS)
+/*!
+ * PFN : 몇번째 page인지 나타냄 
+ * PFN_SECTION_SHIFT = 28 - 12 = 16
+ * PFN에서 섹션번호로 바꿈
+ * */
 #define PFN_SECTION_SHIFT	(SECTION_SIZE_BITS - PAGE_SHIFT)
-/*! PFN_SECTION_SHIFT = 28 - 12 = 16*/
 #define NR_MEM_SECTIONS		(1UL << SECTIONS_SHIFT)
 /*! NR_MEM_SECTIONS = 1 << 4
  * is how many phy-address same sections-bits
  */
+/*! PAGES_PER_SECTION = 1<<16 */
 #define PAGES_PER_SECTION       (1UL << PFN_SECTION_SHIFT)
 #define PAGE_SECTION_MASK	(~(PAGES_PER_SECTION-1))
 /*! PAGE_SECTION_MASK = ~(bin : 0000 1111 1111 1111 1111) */
@@ -1137,8 +1142,20 @@ extern struct mem_section *mem_section[NR_SECTION_ROOTS];
 extern struct mem_section mem_section[NR_SECTION_ROOTS][SECTIONS_PER_ROOT];
 #endif
 
+/*!
+ * __nr_to_section()
+ * - __nr: 몇번째 섹션인지 의미 
+ *   nr번째 섹션의 주소를 반환
+ */
 static inline struct mem_section *__nr_to_section(unsigned long nr)
 {
+    /*!
+     * ROOT의 의미 : mem_section단위(4096/sizeof(struct mem_section)) 
+     * PAGE_SIZE 4096
+     * #define SECTIONS_PER_ROOT       (PAGE_SIZE / sizeof (struct mem_section))
+     * -> 
+     * #define SECTION_NR_TO_ROOT(sec)	((sec) / SECTIONS_PER_ROOT)
+     */
 	if (!mem_section[SECTION_NR_TO_ROOT(nr)])
 		return NULL;
 	return &mem_section[SECTION_NR_TO_ROOT(nr)][nr & SECTION_ROOT_MASK];
@@ -1191,6 +1208,11 @@ static inline int valid_section_nr(unsigned long nr)
 
 static inline struct mem_section *__pfn_to_section(unsigned long pfn)
 {
+    /*!
+     * #define PFN_SECTION_SHIFT	(SECTION_SIZE_BITS - PAGE_SHIFT)
+     *  => 16
+     * #define pfn_to_section_nr(pfn) ((pfn) >> PFN_SECTION_SHIFT)
+     */
 	return __nr_to_section(pfn_to_section_nr(pfn));
 }
 
