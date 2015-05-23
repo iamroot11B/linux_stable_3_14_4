@@ -900,6 +900,10 @@ static int __init early_mem(char *p)
 }
 early_param("mem", early_mem);
 
+/*! 
+ * request_standard_resources()
+ *
+ */
 static void __init request_standard_resources(const struct machine_desc *mdesc)
 {
 	struct memblock_region *region;
@@ -910,6 +914,16 @@ static void __init request_standard_resources(const struct machine_desc *mdesc)
 	kernel_data.start   = virt_to_phys(_sdata);
 	kernel_data.end     = virt_to_phys(_end - 1);
 
+	/*!
+	 * 각 memory block 별로 resource memory 할당 후
+	 * 각 영역에 대한 정보를 셋팅
+	 */
+	/*!
+	 * #define for_each_memblock(memblock_type, region)					\
+	 *	for (region = memblock.memblock_type.regions;					\
+	 *		region < (memblock.memblock_type.regions + memblock.memblock_type.cnt);	\
+	 *		region++)
+	 */
 	for_each_memblock(memory, region) {
 		res = memblock_virt_alloc(sizeof(*res), 0);
 		res->name  = "System RAM";
@@ -1160,7 +1174,9 @@ void __init setup_arch(char **cmdline_p)
 	arm_memblock_init(&meminfo, mdesc);
 
 	/*! 20150117, study start */
+	/*! paging_init */
 	paging_init(mdesc);
+	/*! 20150523, study end */
 	request_standard_resources(mdesc);
 
 	if (mdesc->restart)

@@ -1866,7 +1866,8 @@ void __init paging_init(const struct machine_desc *mdesc)
 	top_pmd = pmd_off_k(0xffff0000);
 
 	/* allocate the zero page. */
-	/*! PAGE_SIZE = 1 << 12 
+	/*! 
+	 * PAGE_SIZE = 1 << 12 
 	 * zero_page is "make memspace with size is PAGE_SIZE and fill 0"
 	 */
 	zero_page = early_alloc(PAGE_SIZE);

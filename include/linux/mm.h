@@ -556,6 +556,15 @@ static inline compound_page_dtor *get_compound_page_dtor(struct page *page)
 	return (compound_page_dtor *)page[1].lru.next;
 }
 
+/*!
+ * compound_order()
+ * - (compound_order)를 반환
+ *   여기서 page[1].lru.prev 가 compound_order 값을 가지고 있음
+ *   -> 2015.2 쯤 lru->prev를 compound_order로 사용되는 것이 헷갈리게 만든다는 이유로
+ *      page구조체에 compound_order 멤버가 추가되어 사용됨
+ *
+ * PG_compound =  여러 페이지로 구성되어 있는 compound page의 일부임
+ */
 static inline int compound_order(struct page *page)
 {
 	if (!PageHead(page))

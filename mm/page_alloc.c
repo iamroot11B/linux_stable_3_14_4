@@ -232,6 +232,11 @@ EXPORT_SYMBOL(nr_online_nodes);
 
 int page_group_by_mobility_disabled __read_mostly;
 
+/*!
+ * set_pageblock_migratetype()
+ *  - page_group_by_mobility_disabled에 따라 page의 migratetype을 셋 
+ *
+ */
 void set_pageblock_migratetype(struct page *page, int migratetype)
 {
 	if (unlikely(page_group_by_mobility_disabled &&
@@ -4136,6 +4141,7 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		    && !(pfn & (pageblock_nr_pages - 1)))
 			set_pageblock_migratetype(page, MIGRATE_MOVABLE);
 
+		/*! 2015.05.23 study start */
 		INIT_LIST_HEAD(&page->lru);
 #ifdef WANT_PAGE_VIRTUAL
 		/* The shift won't overflow because ZONE_NORMAL is below 4G. */
@@ -5042,6 +5048,7 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 						size, MEMMAP_EARLY);
 		BUG_ON(ret);
 		/*!
+		 *
 		 * #define memmap_init(size, nid, zone, start_pfn) \
 		 *	memmap_init_zone((size), (nid), (zone), (start_pfn), MEMMAP_EARLY)
 		 */

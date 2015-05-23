@@ -371,6 +371,11 @@ __SETPAGEFLAG(Head, compound)  __CLEARPAGEFLAG(Head, compound)
 #define PG_head_mask ((1L << PG_compound))
 #define PG_head_tail_mask ((1L << PG_compound) | (1L << PG_reclaim))
 
+/*!
+ * PageHead()
+ * - page의 flags중 PG_compound, PG_reclaim 비트 중
+ *   PG_compound만 셋팅되어있을 경우 true 
+ */
 static inline int PageHead(struct page *page)
 {
 	return ((page->flags & PG_head_tail_mask) == PG_head_mask);

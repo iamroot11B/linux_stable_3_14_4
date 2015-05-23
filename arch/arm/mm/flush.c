@@ -161,6 +161,11 @@ void copy_to_user_page(struct vm_area_struct *vma, struct page *page,
 #endif
 }
 
+/*!
+ * __flush_dcache_page()
+ * -  
+ *
+ */
 void __flush_dcache_page(struct address_space *mapping, struct page *page)
 {
 	/*
@@ -168,11 +173,19 @@ void __flush_dcache_page(struct address_space *mapping, struct page *page)
 	 * page.  This ensures that data in the physical page is mutually
 	 * coherent with the kernels mapping.
 	 */
+
+	/*! highmem이 아닐경우 */
 	if (!PageHighMem(page)) {
 		size_t page_size = PAGE_SIZE << compound_order(page);
 		__cpuc_flush_dcache_area(page_address(page), page_size);
-	} else {
+	} 
+	/*! highmem일 경우 */
+	else {
 		unsigned long i;
+		/*!
+		 * nonaliasing일 경우 kmap_atomic 사용
+		 * 아닐 경우 바로 kmap_high_get 사용
+		 */
 		if (cache_is_vipt_nonaliasing()) {
 			for (i = 0; i < (1 << compound_order(page)); i++) {
 				void *addr = kmap_atomic(page + i);
