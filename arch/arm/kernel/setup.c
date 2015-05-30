@@ -902,11 +902,16 @@ early_param("mem", early_mem);
 
 /*! 
  * request_standard_resources()
- *
+ * - 메모리 블럭 트리 구성
+ *   1. memblock.memory 영역들(system mem) iomem_resource(PCI MEM)의 자식으로 넣어주고,
+ *   2. kernel_code, kernel_data영영을 해당하는 System mem 영역에 넣어준다.
+ *   3. video_ram 영역을 iomem_resource영역의 자식으로 넣어준다.
+ *   4. mdesc의 lp0, lp1, lp2 가 셋팅 되어 있을 경우 ioport_resource의 자식으로 넣어준다.
  */
 static void __init request_standard_resources(const struct machine_desc *mdesc)
 {
 	struct memblock_region *region;
+	/*! include/linux/ioport.h */
 	struct resource *res;
 
 	kernel_code.start   = virt_to_phys(_text);
@@ -931,8 +936,12 @@ static void __init request_standard_resources(const struct machine_desc *mdesc)
 		res->end = __pfn_to_phys(memblock_region_memory_end_pfn(region)) - 1;
 		res->flags = IORESOURCE_MEM | IORESOURCE_BUSY;
 
+		/*! 
+		 * iomem_resource - PCI_mem resource(bank resource)
+		 */
 		request_resource(&iomem_resource, res);
 
+		/*! kernel code, kernel data가 해당되는 system_ram 영역의 자식으로 넣음 */
 		if (kernel_code.start >= res->start &&
 		    kernel_code.end <= res->end)
 			request_resource(res, &kernel_code);
@@ -941,6 +950,7 @@ static void __init request_standard_resources(const struct machine_desc *mdesc)
 			request_resource(res, &kernel_data);
 	}
 
+	/*! Video RAM memory 영역을 iomem_resource의 자식으로 등록 */
 	if (mdesc->video_start) {
 		video_ram.start = mdesc->video_start;
 		video_ram.end   = mdesc->video_end;
@@ -1177,11 +1187,12 @@ void __init setup_arch(char **cmdline_p)
 	/*! paging_init */
 	paging_init(mdesc);
 	/*! 20150523, study end */
+	/*! 20150530, study start */
 	request_standard_resources(mdesc);
 
 	if (mdesc->restart)
 		arm_pm_restart = mdesc->restart;
-
+	/*! 20150530, study end */
 	unflatten_device_tree();
 
 	arm_dt_init_cpu_maps();

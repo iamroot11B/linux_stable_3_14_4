@@ -194,19 +194,34 @@ static struct resource *alloc_resource(gfp_t flags)
 	return res;
 }
 
+/*!
+ * __request_resource()
+ * 
+ * - new를 root의 자식으로 넣음( tree 구성 )
+ *  1. new가 root의 영역 안에 있고,
+ *  2. new와 root의 자식들 영역이 겹치지 않을 경우 root의 자식으로 들어가고 
+ *  3. NULL반환
+ *  실패하는 경우
+ *  1. new가 root의 영역 안에 포함되지 않을 경우 root반환
+ *  2. root의 자식들의 영역과 겹칠 경우 겹치는 경우 겹치는 root의 자식을 반환
+ *
+ */
 /* Return the conflict entry if you can't request it */
-static struct resource * __request_resource(struct resource *root, struct resource *new)
+	static struct resource * __request_resource(struct resource *root, struct resource *new)
 {
 	resource_size_t start = new->start;
 	resource_size_t end = new->end;
 	struct resource *tmp, **p;
 
+	/*! new의 메모리 영역의 시작과 끝의 설정이 잘못 된 경우 */
 	if (end < start)
 		return root;
+	/*! root의 메모리 영역을 벗어날 경우 */
 	if (start < root->start)
 		return root;
 	if (end > root->end)
 		return root;
+	/*! root의 자식들의 영역과 겹치지 않을경우 root의 자식이 된다. */
 	p = &root->child;
 	for (;;) {
 		tmp = *p;

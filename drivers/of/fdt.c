@@ -139,6 +139,10 @@ int of_fdt_match(struct boot_param_header *blob, unsigned long node,
 	return score;
 }
 
+/*!
+ * unflatten_dt_alloc()
+ *  
+ */
 static void *unflatten_dt_alloc(void **mem, unsigned long size,
 				       unsigned long align)
 {
