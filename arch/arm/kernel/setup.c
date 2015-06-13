@@ -1193,9 +1193,11 @@ void __init setup_arch(char **cmdline_p)
 	if (mdesc->restart)
 		arm_pm_restart = mdesc->restart;
 	/*! 20150530, study end */
+	/*! 20150613, study start */
 	unflatten_device_tree();
 
 	arm_dt_init_cpu_maps();
+	/*! 20150613, study end */
 	psci_init();
 #ifdef CONFIG_SMP
 	if (is_smp()) {

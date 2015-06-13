@@ -141,7 +141,7 @@ int of_fdt_match(struct boot_param_header *blob, unsigned long node,
 
 /*!
  * unflatten_dt_alloc()
- *  
+ * - memory 사이즈 더하기 
  */
 static void *unflatten_dt_alloc(void **mem, unsigned long size,
 				       unsigned long align)
@@ -163,6 +163,11 @@ static void *unflatten_dt_alloc(void **mem, unsigned long size,
  * @dad: Parent struct device_node
  * @allnextpp: pointer to ->allnext from last allocated device_node
  * @fpsize: Size of the node path up at the current depth.
+ */
+/*!
+ * unflatten_dt_node
+ *
+ *
  */
 static void * unflatten_dt_node(struct boot_param_header *blob,
 				void *mem,
@@ -373,6 +378,11 @@ static void * unflatten_dt_node(struct boot_param_header *blob,
  * @dt_alloc: An allocator that provides a virtual address to memory
  * for the resulting tree
  */
+/*! __unflatten_device_tree
+ * - flat blob에서 device_node들의 트리 구성
+ *
+ * @dt_alloc(): 메모리 할당 함수의 주소
+ */
 static void __unflatten_device_tree(struct boot_param_header *blob,
 			     struct device_node **mynodes,
 			     void * (*dt_alloc)(u64 size, u64 align))
@@ -399,6 +409,10 @@ static void __unflatten_device_tree(struct boot_param_header *blob,
 	}
 
 	/* First pass, scan for size */
+	/*! unflatten_dt_node
+	 * 첫 번째 과정
+	 * dtb를 unflat 했을 경우 필요한 메모리의 사이즈를 가져온다.
+	 */
 	start = ((void *)blob) + be32_to_cpu(blob->off_dt_struct);
 	size = (unsigned long)unflatten_dt_node(blob, 0, &start, NULL, NULL, 0);
 	size = ALIGN(size, 4);
@@ -414,6 +428,10 @@ static void __unflatten_device_tree(struct boot_param_header *blob,
 	pr_debug("  unflattening %p...\n", mem);
 
 	/* Second pass, do actual unflattening */
+	/*! unflatten_dt_node
+	 * 두 번째 과정
+	 * dtb를 트리형태로 구성(실제 unflattenning)
+	 */
 	start = ((void *)blob) + be32_to_cpu(blob->off_dt_struct);
 	unflatten_dt_node(blob, mem, &start, NULL, &allnextp, 0);
 	if (be32_to_cpup(start) != OF_DT_END)
@@ -452,6 +470,11 @@ EXPORT_SYMBOL_GPL(of_fdt_unflatten_tree);
 int __initdata dt_root_addr_cells;
 int __initdata dt_root_size_cells;
 
+/*! 
+ * 초기화 시점
+ * 1. dtb에서 memory block 구성할때 초기화
+ *
+ */
 struct boot_param_header *initial_boot_params;
 
 #ifdef CONFIG_OF_EARLY_FLATTREE

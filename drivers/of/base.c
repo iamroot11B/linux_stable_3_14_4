@@ -27,12 +27,32 @@
 
 #include "of_private.h"
 
+/*! 
+ * aliases_lookup 초기화
+ * 1. setup_arch - unflatten_device_tree - of_alias_scan -  of_alias_add에서 초기화
+ */
 LIST_HEAD(aliases_lookup);
 
+/*!
+ * of_allnodes 초기화 시점
+ * 1. setup_arch/unflatten_device_tree 에서 초기화 (drivers/of/fdt.c)
+ */
 struct device_node *of_allnodes;
 EXPORT_SYMBOL(of_allnodes);
+/*!
+ * of_chosen 초기화 시점
+ * setup_arch - unflatten_device_tree - of_alias_scan 에서 초기화
+ */
 struct device_node *of_chosen;
+/*!
+ * of_aliases 초기화 시점
+ * setup_arch - unflatten_device_tree - of_alias_scan 에서 초기화
+ */
 struct device_node *of_aliases;
+/*!
+ * of_stdout 초기화 시점
+ * setup_arch - unflatten_device_tree - of_alias_scan 에서 초기화
+ */
 static struct device_node *of_stdout;
 
 DEFINE_MUTEX(of_aliases_mutex);
@@ -88,6 +108,10 @@ int __weak of_node_to_nid(struct device_node *np)
  *		simplify writing of callers
  *
  *	Returns node.
+ */
+/*!
+ * of_node_get
+ * - node의 reference count 증가
  */
 struct device_node *of_node_get(struct device_node *node)
 {
@@ -229,6 +253,10 @@ static const void *__of_get_property(const struct device_node *np,
 /*
  * Find a property with a given name for a given node
  * and return the value.
+ */
+/*!
+ * of_get_property
+ * - 부모 노드의 프로퍼티 리스트(np->next)에서 원하는 프로퍼티가 있는지 찾아봄
  */
 const void *of_get_property(const struct device_node *np, const char *name,
 			    int *lenp)
@@ -553,6 +581,11 @@ EXPORT_SYMBOL(of_get_next_parent);
  *	Returns a node pointer with refcount incremented, use
  *	of_node_put() on it when done.
  */
+/*!
+ * of_get_next_child
+ * - prev가 null이 아닐경우 prev->sibling의 reference count를 증가한 뒤 반환
+ *   prev가 null일 경우 node->child의 reference count를 증가한 뒤 반환
+ */
 struct device_node *of_get_next_child(const struct device_node *node,
 	struct device_node *prev)
 {
@@ -628,11 +661,18 @@ EXPORT_SYMBOL(of_get_child_by_name);
  *	Returns a node pointer with refcount incremented, use
  *	of_node_put() on it when done.
  */
+/*!
+ * of_find_node_by_path
+ * - of_allnodes에서 path를 검색해서 반환
+ */
 struct device_node *of_find_node_by_path(const char *path)
 {
 	struct device_node *np = of_allnodes;
 	unsigned long flags;
 
+	/*!
+	 * of_node_get 안에 atomic한 연산이 있기 때문에 spinlock을 걸어주는 것으로 보임.
+	 */
 	raw_spin_lock_irqsave(&devtree_lock, flags);
 	for (; np; np = np->allnext) {
 		if (np->full_name && (of_node_cmp(np->full_name, path) == 0)
@@ -1788,6 +1828,11 @@ int of_detach_node(struct device_node *np)
 }
 #endif /* defined(CONFIG_OF_DYNAMIC) */
 
+/*!
+ * of_alias_add
+ * - ap 에 np(디바이스 노드), id, stem(stem_len만큼)을 넣어주고
+ *   aliases_lookup 리스트에 삽입
+ */
 static void of_alias_add(struct alias_prop *ap, struct device_node *np,
 			 int id, const char *stem, int stem_len)
 {
@@ -1830,6 +1875,10 @@ void of_alias_scan(void * (*dt_alloc)(u64 size, u64 align))
 	if (!of_aliases)
 		return;
 
+	/*!
+	 * #define for_each_property_of_node(dn, pp) \
+	 *	for (pp = dn->properties; pp != NULL; pp = pp->next)
+	 */
 	for_each_property_of_node(of_aliases, pp) {
 		const char *start = pp->name;
 		const char *end = start + strlen(start);
