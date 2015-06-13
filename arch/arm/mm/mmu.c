@@ -1183,6 +1183,7 @@ static int __init early_vmalloc(char *arg)
 }
 early_param("vmalloc", early_vmalloc);
 
+/*! (sanity_check_meminfo()에서 초기화)*/
 phys_addr_t arm_lowmem_limit __initdata = 0;
 
 /*!
@@ -1411,6 +1412,11 @@ void __init sanity_check_meminfo(void)
    memblock_set_current_limit(memblock_limit);
 }
 
+/*!
+ * prepare_page_table()
+ * - 사용자 영역(0x0000_0000 ~ (0xC000_0000 - 0x100_0000)), module area(0xBF00_0000),
+ *   memblock.memory[0]를 제외한 vmalloc 시작직전(vmalloc 더미 포함) 영역 초기화 및 캐쉬 클린
+ */
 static inline void prepare_page_table(void)
 {
 	unsigned long addr;
@@ -1422,6 +1428,16 @@ static inline void prepare_page_table(void)
 	/*!
 	 * 0 ~ (0xC0000000 - 0x1000000)만큼 pmd table Clear, mmu dcache Clear
 	 * pgd_t 엔트리가 엔트리(1MB) 배열 2개이므로 2MB 단위(PMD_SIZE)로 증가 
+	 ****
+	 * #define CONFIG_PAGE_OFFSET	0xC0000000
+	 * #define PAGE_OFFSET		UL(CONFIG_PAGE_OFFSET)
+	 * #define SZ_16M		0x01000000
+	 * #define MODULES_VADDR	(PAGE_OFFSET - SZ_16M)
+	 ****
+	 * 1 << 20 == 1M
+	 * 1 << 21 == 2M
+	 * #define PMD_SHIFT		21
+	 * #define PMD_SIZE		(1UL << PMD_SHIFT)  
 	 */
 	for (addr = 0; addr < MODULES_VADDR; addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
@@ -1430,6 +1446,7 @@ static inline void prepare_page_table(void)
 	/* The XIP kernel is mapped in the module area -- skip over it */
 	addr = ((unsigned long)_etext + PMD_SIZE - 1) & PMD_MASK;
 #endif
+
 	for ( ; addr < PAGE_OFFSET; addr += PMD_SIZE)
 		pmd_clear(pmd_off_k(addr));
 
@@ -1438,7 +1455,7 @@ static inline void prepare_page_table(void)
 	 */
 	end = memblock.memory.regions[0].base + memblock.memory.regions[0].size;
 	/*! 
-	 * arm_lowmem_limit = high_memory 시작주소 - 1
+	 * arm_lowmem_limit = high_memory 시작주소 - 1(sanity_check_meminfo()에서 초기화)
 	 * high_memory = high_memory 시작주소
 	 */
 	if (end >= arm_lowmem_limit)
@@ -1450,6 +1467,9 @@ static inline void prepare_page_table(void)
 	 */
 	/*!
 	 * VMALLOC 더미(highmem 시작부터 +8Mb까지) 지움
+	 * #define VMALLOC_OFFSET	(8*1024*1024)
+	 * #define VMALLOC_START	(((unsigned long)high_memory + VMALLOC_OFFSET) & ~(VMALLOC_OFFSET-1))
+	 * #define VMALLOC_END		0xff000000UL
 	 */
 	for (addr = __phys_to_virt(end);
 	     addr < VMALLOC_START; addr += PMD_SIZE)

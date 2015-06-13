@@ -661,6 +661,11 @@ static inline void flush_pmd_entry(void *pmd)
 		dsb(ishst);
 }
 
+/*!
+ * clean_pmd_entry(void* pmd)
+ * - pmd d-cache 라인 클린
+ *   tlb_l2_op의 경우 L2캐쉬가 있을 경우에만 실행한다.
+ */
 static inline void clean_pmd_entry(void *pmd)
 {
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
