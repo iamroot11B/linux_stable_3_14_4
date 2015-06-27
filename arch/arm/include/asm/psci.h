@@ -34,6 +34,10 @@ struct psci_operations {
 extern struct psci_operations psci_ops;
 extern struct smp_operations psci_smp_ops;
 
+/*!
+ * psci(Power State Coordination Interface)
+ * - 
+ */
 #ifdef CONFIG_ARM_PSCI
 void psci_init(void);
 bool psci_smp_available(void);

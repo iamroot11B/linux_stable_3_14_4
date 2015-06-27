@@ -531,6 +531,16 @@ void notrace cpu_init(void)
  *  http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Designated-Inits.html  
  *  CONFIG_NR_CPUS=8 (exynos_defconfig)
  *  MPIDR_INVALID = 0xFF000000
+ *  초기화 과정
+ *  1. 최초 초기화 
+ *   - smp_setup_processor_id()
+ *  2. 두번째 셋팅
+ *   - start_kernel/setup_arch/arm_dt_init_cpu_maps()
+ *   - [0] = 부팅 cpu 번호가 들어감
+ *   - [1 ~ 나머지] 나머지 cpu들 번호를 정책에 맞춰 넣어줌
+ *   - 현재 exynos의 id값
+ *   -- 0xFF00_0000 ~ 0xFF00_0003(coretex-a15)
+ *   -- 0xFF00_0100 ~ 0xFF00_0103(coretex-a7)
  */
 u32 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = MPIDR_INVALID };
 
@@ -582,6 +592,10 @@ struct mpidr_hash mpidr_hash;
  *			  MPIDR value. Resulting algorithm is a collision
  *			  free hash carried out through shifting and ORing
  */
+/*!
+ * smp_build_mpidr_hash()
+ * - mpidr hash 생성 
+ */
 static void __init smp_build_mpidr_hash(void)
 {
 	u32 i, affinity;
@@ -589,6 +603,23 @@ static void __init smp_build_mpidr_hash(void)
 	/*
 	 * Pre-scan the list of MPIDRS and filter out bits that do
 	 * not contribute to affinity levels, ie they never toggle.
+	 */
+
+	/*!
+	 * #define for_each_possible_cpu(cpu)
+	 *	for_each_cpu((cpu), cpu_possible_mask)
+	 * #define for_each_cpu(cpu, mask)				\
+	 * for ((cpu) = -1;				\
+	 *	(cpu) = cpumask_next((cpu), (mask)),	\
+	 *	(cpu) < nr_cpu_ids;)
+	 **************
+	 * for ((i) = -1; (i) = cpumask_next((i), cpu_possible_mask), (i) < nr_cpu_ids;)
+	 *	mask |= (cpu_logical_map(i) ^ cpu_logical_map(0));
+	 ******
+	 * ^ = bit xor
+	 * 0001 ^ 0000 => 0001 =>
+	 * 0010 ^ 0000 => 0010
+	 * 0011 ^ 0000 => 0011 
 	 */
 	for_each_possible_cpu(i)
 		mask |= (cpu_logical_map(i) ^ cpu_logical_map(0));
@@ -1198,12 +1229,19 @@ void __init setup_arch(char **cmdline_p)
 
 	arm_dt_init_cpu_maps();
 	/*! 20150613, study end */
+	/*! 20150627, study start */
 	psci_init();
 #ifdef CONFIG_SMP
 	if (is_smp()) {
+		/*! 
+		 * mdesc 초기화 : arch/arm/mach-exynos//mach-exynos5-dt.c
+		 * mdesc->smp_init 설정되어 있지 않음
+		 */
 		if (!mdesc->smp_init || !mdesc->smp_init()) {
+			/*! psci_smp_available return false */
 			if (psci_smp_available())
 				smp_set_ops(&psci_smp_ops);
+			/*! mdesc->smp 초기화 됨 */
 			else if (mdesc->smp)
 				smp_set_ops(mdesc->smp);
 		}
@@ -1215,6 +1253,10 @@ void __init setup_arch(char **cmdline_p)
 	if (!is_smp())
 		hyp_mode_check();
 
+	/*!
+	 * kerex 설정을 위한 초기화 
+	 * crashkernel 영역 저장
+	 */
 	reserve_crashkernel();
 
 #ifdef CONFIG_MULTI_IRQ_HANDLER
@@ -1229,6 +1271,9 @@ void __init setup_arch(char **cmdline_p)
 #endif
 #endif
 
+	/*!
+	 * 실행 안함
+	 */
 	if (mdesc->init_early)
 		mdesc->init_early();
 }

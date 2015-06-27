@@ -657,6 +657,11 @@ EXPORT_SYMBOL(cpu_all_bits);
 static DECLARE_BITMAP(cpu_possible_bits, CONFIG_NR_CPUS) __read_mostly
 	= CPU_BITS_ALL;
 #else
+/*!
+ * #define DECLARE_BITMAP(name,bits) \
+ *	unsigned long name[BITS_TO_LONGS(bits)]
+ *=> usigned long cpu_possible_bits[1];
+ */
 static DECLARE_BITMAP(cpu_possible_bits, CONFIG_NR_CPUS) __read_mostly;
 #endif
 const struct cpumask *const cpu_possible_mask = to_cpumask(cpu_possible_bits);

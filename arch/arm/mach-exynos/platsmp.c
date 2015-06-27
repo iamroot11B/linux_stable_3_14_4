@@ -175,11 +175,19 @@ static int exynos_boot_secondary(unsigned int cpu, struct task_struct *idle)
  * which may be present or become present in the system.
  */
 
+/*!
+ * exynos_smp_init_cpus()
+ * - set_cpu_possible() 
+ */
 static void __init exynos_smp_init_cpus(void)
 {
 	void __iomem *scu_base = scu_base_addr();
 	unsigned int i, ncores;
 
+	/*!
+	 * ARM_CPU_PART_CORTEX_A15일 경우 arm_dt_init_cpu_maps에서 set_cpu_possible()
+	 * 과정을 거치기 때문에 바로 return
+	 */
 	if (read_cpuid_part_number() == ARM_CPU_PART_CORTEX_A9)
 		ncores = scu_base ? scu_get_core_count(scu_base) : 1;
 	else

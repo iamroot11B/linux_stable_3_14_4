@@ -24,6 +24,11 @@
 #include <asm/opcodes-virt.h>
 #include <asm/psci.h>
 
+/*!
+ * 현재 분석중인 엑시노스 5420 옵션에서 psci를 사용하고 있지 않음.
+ * 최초 초기화 위치
+ *  - start_kernel/setup_arch/psci_init
+ */
 struct psci_operations psci_ops;
 
 static int (*invoke_psci_fn)(u32, u32, u32, u32);
@@ -158,6 +163,10 @@ static const struct of_device_id psci_of_match[] __initconst = {
 	{},
 };
 
+/*!
+ * psci_init()
+ * - dtb를 통해 psci_ops 초기화 
+ */
 void __init psci_init(void)
 {
 	struct device_node *np;

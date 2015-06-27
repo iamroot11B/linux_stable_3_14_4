@@ -109,6 +109,7 @@ extern const struct cpumask *const cpu_active_mask;
 static inline unsigned int cpumask_check(unsigned int cpu)
 {
 #ifdef CONFIG_DEBUG_PER_CPU_MAPS
+    /*! nr_cpumask_bits = 8 */
 	WARN_ON_ONCE(cpu >= nr_cpumask_bits);
 #endif /* CONFIG_DEBUG_PER_CPU_MAPS */
 	return cpu;
@@ -176,6 +177,11 @@ static inline unsigned int cpumask_next(int n, const struct cpumask *srcp)
 	/* -1 is a legal arg here. */
 	if (n != -1)
 		cpumask_check(n);
+    /*!
+     * cpumask_bits(srcp)
+     * =>srcp->bits
+     * nr_cpumask_bits = 8
+     */
 	return find_next_bit(cpumask_bits(srcp), nr_cpumask_bits, n+1);
 }
 

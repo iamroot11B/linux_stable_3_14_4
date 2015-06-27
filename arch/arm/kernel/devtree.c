@@ -132,6 +132,10 @@ void __init arm_dt_init_cpu_maps(void)
 		 */
 		/*!
 		 * MPIDR_HWID_BITMASK = 0x00FFFFFF
+		 * cpu reg
+		 * => 0xFF00_0000 ~ 0xFF00_0003(coretex-a15)
+		 *    0xFF00_0100 ~ 0xFF00_0103(coretex-a7)
+		 * 
 		 */
 		if (hwid & ~MPIDR_HWID_BITMASK)
 			return;

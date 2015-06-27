@@ -73,6 +73,10 @@ enum ipi_msg_type {
 
 static DECLARE_COMPLETION(cpu_running);
 
+/*!
+ * smp_ops 초기화
+ * 1. start_kernel/smp_set_ops() 에서 최초 초기화  
+ */
 static struct smp_operations smp_ops;
 
 void __init smp_set_ops(struct smp_operations *ops)
@@ -135,6 +139,10 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 /* platform specific SMP operations */
 void __init smp_init_cpus(void)
 {
+	/*!
+	 * smp_ops.smp_init_cpus = exynos_smp_init_cpus
+	 * exynos_smp_init_cpus 실행
+	 */
 	if (smp_ops.smp_init_cpus)
 		smp_ops.smp_init_cpus();
 }

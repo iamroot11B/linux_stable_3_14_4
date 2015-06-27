@@ -576,7 +576,8 @@ asmlinkage void __init start_kernel(void)
 	/*!
 	 */
 	setup_arch(&command_line);
-	
+	/*! 2015/06/27 study end */
+
 	mm_init_owner(&init_mm, &init_task);
 	mm_init_cpumask(&init_mm);
 	setup_command_line(command_line);
