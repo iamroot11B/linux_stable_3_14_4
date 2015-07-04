@@ -1,0 +1,800 @@
+[    0.000000] [c0] Booting Linux on physical CPU 0x100
+[    0.000000] [c0] Initializing cgroup subsys cpu
+[    0.000000] [c0] Initializing cgroup subsys cpuacct
+[    0.000000] [c0] Linux version 3.10.58+ (tobetter@hkxeon) (gcc version 4.6.x-google 20120106 (prerelease) (GCC) ) #13 SMP PREEMPT Tue Nov 4 14:09:41 KST 2014
+[    0.000000] [c0] CPU: ARMv7 Processor [410fc073] revision 3 (ARMv7), cr=10c5387d
+[    0.000000] [c0] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] [c0] Machine: ODROID-XU3, model: Hardkernel odroid-xu3 board based on EXYNOS5422
+[    0.000000] [c0] ION: Contiguous 0x6650000 bytes @ 0x0 defined for 0:common
+[    0.000000] [c0] ION: Contiguous 0x400000 bytes @ 0x0 defined for 2:mfc_sh
+[    0.000000] [c0] ION: Contiguous 0x800000 bytes @ 0x0 defined for 10:g2d_wfd
+[    0.000000] [c0] ION: Contiguous 0x6000000 bytes @ 0x0 defined for 11:video
+[    0.000000] [c0] ION: Contiguous 0x1000000 bytes @ 0x0 defined for 7:mfc_input
+[    0.000000] [c0] ION: Contiguous 0x400000 bytes @ 0x0 defined for 9:sectbl
+[    0.000000] [c0] ION: Contiguous 0x400000 bytes @ 0x0 defined for 8:mfc_fw
+[    0.000000] [c0] ION: Contiguous 0x400000 bytes @ 0x0 defined for 12:mfc_nfw
+[    0.000000] [c0] ION: Contiguous 0x400000 bytes @ 0x0 defined for 13:secdma
+[    0.000000] [c0] cma: CMA: reserved 104 MiB at b8000000
+[    0.000000] [c0] cma: CMA: reserved 4 MiB at b7c00000
+[    0.000000] [c0] cma: CMA: reserved 8 MiB at b7400000
+[    0.000000] [c0] cma: CMA: reserved 96 MiB at b1400000
+[    0.000000] [c0] cma: CMA: reserved 16 MiB at b0400000
+[    0.000000] [c0] cma: CMA: reserved 4 MiB at b0000000
+[    0.000000] [c0] cma: CMA: reserved 4 MiB at afc00000
+[    0.000000] [c0] cma: CMA: reserved 4 MiB at af800000
+[    0.000000] [c0] cma: CMA: reserved 4 MiB at af400000
+[    0.000000] [c0] cma: CMA: reserved 256 MiB at 5f800000
+[    0.000000] [c0] Memory policy: ECC disabled, Data cache writealloc
+[    0.000000] [c0] create_mapping_memory: section: 40000000 ~ 6f800000
+[    0.000000] [c0] CPU EXYNOS5422 (id 0xe5422001)
+[    0.000000] [c0] On node 0 totalpages: 518656
+[    0.000000] [c0] free_area_init_node: node 0, pgdat c0915e80, node_mem_map c0d82000
+[    0.000000] [c0]   Normal zone: 1520 pages used for memmap
+[    0.000000] [c0]   Normal zone: 0 pages reserved
+[    0.000000] [c0]   Normal zone: 194560 pages, LIFO batch:31
+[    0.000000] [c0]   HighMem zone: 2532 pages used for memmap
+[    0.000000] [c0]   HighMem zone: 324096 pages, LIFO batch:31
+[    0.000000] [c0] PERCPU: Embedded 9 pages/cpu @c1d90000 s14784 r8192 d13888 u36864
+[    0.000000] [c0] pcpu-alloc: s14784 r8192 d13888 u36864 alloc=9*4096
+[    0.000000] [c0] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 [0] 6 [0] 7 
+[    0.000000] [c0] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 517136
+[    0.000000] [c0] Kernel command line: console=tty1 console=ttySAC2,115200n8 root=UUID=e139ce78-9841-40fe-8823-96a304a09859 rootwait ro smsc95xx.macaddr=00:1e:06:61:7a:39
+[    0.000000] [c0] PID hash table entries: 4096 (order: 2, 16384 bytes)
+[    0.000000] [c0] Dentry cache hash table entries: 131072 (order: 7, 524288 bytes)
+[    0.000000] [c0] Inode-cache hash table entries: 65536 (order: 6, 262144 bytes)
+[    0.000000] [c0] Memory: 2026MB = 2026MB total
+[    0.000000] [c0] Memory: 1528608k/1528608k available, 546016k reserved, 1046528K highmem
+[    0.000000] [c0] Virtual kernel memory layout:
+[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+[    0.000000]     fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+[    0.000000]     vmalloc : 0xf0000000 - 0xff000000   ( 240 MB)
+[    0.000000]     lowmem  : 0xc0000000 - 0xef800000   ( 760 MB)
+[    0.000000]     pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)
+[    0.000000]     modules : 0xbf000000 - 0xbfe00000   (  14 MB)
+[    0.000000]       .text : 0xc0008000 - 0xc084100c   (8421 kB)
+[    0.000000]       .init : 0xc0842000 - 0xc08a89c0   ( 411 kB)
+[    0.000000]       .data : 0xc08aa000 - 0xc091a054   ( 449 kB)
+[    0.000000]        .bss : 0xc091a054 - 0xc0d81720   (4510 kB)
+[    0.000000] [c0] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=8, Nodes=1
+[    0.000000] [c0] Preemptible hierarchical RCU implementation.
+[    0.000000] [c0] NR_IRQS:16 nr_irqs:16 16
+[    0.000000] [c0] apll 800000000
+[    0.000000] [c0] bpll 825000000
+[    0.000000] [c0] cpll 666000000
+[    0.000000] [c0] dpll 600000000
+[    0.000000] [c0] epll 180633609
+[    0.000000] [c0] rpll 66000000
+[    0.000000] [c0] ipll 432000000
+[    0.000000] [c0] spll 800000000
+[    0.000000] [c0] dout_spll_ctrl_div2 400000000
+[    0.000000] [c0] vpll 400000000
+[    0.000000] [c0] mpll 532000000
+[    0.000000] [c0] Clock enables : TOP, MIF
+[    0.000000] [c0] mmc0: dout_mmc0 666000000
+[    0.000000] [c0] mmc1: dout_mmc1 800000000
+[    0.000000] [c0] mmc2: dout_mmc2 666000000
+[    0.000000] [c0] scaler: dout_aclk_400_mscl 333000000 aclk_400_mscl 333000000
+[    0.000000] [c0] [g2d_init_clock:313] aclk_333_g2d:333000000
+[    0.000000] [c0] gscaler: dout_aclk_300_gscl 300000000 aclk_300_gscl 300000000
+[    0.000000] [c0] [jpeg_clock_init:368]jpeg: dout_aclk_300_jpeg 300000000 aclk_300_jpeg 300000000
+[    0.000000] [c0] mfc: aclk_333 400000000
+[    0.000000] [c0] Exynos5422: clock setup completed
+[    0.000000] [c0] Exynos: pwm: clock setup completed
+[    0.000000] [c0] sched_clock: 32 bits at 24MHz, resolution 41ns, wraps every 178956ms
+[    0.000000] [c0] Switching to timer-based delay loop
+[    0.000000] [c0] EXYNOS5422 PMU Initialize
+[    0.000000] [c0] Console: colour dummy device 80x30
+[    0.000000] [c0] console [tty1] enabled
+[    0.000000] [c0] Lock dependency validator: Copyright (c) 2006 Red Hat, Inc., Ingo Molnar
+[    0.000000] [c0] ... MAX_LOCKDEP_SUBCLASSES:  8
+[    0.000000] [c0] ... MAX_LOCK_DEPTH:          48
+[    0.000000] [c0] ... MAX_LOCKDEP_KEYS:        8191
+[    0.000000] [c0] ... CLASSHASH_SIZE:          4096
+[    0.000000] [c0] ... MAX_LOCKDEP_ENTRIES:     16384
+[    0.000000] [c0] ... MAX_LOCKDEP_CHAINS:      32768
+[    0.000000] [c0] ... CHAINHASH_SIZE:          16384
+[    0.000000] [c0]  memory used by lock dependency info: 3679 kB
+[    0.000000] [c0]  per task-struct memory footprint: 1152 bytes
+[    0.006666] [c0] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=120000)
+[    0.006762] [c0] pid_max: default: 32768 minimum: 301
+[    0.007279] [c0] Mount-cache hash table entries: 512
+[    0.043249] [c0] Initializing cgroup subsys debug
+[    0.043324] [c0] Initializing cgroup subsys freezer
+[    0.043571] [c0] CPU: Testing write buffer coherency: ok
+[    0.043669] [c0] ftrace: allocating 21428 entries in 63 pages
+[    0.090806] [c0] /cpus/cpu@0 missing clock-frequency property
+[    0.090875] [c0] /cpus/cpu@1 missing clock-frequency property
+[    0.090922] [c0] /cpus/cpu@2 missing clock-frequency property
+[    0.090968] [c0] /cpus/cpu@3 missing clock-frequency property
+[    0.091012] [c0] /cpus/cpu@4 missing clock-frequency property
+[    0.091056] [c0] /cpus/cpu@5 missing clock-frequency property
+[    0.091099] [c0] /cpus/cpu@6 missing clock-frequency property
+[    0.091143] [c0] /cpus/cpu@7 missing clock-frequency property
+[    0.091240] [c0] CPU0: thread -1, cpu 0, socket 1, mpidr 80000100
+[    0.091450] [c0] Running under secure firmware.
+[    0.091523] [c0] Setting up static identity map for 0xc05db710 - 0xc05db768
+[    0.091580] [c0] Exynos-SnapShot: exynos_ss_init failed
+[    0.111934] [c0] ftrace: Allocated trace_printk buffers
+[    0.133586] [c0] cpu1: SWRESET
+[    0.133840] [c1] CPU1: Booted secondary processor
+[    0.133869] [c1] CPU1: thread -1, cpu 1, socket 1, mpidr 80000101
+[    0.143539] [c0] cpu2: SWRESET
+[    0.143856] [c2] CPU2: Booted secondary processor
+[    0.143883] [c2] CPU2: thread -1, cpu 2, socket 1, mpidr 80000102
+[    0.153514] [c0] cpu3: SWRESET
+[    0.153827] [c3] CPU3: Booted secondary processor
+[    0.153854] [c3] CPU3: thread -1, cpu 3, socket 1, mpidr 80000103
+[    0.162774] [c4] CPU4: Booted secondary processor
+[    0.163550] [c4] CPU4: thread -1, cpu 0, socket 0, mpidr 80000000
+[    0.172789] [c5] CPU5: Booted secondary processor
+[    0.173544] [c5] CPU5: thread -1, cpu 1, socket 0, mpidr 80000001
+[    0.182779] [c6] CPU6: Booted secondary processor
+[    0.183557] [c6] CPU6: thread -1, cpu 2, socket 0, mpidr 80000002
+[    0.192781] [c7] CPU7: Booted secondary processor
+[    0.193558] [c7] CPU7: thread -1, cpu 3, socket 0, mpidr 80000003
+[    0.193825] [c0] Brought up 8 CPUs
+[    0.194151] [c0] SMP: Total of 8 processors activated (384.00 BogoMIPS).
+[    0.194198] [c0] CPU: All CPU(s) started in HYP mode.
+[    0.194237] [c0] CPU: Virtualization extensions available.
+[    0.196722] [c0] devtmpfs: initialized
+[    0.234927] [c6] sched: registering cpufreq notifiers for scale-invariant loads
+[    0.237262] [c6] pinctrl core: initialized pinctrl subsystem
+[    0.239245] [c4] regulator-dummy: no parameters
+[    0.250999] [c5] NET: Registered protocol family 16
+[    0.251301] [c5] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.264315] [c6] gpiochip_add: registered GPIOs 0 to 7 on device: gpy7
+[    0.264738] [c6] gpiochip_add: registered GPIOs 8 to 15 on device: gpx0
+[    0.265143] [c6] gpiochip_add: registered GPIOs 16 to 23 on device: gpx1
+[    0.265547] [c6] gpiochip_add: registered GPIOs 24 to 31 on device: gpx2
+[    0.265967] [c6] gpiochip_add: registered GPIOs 32 to 39 on device: gpx3
+[    0.268468] [c7] gpiochip_add: registered GPIOs 40 to 47 on device: gpc0
+[    0.268952] [c4] gpiochip_add: registered GPIOs 48 to 55 on device: gpc1
+[    0.269392] [c5] gpiochip_add: registered GPIOs 56 to 62 on device: gpc2
+[    0.269839] [c6] gpiochip_add: registered GPIOs 63 to 66 on device: gpc3
+[    0.270261] [c6] gpiochip_add: registered GPIOs 67 to 68 on device: gpc4
+[    0.270668] [c6] gpiochip_add: registered GPIOs 69 to 76 on device: gpd1
+[    0.271086] [c6] gpiochip_add: registered GPIOs 77 to 82 on device: gpy0
+[    0.271490] [c6] gpiochip_add: registered GPIOs 83 to 86 on device: gpy1
+[    0.271899] [c6] gpiochip_add: registered GPIOs 87 to 92 on device: gpy2
+[    0.272322] [c7] gpiochip_add: registered GPIOs 93 to 100 on device: gpy3
+[    0.272758] [c4] gpiochip_add: registered GPIOs 101 to 108 on device: gpy4
+[    0.273190] [c5] gpiochip_add: registered GPIOs 109 to 116 on device: gpy5
+[    0.273629] [c6] gpiochip_add: registered GPIOs 117 to 124 on device: gpy6
+[    0.275760] [c6] gpiochip_add: registered GPIOs 125 to 132 on device: gpe0
+[    0.276183] [c6] gpiochip_add: registered GPIOs 133 to 134 on device: gpe1
+[    0.276587] [c6] gpiochip_add: registered GPIOs 135 to 140 on device: gpf0
+[    0.277004] [c7] gpiochip_add: registered GPIOs 141 to 148 on device: gpf1
+[    0.277440] [c4] gpiochip_add: registered GPIOs 149 to 156 on device: gpg0
+[    0.277871] [c5] gpiochip_add: registered GPIOs 157 to 164 on device: gpg1
+[    0.278301] [c6] gpiochip_add: registered GPIOs 165 to 166 on device: gpg2
+[    0.278726] [c6] gpiochip_add: registered GPIOs 167 to 170 on device: gpj4
+[    0.280688] [c6] gpiochip_add: registered GPIOs 171 to 178 on device: gpa0
+[    0.281110] [c6] gpiochip_add: registered GPIOs 179 to 184 on device: gpa1
+[    0.281521] [c6] gpiochip_add: registered GPIOs 185 to 192 on device: gpa2
+[    0.281937] [c7] gpiochip_add: registered GPIOs 193 to 197 on device: gpb0
+[    0.282369] [c4] gpiochip_add: registered GPIOs 198 to 202 on device: gpb1
+[    0.282853] [c5] gpiochip_add: registered GPIOs 203 to 206 on device: gpb2
+[    0.283314] [c6] gpiochip_add: registered GPIOs 207 to 214 on device: gpb3
+[    0.284043] [c6] gpiochip_add: registered GPIOs 215 to 216 on device: gpb4
+[    0.284465] [c6] gpiochip_add: registered GPIOs 217 to 224 on device: gph0
+[    0.286839] [c6] gpiochip_add: registered GPIOs 225 to 231 on device: gpz
+[    0.322096] [c6] syscon 10040000.system-controller: regmap [mem 0x10040000-0x10044fff] registered
+[    0.322845] [c7] syscon 10050000.syscon: regmap [mem 0x10050000-0x10054fff] registered
+[    0.337428] [c4] hw-breakpoint: Failed to enable monitor mode on CPU 4.
+[    0.339266] [c7] S3C Power Management, Copyright 2004 Simtec Electronics
+[    0.344542] [c4] PM DOMAIN: pd-cam has a new child pd-isp.
+[    0.345244] [c4] PM DOMAIN: pd-gscl has a new child pd-cam.
+[    0.345291] [c4] EXYNOS5: PM Domain Initialize
+[    0.345595] [c4]    pd-gscl   - on 
+[    0.345777] [c4]    pd-isp    - on 
+[    0.345810] [c4]    pd-mfc    - on,  always
+[    0.345842] [c4]    pd-g3d    - on,  always
+[    0.345874] [c4]    pd-disp1  - on,  always
+[    0.346059] [c4]    pd-maudio - on 
+[    0.346092] [c4]    pd-g2d    - on,  always
+[    0.346275] [c4]    pd-mscl   - on 
+[    0.346309] [c4]    pd-fsys   - on,  always
+[    0.346342] [c4]    pd-psgen  - on,  always
+[    0.346375] [c4]    pd-peric  - on,  always
+[    0.346406] [c4]    pd-wcore  - on,  always
+[    0.346591] [c4]    pd-cam    - on 
+[    0.346630] [c4] EXYNOS: Initializing architecture
+[    0.348972] [c7] exynos-sysmmu 10a60000.sysmmu: --> 10850000.fimg2d
+[    0.349016] [c7] exynos-sysmmu 10a60000.sysmmu: [OK]
+[    0.349356] [c7] exynos-sysmmu 10a70000.sysmmu: --> 10850000.fimg2d
+[    0.349398] [c7] exynos-sysmmu 10a70000.sysmmu: [OK]
+[    0.349745] [c7] exynos-sysmmu 14650000.sysmmu: --> 14450000.mixer
+[    0.349785] [c7] exynos-sysmmu 14650000.sysmmu: [OK]
+[    0.350113] [c7] exynos-sysmmu 13e80000.sysmmu: --> 13e00000.gsc
+[    0.350153] [c7] exynos-sysmmu 13e80000.sysmmu: [OK]
+[    0.350476] [c7] exynos-sysmmu 13e90000.sysmmu: --> 13e10000.gsc
+[    0.350515] [c7] exynos-sysmmu 13e90000.sysmmu: [OK]
+[    0.350846] [c7] exynos-sysmmu 12880000.sysmmu: --> 12800000.scaler
+[    0.350886] [c7] exynos-sysmmu 12880000.sysmmu: [OK]
+[    0.351217] [c7] exynos-sysmmu 12890000.sysmmu: --> 12810000.scaler
+[    0.351256] [c7] exynos-sysmmu 12890000.sysmmu: [OK]
+[    0.351590] [c7] exynos-sysmmu 128a0000.sysmmu: --> 12820000.scaler
+[    0.351630] [c7] exynos-sysmmu 128a0000.sysmmu: [OK]
+[    0.351961] [c7] exynos-sysmmu 128c0000.sysmmu: --> 12800000.scaler
+[    0.352000] [c7] exynos-sysmmu 128c0000.sysmmu: [OK]
+[    0.352330] [c7] exynos-sysmmu 128d0000.sysmmu: --> 12810000.scaler
+[    0.352370] [c7] exynos-sysmmu 128d0000.sysmmu: [OK]
+[    0.352699] [c7] exynos-sysmmu 128e0000.sysmmu: --> 12820000.scaler
+[    0.352739] [c7] exynos-sysmmu 128e0000.sysmmu: [OK]
+[    0.353067] [c7] exynos-sysmmu 11f10000.sysmmu: --> 11f50000.jpeg
+[    0.353106] [c7] exynos-sysmmu 11f10000.sysmmu: [OK]
+[    0.353432] [c7] exynos-sysmmu 11f20000.sysmmu: --> 11f60000.jpeg
+[    0.353471] [c7] exynos-sysmmu 11f20000.sysmmu: [OK]
+[    0.353818] [c7] exynos-sysmmu 11200000.sysmmu: --> 11000000.mfc
+[    0.353858] [c7] exynos-sysmmu 11200000.sysmmu: [OK]
+[    0.354179] [c7] exynos-sysmmu 11210000.sysmmu: --> 11000000.mfc
+[    0.354219] [c7] exynos-sysmmu 11210000.sysmmu: [OK]
+[    0.354572] [c7] exynos-sysmmu 14640000.sysmmu: --> 14400000.fimd
+[    0.354611] [c7] exynos-sysmmu 14640000.sysmmu: [OK]
+[    0.354967] [c7] exynos-sysmmu 14680000.sysmmu: --> 14400000.fimd
+[    0.355007] [c7] exynos-sysmmu 14680000.sysmmu: [OK]
+[    0.355693] [c4] CPU Info : Samsung Exynos5422 Soc is BIN2
+[    0.355731] [c4] EXYNOS5422 ASV :  IDS : 17 HPM : 60
+[    0.355791] [c4] VDD_ARM ASV group is 1
+[    0.355827] [c4] VDD_KFC ASV group is 1
+[    0.355856] [c4] VDD_INT ASV group is 1
+[    0.355884] [c4] VDD_MIF ASV group is 1
+[    0.355912] [c4] VDD_G3D ASV group is 1
+[    0.355940] [c4] VDD_ISP ASV group is 1
+[    0.414031] [c6] bio: create slab <bio-0> at 0
+[    0.416261] [c7] of_get_named_gpio_flags exited with status 119
+[    0.416766] [c4] VUSB_BOOST_5V: 5000 mV 
+[    0.417078] [c4] of_get_named_gpio_flags: can't parse gpios property
+[    0.417552] [c5] MAIN_DC: no parameters
+[    0.417880] [c5] of_get_named_gpio_flags: can't parse gpios property
+[    0.418351] [c6] hdmi-en: no parameters
+[    0.421325] [c7] SCSI subsystem initialized
+[    0.423114] [c7] of_get_named_gpio_flags exited with status 190
+[    0.424333] [c4] PM DOMAIN: pd-isp, Device : 131a0000.spi Registered
+[    0.424415] [c4] s3c64xx-spi 131a0000.spi: spi bus clock parent not specified, using clock at index 0 as parent
+[    0.424468] [c4] s3c64xx-spi 131a0000.spi: number of chip select lines not specified, assuming 1 chip select line
+[    0.424907] [c4] PM DOMAIN: pd-isp, Device : 131b0000.spi Registered
+[    0.424982] [c4] s3c64xx-spi 131b0000.spi: spi bus clock parent not specified, using clock at index 0 as parent
+[    0.425040] [c4] s3c64xx-spi 131b0000.spi: number of chip select lines not specified, assuming 1 chip select line
+[    0.427118] [c7] usbcore: registered new interface driver usbfs
+[    0.427500] [c4] usbcore: registered new interface driver hub
+[    0.427991] [c5] usbcore: registered new device driver usb
+[    0.436011] [c4] vdd_mif: 700 <--> 1300 mV at 1100 mV 
+[    0.437425] [c5] vdd_eagle: 800 <--> 1500 mV at 1000 mV 
+[    0.438910] [c6] vdd_int: 800 <--> 1400 mV at 1000 mV 
+[    0.440327] [c7] vdd_g3d: 700 <--> 1400 mV at 1000 mV 
+[    0.441734] [c4] vdd_kfc: 800 <--> 1500 mV at 1025 mV 
+[    0.443457] [c5] vddf_2v85: 2850 mV 
+[    0.445039] [c6] vdd_adc: 1800 mV 
+[    0.446583] [c4] vdd_pll: 1800 mV 
+[    0.448128] [c5] vdd_ldo6: 1000 mV 
+[    0.449811] [c6] vdd_ldo7: 1800 mV 
+[    0.451365] [c7] vdd_ldo8: 1800 mV 
+[    0.453052] [c4] vdd_ldo9: 3300 mV 
+[    0.454644] [c5] vdd_ldo10: 1800 mV 
+[    0.456201] [c6] vdd_ldo11: 1000 mV 
+[    0.457553] [c6] vdd_ldo13: 1800 <--> 3300 mV at 3300 mV 
+[    0.459293] [c6] vdd_ldo15: 3300 mV 
+[    0.461033] [c7] vdd_eth: 3300 mV 
+[    0.462590] [c4] vdd_ldo18: 1800 mV 
+[    0.464125] [c5] LDO19: ramp_delay not set
+[    0.464159] [c5] vdd_ldo19: set_voltage_time_sel() failed: -22
+[    0.464633] [c5] vdd_ldo19: 2850 mV 
+[    0.465873] [c6] vdd_mifs: 800 <--> 1100 mV at 1000 mV 
+[    0.467426] [c6] vdd_ldo26: 3000 mV 
+[    0.468684] [c6] vdd_g3ds: 800 <--> 1100 mV at 1050 mV 
+[    0.470240] [c7] vdd_ldo28: 3300 mV 
+[    0.473986] [c7] of_get_named_gpio_flags exited with status 33
+[    0.474015] [c7] of_get_named_gpio_flags exited with status 23
+[    0.476131] [c7] i2c-gpio i2c_gpio.13: using pins 33 (SDA) and 23 (SCL)
+[    0.476977] [c7] s3c-i2c 12c60000.i2c: slave address 0x00
+[    0.480712] [c7] s3c-i2c 12c60000.i2c: i2c-3: S3C I2C adapter
+[    0.480995] [c7] s3c-i2c 12c70000.i2c: slave address 0x00
+[    0.481507] [c7] s3c-i2c 12c70000.i2c: i2c-4: S3C I2C adapter
+[    0.481774] [c7] s3c-i2c 12c80000.i2c: slave address 0x00
+[    0.483094] [c4] s3c-i2c 12c80000.i2c: i2c-5: S3C I2C adapter
+[    0.483948] [c5] media: Linux media interface: v0.10
+[    0.484292] [c5] Linux video capture interface: v2.00
+[    0.488914] [c5] IOVMMU: Created debugfs entry at debugfs/iovmm
+[    0.490144] [c5] Advanced Linux Sound Architecture Driver Initialized.
+[    0.490748] [c5] PM DOMAIN: pd-maudio, Device : 3810000.lpass Registered
+[    0.490808] [c5] Samsung Low Power Audio Subsystem driver, (c)2013 Samsung Electronics
+[    0.497984] [c5] Switching to clocksource mct-frc
+[    0.591045] [c6] NET: Registered protocol family 2
+[    0.592487] [c6] TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+[    0.592989] [c6] TCP bind hash table entries: 8192 (order: 6, 294912 bytes)
+[    0.595031] [c6] TCP: Hash tables configured (established 8192 bind 8192)
+[    0.595176] [c6] TCP: reno registered
+[    0.595225] [c6] UDP hash table entries: 512 (order: 3, 40960 bytes)
+[    0.595532] [c6] UDP-Lite hash table entries: 512 (order: 3, 40960 bytes)
+[    0.596657] [c6] NET: Registered protocol family 1
+[    0.597171] [c6] Unpacking initramfs...
+[    0.741393] [c6] Freeing initrd memory: 2044K (c2001000 - c2200000)
+[    0.757255] [c6] bounce pool size: 64 pages
+[    0.778660] [c7] VFS: Disk quotas dquot_6.5.2
+[    0.779282] [c7] Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+[    0.783954] [c7] ROMFS MTD (C) 2007 Red Hat, Inc.
+[    0.784421] [c7] msgmni has been set to 1457
+[    0.788288] [c7] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 250)
+[    0.788358] [c7] io scheduler noop registered
+[    0.788393] [c7] io scheduler deadline registered
+[    0.788872] [c7] io scheduler cfq registered (default)
+[    0.800538] [c7] dma-pl330 10800000.mdma: Loaded driver for PL330 DMAC-2364208
+[    0.800588] [c7] dma-pl330 10800000.mdma: 	DBUFF-64x8bytes Num_Chans-8 Num_Peri-1 Num_Events-32
+[    0.815425] [c7] dma-pl330 121a0000.pdma: Loaded driver for PL330 DMAC-2364208
+[    0.815478] [c7] dma-pl330 121a0000.pdma: 	DBUFF-32x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+[    0.829043] [c7] dma-pl330 121b0000.pdma: Loaded driver for PL330 DMAC-2364208
+[    0.829094] [c7] dma-pl330 121b0000.pdma: 	DBUFF-32x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+[    0.836066] [c7] dma-pl330 3880000.adma: Loaded driver for PL330 DMAC-2364208
+[    0.836112] [c7] dma-pl330 3880000.adma: 	DBUFF-4x8bytes Num_Chans-6 Num_Peri-16 Num_Events-6
+[    1.118063] [c7] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    1.122505] [c7] 12c00000.serial: ttySAC0 at MMIO 0x12c00000 (irq = 83) is a S3C6400/10
+[    1.123523] [c7] samsung-pinctrl 14010000.pinctrl: pin gpa0-7 already requested by 12c80000.i2c; cannot claim for 12c10000.serial
+[    1.123581] [c7] samsung-pinctrl 14010000.pinctrl: pin-178 (12c10000.serial) status -22
+[    1.123632] [c7] samsung-pinctrl 14010000.pinctrl: could not request pin 178 on device samsung-pinctrl
+[    1.123685] [c7] samsung-uart 12c10000.serial: Error applying setting, reverse things back
+[    1.123848] [c7] 12c10000.serial: ttySAC1 at MMIO 0x12c10000 (irq = 84) is a S3C6400/10
+[    1.124868] [c7] 12c20000.serial: ttySAC2 at MMIO 0x12c20000 (irq = 85) is a S3C6400/10
+[    2.700215] [c7] console [ttySAC2] enabled
+[    2.705246] [c7] 12c30000.serial: ttySAC3 at MMIO 0x12c30000 (irq = 86) is a S3C6400/10
+[    2.715448] [c7] [drm] Initialized drm 1.1.0 20060810
+[    2.723419] [c7] of_get_named_gpio_flags exited with status 39
+[    2.728198] [c7] [drm] Supports vblank timestamp caching Rev 2 (21.10.2013).
+[    2.733836] [c7] [drm] No driver support for vblank timestamp query.
+[    2.740173] [c7] exynos-mixer 14450000.mixer: probe start
+[    2.745808] [c7] exynos-drm exynos-drm: bound 14450000.mixer (ops mixer_component_ops)
+[    2.754323] [c7] exynos-drm exynos-drm: bound 14530000.hdmi (ops hdmi_component_ops)
+[    2.761474] [c7] [drm] Initialized exynos 1.0.0 20110530 on minor 0
+[    2.771255] [c7] mali 11800000.mali: GPU identified as 0x0620 r0p1 status 0
+[    2.778533] mali 11800000.mali: Probed as mali0
+[    2.794894] [c6] loop: module loaded
+[    2.799530] [c6] tun: Universal TUN/TAP device driver, 1.6
+[    2.803603] [c6] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+[    2.811148] [c6] usbcore: registered new interface driver asix
+[    2.816366] [c6] usbcore: registered new interface driver cdc_ether
+[    2.822643] [c6] usbcore: registered new interface driver smsc95xx
+[    2.828763] [c6] usbcore: registered new interface driver zaurus
+[    2.838767] [c6] samsung-pinctrl 13400000.pinctrl: does not have pin group gpc1-0
+[    2.844848] [c6] samsung-pinctrl 13400000.pinctrl: invalid group gpc1-0 in map table
+[    2.852568] [c6] samsung-pinctrl 13400000.pinctrl: does not have pin group gpc1-0
+[    2.860027] [c6] samsung-pinctrl 13400000.pinctrl: could not map group config for "gpc1-0"
+[    2.869416] of_get_named_gpio_flags exited with status 48
+[    2.869442] [c6] of_get_named_gpio_flags exited with status 37
+[    2.869517] [c6] samsung-pinctrl 13400000.pinctrl: does not have pin group gpc1-0
+[    2.875733] [c6] samsung-pinctrl 13400000.pinctrl: invalid group gpc1-0 in map table
+[    2.883472] [c6] samsung-pinctrl 13400000.pinctrl: does not have pin group gpc1-0
+[    2.890915] [c6] samsung-pinctrl 13400000.pinctrl: could not map group config for "gpc1-0"
+[    2.899173] exynos-dwc3 usb.1: failed to configure pins
+[    3.107478] [c6] of_get_named_gpio_flags exited with status 17
+[    3.107504] [c6] of_get_named_gpio_flags exited with status 36
+[    3.308743] [c6] dwc3 12400000.dwc3: dwc3_otg address space is not supported
+[    3.315672] [c6] dwc3 12400000.dwc3: Binding gadget dwc3-gadget
+[    3.321843] [c7] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    3.327402] [c7] ehci-s5p: EHCI s5p driver
+[    3.331780] [c7] of_get_named_gpio_flags exited with status 121
+[    3.332051] [c7] s5p-ehci 12110000.usb: EHCI Host Controller
+[    3.337228] [c7] s5p-ehci 12110000.usb: new USB bus registered, assigned bus number 1
+[    3.345158] [c7] s5p-ehci 12110000.usb: irq 103, io mem 0x12110000
+[    3.358229] [c7] s5p-ehci 12110000.usb: USB 2.0 started, EHCI 1.00
+[    3.365019] [c7] hub 1-0:1.0: USB hub found
+[    3.367769] [c7] hub 1-0:1.0: 3 ports detected
+[    3.373845] [c7] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    3.379437] [c7] exynos-ohci 12120000.usb: EXYNOS OHCI Host Controller
+[    3.385629] [c7] exynos-ohci 12120000.usb: new USB bus registered, assigned bus number 2
+[    3.393687] [c7] exynos-ohci 12120000.usb: irq 103, io mem 0x12120000
+[    3.459072] [c6] hub 2-0:1.0: USB hub found
+[    3.461825] [c6] hub 2-0:1.0: 3 ports detected
+[    3.468040] [c6] xhci-hcd xhci-hcd.2.auto: xHCI Host Controller
+[    3.472590] [c6] xhci-hcd xhci-hcd.2.auto: new USB bus registered, assigned bus number 3
+[    3.480862] [c6] xhci-hcd xhci-hcd.2.auto: irq 104, io mem 0x12000000
+[    3.488262] [c6] xHCI xhci_add_endpoint called for root hub
+[    3.488279] [c6] xHCI xhci_check_bandwidth called for root hub
+[    3.488844] [c6] hub 3-0:1.0: USB hub found
+[    3.491630] [c6] hub 3-0:1.0: 1 port detected
+[    3.496525] [c6] xhci-hcd xhci-hcd.2.auto: xHCI Host Controller
+[    3.501877] [c6] xhci-hcd xhci-hcd.2.auto: new USB bus registered, assigned bus number 4
+[    3.511126] [c6] xHCI xhci_add_endpoint called for root hub
+[    3.511143] [c6] xHCI xhci_check_bandwidth called for root hub
+[    3.511707] [c6] hub 4-0:1.0: USB hub found
+[    3.514499] [c6] hub 4-0:1.0: 1 port detected
+[    3.520165] [c6] usbcore: registered new interface driver usb-storage
+[    3.525968] [c6] usbcore: registered new interface driver usbserial
+[    3.531845] [c6] usbcore: registered new interface driver usbserial_generic
+[    3.538783] [c6] usbserial: USB Serial support registered for generic
+[    3.546957] [c6] mousedev: PS/2 mouse device common for all mice
+[    3.555855] [c6] s2m-rtc s2m-rtc: s2m_rtc_enable_wtsr: enable WTSR
+[    3.560938] [c6] s2m-rtc s2m-rtc: s2m_rtc_enable_smpl: enable SMPL
+[    3.567364] [c6] s2m_rtc_enable_smpl: WTSR_SMPL(0xc7)
+[    3.573649] [c6] s2m_rtc_read_time: 2015/6/28 8:33:50(0)
+[    3.577808] [c6] s2m_rtc_read_alarm: 2000/1/1 12:0:0(0)
+[    3.584576] [c6] s2m_rtc_read_time: 2015/6/28 8:33:50(0)
+[    3.589146] [c6] s2m-rtc s2m-rtc: rtc core: registered s2m-rtc as rtc0
+[    3.596189] [c6] i2c /dev entries driver
+[    3.603363] [c6] IR NEC protocol handler initialized
+[    3.606875] [c6] IR RC5(x) protocol handler initialized
+[    3.612115] [c6] IR RC6 protocol handler initialized
+[    3.617063] [c6] IR JVC protocol handler initialized
+[    3.622083] [c6] IR Sony protocol handler initialized
+[    3.627038] [c6] IR RC5 (streamzap) protocol handler initialized
+[    3.633030] [c6] IR SANYO protocol handler initialized
+[    3.638165] [c6] IR MCE Keyboard/mouse protocol handler initialized
+[    3.644975] [c6] s5p-mfc 11000000.mfc: s5p_mfc_probe()
+[    3.645005] [c6] s5p-mfc 11000000.mfc: of alias get id : mfc-0 
+[    3.646037] [c7] s5p-mfc 11000000.mfc: decoder registered as /dev/video6
+[    3.651956] [c7] s5p-mfc 11000000.mfc: encoder registered as /dev/video7
+[    3.658433] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x40000000 B, IOVMM from 0x10000000.
+[    3.666643] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x20000000 B, IOVMM from 0x50000000.
+[    3.675230] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x10000000 B, IOVMM from 0x70000000.
+[    3.683845] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x30000000 B, IOVMM from 0x80000000.
+[    3.688265] [c5] usb 1-1: new high-speed USB device number 2 using s5p-ehci
+[    3.699396] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x20000000 B, IOVMM from 0xb0000000.
+[    3.707922] [c4] s5p-mfc 11000000.mfc: IOVMM: IOVM SIZE = 0x10000000 B, IOVMM from 0xd0000000.
+[    3.717453] [c4] ion_cma ion_mfc_nfw: Alread isolated!
+[    3.721633] [c4] s5p_mfc_probe--
+[    3.723943] [c5] TRIMINFO[0] = 0x806b32
+[    3.726324] [c5] TMU_CONTROL[0] = 0x10609803
+[    3.730610] [c5] CURRENT_TEMP[0] = 0x4b
+[    3.734430] [c5] THRESHOLD_TEMP_RISE[0] = 0x87827d78
+[    3.739377] [c5] THRESHOLD_TEMP_FALL[0] = 0x85807b76
+[    3.744339] [c5] INTEN[0] = 0x11111111
+[    3.748013] [c5] INTCLEAR[0] = 0x0
+[    3.751464] [c5] TRIMINFO[1] = 0x805f25
+[    3.755247] [c5] TMU_CONTROL[1] = 0x10609803
+[    3.759500] [c5] CURRENT_TEMP[1] = 0x3e
+[    3.763320] [c5] THRESHOLD_TEMP_RISE[1] = 0x7a75706b
+[    3.768269] [c5] THRESHOLD_TEMP_FALL[1] = 0x78736e69
+[    3.773210] [c5] INTEN[1] = 0x11111111
+[    3.776905] [c5] INTCLEAR[1] = 0x0
+[    3.780355] [c5] TRIMINFO[2] = 0x80692f
+[    3.784139] [c5] TMU_CONTROL[2] = 0x10609803
+[    3.788398] [c5] CURRENT_TEMP[2] = 0x3d
+[    3.792178] [c5] THRESHOLD_TEMP_RISE[2] = 0x78736e69
+[    3.797163] [c5] THRESHOLD_TEMP_FALL[2] = 0x76716c67
+[    3.802106] [c5] INTEN[2] = 0x11111111
+[    3.805845] [c5] INTCLEAR[2] = 0x0
+[    3.809252] [c5] TRIMINFO[3] = 0x805f23
+[    3.813001] [c5] TMU_CONTROL[3] = 0x10609803
+[    3.817299] [c5] CURRENT_TEMP[3] = 0x4e
+[    3.821106] [c5] THRESHOLD_TEMP_RISE[3] = 0x8b86817c
+[    3.821593] [c6] hub 1-1:1.0: USB hub found
+[    3.821797] [c6] hub 1-1:1.0: 5 ports detected
+[    3.834658] [c5] THRESHOLD_TEMP_FALL[3] = 0x89847f7a
+[    3.839597] [c5] INTEN[3] = 0x11111111
+[    3.843335] [c5] INTCLEAR[3] = 0x0
+[    3.846699] [c5] TRIMINFO[4] = 0x807036
+[    3.850523] [c5] TMU_CONTROL[4] = 0x10609803
+[    3.854782] [c5] CURRENT_TEMP[4] = 0x45
+[    3.858604] [c5] THRESHOLD_TEMP_RISE[4] = 0x847f7a75
+[    3.863544] [c5] THRESHOLD_TEMP_FALL[4] = 0x827d7873
+[    3.868485] [c5] INTEN[4] = 0x11111111
+[    3.872176] [c5] INTCLEAR[4] = 0x0
+[    3.877780] [c5] s3c2410-wdt 101d0000.watchdog: watchdog inactive, reset disabled, irq disabled
+[    3.887392] [c5] device-mapper: ioctl: 4.24.0-ioctl (2013-01-15) initialised: dm-devel@redhat.com
+[    3.895764] [c5] cpuidle: using governor ladder
+[    3.901015] [c5] cpuidle: using governor menu
+[    3.904291] [c5] Synopsys Designware Multimedia Card Interface Driver
+[    3.911679] [c5] dwmmc_exynos 12200000.dwmmc0: Clock pin control Pin:gpc0-0 Addr:13410000.pinctrl Val:3 Num:4
+[    3.920381] of_get_named_gpio_flags exited with status 69
+[    3.920427] [c5] dwmmc_exynos 12200000.dwmmc0: dw_mci_parse_dt : emmc h/w reset gpio[69] notifier registered.
+[    3.930310] [c5] dwmmc_exynos 12200000.dwmmc0: Using internal DMA controller.
+[    3.937300] [c5] dwmmc_exynos 12200000.dwmmc0: FIFOTH: 0x 300f0030
+[    3.943464] dwmmc_exynos 12200000.dwmmc0: Version ID is 250a
+[    3.949488] [c6] dwmmc_exynos 12200000.dwmmc0: DW MMC controller at irq 107, 64 bit host data width, 64 deep fifo
+[    3.978237] [c6] mmc_host mmc0: Bus speed (slot 0) = 20812500Hz (slot req 400000Hz, actual 385416HZ div = 27)
+[    3.998459] [c6] dwmmc_exynos 12200000.dwmmc0: 1 slots initialized
+[    4.003789] [c6] dwmmc_exynos 12220000.dwmmc2: Clock pin control Pin:gpc2-0 Addr:13410000.pinctrl Val:3 Num:4
+[    4.013276] of_get_named_gpio_flags: can't parse gpios property
+[    4.013392] [c6] dwmmc_exynos 12220000.dwmmc2: Using internal DMA controller.
+[    4.020258] [c6] dwmmc_exynos 12220000.dwmmc2: FIFOTH: 0x 300f0030
+[    4.026541] dwmmc_exynos 12220000.dwmmc2: Version ID is 250a
+[    4.032395] [c6] dwmmc_exynos 12220000.dwmmc2: DW MMC controller at irq 109, 64 bit host data width, 64 deep fifo
+[    4.042633] [c6] mmc1: vmmc regulator found
+[    4.046570] [c6] mmc1: vqmmc regulator found
+[    4.066704] [c7] mmc0: BKOPS_EN bit is not set
+[    4.068273] [c6] mmc_host mmc1: Bus speed (slot 0) = 20812500Hz (slot req 400000Hz, actual 385416HZ div = 27)
+[    4.083394] [c6] dwmmc_exynos 12220000.dwmmc2: 1 slots initialized
+[    4.089552] [c4] mmc_host mmc0: Bus speed (slot 0) = 166500000Hz (slot req 400000Hz, actual 398325HZ div = 209)
+[    4.089645] [c5] leds-gpio leds.15: pins are not configured from the driver
+[    4.089696] [c5] of_get_named_gpio_flags exited with status 205
+[    4.089727] [c5] of_get_named_gpio_flags exited with status 204
+[    4.089755] [c5] of_get_named_gpio_flags exited with status 27
+[    4.089792] [c5] of_get_named_gpio_flags exited with status 205
+[    4.090714] [c6] of_get_named_gpio_flags exited with status 204
+[    4.091964] [c7] of_get_named_gpio_flags exited with status 27
+[    4.094903] [c6] ledtrig-cpu: registered to indicate activity on CPUs
+[    4.095407] [c7] S5P ACE Driver(SLIMSSS), (c) 2013 Samsung Electronics
+[    4.096618] [c7] ACE: ecb-aes-s5p-ace
+[    4.096959] [c7] ACE: cbc-aes-s5p-ace
+[    4.097295] [c7] ACE: ctr-aes-s5p-ace
+[    4.097629] [c7] ACE: xts-aes-s5p-ace
+[    4.097987] [c7] ACE: sha1-s5p-ace
+[    4.098407] [c7] ACE: sha256-s5p-ace
+[    4.098418] [c7] ACE driver is initialized
+[    4.114132] [c6] usbcore: registered new interface driver usbhid
+[    4.114146] [c6] usbhid: USB HID core driver
+[    4.116340] [c5] exynos-adc 12d10000.adc: operating without regulator vdd[-19]
+[    4.117637] [c6] exynos-adc 12d10000.adc: Probed successfully driver.
+[    4.119715] [c7] odroid-fan odroid_fan.14: unable to request PWM, trying legacy API
+[    4.119959] [c7] pwm-samsung: tin parent at 66600000
+[    4.121393] [c5] INA231 3-0040: I2C write error: (-6) reg: 0x0 
+[    4.121409] [c5] INA231 3-0040: ============= Probe INA231 Fail! : sensor_arm (0xFFFFFFFA) ============= 
+[    4.122035] [c5] INA231 3-0041: I2C write error: (-6) reg: 0x0 
+[    4.122050] [c5] INA231 3-0041: ============= Probe INA231 Fail! : sensor_mem (0xFFFFFFFA) ============= 
+[    4.122687] [c5] INA231 3-0044: I2C write error: (-6) reg: 0x0 
+[    4.122701] [c5] INA231 3-0044: ============= Probe INA231 Fail! : sensor_g3d (0xFFFFFFFA) ============= 
+[    4.123399] [c5] INA231 3-0045: I2C write error: (-6) reg: 0x0 
+[    4.123412] [c5] INA231 3-0045: ============= Probe INA231 Fail! : sensor_kfc (0xFFFFFFFA) ============= 
+[    4.123961] [c6] i2c-core: driver [INA231] using legacy suspend method
+[    4.123973] [c6] i2c-core: driver [INA231] using legacy resume method
+[    4.126538] [c6] ioboard-bh1780 2-0029: I2C write byte error: data=0x8b
+[    4.126549] [c6] 
+[    4.126549] =================== ioboard_bh1780_probe FAIL! ===================
+[    4.126549] 
+[    4.127081] [c7] i2c-core: driver [ioboard-bh1780] using legacy suspend method
+[    4.127094] [c7] i2c-core: driver [ioboard-bh1780] using legacy resume method
+[    4.129751] [c7] 
+[    4.129751] =================== ioboard_bmp180_probe FAIL! ===================
+[    4.129751] 
+[    4.130261] [c5] i2c-core: driver [ioboard-bmp180] using legacy suspend method
+[    4.130272] [c5] i2c-core: driver [ioboard-bmp180] using legacy resume method
+[    4.131606] [c5] samsung-pinctrl 14010000.pinctrl: pin gpb3-2 already requested by 12c70000.i2c; cannot claim for ioboard_key_led.12
+[    4.131622] [c5] samsung-pinctrl 14010000.pinctrl: pin-209 (ioboard_key_led.12) status -22
+[    4.131635] [c5] samsung-pinctrl 14010000.pinctrl: could not request pin 209 on device samsung-pinctrl
+[    4.131648] [c5] ioboard-keyled ioboard_key_led.12: Error applying setting, reverse things back
+[    4.131959] [c5] of_get_named_gpio_flags exited with status 29
+[    4.131990] [c5] of_get_named_gpio_flags exited with status 30
+[    4.132027] [c5] of_get_named_gpio_flags exited with status 22
+[    4.132071] [c5] of_get_named_gpio_flags exited with status 18
+[    4.132122] [c5] of_get_named_gpio_flags exited with status 31
+[    4.132179] [c5] of_get_named_gpio_flags exited with status 28
+[    4.132242] [c5] of_get_named_gpio_flags exited with status 19
+[    4.132315] [c5] of_get_named_gpio_flags exited with status 209
+[    4.132393] [c5] of_get_named_gpio_flags exited with status 24
+[    4.132745] [c5] 
+[    4.132745] =================== ioboard_keyled_probe ===================
+[    4.132745] 
+[    4.133894] [c6] of_get_named_gpio_flags exited with status 21
+[    4.185097] [c6] wait_until_ready : timeout error!!
+[    4.185108] [c6] ioboard_spi_id_read : ready error!
+[    4.185117] [c6] 
+[    4.185117] =================== ioboard_spi_probe FAIL! ===================
+[    4.185117] 
+[    4.185218] [c6] ioboard-spi: probe of spi1.0 failed with error -1
+[    4.194731] [c5] of_get_named_gpio_flags exited with status 34
+[    4.199045] [c7] lpass_register_subip: i2s(ddc7c410) registered
+[    4.223501] [c6] max98090 1-0010: MAX98090 REVID=0x43
+[    4.234037] [c7] odroid-audio sound.11:  HiFi <-> samsung-i2s-sec mapping ok
+[    4.234939] [c7] odroid-audio sound.11:  HiFi <-> samsung-i2s-sec mapping ok
+[    4.248696] [c5] Netfilter messages via NETLINK v0.30.
+[    4.249736] [c5] arp_tables: (C) 2002 David S. Miller
+[    4.249963] [c5] TCP: cubic registered
+[    4.249976] [c5] Initializing XFRM netlink socket
+[    4.253895] [c7] NET: Registered protocol family 10
+[    4.256300] [c7] mip6: Mobile IPv6
+[    4.256321] [c7] sit: IPv6 over IPv4 tunneling driver
+[    4.261962] [c7] NET: Registered protocol family 17
+[    4.262060] [c7] NET: Registered protocol family 15
+[    4.262146] [c7] NET: Registered protocol family 35
+[    4.457208] mmc_host mmc0: Bus speed (slot 0) = 166500000Hz (slot req 166500000Hz, actual 166500000HZ div = 0)
+[    4.457307] [c5] usb 1-1.1: new high-speed USB device number 3 using s5p-ehci
+[    4.457374] [c4] mmc_host mmc0: Bus speed (slot 0) = 333000000Hz (slot req 166500000Hz, actual 166500000HZ div = 1)
+[    4.457429] [c4] mmc_host mmc0: Bus speed (slot 0) = 333000000Hz (slot req 200000000Hz, actual 166500000HZ div = 1)
+[    4.458601] [c0] dwmmc_exynos 12200000.dwmmc0: End bit error
+[    4.458716] [c4] mmc_host mmc0: Tuning error: cmd.error:0, data.error:-5
+[    4.458851] [c0] dwmmc_exynos 12200000.dwmmc0: End bit error
+[    4.458960] [c4] mmc_host mmc0: Tuning error: cmd.error:0, data.error:-5
+[    4.459088] [c0] dwmmc_exynos 12200000.dwmmc0: End bit error
+[    4.459197] [c4] mmc_host mmc0: Tuning error: cmd.error:0, data.error:-5
+[    4.459393] [c4] dwmmc_exynos 12200000.dwmmc0: sample_good: 0x 1f best_sample: 0x 02
+[    4.460196] [c4] mmc_host mmc0: Bus speed (slot 0) = 41625000Hz (slot req 200000000Hz, actual 41625000HZ div = 0)
+[    4.460250] [c4] mmc_host mmc0: Bus speed (slot 0) = 41625000Hz (slot req 41625000Hz, actual 41625000HZ div = 0)
+[    4.460865] [c4] mmc_host mmc0: Bus speed (slot 0) = 333000000Hz (slot req 41625000Hz, actual 41625000HZ div = 4)
+[    4.460931] [c4] mmc_host mmc0: Bus speed (slot 0) = 333000000Hz (slot req 200000000Hz, actual 166500000HZ div = 1)
+[    4.461722] [c4] mmc0: new HS200-DDR MMC card at address 0001
+[    4.463686] [c5] mmcblk0: mmc0:0001 064GE2 58.2 GiB 
+[    4.464108] [c5] mmcblk0boot0: mmc0:0001 064GE2 partition 1 4.00 MiB
+[    4.464528] [c5] mmcblk0boot1: mmc0:0001 064GE2 partition 2 4.00 MiB
+[    4.464930] [c5] mmcblk0rpmb: mmc0:0001 064GE2 partition 3 4.00 MiB
+[    4.467769] [c5]  mmcblk0: p1 p2
+[    4.475808] [c5]  mmcblk0boot1: unknown partition table
+[    4.479449] [c5]  mmcblk0boot0: unknown partition table
+[    4.563711] [c6] smsc95xx v1.0.4
+[    4.623865] [c6] smsc95xx 1-1.1:1.0 eth0: register 'smsc95xx' at usb-12110000.usb-1.1, smsc95xx USB 2.0 Ethernet, 00:1e:06:61:7a:39
+[    4.457006] [c7] VFP support v0.3: [c7] implementor 41 architecture 4 part 30 variant f rev 0
+[    4.647447] [c7] Registering SWP/SWPB emulation handler
+[    4.652598] [c7] SRAM ASV group [1] : MIF(1000000), G3D(1050000)
+[    4.667956] [c7] registered taskstats version 1
+[    4.671286] [c7] hdmi-en: disabling
+[    4.674567] [c7] MAIN_DC: disabling
+[    4.677998] [c7] VUSB_BOOST_5V: disabling
+[    4.682029] [c7] regulator-dummy: disabling
+[    4.687106] [c4] of_get_named_gpio_flags exited with status 11
+[    4.687247] [c4] gpiod_set_debounce: gpio-11 status -22
+[    4.688043] [c6] input: gpio_keys.7 as /devices/gpio_keys.7/input/input0
+[    4.696337] [c6] s2m_rtc_read_time: 2015/6/28 8:33:51(0)
+[    4.700359] [c6] s2m-rtc s2m-rtc: setting system clock to 2015-06-28 08:33:51 UTC (1435480431)
+[    4.708886] [c6] CPUFREQ of CA7  L0 : 1250000 uV
+[    4.713446] [c6] CPUFREQ of CA7  L0 : ABB 8
+[    4.717547] [c6] CPUFREQ of CA7  L1 : 1250000 uV
+[    4.722211] [c6] CPUFREQ of CA7  L1 : ABB 8
+[    4.726376] [c6] CPUFREQ of CA7  L2 : 1250000 uV
+[    4.730969] [c6] CPUFREQ of CA7  L2 : ABB 8
+[    4.735135] [c6] CPUFREQ of CA7  L3 : 1237500 uV
+[    4.739731] [c6] CPUFREQ of CA7  L3 : ABB 2
+[    4.743891] [c6] CPUFREQ of CA7  L4 : 1187500 uV
+[    4.748500] [c6] CPUFREQ of CA7  L4 : ABB 2
+[    4.752600] [c6] CPUFREQ of CA7  L5 : 1150000 uV
+[    4.757262] [c6] CPUFREQ of CA7  L5 : ABB 2
+[    4.761422] [c6] CPUFREQ of CA7  L6 : 1112500 uV
+[    4.766026] [c6] CPUFREQ of CA7  L6 : ABB 2
+[    4.770184] [c6] CPUFREQ of CA7  L7 : 1075000 uV
+[    4.774783] [c6] CPUFREQ of CA7  L7 : ABB 2
+[    4.778948] [c6] CPUFREQ of CA7  L8 : 1037500 uV
+[    4.783547] [c6] CPUFREQ of CA7  L8 : ABB 2
+[    4.787654] [c6] CPUFREQ of CA7  L9 : 1000000 uV
+[    4.792310] [c6] CPUFREQ of CA7  L9 : ABB 2
+[    4.796475] [c6] CPUFREQ of CA7  L10 : 962500 uV
+[    4.801074] [c6] CPUFREQ of CA7  L10 : ABB 2
+[    4.805324] [c6] CPUFREQ of CA7  L11 : 925000 uV
+[    4.809925] [c6] CPUFREQ of CA7  L11 : ABB 2
+[    4.814176] [c6] CPUFREQ of CA7  L12 : 912500 uV
+[    4.818775] [c6] CPUFREQ of CA7  L12 : ABB 2
+[    4.822968] [c6] CPUFREQ of CA7  L13 : 900000 uV
+[    4.827626] [c6] CPUFREQ of CA7  L13 : ABB 2
+[    4.831876] [c6] CPUFREQ of CA7  L14 : 900000 uV
+[    4.836476] [c6] CPUFREQ of CA7  L14 : ABB 2
+[    4.840988] [c6] kfc clock[800000], mx_mspll clock[666000]
+[    4.846206] [c6] [SET_EMA_TEST] volt : 887500  value : 0x44
+[    4.851752] [c6] [SET_EMA_TEST] volt : 937500  value : 0x44
+[    4.857304] [c6] [SET_EMA_TEST] volt : 1032500  value : 0x33
+[    4.862942] [c6] [SET_EMA_TEST] volt : 1142500  value : 0x11
+[    4.868585] [c6] [SET_EMA_TEST] volt : 1167500  value : 0x11
+[    4.874223] [c6] CPUFREQ of CA15 L0 : 1237500 uV
+[    4.878819] [c6] CPUFREQ of CA15  L0 : ABB 8
+[    4.883011] [c6] CPUFREQ of CA15 L1 : 1237500 uV
+[    4.887668] [c6] CPUFREQ of CA15  L1 : ABB 8
+[    4.891918] [c6] CPUFREQ of CA15 L2 : 1237500 uV
+[    4.896519] [c6] CPUFREQ of CA15  L2 : ABB 8
+[    4.900768] [c6] CPUFREQ of CA15 L3 : 1237500 uV
+[    4.905368] [c6] CPUFREQ of CA15  L3 : ABB 8
+[    4.909618] [c6] CPUFREQ of CA15 L4 : 1237500 uV
+[    4.914219] [c6] CPUFREQ of CA15  L4 : ABB 8
+[    4.918470] [c6] CPUFREQ of CA15 L5 : 1237500 uV
+[    4.923011] [c6] CPUFREQ of CA15  L5 : ABB 8
+[    4.927319] [c6] CPUFREQ of CA15 L6 : 1225000 uV
+[    4.931919] [c6] CPUFREQ of CA15  L6 : ABB 255
+[    4.936343] [c6] CPUFREQ of CA15 L7 : 1187500 uV
+[    4.940947] [c6] CPUFREQ of CA15  L7 : ABB 255
+[    4.945365] [c6] CPUFREQ of CA15 L8 : 1150000 uV
+[    4.949968] [c6] CPUFREQ of CA15  L8 : ABB 255
+[    4.954391] [c6] CPUFREQ of CA15 L9 : 1112500 uV
+[    4.958990] [c6] CPUFREQ of CA15  L9 : ABB 255
+[    4.963415] [c6] CPUFREQ of CA15 L10 : 1087500 uV
+[    4.968043] [c6] CPUFREQ of CA15  L10 : ABB 255
+[    4.972612] [c6] CPUFREQ of CA15 L11 : 1075000 uV
+[    4.977298] [c6] CPUFREQ of CA15  L11 : ABB 255
+[    4.981809] [c6] CPUFREQ of CA15 L12 : 1050000 uV
+[    4.986496] [c6] CPUFREQ of CA15  L12 : ABB 255
+[    4.991006] [c6] CPUFREQ of CA15 L13 : 1025000 uV
+[    4.995693] [c6] CPUFREQ of CA15  L13 : ABB 255
+[    5.000203] [c6] CPUFREQ of CA15 L14 : 1000000 uV
+[    5.004890] [c6] CPUFREQ of CA15  L14 : ABB 255
+[    5.009402] [c6] CPUFREQ of CA15 L15 : 975000 uV
+[    5.014001] [c6] CPUFREQ of CA15  L15 : ABB 255
+[    5.018512] [c6] CPUFREQ of CA15 L16 : 950000 uV
+[    5.023053] [c6] CPUFREQ of CA15  L16 : ABB 255
+[    5.027623] [c6] CPUFREQ of CA15 L17 : 925000 uV
+[    5.032222] [c6] CPUFREQ of CA15  L17 : ABB 255
+[    5.036733] [c6] CPUFREQ of CA15 L18 : 900000 uV
+[    5.041332] [c6] CPUFREQ of CA15  L18 : ABB 255
+[    5.045845] [c6] CPUFREQ of CA15 L19 : 900000 uV
+[    5.050445] [c6] CPUFREQ of CA15  L19 : ABB 255
+[    5.054953] [c6] CPUFREQ of CA15 L20 : 900000 uV
+[    5.059553] [c6] CPUFREQ of CA15  L20 : ABB 255
+[    5.064065] [c6] CPUFREQ of CA15 L21 : 900000 uV
+[    5.068664] [c6] CPUFREQ of CA15  L21 : ABB 255
+[    5.073118] [c6] CPUFREQ of CA15 L22 : 900000 uV
+[    5.077773] [c6] CPUFREQ of CA15  L22 : ABB 255
+[    5.082565] [c6] eagle clock[800000], mpll clock[800000]
+[    5.092392] [c4] Exynos: Kernel Thermal management registered
+[    5.097127] [c4] ### dt-test ### No testcase data in device tree; not running tests
+[    5.143844] [c5] MIF 825000Khz ASV is 987500uV
+[    5.146882] [c5] DEVFREQ(MIF) : 825000Khz, ABB 14
+[    5.151542] [c5] MIF 728000Khz ASV is 950000uV
+[    5.155965] [c5] DEVFREQ(MIF) : 728000Khz, ABB 14
+[    5.160646] [c5] MIF 633000Khz ASV is 912500uV
+[    5.165070] [c5] DEVFREQ(MIF) : 633000Khz, ABB 14
+[    5.169756] [c5] MIF 543000Khz ASV is 887500uV
+[    5.174181] [c5] DEVFREQ(MIF) : 543000Khz, ABB 14
+[    5.178864] [c5] MIF 413000Khz ASV is 825000uV
+[    5.183294] [c5] DEVFREQ(MIF) : 413000Khz, ABB 14
+[    5.187942] [c5] MIF 275000Khz ASV is 800000uV
+[    5.192404] [c5] DEVFREQ(MIF) : 275000Khz, ABB 14
+[    5.197084] [c5] MIF 206000Khz ASV is 800000uV
+[    5.201513] [c5] DEVFREQ(MIF) : 206000Khz, ABB 14
+[    5.206196] [c5] MIF 165000Khz ASV is 800000uV
+[    5.210623] [c5] DEVFREQ(MIF) : 165000Khz, ABB 14
+[    5.215307] [c5] MIF 138000Khz ASV is 800000uV
+[    5.219733] [c5] DEVFREQ(MIF) : 138000Khz, ABB 14
+[    5.225705] [c5] MIF: set ASV freq 825000, voltage 987500
+[    5.230942] [c5] INT 600000Khz ASV is 1012500uV
+[    5.234322] [c5] DEVFREQ(INT) : 600000Khz, ABB 255
+[    5.239081] [c5] INT 500000Khz ASV is 1000000uV
+[    5.243595] [c5] DEVFREQ(INT) : 500000Khz, ABB 255
+[    5.248365] [c5] INT 480000Khz ASV is 1000000uV
+[    5.252846] [c5] DEVFREQ(INT) : 480000Khz, ABB 255
+[    5.257658] [c5] INT 460000Khz ASV is 1000000uV
+[    5.262163] [c5] DEVFREQ(INT) : 460000Khz, ABB 255
+[    5.266949] [c5] INT 440000Khz ASV is 1000000uV
+[    5.271446] [c5] DEVFREQ(INT) : 440000Khz, ABB 255
+[    5.276214] [c5] INT 420000Khz ASV is 1000000uV
+[    5.280730] [c5] DEVFREQ(INT) : 420000Khz, ABB 255
+[    5.285498] [c5] INT 400000Khz ASV is 962500uV
+[    5.289928] [c5] DEVFREQ(INT) : 400000Khz, ABB 255
+[    5.294698] [c5] INT 333000Khz ASV is 937500uV
+[    5.299125] [c5] DEVFREQ(INT) : 333000Khz, ABB 255
+[    5.303894] [c5] INT 222000Khz ASV is 912500uV
+[    5.308322] [c5] DEVFREQ(INT) : 222000Khz, ABB 255
+[    5.313060] [c5] INT 111000Khz ASV is 887500uV
+[    5.317518] [c5] DEVFREQ(INT) : 111000Khz, ABB 255
+[    5.322289] [c5] INT 83000Khz ASV is 887500uV
+[    5.326629] [c5] DEVFREQ(INT) : 83000Khz, ABB 255
+[    6.333161] [c5] PM DOMAIN: Power off unused power domains.
+[    6.337615] [c5] ALSA device list:
+[    6.340684] [c5] pd-cam: Power-off latency exceeded, new value 3091583 ns
+[    6.347475] [c4]   #0: odroid-audio
+[    6.352063] [c4] Freeing unused kernel memory: 408K (c0842000 - c08a8000)
+[    6.408466] [c7] systemd-udevd[1581]: starting version 204
+[    6.836542] [c5] EXT4-fs (mmcblk0p2): mounted filesystem with ordered data mode. Opts: (null)
+[    7.128181] [c7] init: plymouth-upstart-bridge main process (1649) terminated with status 1
+[    7.135212] [c7] init: plymouth-upstart-bridge main process ended, respawning
+[    7.176343] [c7] init: plymouth-upstart-bridge main process (1658) terminated with status 1
+[    7.183430] [c7] init: plymouth-upstart-bridge main process ended, respawning
+[    7.206937] [c6] init: plymouth-upstart-bridge main process (1662) terminated with status 1
+[    7.213908] [c6] init: plymouth-upstart-bridge main process ended, respawning
+[    7.377666] [c6] init: mounted-proc main process (1674) terminated with status 1
+[    7.526154] [c5] EXT4-fs (mmcblk0p2): re-mounted. Opts: errors=remount-ro
+[    7.924079] [c5] systemd-udevd[1837]: starting version 204
+[    7.949053] [c5] FAT-fs (mmcblk0p1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+[    8.105454] [c4] fuse init (API version 7.22)
+[    8.202402] [c7] [d:0, c:0] s5p_mfc_open:1629: NORMAL instance is opened [0:1]
+[    8.204929] [c7] [d:0] s5p_mfc_alloc_firmware:122: Port for DRM F/W : 0xafc00000
+[    8.206780] [c7] [d:0] s5p_mfc_init_memctrl:304: [1] Base Address : 10000000
+[    8.207319] [c7] [d:0] mfc_init_hw:426: MFC v8.0, F/W: 14yy, 01mm, 13dd (D)
+[    8.207478] [c7] [d:0, c:0] s5p_mfc_open:1725: MFC open completed [0:1] dev = de32c010, ctx = dca80000
+[    8.207721] [c7] [d:0, c:0] s5p_mfc_release:1883: MFC driver release is called [0:1], is_drm(0)
+[    8.207847] [c7] s5p_mfc_dev_release:1801: power off
+[    8.208478] [c7] [d:0] s5p_mfc_release:2037: mfc driver release finished [0:0], dev = de32c010
+[    8.210925] [c4] [d:0, c:0] s5p_mfc_open:1629: NORMAL instance is opened [0:1]
+[    8.212144] [c4] [d:0] s5p_mfc_alloc_firmware:122: Port for DRM F/W : 0xafc00000
+[    8.213649] [c4] [d:0] s5p_mfc_init_memctrl:304: [1] Base Address : 10000000
+[    8.216298] [c4] [d:0] mfc_init_hw:426: MFC v8.0, F/W: 14yy, 01mm, 13dd (D)
+[    8.216454] [c4] [d:0, c:0] s5p_mfc_open:1725: MFC open completed [0:1] dev = de32c010, ctx = ddb23800
+[    8.216649] [c4] [d:0, c:0] s5p_mfc_release:1883: MFC driver release is called [0:1], is_drm(0)
+[    8.216681] [c4] s5p_mfc_dev_release:1801: power off
+[    8.217066] [c4] [d:0] s5p_mfc_release:2037: mfc driver release finished [0:0], dev = de32c010
+[    8.569650] [c7] Bluetooth: Core ver 2.16
+[    8.569760] [c7] NET: Registered protocol family 31
+[    8.569773] [c7] Bluetooth: HCI device and connection manager initialized
+[    8.569932] [c7] Bluetooth: HCI socket layer initialized
+[    8.569956] [c7] Bluetooth: L2CAP socket layer initialized
+[    8.570066] [c7] Bluetooth: SCO socket layer initialized
+[    8.600799] [c4] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    8.600817] [c4] Bluetooth: BNEP filters: protocol multicast
+[    8.600859] [c4] Bluetooth: BNEP socket layer initialized
+[    8.601042] [c6] Bluetooth: RFCOMM TTY layer initialized
+[    8.601100] [c6] Bluetooth: RFCOMM socket layer initialized
+[    8.601113] [c6] Bluetooth: RFCOMM ver 1.11
+[    9.102025] [c4] smsc95xx 1-1.1:1.0 eth0: hardware isn't capable of remote wakeup
+[    9.102339] [c4] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[   10.651319] [c0] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[   10.652385] [c0] smsc95xx 1-1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0xCDE1
+[   10.699826] [c7] s2m_rtc_set_time: 2015/6/28 8:33:57(0)
+[   10.701464] [c7] s2m_rtc_read_time: 2015/6/28 8:33:58(0)
+[   10.701762] [c7] s2m_rtc_stop_alarm: 2000/1/1 12:0:0(0)
+[   12.192499] [c4] init: failsafe main process (2087) killed by TERM signal
+[   12.539343] [c5] ip_tables: (C) 2000-2006 Netfilter Core Team
+[   12.667218] [c5] bio: create slab <bio-1> at 1
+[   12.825689] [c4] Bridge firewalling registered
+[   12.855256] [c0] IPv6: ADDRCONF(NETDEV_UP): docker0: link is not ready
+[   12.906178] [c4] nf_conntrack version 0.5.0 (16384 buckets, 65536 max)

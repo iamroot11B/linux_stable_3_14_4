@@ -2906,7 +2906,10 @@ extern void mm_init_owner(struct mm_struct *mm, struct task_struct *p);
 static inline void mm_update_next_owner(struct mm_struct *mm)
 {
 }
-
+/*!
+ * 메모리의 소유자 설정
+ * 현재 CONFIG_MM_OWNER가 설정되어 있지 않음
+ */
 static inline void mm_init_owner(struct mm_struct *mm, struct task_struct *p)
 {
 }

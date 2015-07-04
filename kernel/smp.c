@@ -482,8 +482,24 @@ int nr_cpu_ids __read_mostly = NR_CPUS;
 EXPORT_SYMBOL(nr_cpu_ids);
 
 /* An arch may set nr_cpu_ids earlier if needed, so this would be redundant */
+/*!
+ * setup_nr_cpu_ids()
+ * - CPU 개수를 전역 변수인 nr_cpu_ids 에 저장
+ */
 void __init setup_nr_cpu_ids(void)
 {
+
+	/*!
+	 * cpu_possible_mask 최대로 장착 가능한 CPU들에 대한 비트맵
+	 * cpu_present_mask 시스템 내에 장착된 CPU들에 대한 비트맵
+	 * cpu_online_mask 시스템에 장착된 CPU 중에서 사용 중인 CPU들에 대한 비트맵
+	 * cpu_active_mask 온라인 상태이고 이주(migration)할 수 있는 CPU들에 대한 비트맵
+	 ********************************************************************************
+	 *  #define cpumask_bits(maskp) ((maskp)->bits)
+	 ********************************************************************************
+	 * cpumask_bits(cpu_possible_mask)
+	 * => cpu_possible_mask->bits
+	 */
 	nr_cpu_ids = find_last_bit(cpumask_bits(cpu_possible_mask),NR_CPUS) + 1;
 }
 

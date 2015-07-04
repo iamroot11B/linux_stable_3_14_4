@@ -455,6 +455,10 @@ struct mm_struct {
 	struct uprobes_state uprobes_state;
 };
 
+/*!
+ * CONFIG_CPUMASK_OFFSTACK이 설정되어 있지 않음
+ *
+ */
 static inline void mm_init_cpumask(struct mm_struct *mm)
 {
 #ifdef CONFIG_CPUMASK_OFFSTACK

@@ -29,6 +29,10 @@ extern char __bss_start[], __bss_stop[];
 extern char __init_begin[], __init_end[];
 extern char _sinittext[], _einittext[];
 extern char _end[];
+/*!
+ * __per_cpu_start, __per_cpu_end 초기화 시점
+ * - vmlinux.ld 쪽에서 초기화
+ */
 extern char __per_cpu_load[], __per_cpu_start[], __per_cpu_end[];
 extern char __kprobes_text_start[], __kprobes_text_end[];
 extern char __entry_text_start[], __entry_text_end[];

@@ -1456,12 +1456,22 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 	unsigned int cpu, tcpu;
 	struct pcpu_alloc_info *ai;
 	unsigned int *cpu_map;
-
+	/*! pcpu_embed_first_chunk에서 불렸을 경우 파라미터 값
+	 * reserved_size = (8 << 10) = 100 00_0000_0000 = 8192 = 8k
+	 * dyn_size = (12 << 10) = 12288 = 12k
+	 * atom_size = 4096
+	 * static_size = 약 7k
+	 */
 	/* this function may be called multiple times */
 	memset(group_map, 0, sizeof(group_map));
 	memset(group_cnt, 0, sizeof(group_cnt));
 
+
 	/* calculate size_sum and ensure dyn_size is enough for early alloc */
+	/*! pcpu_embed_first_chunk에서 불렸을 경우 파라미터 값
+	 * size_sum = 7 + 8 + 12 = 27k
+	 * dyn_size = 12k
+	 */
 	size_sum = PFN_ALIGN(static_size + reserved_size +
 			    max_t(size_t, dyn_size, PERCPU_DYNAMIC_EARLY_SIZE));
 	dyn_size = size_sum - static_size - reserved_size;
@@ -1472,8 +1482,25 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 	 * which can accommodate 4k aligned segments which are equal to
 	 * or larger than min_unit_size.
 	 */
+	/*! pcpu_embed_first_chunk에서 불렸을 경우 파라미터 값
+	 * min_unit_size = 32k
+	 * alloc_size = 32k
+	 * upa = 1
+	 * max_upa = 1
+	 * #define PCPU_MIN_UNIT_SIZE		PFN_ALIGN(32 << 10) = 32k
+	 */
 	min_unit_size = max_t(size_t, size_sum, PCPU_MIN_UNIT_SIZE);
-
+/*!
+ * #define roundup(x, y) (					\
+ * {							\
+ *	const typeof(y) __y = y;			\
+ *	(((x) + (__y - 1)) / __y) * __y;		\
+ * }							\
+ *
+ * min_unit_size, atom_size
+ * (((min_unit_size) + ( 4096 -1 ) / 4096) * 4096)
+ * 
+ */
 	alloc_size = roundup(min_unit_size, atom_size);
 	upa = alloc_size / min_unit_size;
 	while (alloc_size % upa || ((alloc_size / upa) & ~PAGE_MASK))
@@ -1481,6 +1508,13 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 	max_upa = upa;
 
 	/* group cpus according to their proximity */
+	/*!
+	 * #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
+	 * #define for_each_cpu(cpu, mask)				\
+	 *	for ((cpu) = -1;(cpu) = cpumask_next((cpu), (mask)), (cpu) < nr_cpu_ids;)
+	 ***********
+	 * => for((cpu) = -1; (cpu) = cpumask_next((cpu),(mask)), (cpu) < nr_cpu_ids;)
+	 */
 	for_each_possible_cpu(cpu) {
 		group = 0;
 	next_group:
@@ -1615,6 +1649,19 @@ int __init pcpu_embed_first_chunk(size_t reserved_size, size_t dyn_size,
 				  pcpu_fc_alloc_fn_t alloc_fn,
 				  pcpu_fc_free_fn_t free_fn)
 {
+/*!
+ * 처음 불렸을 때
+ * - 
+ * start_kernel/setup_per_cpu_areas(void)에서
+ * reserved_size = (8 << 10) = 100 00_0000_0000 = 8192
+ * dyn_size = (12 << 10) = 12288
+ * atom_size = 4096
+ * cpu_distance_fn = null
+ * alloc_fn = pcpu_dfl_fc_alloc : 할당 콜백함수
+ * free_fn = pcpu_dfl_fc_free : 해제 콜백함수
+ *************************************************
+ * 
+ */
 	void *base = (void *)ULONG_MAX;
 	void **areas = NULL;
 	struct pcpu_alloc_info *ai;
@@ -1860,6 +1907,10 @@ static void __init pcpu_dfl_fc_free(void *ptr, size_t size)
 	memblock_free_early(__pa(ptr), size);
 }
 
+/*!
+ * setup_per_cpu_areas
+ * - 
+ */
 void __init setup_per_cpu_areas(void)
 {
 	unsigned long delta;
@@ -1869,6 +1920,13 @@ void __init setup_per_cpu_areas(void)
 	/*
 	 * Always reserve area for module percpu variables.  That's
 	 * what the legacy allocator did.
+	 */
+	/*
+	 * #define PERCPU_MODULE_RESERVE		(8 << 10)
+	 * #define PERCPU_DYNAMIC_RESERVE		(12 << 10)
+	 * #define PAGE_SIZE 4096
+	 * pcpu_dfl_fc_alloc : 할당 콜백함수
+	 * pcpu_dfl_fc_free : 해제 콜백함수
 	 */
 	rc = pcpu_embed_first_chunk(PERCPU_MODULE_RESERVE,
 				    PERCPU_DYNAMIC_RESERVE, PAGE_SIZE, NULL,

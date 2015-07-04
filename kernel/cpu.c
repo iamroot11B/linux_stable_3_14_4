@@ -658,12 +658,30 @@ static DECLARE_BITMAP(cpu_possible_bits, CONFIG_NR_CPUS) __read_mostly
 	= CPU_BITS_ALL;
 #else
 /*!
- * #define DECLARE_BITMAP(name,bits) \
- *	unsigned long name[BITS_TO_LONGS(bits)]
- *=> usigned long cpu_possible_bits[1];
+ * #define DECLARE_BITMAP(name,bits)	unsigned long name[BITS_TO_LONGS(bits)]
+ * #define BITS_TO_LONGS(nr)		DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
+ * #define DIV_ROUND_UP(n,d)	(((n) + (d) - 1) / (d))
+ * CONFIG_NR_CPUS	8
+ *********
+ * DECLARE_BITMAP(cpu_possible_bits, CONFIG_NR_CPUS)
+ * => unsigned long cpu_possible_bits[BITS_TO_LONGS(8)]
+ * => usigned long cpu_possible_bits[1];
  */
 static DECLARE_BITMAP(cpu_possible_bits, CONFIG_NR_CPUS) __read_mostly;
 #endif
+/*!
+ * to_cpumask(cpu_possible_bits)
+ * => (struct cpumask*) cpu_possible_bits
+ * => const struct cpumask *const cpu_possible_mask = (struct cpumask*) cpu_possible_bits;
+ */
+/*!
+ * #define DECLARE_BITMAP(name,bits)	unsigned long name[BITS_TO_LONGS(bits)]
+ * #define BITS_TO_LONGS(nr)		DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
+ * #define DIV_ROUND_UP(n,d)	(((n) + (d) - 1) / (d))
+ **************************************************************************
+ * typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
+ * => typedef struct cpumask { unsigned long bits[1] }
+ */
 const struct cpumask *const cpu_possible_mask = to_cpumask(cpu_possible_bits);
 EXPORT_SYMBOL(cpu_possible_mask);
 

@@ -143,6 +143,11 @@ EXPORT_SYMBOL(elf_platform);
 
 static const char *cpu_name;
 static const char *machine_name;
+
+/*! 
+ * 초기화 시점 
+ * start_kernel->setup_arch 에서 초기화(boot_command_line을 복사)
+ */
 static char __initdata cmd_line[COMMAND_LINE_SIZE];
 const struct machine_desc *machine_desc __initdata;
 

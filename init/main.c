@@ -120,7 +120,19 @@ extern void time_init(void);
 void (*__initdata late_time_init)(void);
 
 /* Untouched command line saved by arch-specific code. */
+/*!
+ * boot_command_line 초기화 시점
+ * - start_kernel/setup_arch/setup_machine_fdt/early_init_dt_scan/early_init_dt_scan_chosen 에서
+ *	dts 파일 안에 chosen 안의 bootarg에 들어있는 값으로 초기화
+ * - else(문제 발생 시)
+ *   - setup_arch -> setup_machine_tags에서 (setup_machine_fdt 함수 실패시)
+ */
 char __initdata boot_command_line[COMMAND_LINE_SIZE];
+
+/*!
+ * saved_command_line, initcall_command_line, static_command_line 초기화
+ * 1. start_kernel->setup_arch->setup_command_line 에서 초기화
+ */
 /* Untouched saved command line (eg. for /proc) */
 char *saved_command_line;
 /* Command line for parameter parsing */
@@ -346,6 +358,10 @@ static inline void smp_prepare_cpus(unsigned int maxcpus) { }
  * We also need to store the touched command line since the parameter
  * parsing is performed in place, and we should allow a component to
  * store reference of name/value for future reference.
+ */
+/*!
+ * setup_command_line()
+ * - saved_command_line, initcall_command_line, static_command_line 을 초기화
  */
 static void __init setup_command_line(char *command_line)
 {
@@ -577,9 +593,11 @@ asmlinkage void __init start_kernel(void)
 	 */
 	setup_arch(&command_line);
 	/*! 2015/06/27 study end */
-
+	/*! 2015/06/27 study start */
+	/*! 아래 두 함수에서 실행되는 부분 없음(설정X)*/
 	mm_init_owner(&init_mm, &init_task);
 	mm_init_cpumask(&init_mm);
+	/*! boot_command_line 초기화 시점 찾아보기 */
 	setup_command_line(command_line);
 	setup_nr_cpu_ids();
 	setup_per_cpu_areas();

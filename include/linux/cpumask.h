@@ -14,6 +14,7 @@
 /*!
  * DECLARE_BITMAP(bits, NR_CPUS)
  * => unsigned long bits[1]   (NR_CPUS=8일경우)
+ * => typedef struct cpumask { unsigned long bits[1] }
  */
 typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
 
@@ -29,6 +30,10 @@ typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
 #if NR_CPUS == 1
 #define nr_cpu_ids		1
 #else
+/*!
+ * nr_cpu_ids 초기화 시점
+ * 1. start_kernel -> setup_nr_cpu_ids
+ */
 extern int nr_cpu_ids;
 #endif
 
