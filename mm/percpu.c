@@ -1051,6 +1051,9 @@ phys_addr_t per_cpu_ptr_to_phys(void *addr)
  * Pointer to the allocated pcpu_alloc_info on success, NULL on
  * failure.
  */
+/*!
+ * percpu allocation에 대한 allocation정보 및 allocation
+ */
 struct pcpu_alloc_info * __init pcpu_alloc_alloc_info(int nr_groups,
 						      int nr_units)
 {
@@ -1061,18 +1064,31 @@ struct pcpu_alloc_info * __init pcpu_alloc_alloc_info(int nr_groups,
 
 	base_size = ALIGN(sizeof(*ai) + nr_groups * sizeof(ai->groups[0]),
 			  __alignof__(ai->groups[0].cpu_map[0]));
+	/*!
+	 * pcpu_alloc_info 구조체 크기 구함
+	 */
 	ai_size = base_size + nr_units * sizeof(ai->groups[0].cpu_map[0]);
-
+	/*!
+	 * 앞서 구한 구조체 안에서 참조하는 구조체 안 배열 크기를 구하여 더해준다.
+	 */
 	ptr = memblock_virt_alloc_nopanic(PFN_ALIGN(ai_size), 0);
+	/*!
+	 * 해당 크기만큼 메모리 얼록!
+	 */
 	if (!ptr)
 		return NULL;
 	ai = ptr;
 	ptr += base_size;
 
 	ai->groups[0].cpu_map = ptr;
-
+	/*!
+	 * 앞서 얼로케이션 한 메모리를 할당(매핑)하여준다.
+	 */
 	for (unit = 0; unit < nr_units; unit++)
 		ai->groups[0].cpu_map[unit] = NR_CPUS;
+	/*!
+	 * cpu_map을 가용한 최대치로 이니셜 라이징 한다.
+	 */
 
 	ai->nr_groups = nr_groups;
 	ai->__ai_size = PFN_ALIGN(ai_size);
@@ -1532,6 +1548,9 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 		group_map[cpu] = group;
 		group_cnt[group]++;
 	}
+		/*!
+		 *  처음 들어왔을 때는, cpu_distance_fn 이 없으므로, 현재 group_cnt[0] = nr_cpus 
+		 */
 
 	/*
 	 * Expand unit size until address space usage goes over 75%
@@ -1556,6 +1575,9 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 		 * greater-than comparison ensures upa==1 always
 		 * passes the following check.
 		 */
+		/*!
+		 *  최대 장착 가능한 cpu의 1/3 이하가 wasted 라면 upa(unit per alloc)을 낮춘다.
+		 */
 		if (wasted > num_possible_cpus() / 3)
 			continue;
 
@@ -1579,6 +1601,10 @@ static struct pcpu_alloc_info * __init pcpu_build_alloc_info(
 	for (group = 0; group < nr_groups; group++) {
 		ai->groups[group].cpu_map = cpu_map;
 		cpu_map += roundup(group_cnt[group], upa);
+	/*
+	 * 위 nr_units 를 구하는 코드에서 group 갯수 감안하여 갯수 할당.
+	 * 따라서, group 마다 cpu_map을 분할하여 할당하여 준다.
+	 */
 	}
 
 	ai->static_size = static_size;
@@ -1677,6 +1703,9 @@ int __init pcpu_embed_first_chunk(size_t reserved_size, size_t dyn_size,
 	areas_size = PFN_ALIGN(ai->nr_groups * sizeof(void *));
 
 	areas = memblock_virt_alloc_nopanic(areas_size, 0);
+	/*!
+	 * group갯수 만큼 포인터 만듬
+	 */
 	if (!areas) {
 		rc = -ENOMEM;
 		goto out_free;
@@ -1734,7 +1763,9 @@ int __init pcpu_embed_first_chunk(size_t reserved_size, size_t dyn_size,
 				     ai->groups[group].base_offset);
 	}
 	max_distance += ai->unit_size;
-
+	/*!
+	 * 2015-07-18 StudyEnd
+	 */
 	/* warn if maximum distance is further than 75% of vmalloc space */
 	if (max_distance > VMALLOC_TOTAL * 3 / 4) {
 		pr_warning("PERCPU: max_distance=0x%zx too large for vmalloc "

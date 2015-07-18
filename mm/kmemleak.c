@@ -938,7 +938,9 @@ EXPORT_SYMBOL_GPL(kmemleak_alloc_percpu);
 void __ref kmemleak_free(const void *ptr)
 {
 	pr_debug("%s(0x%p)\n", __func__, ptr);
-
+/*!
+ * 초기화 전(kmemleak_init 전)에는 RBtree가 초기화되어있지 않으며, kmemleak_enabled = 0, kmemleak_early_log = 1 
+ */
 	if (atomic_read(&kmemleak_enabled) && ptr && !IS_ERR(ptr))
 		delete_object_full((unsigned long)ptr);
 	else if (atomic_read(&kmemleak_early_log))
