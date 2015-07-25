@@ -402,8 +402,15 @@ void __init smp_cpus_done(unsigned int max_cpus)
 	hyp_mode_check();
 }
 
+/*!
+ * smp_prepare_boot_cpu
+ * - TPIDRPRW에 현재 cpu의 percpu chunk 위치(offset)를 설정
+ */
 void __init smp_prepare_boot_cpu(void)
 {
+	/*
+	 * #define per_cpu_offset(x) (__per_cpu_offset[x])
+	 */
 	set_my_cpu_offset(per_cpu_offset(smp_processor_id()));
 }
 

@@ -557,9 +557,18 @@ static inline void cpumask_copy(struct cpumask *dstp,
  * If len is zero, returns zero.  Otherwise returns the length of the
  * (nul-terminated) @buf string.
  */
+/*!
+ * cpumask를 comma단위로 나누어진 헥사값으로 대체하여 buf에 저장
+ */
 static inline int cpumask_scnprintf(char *buf, int len,
 				    const struct cpumask *srcp)
 {
+    /*!
+     * #define nr_cpumask_bits	nr_cpu_ids
+     * #define nr_cpu_ids		1
+     ***
+     * nr_cpumask_bits = 1
+     */
 	return bitmap_scnprintf(buf, len, cpumask_bits(srcp), nr_cpumask_bits);
 }
 

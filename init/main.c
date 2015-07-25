@@ -602,6 +602,7 @@ asmlinkage void __init start_kernel(void)
 	setup_nr_cpu_ids();
 	setup_per_cpu_areas();
 	smp_prepare_boot_cpu();	/* arch-specific boot-cpu hooks */
+	/*! 2015.07.25 study end */
 
 	build_all_zonelists(NULL, NULL);
 	page_alloc_init();

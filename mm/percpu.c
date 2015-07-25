@@ -112,31 +112,71 @@ struct pcpu_chunk {
 
 static int pcpu_unit_pages __read_mostly;
 static int pcpu_unit_size __read_mostly;
+/*!
+ * pcpu_nr_units 초기화
+ * 1. pcpu_setup_first_chunk에서 초기화
+ */
 static int pcpu_nr_units __read_mostly;
 static int pcpu_atom_size __read_mostly;
 static int pcpu_nr_slots __read_mostly;
 static size_t pcpu_chunk_struct_size __read_mostly;
 
+/*!
+ * pcpu_low_unit_cpu 초기화
+ * - pcpu_setup_first_chunk 에서 초기화 
+ * pcpu_high_unit_cpu 초기화
+ * - pcpu_setup_first_chunk 에서 초기화
+ */
 /* cpus with the lowest and highest unit addresses */
 static unsigned int pcpu_low_unit_cpu __read_mostly;
 static unsigned int pcpu_high_unit_cpu __read_mostly;
 
 /* the address of the first chunk which starts with the kernel static area */
+/*!
+ * pcpu_base_addr 초기화
+ * -1. pcpu_setup_first_chunk
+ */
 void *pcpu_base_addr __read_mostly;
 EXPORT_SYMBOL_GPL(pcpu_base_addr);
 
+/*!
+ * pcpu_unit_map 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ */
 static const int *pcpu_unit_map __read_mostly;		/* cpu -> unit */
+/*!
+ * pcpu_unit_offsets 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ *     
+ */
 const unsigned long *pcpu_unit_offsets __read_mostly;	/* cpu -> unit offset */
 
 /* group information, used for vm allocation */
+/*!
+ * pcpu_nr_groups 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ */
 static int pcpu_nr_groups __read_mostly;
+/*!
+ * pcpu_group_offsets 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ */
 static const unsigned long *pcpu_group_offsets __read_mostly;
+/*!
+ * pcpu_group_sizes 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ */
 static const size_t *pcpu_group_sizes __read_mostly;
 
 /*
  * The first chunk which always exists.  Note that unlike other
  * chunks, this one can be allocated and mapped in several different
  * ways and thus often doesn't live in the vmalloc area.
+ */
+/*!
+ * pcpu_first_chunk 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ *     dchunk?:schunk
  */
 static struct pcpu_chunk *pcpu_first_chunk;
 
@@ -146,6 +186,11 @@ static struct pcpu_chunk *pcpu_first_chunk;
  * reserved offset is in pcpu_reserved_chunk_limit.  When reserved
  * area doesn't exist, the following variables contain NULL and 0
  * respectively.
+ */
+/*!
+ * pcpu_reserved_chunk 초기화
+ * -1. pcpu_setup_first_chunk 에서 초기화
+ *     reserved_size가 있을겨우  schunk 대입
  */
 static struct pcpu_chunk *pcpu_reserved_chunk;
 static int pcpu_reserved_chunk_limit;
@@ -177,6 +222,9 @@ static int pcpu_reserved_chunk_limit;
 static DEFINE_MUTEX(pcpu_alloc_mutex);	/* protects whole alloc and reclaim */
 static DEFINE_SPINLOCK(pcpu_lock);	/* protects index data structures */
 
+/*! pcpu_slot 초기화
+ * -1. pcpu_setup_first_chunk에서 초기화
+ */
 static struct list_head *pcpu_slot __read_mostly; /* chunk list slots */
 
 /* reclaim work to release fully free chunks, scheduled from free path */
@@ -1236,6 +1284,9 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 	int *unit_map;
 	int group, unit, i;
 
+	/*!
+	 * cpu_possible_mask 맵핑을 .단위 스트링으로 변환하여 cpus_buf에 대입
+	 */
 	cpumask_scnprintf(cpus_buf, sizeof(cpus_buf), cpu_possible_mask);
 
 #define PCPU_SETUP_BUG_ON(cond)	do {					\
@@ -1262,25 +1313,34 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 	PCPU_SETUP_BUG_ON(pcpu_verify_alloc_info(ai) < 0);
 
 	/* process group information and build config tables accordingly */
+	/*! NUMA를 위한 그룹 테이블 생성 
+	 * 1개 배열 생성
+	 */
 	group_offsets = memblock_virt_alloc(ai->nr_groups *
 					     sizeof(group_offsets[0]), 0);
 	group_sizes = memblock_virt_alloc(ai->nr_groups *
 					   sizeof(group_sizes[0]), 0);
+	/*! 8개 배열 생성 */
 	unit_map = memblock_virt_alloc(nr_cpu_ids * sizeof(unit_map[0]), 0);
 	unit_off = memblock_virt_alloc(nr_cpu_ids * sizeof(unit_off[0]), 0);
 
+	/*!
+	 * #define UINT_MAX	(~0U)
+	 */
 	for (cpu = 0; cpu < nr_cpu_ids; cpu++)
 		unit_map[cpu] = UINT_MAX;
 
 	pcpu_low_unit_cpu = NR_CPUS;
 	pcpu_high_unit_cpu = NR_CPUS;
 
+	/*! nr_groups == 8 */
 	for (group = 0, unit = 0; group < ai->nr_groups; group++, unit += i) {
 		const struct pcpu_group_info *gi = &ai->groups[group];
 
 		group_offsets[group] = gi->base_offset;
 		group_sizes[group] = gi->nr_units * ai->unit_size;
 
+		/*! gi->nr_units == 8(core) */
 		for (i = 0; i < gi->nr_units; i++) {
 			cpu = gi->cpu_map[i];
 			if (cpu == NR_CPUS)
@@ -1302,6 +1362,9 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 				pcpu_high_unit_cpu = cpu;
 		}
 	}
+	/*! 
+	 * 그룹이 하나이므로 unit = 8
+	 */
 	pcpu_nr_units = unit;
 
 	for_each_possible_cpu(cpu)
@@ -1378,6 +1441,14 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 		dchunk->map[dchunk->map_used++] = dchunk->free_size;
 	}
 
+	/*!
+	 * reserved_size가 있을경우
+	 * - pcpu_first_chunk = dchunk
+	 *   pcpu_reserved_chunk = schunk
+	 * reserved_size가 없을 경우
+	 * - pcpu_first_chunk = schunk
+	 *   pcpu_reserved_chunk = null`
+	 */
 	/* link the first chunk in */
 	pcpu_first_chunk = dchunk ?: schunk;
 	pcpu_chunk_relocate(pcpu_first_chunk, -1);
@@ -1766,7 +1837,11 @@ int __init pcpu_embed_first_chunk(size_t reserved_size, size_t dyn_size,
 	/*!
 	 * 2015-07-18 StudyEnd
 	 */
+	/*! 2015-07-25 StudyStart */
 	/* warn if maximum distance is further than 75% of vmalloc space */
+	/*!
+	 * #define VMALLOC_TOTAL (VMALLOC_END - VMALLOC_START)
+	 */
 	if (max_distance > VMALLOC_TOTAL * 3 / 4) {
 		pr_warning("PERCPU: max_distance=0x%zx too large for vmalloc "
 			   "space 0x%lx\n", max_distance,
@@ -1922,6 +1997,9 @@ out_free_ar:
  * generally a good idea TLB-wise because percpu area can piggy back
  * on the physical linear memory mapping which uses large page
  * mappings on applicable archs.
+ */
+/*! __per_cpu_offset 초기화
+ * -1. main/setup_per_cpu_areas에서 초기화
  */
 unsigned long __per_cpu_offset[NR_CPUS] __read_mostly;
 EXPORT_SYMBOL(__per_cpu_offset);
