@@ -341,6 +341,9 @@ EXPORT_SYMBOL_GPL(blocking_notifier_call_chain);
  *
  *	Currently always returns zero.
  */
+/*! From cpu_notifier()
+ * n = page_alloc_cpu_notify_nb
+ */
 int raw_notifier_chain_register(struct raw_notifier_head *nh,
 		struct notifier_block *n)
 {

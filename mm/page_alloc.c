@@ -2953,6 +2953,12 @@ EXPORT_SYMBOL(free_pages_exact);
  * zone, the number of pages is calculated as:
  *     managed_pages - high_pages
  */
+/*! offset = 0x02 (ZONE_MOVABLE)
+ * zone_list를 돌면서 특정 존(여기선 ZONE_MOVABLE)만 찾아
+ * 사이즈를 더해 주고 그 sum 값을 반환한다.
+ * 여기서 사이즈는 zone->managed_pages 에서 zone->watermarks[2](page_high)를 뺀 값이다.
+ * 참조(http://codecat.tistory.com/entry/Virtual-Linux-Manager-%EC%A0%95%EB%A6%AC-1)
+ */
 static unsigned long nr_free_zone_pages(int offset)
 {
 	struct zoneref *z;
@@ -2993,6 +2999,10 @@ EXPORT_SYMBOL_GPL(nr_free_buffer_pages);
  */
 unsigned long nr_free_pagecache_pages(void)
 {
+	/*! GFP_HIGHUSER_MOVABLE = 0x200da (0b 0010 0000 0000 1101 1010) */
+	/*! gfp_zone은 GFP_HIGHUSER_MOVABLE flag을 검사해서 zone 타입을 반환한다.
+	 * (여기서는 0x02 - ZONE_MOVABLE 을 반환)
+	 */
 	return nr_free_zone_pages(gfp_zone(GFP_HIGHUSER_MOVABLE));
 }
 
@@ -3820,6 +3830,8 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 
 	if (system_state == SYSTEM_BOOTING) {
 		__build_all_zonelists(NULL);
+		
+		/*! 2015.08.22 study start */
 		mminit_verify_zonelist();
 		cpuset_init_current_mems_allowed();
 	} else {
@@ -3832,6 +3844,7 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 		stop_machine(__build_all_zonelists, pgdat, NULL);
 		/* cpuset refresh routine should be here */
 	}
+	/*! 여기서 vm_total_pages은 각 zone을 돌면서 ZONE_MOVABLE에 해당하는 zone 사이즈들의 합이다.  */
 	vm_total_pages = nr_free_pagecache_pages();
 	/*
 	 * Disable grouping by mobility if the number of pages in the
@@ -3839,6 +3852,9 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 	 * more accurate, but expensive to check per-zone. This check is
 	 * made on memory-hotadd so a system can start with mobility
 	 * disabled and enable it later
+	 */
+	/*! vm_total_pages가 pageblock_nr_pages * MIGRATE_TYPES 보다 작으면 page grouping을 하지 않는다.
+	 *  페이지 그룹핑 - 모기향 책 (304p 17.8 페이지 모빌리티 참조)
 	 */
 	if (vm_total_pages < (pageblock_nr_pages * MIGRATE_TYPES))
 		page_group_by_mobility_disabled = 1;
@@ -5726,6 +5742,10 @@ static int page_alloc_cpu_notify(struct notifier_block *self,
 
 void __init page_alloc_init(void)
 {
+	/*! cpu_notifier에 의해 struct notifier_block page_alloc_cpu_notify_nb 을 만들고,
+	 * 구조체의 .notifier_call에 page_alloc_cpu_notify함수를, .priority 에 0 값을 넣어주고,
+	 * cpu_chain에 page_alloc_cpu_notify_nb 를 등록해준다.
+	 */
 	hotcpu_notifier(page_alloc_cpu_notify, 0);
 }
 

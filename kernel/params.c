@@ -197,10 +197,15 @@ int parse_args(const char *doing,
 		int ret;
 		int irq_was_disabled;
 
+		/*! next_arg : '=' 과 '"'를 이용하여 파싱 */
 		args = next_arg(args, &param, &val);
 		irq_was_disabled = irqs_disabled();
+
+		/*! next_args에서 파싱한 한 파트를 parse_one에서 디테일하게 파싱하고, unknown 함수까지 실행 해 준다 */
 		ret = parse_one(param, val, doing, params, num,
 				min_level, max_level, unknown);
+
+		/*! 아래는 단순 에러 print */
 		if (irq_was_disabled && !irqs_disabled())
 			pr_warn("%s: option '%s' enabled irq's!\n",
 				doing, param);

@@ -48,7 +48,6 @@ static RAW_NOTIFIER_HEAD(cpu_chain);
 static int cpu_hotplug_disabled;
 
 #ifdef CONFIG_HOTPLUG_CPU
-
 static struct {
 	struct task_struct *active_writer;
 	struct mutex lock; /* Synchronizes accesses to refcount, */
@@ -65,6 +64,7 @@ static struct {
 
 void get_online_cpus(void)
 {
+	/*! might_sleep do nothing. */
 	might_sleep();
 	if (cpu_hotplug.active_writer == current)
 		return;
@@ -81,9 +81,14 @@ void put_online_cpus(void)
 		return;
 	mutex_lock(&cpu_hotplug.lock);
 
+	/*! cpu_hotplug.refcount 이 0이면 warning 후 ++ 해 준다. */
 	if (WARN_ON(!cpu_hotplug.refcount))
 		cpu_hotplug.refcount++; /* try to fix things up */
 
+	/*! --cpu_hotplug.refcount 가 0이고, cpu_hotplug.active_writer 값이 있을 경우
+	 * wake_up_process(cpu_hotplug.active_writer) 를 수행.
+	 * (현재 cpu_hotplug.active_writer는 NULL)
+	 */
 	if (!--cpu_hotplug.refcount && unlikely(cpu_hotplug.active_writer))
 		wake_up_process(cpu_hotplug.active_writer);
 	mutex_unlock(&cpu_hotplug.lock);
@@ -157,11 +162,19 @@ void cpu_hotplug_enable(void)
 #endif	/* CONFIG_HOTPLUG_CPU */
 
 /* Need to know about CPUs going up/down? */
+/*! From cpu_notifier()
+ * nb = page_alloc_cpu_notify_nb  
+ */
 int __ref register_cpu_notifier(struct notifier_block *nb)
 {
 	int ret;
+	/*! mutex_lock  */
 	cpu_maps_update_begin();
+
+	/*! cpu_chain에 nb를 등록 */
 	ret = raw_notifier_chain_register(&cpu_chain, nb);
+
+	/*! mutex_unlock */
 	cpu_maps_update_done();
 	return ret;
 }

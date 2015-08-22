@@ -2342,6 +2342,10 @@ void cpuset_cpus_allowed_fallback(struct task_struct *tsk)
 
 void cpuset_init_current_mems_allowed(void)
 {
+	/*! currnet : current_thread_info()->task
+	 * nodes_setall : current->mems_allowed 비트맵에 시스템의 모든 노드를 1로 설정.
+	 * 우리 경우 current->mems_allowed->bits의 0번 bit만 1로 set
+	 */
 	nodes_setall(current->mems_allowed);
 }
 
