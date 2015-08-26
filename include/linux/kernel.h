@@ -157,14 +157,14 @@
 struct completion;
 struct pt_regs;
 struct user;
-
+/*! CONFIG_PREEMPT_VOLUNTARY define 안 됨  */
 #ifdef CONFIG_PREEMPT_VOLUNTARY
 extern int _cond_resched(void);
 # define might_resched() _cond_resched()
 #else
 # define might_resched() do { } while (0)
 #endif
-
+/*! CONFIG_DEBUG_ATOMIC_SLEEP define 안됨  */
 #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
   void __might_sleep(const char *file, int line, int preempt_offset);
 /**

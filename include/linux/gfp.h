@@ -115,6 +115,7 @@ struct vm_area_struct;
 #define GFP_USER	(__GFP_WAIT | __GFP_IO | __GFP_FS | __GFP_HARDWALL)
 #define GFP_HIGHUSER	(__GFP_WAIT | __GFP_IO | __GFP_FS | __GFP_HARDWALL | \
 			 __GFP_HIGHMEM)
+/*! GFP_HIGHUSER_MOVABLE = 0x200da (0b 0010 0000 0000 1101 1010) */
 #define GFP_HIGHUSER_MOVABLE	(__GFP_WAIT | __GFP_IO | __GFP_FS | \
 				 __GFP_HARDWALL | __GFP_HIGHMEM | \
 				 __GFP_MOVABLE)
@@ -253,12 +254,18 @@ static inline int allocflags_to_migratetype(gfp_t gfp_flags)
 	| 1 << (___GFP_MOVABLE | ___GFP_DMA32 | ___GFP_HIGHMEM)		      \
 	| 1 << (___GFP_MOVABLE | ___GFP_DMA32 | ___GFP_DMA | ___GFP_HIGHMEM)  \
 )
-
+/*! flags = 0x200da */
 static inline enum zone_type gfp_zone(gfp_t flags)
 {
 	enum zone_type z;
+	/*! GFP_ZONEMASK  = 0x0F
+	 * bit = (flags & GFP_ZONEMASK) -> 하위 4bit(zone modifier) 값만 취한다.
+	 */
 	int bit = (__force int) (flags & GFP_ZONEMASK);
 
+	/*! ZONES_SHIFT = 2
+	 * z = 0x02  (ZONE_MOVABLE)
+	 */
 	z = (GFP_ZONE_TABLE >> (bit * ZONES_SHIFT)) &
 					 ((1 << ZONES_SHIFT) - 1);
 	VM_BUG_ON((GFP_ZONE_BAD >> bit) & 1);

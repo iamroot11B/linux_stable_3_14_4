@@ -181,6 +181,12 @@ static int __init obsolete_checksetup(char *line)
 	const struct obs_kernel_param *p;
 	int had_early_param = 0;
 
+	/*! param 이
+	 * 1) parse_early_param에서 수행 되었거나
+	 * 2) __setup_start->setup_func 이 NULL이거나,
+	 * 3) __setup_start->setup_func(line + n) 의 리턴값이 true 일 때,
+	 * obsolete param으로 판단한다.
+	 */
 	p = __setup_start;
 	do {
 		int n = strlen(p->str);
@@ -270,6 +276,7 @@ static int __init repair_env_string(char *param, char *val, const char *unused)
  */
 static int __init unknown_bootoption(char *param, char *val, const char *unused)
 {
+	/*! param의 마지막 NULL 문자를 '='으로 복구 해 준다. */
 	repair_env_string(param, val, unused);
 
 	/* Handle obsolete-style parameters */
@@ -425,6 +432,12 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 	 * early_param에 의해 __setup_param이 호출되고, setup_func가 등록된지만,
 	 * 엑시노스 5420의 경우 console 의 내용에 earlycon이 없어 do_early_param에서
 	 * 해주는 정확한 일이 없다. 
+	 */
+	/*!
+	 * 아래 (p->early && parameq(param, p->str))의 조건을 만족하면 if문 안의 내용을 수행한다.
+	 * (early_param("mminit_loglevel", set_mminit_loglevel) 확인 중 발견)
+	 * early_param 매크로에 의해 등록된 obs_kernel_param struct의 setup->func()을 수행한다.
+	 * (아래 p->setup_func(val))
 	 */
 	for (p = __setup_start; p < __setup_end; p++) {
 		if ((p->early && parameq(param, p->str)) ||
@@ -609,7 +622,13 @@ asmlinkage void __init start_kernel(void)
 	page_alloc_init();
 
 	pr_notice("Kernel command line: %s\n", boot_command_line);
+
+	/*! exynos - ARM은 setup_arch에서 해 줬기 때문에,
+	 * 아래 parse_early_param은 아무것도 하지 않고 바로 빠져 나온다.
+	 */
 	parse_early_param();
+
+	/*! __start___param : __param의 시작주소, __stop___param : __param의 끝 주소 */
 	parse_args("Booting kernel", static_command_line, __start___param,
 		   __stop___param - __start___param,
 		   -1, -1, &unknown_bootoption);

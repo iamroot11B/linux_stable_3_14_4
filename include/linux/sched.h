@@ -1436,6 +1436,9 @@ struct task_struct {
 	cputime_t acct_timexpd;	/* stime + utime since last update */
 #endif
 #ifdef CONFIG_CPUSETS
+	/*! cpuset_init_current_mems_allowed에서
+	 * current->mems_allowed->bits의 0번 bit를 1로 set.
+	 */
 	nodemask_t mems_allowed;	/* Protected by alloc_lock */
 	seqcount_t mems_allowed_seq;	/* Seqence no to catch updates */
 	int cpuset_mem_spread_rotor;

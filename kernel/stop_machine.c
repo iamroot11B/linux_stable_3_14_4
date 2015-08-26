@@ -545,7 +545,7 @@ static int __init cpu_stop_init(void)
 early_initcall(cpu_stop_init);
 
 #ifdef CONFIG_STOP_MACHINE
-
+/*! (__build_all_zonelists, pgdat, NULL);  */
 int __stop_machine(int (*fn)(void *), void *data, const struct cpumask *cpus)
 {
 	struct multi_stop_data msdata = {
@@ -574,17 +574,25 @@ int __stop_machine(int (*fn)(void *), void *data, const struct cpumask *cpus)
 		return ret;
 	}
 
+	/*! stop_machine_initialized 가 init 된 이후에는 아래 구문 수행 
+	 *  msdata->attr.state 를 MULTI_STOP_PREPARE로 바꿔준 후,
+	 *  stop_cpus를 수행한 후 그 리턴값을 반환
+	 */
 	/* Set the initial state and stop all online cpus. */
 	set_state(&msdata, MULTI_STOP_PREPARE);
 	return stop_cpus(cpu_online_mask, multi_cpu_stop, &msdata);
 }
-
+/*! stop_machine(__build_all_zonelists, pgdat, NULL); */
 int stop_machine(int (*fn)(void *), void *data, const struct cpumask *cpus)
 {
 	int ret;
 
 	/* No CPUs can come up or down during this. */
+	/*! get_online_cpus : mutex_lock 걸고 cpu_hotplug.refcount++ 수행 */
 	get_online_cpus();
+	/*! __stop_machine
+	 * local irq disable 후 __build_all_zonelists(pgdat) 를 수행하고 irq restore 후 그 리턴값(0)을 반환한다.
+	 */
 	ret = __stop_machine(fn, data, cpus);
 	put_online_cpus();
 	return ret;

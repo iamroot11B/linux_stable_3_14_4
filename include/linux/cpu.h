@@ -117,6 +117,7 @@ enum {
 #ifdef CONFIG_SMP
 /* Need to know about CPUs going up/down? */
 #if defined(CONFIG_HOTPLUG_CPU) || !defined(MODULE)
+/*! From page_alloc_init() 인자들 : (page_alloc_cpu_notify, 0)  */
 #define cpu_notifier(fn, pri) {					\
 	static struct notifier_block fn##_nb =			\
 		{ .notifier_call = fn, .priority = pri };	\

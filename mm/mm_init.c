@@ -25,9 +25,11 @@ void mminit_verify_zonelist(void)
 {
 	int nid;
 
+	/*! mminit_loglevel : do_early_param에서 초기화 됨. */
 	if (mminit_loglevel < MMINIT_VERIFY)
 		return;
 
+	/*! mminit_loglevel < MMINIT_VERIFY 일 경우, zonelists 내용을 단순히 display 해 줌 */
 	for_each_online_node(nid) {
 		pg_data_t *pgdat = NODE_DATA(nid);
 		struct zone *zone;
@@ -142,11 +144,19 @@ void __meminit mminit_verify_page_links(struct page *page, enum zone_type zone,
 	BUG_ON(page_to_pfn(page) != pfn);
 }
 
+/*! do_early_param에서 call 됨.
+ *  str 매개변수에서 숫자값을 파싱하여 mmint_loglevel변수에 넣어줌
+ */
 static __init int set_mminit_loglevel(char *str)
 {
 	get_option(&str, &mminit_loglevel);
 	return 0;
 }
+/*! 아래 early_param() 의 결과로,
+ * __setup_str_mminit_loglevel[] = "mminit_loglevel"
+ * struct obs_kernel_param __setup_mminit_loglevel  가 생성되고,
+ * do_early_param에서 초기화 되었다.
+ */
 early_param("mminit_loglevel", set_mminit_loglevel);
 #endif /* CONFIG_DEBUG_MEMORY_INIT */
 
