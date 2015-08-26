@@ -24,6 +24,11 @@
 #include "internal.h"
 
 #ifndef CONFIG_NEED_MULTIPLE_NODES
+/*! contig_page_data - 초기화 시점
+ * 1. start_kernel -> setup_arch -> paging_init 에서 초기화
+ *   - ->node_zones (in memmap_init_zone 에서 초기화)
+ */
+
 struct pglist_data __refdata contig_page_data = {
 	.bdata = &bootmem_node_data[0]
 };

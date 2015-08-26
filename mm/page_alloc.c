@@ -3265,10 +3265,14 @@ static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
  *
  * Add all populated zones of a node to the zonelist.
  */
+/*! build_zonelists_node
+ * - populated_zone을 찾아 zonelist->zonerefs안에 저장해둔다.
+ */
 static int build_zonelists_node(pg_data_t *pgdat, struct zonelist *zonelist,
 				int nr_zones)
 {
 	struct zone *zone;
+	/*! MAX_NR_ZONES = 3 */
 	enum zone_type zone_type = MAX_NR_ZONES;
 
 	do {
@@ -3687,12 +3691,15 @@ static void set_zonelist_order(void)
 	current_zonelist_order = ZONELIST_ORDER_ZONE;
 }
 
+/*! build_zonelists 
+ */
 static void build_zonelists(pg_data_t *pgdat)
 {
 	int node, local_node;
 	enum zone_type j;
 	struct zonelist *zonelist;
 
+	/*! pgdat->node_id 0으로 초기화 되었었음 */
 	local_node = pgdat->node_id;
 
 	zonelist = &pgdat->node_zonelists[0];
@@ -3755,6 +3762,9 @@ static void setup_zone_pageset(struct zone *zone);
 DEFINE_MUTEX(zonelists_mutex);
 
 /* return values int ....just for stop_machine() */
+/*! build_zonelists()
+ * 
+ */
 static int __build_all_zonelists(void *data)
 {
 	int nid;
@@ -3770,7 +3780,17 @@ static int __build_all_zonelists(void *data)
 		build_zonelist_cache(self);
 	}
 
+	/*!
+	 * #define for_each_online_node(node) for_each_node_state(node, N_ONLINE)
+	 * N_ONLINE = 1
+	 *************************************************************************
+	 * #define for_each_node_state(node, __state) \
+	 *	for ( (node) = 0; (node) == 0; (node) = 1)
+	 */
 	for_each_online_node(nid) {
+		/*!
+		 * #define NODE_DATA(nid)		(&contig_page_data)
+		 */
 		pg_data_t *pgdat = NODE_DATA(nid);
 
 		build_zonelists(pgdat);
@@ -3790,7 +3810,17 @@ static int __build_all_zonelists(void *data)
 	 * needs the percpu allocator in order to allocate its pagesets
 	 * (a chicken-egg dilemma).
 	 */
+	/*! 2015.08.08 study end */
 	for_each_possible_cpu(cpu) {
+		/*!
+		 * #define per_cpu(var, cpu)		(*SHIFT_PERCPU_PTR(&(var), per_cpu_offset(cpu)))
+		 * #define SHIFT_PERCPU_PTR(__p, __offset)	({				\
+		 *	__verify_pcpu_ptr((__p));					\
+		 *	RELOC_HIDE((typeof(*(__p)) __kernel __force *)(__p), (__offset)); \
+		 *	})
+		 *********************
+		 * 해당 cpu의 boot_pageset변수를 가져옴
+		 */
 		setup_pageset(&per_cpu(boot_pageset, cpu), 0);
 
 #ifdef CONFIG_HAVE_MEMORYLESS_NODES
@@ -3814,10 +3844,15 @@ static int __build_all_zonelists(void *data)
  * Called with zonelists_mutex held always
  * unless system_state == SYSTEM_BOOTING.
  */
+/*! build_all_zonelists()
+ *
+ */
 void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 {
+	/*! current_zonelist_order = ZONELIST_ORDER_ZONE */
 	set_zonelist_order();
 
+	/*! system_state */
 	if (system_state == SYSTEM_BOOTING) {
 		__build_all_zonelists(NULL);
 		mminit_verify_zonelist();
@@ -4276,6 +4311,9 @@ static void pageset_set_batch(struct per_cpu_pageset *p, unsigned long batch)
 	pageset_update(&p->pcp, 6 * batch, max(1UL, 1 * batch));
 }
 
+/*! pageset_init
+ * pageset안의 list들(MIGRATE_PCPTYPE에 해당하는) head 초기화
+ */
 static void pageset_init(struct per_cpu_pageset *p)
 {
 	struct per_cpu_pages *pcp;

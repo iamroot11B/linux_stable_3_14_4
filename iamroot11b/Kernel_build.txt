@@ -1,0 +1,10 @@
+
+sudo apt-get install git-core ctags cscope libncurses5-dev gcc-arm-linux-gnueabi
+git clone https://github.com/iamroot11B/linux_stable_3_14_4
+git clone https://github.com/ygpark/vimconfig.git ~/vimconfig
+~/vimconfig/install.sh
+make exynos_defconfig ARCH=arm
+make menuconfig ARCH=arm
+make -j4 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+./tag_update.sh
+
