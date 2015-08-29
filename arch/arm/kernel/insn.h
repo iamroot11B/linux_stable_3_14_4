@@ -14,6 +14,7 @@ arm_gen_nop(void)
 unsigned long
 __arm_gen_branch(unsigned long pc, unsigned long addr, bool link);
 
+/*! pc : entry->code, addr : entry->target */
 static inline unsigned long
 arm_gen_branch(unsigned long pc, unsigned long addr)
 {

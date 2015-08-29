@@ -752,10 +752,11 @@ void __init setup_log_buf(int early)
 	unsigned long flags;
 	char *new_log_buf;
 	int free;
-
+	/*! new_log_buf_len => 위 early_param macro를 통해 log_buf_len 파라미터의 값을 받아온다.  */
 	if (!new_log_buf_len)
 		return;
 
+	/*! new_log_buf_len 크기를 malloc */
 	if (early) {
 		new_log_buf =
 			memblock_virt_alloc(new_log_buf_len, PAGE_SIZE);
@@ -774,6 +775,8 @@ void __init setup_log_buf(int early)
 	log_buf = new_log_buf;
 	new_log_buf_len = 0;
 	free = __LOG_BUF_LEN - log_next_idx;
+	/*! 기존 log_buf의 내용은 __log_buf 배열 안에 저장되어 있으며,
+	 * 이 내용을 새로 malloc 해준 log_buf에 복사 해 준다.	 */
 	memcpy(log_buf, __log_buf, __LOG_BUF_LEN);
 	raw_spin_unlock_irqrestore(&logbuf_lock, flags);
 

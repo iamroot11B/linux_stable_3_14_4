@@ -202,6 +202,10 @@ void __init jump_label_init(void)
 	for (iter = iter_start; iter < iter_stop; iter++) {
 		struct static_key *iterk;
 
+		/*! static-keys를 설명하자면, static-keys는 likely와 unlikely를 runtime에 적용하는 테크닉
+		 * jump_table 에 등록된 branch 들은 위 테크닉에 의해 좀 더 빠른 branch jump가 가능한 것 같다.
+		 * Documentation/static-keys.txt 참조 (w/, w/o jump table 비교 : 186 Line)
+		 */
 		iterk = (struct static_key *)(unsigned long)iter->key;
 		arch_jump_label_transform_static(iter, jump_label_type(iterk));
 		if (iterk == key)

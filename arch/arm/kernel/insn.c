@@ -32,9 +32,14 @@ __arm_gen_branch_thumb2(unsigned long pc, unsigned long addr, bool link)
 	return __opcode_thumb32_compose(first, second);
 }
 
+/*! pc : entry->code, addr : entry->target */
 static unsigned long
 __arm_gen_branch_arm(unsigned long pc, unsigned long addr, bool link)
 {
+	/*! 0xea000000 = the opcode for the Branch instruction
+	 *  http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0203gk/Caccfahd.html 
+	 */
+	
 	unsigned long opcode = 0xea000000;
 	long offset;
 
@@ -52,6 +57,7 @@ __arm_gen_branch_arm(unsigned long pc, unsigned long addr, bool link)
 	return opcode | offset;
 }
 
+/*! pc : entry->code, addr : entry->target */
 unsigned long
 __arm_gen_branch(unsigned long pc, unsigned long addr, bool link)
 {

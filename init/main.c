@@ -431,7 +431,7 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 	 * early_param("earlycon", setup_early_serial8250_console);
 	 * early_param에 의해 __setup_param이 호출되고, setup_func가 등록된지만,
 	 * 엑시노스 5420의 경우 console 의 내용에 earlycon이 없어 do_early_param에서
-	 * 해주는 정확한 일이 없다. 
+	 * 해주는 정확한 일이 없다. -> 내용 수정. 아래 참조
 	 */
 	/*!
 	 * 아래 (p->early && parameq(param, p->str))의 조건을 만족하면 if문 안의 내용을 수행한다.
@@ -468,9 +468,6 @@ void __init parse_early_param(void)
 
 	/* All fall through to do_early_param. */
 	strlcpy(tmp_cmdline, boot_command_line, COMMAND_LINE_SIZE);
-	/*!
-	 * do_early_param을 위한 코드지만, 엑시노스 5420의 경우 do_early_param가 해주는 일이 없음.
-	 */
 	parse_early_options(tmp_cmdline);
 	done = 1;
 }
@@ -632,12 +629,20 @@ asmlinkage void __init start_kernel(void)
 	parse_args("Booting kernel", static_command_line, __start___param,
 		   __stop___param - __start___param,
 		   -1, -1, &unknown_bootoption);
-
+	/*! 2015.08.22 study end */
+	/*! 2015.08.29 study start */
+	
+	/*! HAVE_JUMP_LABEL define 안 돼있음.
+	 * Optimize very unlikely/likely branches (from Kconfig)
+	 */
 	jump_label_init();
 
 	/*
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
+	 */
+	/*! 우리는 CONFIG_PRINTK define 돼 있음.
+	 *  log_buf 에 new_log_buf_len 크기만큼 mem alloc 한다.
 	 */
 	setup_log_buf(0);
 	pidhash_init();

@@ -6153,6 +6153,15 @@ __setup("hashdist=", set_hashdist);
  *   quantity of entries
  * - limit is the number of hash buckets, not the total allocation size
  */
+/*! ("PID",
+ * sizeof(*pid_hash),		=> sizeof(struct hlist_head)
+ * 0,
+ * 18,
+ * HASH_EARLY | HASH_SMALL,	=> HASH_EARLY 0x00000001, HASH_SMALL 0x00000002
+ * &pidhash_shift,			=> pidhash_shift = 4
+ * NULL,
+ * 0, 4096)  
+ */
 void *__init alloc_large_system_hash(const char *tablename,
 				     unsigned long bucketsize,
 				     unsigned long numentries,
@@ -6168,15 +6177,21 @@ void *__init alloc_large_system_hash(const char *tablename,
 	void *table = NULL;
 
 	/* allow the kernel cmdline to have a say */
+	/*!numentries : 생성시키려는 hash table entry 갯수
+	 * numentries 가 0이면 현 시스템에 존재하는 페이지 개수와 페이지 크기를 기반으로 적절한 값으로 numentries 값을 설정한다
+	 */
 	if (!numentries) {
 		/* round applicable memory size up to nearest megabyte */
+		/*! nr_all_pages = 모든 zone의 page 갯수  */
 		numentries = nr_kernel_pages;
 
 		/* It isn't necessary when PAGE_SIZE >= 1MB */
+		/*! page 갯수를 1mb 단위로 roundup */
 		if (PAGE_SHIFT < 20)
 			numentries = round_up(numentries, (1<<20)/PAGE_SIZE);
 
 		/* limit to 1 bucket per 2^scale bytes of low memory */
+		/*! 전체 페이지를 bucket 단위(1<<scale) 로 몇개인지 계산 해 준다.*/
 		if (scale > PAGE_SHIFT)
 			numentries >>= (scale - PAGE_SHIFT);
 		else
@@ -6186,29 +6201,44 @@ void *__init alloc_large_system_hash(const char *tablename,
 		if (unlikely(flags & HASH_SMALL)) {
 			/* Makes no sense without HASH_EARLY */
 			WARN_ON(!(flags & HASH_EARLY));
+			/*! 아래는 HASH_SMALL와 HASH_EARLY가 동시에 있는 경우. (없으면 위에서 WARN_ON 해준다)
+			 * numentries 가 최소 갯수 이하면 최소 갯수로 늘려준다.(1 << *_hash_shift) */
 			if (!(numentries >> *_hash_shift)) {
 				numentries = 1UL << *_hash_shift;
 				BUG_ON(!numentries);
 			}
-		} else if (unlikely((numentries * bucketsize) < PAGE_SIZE))
+		}
+		/*! (numentries * bucketsize)(전체 hash table size)가 PAGE_SIZE보다 작으면,
+		 * 한 PAGE를 전부 사용하도록 numentries 값 변경 */
+		else if (unlikely((numentries * bucketsize) < PAGE_SIZE))
 			numentries = PAGE_SIZE / bucketsize;
 	}
+	
+	/*! 위 과정을 통해 구한 numentries을 2의 승수배로 round up 해준다. */
 	numentries = roundup_pow_of_two(numentries);
 
 	/* limit allocation size to 1/16 total memory by default */
+	/*! max = high_memory = 4096  */
 	if (max == 0) {
+		/*! 1/16 total memory 계산  */
 		max = ((unsigned long long)nr_all_pages << PAGE_SHIFT) >> 4;
 		do_div(max, bucketsize);
 	}
 	max = min(max, 0x80000000ULL);
 
+	/*! low_limit=0
+	 *  numentries가 지정한 low_limit 보다 작으면 low_limit으로 설정,
+	 *  numentries가 가능한 max 보다 크게 계산 되었으면 가능한 max로 설정
+	 */
 	if (numentries < low_limit)
 		numentries = low_limit;
 	if (numentries > max)
 		numentries = max;
 
+	/*! log 2-numentris 값을 구한다(numentries가 2의 몇 승수인지) */
 	log2qty = ilog2(numentries);
-
+	/*! 2015-08-29 study end */
+	
 	do {
 		size = bucketsize << log2qty;
 		if (flags & HASH_EARLY)

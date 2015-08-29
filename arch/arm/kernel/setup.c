@@ -1169,6 +1169,7 @@ void __init setup_arch(char **cmdline_p)
 
 	/*!
 	 * do_early_param을 위한 코드지만, 엑시노스 5420의 경우 do_early_param가 해주는 일이 없음.
+	 * -> 확인 결과 해주는 내용 확인 do_early_param 함수 코멘트 참조
 	 */
 	parse_early_param();
 
