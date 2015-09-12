@@ -326,6 +326,10 @@ static inline struct page *alloc_pages_node(int nid, gfp_t gfp_mask,
 	if (nid < 0)
 		nid = numa_node_id();
 
+	/*! From 'alloc_large_system_hash'
+     * gfp_mask = GFP_ATOMIC
+     * node_zonelist(...) = contig_page_data.node_zonelists[0]
+     */
 	return __alloc_pages(gfp_mask, order, node_zonelist(nid, gfp_mask));
 }
 

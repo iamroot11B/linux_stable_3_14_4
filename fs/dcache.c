@@ -3416,7 +3416,12 @@ EXPORT_SYMBOL(d_genocide);
 
 void __init vfs_caches_init_early(void)
 {
+	/*! pid_hash 와 동일한 과정을 통해 memory 할당 및 list head init 수행
+	 * 다른 점은 hlist_head 대신 hlist_bl_head 사용.
+	 */
 	dcache_init_early();
+
+	/*! pid_hash 와 동일한 과정을 통해 memory 할당 및 list head init 수행 */
 	inode_init_early();
 }
 

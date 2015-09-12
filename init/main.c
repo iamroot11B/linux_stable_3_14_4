@@ -647,6 +647,8 @@ asmlinkage void __init start_kernel(void)
 	setup_log_buf(0);
 	pidhash_init();
 	vfs_caches_init_early();
+	/*! dcache_init_early 시 사용하는 hlist_bl_head 에 관해 좀 더 볼 필요있음. */
+	/*! 2015.09.12 study end */
 	sort_main_extable();
 	trap_init();
 	mm_init();

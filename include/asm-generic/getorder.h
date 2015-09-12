@@ -46,6 +46,9 @@ int __get_order(unsigned long size)
  * This function may be used to initialise variables with compile time
  * evaluations of constants.
  */
+/*! PAGE_SIZE * 2^x : x의 값을 구하는 매크로
+ * __builtin_constant_p : 컴파일 시 값이 상수로 알려져 있는지 판단합니다.
+ */
 #define get_order(n)						\
 (								\
 	__builtin_constant_p(n) ? (				\

@@ -29,7 +29,9 @@
 #define LIST_BL_BUG_ON(x)
 #endif
 
-
+/*! hlist_bl_head -
+ * hlist_head 와 다른 점은 주소의 마지막 bit으로 lock 여부 확인
+ */
 struct hlist_bl_head {
 	struct hlist_bl_node *first;
 };
