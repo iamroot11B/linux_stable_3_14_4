@@ -41,7 +41,10 @@
 
 #define pid_hashfn(nr, ns)	\
 	hash_long((unsigned long)nr + (unsigned long)ns, pidhash_shift)
+/*! pidhash_init 에서 할당 및 초기화 해 줌  */
 static struct hlist_head *pid_hash;
+
+/*! alloc_large_system_hash 함수에서 사용된 log2qty 값으로 바꿔 줌. */
 static unsigned int pidhash_shift = 4;
 struct pid init_struct_pid = INIT_STRUCT_PID;
 
@@ -567,6 +570,7 @@ struct pid *find_ge_pid(int nr, struct pid_namespace *ns)
  * machine.  From a minimum of 16 slots up to 4096 slots at one gigabyte or
  * more.
  */
+/*! pid hash table은 PID를 키로하여 PID에 대한 processor descriptor를 검색하기 위한 Hash Table. */
 void __init pidhash_init(void)
 {
 	unsigned int i, pidhash_size;

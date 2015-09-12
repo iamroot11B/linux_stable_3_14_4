@@ -52,6 +52,13 @@ static inline int zref_in_nodemask(struct zoneref *zref, nodemask_t *nodes)
 }
 
 /* Returns the next zone at or below highest_zoneidx in a zonelist */
+/*! From 'alloc_large_system_hash' -> '__alloc_pages_nodemask' -> 'first_zones_zonelist'
+ * *z = &(contig_page_data.node_zonelists[0])->_zonerefs
+ * highest_zoneidx = 0
+ * *nodes = NULL
+ * **zone = &preferred_zone
+ * : Next zone 을 찾아서 preffered_zone에 넣어주고, 찾은 zone을 return 해 주는 함수
+ */
 struct zoneref *next_zones_zonelist(struct zoneref *z,
 					enum zone_type highest_zoneidx,
 					nodemask_t *nodes,
@@ -61,6 +68,7 @@ struct zoneref *next_zones_zonelist(struct zoneref *z,
 	 * Find the next suitable zone to use for the allocation.
 	 * Only filter based on nodemask if it's set
 	 */
+	/*! zonelist_zone_idx는 0으로 initialize 된 후, ZONE_DMA일 경우 0, ZONE_NORMAL과 etc 일 경우 1로 set.  */
 	if (likely(nodes == NULL))
 		while (zonelist_zone_idx(z) > highest_zoneidx)
 			z++;

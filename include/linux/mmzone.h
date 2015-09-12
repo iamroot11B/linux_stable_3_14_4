@@ -1003,6 +1003,12 @@ struct zoneref *next_zones_zonelist(struct zoneref *z,
  * used to iterate the zonelist with next_zones_zonelist by advancing it by
  * one before calling.
  */
+/*! From 'alloc_large_system_hash' -> '__alloc_pages_nodemask'
+ * *zonelist = &(contig_page_data.node_zonelists[0])
+ * highest_zoneidx = 0
+ * *nodes = NULL
+ * **zone = &preferred_zone
+ */
 static inline struct zoneref *first_zones_zonelist(struct zonelist *zonelist,
 					enum zone_type highest_zoneidx,
 					nodemask_t *nodes,

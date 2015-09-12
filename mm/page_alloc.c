@@ -1534,6 +1534,7 @@ struct page *buffered_rmqueue(struct zone *preferred_zone,
 	int cold = !!(gfp_flags & __GFP_COLD);
 
 again:
+	/*! order 가 0인 경우(page size 4096 보다 작거나 같은 경우) 와 아닌 경우를 분리하여 처리  */
 	if (likely(order == 0)) {
 		struct per_cpu_pages *pcp;
 		struct list_head *list;
@@ -2688,27 +2689,45 @@ got_pg:
 	return page;
 }
 
+
 /*
  * This is the 'heart' of the zoned buddy allocator.
+ */
+/*! From 'alloc_large_system_hash'
+ * gfp_mask = GFP_ATOMIC,
+ * order = ...
+ * *zonelist = &(contig_page_data.node_zonelists[0])
+ * nodemask = NULL
  */
 struct page *
 __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 			struct zonelist *zonelist, nodemask_t *nodemask)
 {
+	/*! From 'alloc_large_system_hash'
+	 *  gfp_mask = GFP_ATOMIC = __GFP_HIGH 
+	 *  gfp_zone(gfp_mask) = 0 (우리는 ZONE_NORMAL)
+	 */ 
 	enum zone_type high_zoneidx = gfp_zone(gfp_mask);
 	struct zone *preferred_zone;
 	struct page *page = NULL;
 	int migratetype = allocflags_to_migratetype(gfp_mask);
 	unsigned int cpuset_mems_cookie;
+	/*! alloc_flags = 0x141  */
 	int alloc_flags = ALLOC_WMARK_LOW|ALLOC_CPUSET|ALLOC_FAIR;
 	struct mem_cgroup *memcg = NULL;
 
+	/*! gfp_allowed_mask = (__GFP_WAIT|__GFP_IO|__GFP_FS) 제외하고 모두 allowed.*/
 	gfp_mask &= gfp_allowed_mask;
 
+	/*! 우리는 CONFIG_PROVE_LOCKING not defined.   */
 	lockdep_trace_alloc(gfp_mask);
 
+	/*! gfp_mask & __GFP_WAIT 만족해도 우리는 결국 do nothing */
 	might_sleep_if(gfp_mask & __GFP_WAIT);
 
+	/*! should_fail_alloc_page()
+	 * CONFIG_FAIL_PAGE_ALLOC define 안 돼 있어서 우리는 무조건 false  
+	 */
 	if (should_fail_alloc_page(gfp_mask, order))
 		return NULL;
 
@@ -2717,6 +2736,7 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 	 * valid zone. It's possible to have an empty zonelist as a result
 	 * of GFP_THISNODE and a memoryless node
 	 */
+	/*! build_all_zonelists에서 contig_page_data.node_zonelists[0] 에 setting 해 줌  */
 	if (unlikely(!zonelist->_zonerefs->zone))
 		return NULL;
 
@@ -2724,13 +2744,16 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 	 * Will only have any effect when __GFP_KMEMCG is set.  This is
 	 * verified in the (always inline) callee
 	 */
+	/*! gfp_mask = GFP_ATOMIC = __GFP_HIGH  */
 	if (!memcg_kmem_newpage_charge(gfp_mask, &memcg, order))
 		return NULL;
 
 retry_cpuset:
+	/*! CONFIG_CPUSETS not defined -> do nothing  */
 	cpuset_mems_cookie = get_mems_allowed();
 
 	/* The preferred zone is used for statistics later */
+	/*! nodemask 가 참이면 nodemask, 아니면 &cpuset_current_mems_allowed */
 	first_zones_zonelist(zonelist, high_zoneidx,
 				nodemask ? : &cpuset_current_mems_allowed,
 				&preferred_zone);
@@ -2743,6 +2766,7 @@ retry_cpuset:
 #endif
 retry:
 	/* First allocation attempt */
+	/*! 2015-09-12. 아래 get_page_from_freelist는 간략히 살펴 봄 */
 	page = get_page_from_freelist(gfp_mask|__GFP_HARDWALL, nodemask, order,
 			zonelist, high_zoneidx, alloc_flags,
 			preferred_zone, migratetype);
@@ -2773,7 +2797,8 @@ retry:
 				zonelist, high_zoneidx, nodemask,
 				preferred_zone, migratetype);
 	}
-
+	/*! trace_mm_page_alloc() 
+	 * include/trace/events/kmem.h L194 에서 매크로로 만들어 줌.  */
 	trace_mm_page_alloc(page, order, gfp_mask, migratetype);
 
 out:
@@ -2783,9 +2808,11 @@ out:
 	 * the mask is being updated. If a page allocation is about to fail,
 	 * check if the cpuset changed during allocation and if so, retry.
 	 */
+	/*! CONFIG_CPUSET not defined. -> Do nothing */
 	if (unlikely(!put_mems_allowed(cpuset_mems_cookie) && !page))
 		goto retry_cpuset;
 
+	/*! CONFIG_MEMCG_KMEM not defined. -> Do nothing */
 	memcg_kmem_commit_charge(page, memcg, order);
 
 	return page;
@@ -2892,6 +2919,9 @@ static void *make_alloc_exact(unsigned long addr, unsigned order, size_t size)
  * This function is also limited by MAX_ORDER.
  *
  * Memory allocated by this function must be released by free_pages_exact().
+ */
+/*! From 'alloc_large_system_hash'
+ *  alloc_large_system_hash에서 들어 오지 않는 함수 지만 get_page_from_freelist 함수 제외하고 살펴 봄.(2015-09-12)
  */
 void *alloc_pages_exact(size_t size, gfp_t gfp_mask)
 {
@@ -6218,7 +6248,7 @@ void *__init alloc_large_system_hash(const char *tablename,
 	numentries = roundup_pow_of_two(numentries);
 
 	/* limit allocation size to 1/16 total memory by default */
-	/*! max = high_memory = 4096  */
+	/*! max = high_memory = 4096 (From 'pidhash_init')  */
 	if (max == 0) {
 		/*! 1/16 total memory 계산  */
 		max = ((unsigned long long)nr_all_pages << PAGE_SHIFT) >> 4;
@@ -6239,13 +6269,23 @@ void *__init alloc_large_system_hash(const char *tablename,
 	log2qty = ilog2(numentries);
 	/*! 2015-08-29 study end */
 	
+	/*! 2015-09-12 study start */
+
 	do {
 		size = bucketsize << log2qty;
-		if (flags & HASH_EARLY)
+		/*! 메모리 관리자가 bootmem일 경우 - flags & HASH_EARLY    */
+		if (flags & HASH_EARLY)	
 			table = memblock_virt_alloc_nopanic(size, 0);
+		/*! hashdist = default 0.
+		 *  CONFIG_NUMA와 CONFIG_64BIT 가 define 돼 있으면 default 값 1을 가지고,
+		 *  boot param 에 "hashdist" 항목이 명시 돼 있는 경우 그 값을 사용.
+		 */
 		else if (hashdist)
 			table = __vmalloc(size, GFP_ATOMIC, PAGE_KERNEL);
 		else {
+			/*! 위 두 경우 모두 해당되지 않는 경우 alloc_pages_exact을 통해 할당.
+			 * get_page_from_freelist 함수 제외하고 살펴 봄.(2015-09-12)
+			 */
 			/*
 			 * If bucketsize is not a power-of-two, we may free
 			 * some pages at the end of hash table which
@@ -6257,6 +6297,8 @@ void *__init alloc_large_system_hash(const char *tablename,
 			}
 		}
 	} while (!table && size > PAGE_SIZE && --log2qty);
+	/*! 위 while에서 table이 NULL 이면(mem alloc 실패) size를 줄여서 재시도한다.
+	 * size를 줄이다 PAGE_SIZE보다도 작아지면 최종 실패로 while문을 빠져나오고, 아래 if 에서 panic 처리 */
 
 	if (!table)
 		panic("Failed to allocate %s hash table\n", tablename);
@@ -6267,8 +6309,10 @@ void *__init alloc_large_system_hash(const char *tablename,
 	       ilog2(size) - PAGE_SHIFT,
 	       size);
 
+	/*! _hash_shift = bit shift 갯수 (2의 x 승 => 1<<x)  */
 	if (_hash_shift)
 		*_hash_shift = log2qty;
+	/*! _hash_mask = bit shift 갯수 만큼 1로 채운 값 (ex. 0x00ff) */
 	if (_hash_mask)
 		*_hash_mask = (1 << log2qty) - 1;
 
