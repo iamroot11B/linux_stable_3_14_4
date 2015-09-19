@@ -76,7 +76,13 @@
 
 #ifndef CONFIG_NEED_MULTIPLE_NODES
 /* use the per-pgdat data instead for discontigmem - mbligh */
+/*! max_mapnr 초기화
+ * 1. start_kernel -> mm_init -> mem_init에서 초기화(pfn_to_page(max_pfn) - mem_map)
+ */
 unsigned long max_mapnr;
+/*! mem_map 초기화
+ * 1.  alloc_node_mem_map 에서 초기화(NODE_DATA(0)->mem_map)
+ */
 struct page *mem_map;
 
 EXPORT_SYMBOL(max_mapnr);

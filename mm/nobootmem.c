@@ -119,6 +119,15 @@ static unsigned long __init free_low_memory_core_early(void)
 	phys_addr_t start, end;
 	u64 i;
 
+	/*! 2015.09.19 study end */
+	/*!
+#define for_each_free_mem_range(i, nid, p_start, p_end, p_nid)		\
+	for (i = 0,							\
+	     __next_free_mem_range(&i, nid, p_start, p_end, p_nid);	\
+	     i != (u64)ULLONG_MAX;					\
+	     __next_free_mem_range(&i, nid, p_start, p_end, p_nid))
+	 *
+	 */
 	for_each_free_mem_range(i, NUMA_NO_NODE, &start, &end, NULL)
 		count += __free_memory_core(start, end);
 

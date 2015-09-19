@@ -456,8 +456,11 @@ static inline void poison_init_mem(void *s, size_t count)
 		*p++ = 0xe7fddef0;
 }
 
-static inline void
-free_memmap(unsigned long start_pfn, unsigned long end_pfn)
+/*! free_memmap()
+ * - start_pfn, end_pfn을 물리 메모리로 변환 후 빈 공간이 있을 경우 memblock_free_early 실행
+ *
+ */
+static inline void free_memmap(unsigned long start_pfn, unsigned long end_pfn)
 {
 	struct page *start_pg, *end_pg;
 	phys_addr_t pg, pgend;
@@ -485,6 +488,10 @@ free_memmap(unsigned long start_pfn, unsigned long end_pfn)
 
 /*
  * The mem_map array can get very big.  Free the unused area of the memory map.
+ */
+/*!
+ * free_unused_memmap()
+ * reserved영역 중 빈공간이 있는 부분(hole, empty space)을 제거
  */
 static void __init free_unused_memmap(struct meminfo *mi)
 {
@@ -610,6 +617,7 @@ void __init mem_init(void)
 
 	/* this will put all unused low memory onto the freelists */
 	free_unused_memmap(&meminfo);
+	/*! bootmem.c가 아닌 nobootmem.c로 들어감 */
 	free_all_bootmem();
 
 #ifdef CONFIG_SA1111

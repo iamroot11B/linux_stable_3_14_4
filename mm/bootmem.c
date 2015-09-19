@@ -259,10 +259,20 @@ static inline void __init reset_node_managed_pages(pg_data_t *pgdat)
 		z->managed_pages = 0;
 }
 
+/*!
+ * reset_all_zones_managed_pages()
+ * zone->managed_pages 를 0으로 만듬
+ */
 void __init reset_all_zones_managed_pages(void)
 {
 	struct pglist_data *pgdat;
 
+	/*!
+	 * #define for_each_online_pgdat(pgdat)			\
+	 * for (pgdat = first_online_pgdat();		\
+	 *    pgdat;					\
+	 *    pgdat = next_online_pgdat(pgdat))
+	 */
 	for_each_online_pgdat(pgdat)
 		reset_node_managed_pages(pgdat);
 	reset_managed_pages_done = 1;
@@ -280,6 +290,15 @@ unsigned long __init free_all_bootmem(void)
 
 	reset_all_zones_managed_pages();
 
+	/*!
+#define list_for_each_entry(pos, head, member)				\
+	for (pos = list_first_entry(head, typeof(*pos), member);	\
+	     &pos->member != (head);					\
+	     pos = list_next_entry(pos, member))
+	*****
+#define list_first_entry(ptr, type, member) \
+	list_entry((ptr)->next, type, member)
+	 */
 	list_for_each_entry(bdata, &bdata_list, list)
 		total_pages += free_all_bootmem_core(bdata);
 

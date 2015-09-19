@@ -64,6 +64,10 @@ static int __init alloc_node_page_cgroup(int nid)
 	return 0;
 }
 
+/*!
+ * page_cgroup_init_flatmem()
+ * - nid마다 페이지cgroup을 위한 메모리 할당
+ */
 void __init page_cgroup_init_flatmem(void)
 {
 

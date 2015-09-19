@@ -33,6 +33,9 @@ static int cmp_ex(const void *a, const void *b)
 	return 0;
 }
 
+/*! sort_extable()
+ * - sort
+ */
 void sort_extable(struct exception_table_entry *start,
 		  struct exception_table_entry *finish)
 {

@@ -269,6 +269,10 @@ phys_addr_t __init_memblock memblock_find_in_range(phys_addr_t start,
 					    NUMA_NO_NODE);
 }
 
+/*!
+ * memblock_remove_region()
+ * - type->regions[r+1]을 type->regions[r]로 땡김
+ */
 static void __init_memblock memblock_remove_region(struct memblock_type *type, unsigned long r)
 {
 	type->total_size -= type->regions[r].size;
@@ -637,6 +641,12 @@ int __init_memblock memblock_add(phys_addr_t base, phys_addr_t size)
  *
  * RETURNS:
  * 0 on success, -errno on failure.
+ */
+/*!
+ * memblock_isolate_range()
+ * - 주어진 memblock에서 isolated region(빈공간)을 찾음
+ * @start_rgn(out): isolated region의 시작점
+ * @end_rgn(out): isolated region의 끝
  */
 static int __init_memblock memblock_isolate_range(struct memblock_type *type,
 					phys_addr_t base, phys_addr_t size,
