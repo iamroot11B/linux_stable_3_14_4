@@ -834,6 +834,7 @@ int __init_memblock memblock_clear_hotplug(phys_addr_t base, phys_addr_t size)
  * As both region arrays are sorted, the function advances the two indices
  * in lockstep and returns each intersection.
  */
+/*! region 별로 free 영역을 out_start, out_end addr로 설정, 해당 region의 nid를 out_nid 설정 해 주고 return */
 void __init_memblock __next_free_mem_range(u64 *idx, int nid,
 					   phys_addr_t *out_start,
 					   phys_addr_t *out_end, int *out_nid)

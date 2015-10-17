@@ -464,7 +464,9 @@ static inline void set_page_order(struct page *page, int order)
 
 static inline void rmv_page_order(struct page *page)
 {
+	/*! page->_mapcount  = -1 로 설정 */
 	__ClearPageBuddy(page);
+	/*! (page)->private = 0 설정  */
 	set_page_private(page, 0);
 }
 
@@ -552,6 +554,7 @@ static inline int page_is_buddy(struct page *page, struct page *buddy,
  * -- nyc
  */
 
+/*! __free_one_page 함수 관련 참조 : http://woodz.tistory.com/category/Linux%20Kernel%20Study?page=1  */
 static inline void __free_one_page(struct page *page,
 		struct zone *zone, unsigned int order,
 		int migratetype)
@@ -569,20 +572,29 @@ static inline void __free_one_page(struct page *page,
 
 	VM_BUG_ON(migratetype == -1);
 
+	/*! page_idx : page의 page frame number를 (1<<11) - 1 와 & 연산*/
 	page_idx = page_to_pfn(page) & ((1 << MAX_ORDER) - 1);
 
 	VM_BUG_ON_PAGE(page_idx & ((1 << order) - 1), page);
 	VM_BUG_ON_PAGE(bad_range(zone, page), page);
 
+	/*! order(0) ~ MAX_ORDER(1<<32) - 1 까지 loop 수행 */
 	while (order < MAX_ORDER-1) {
+		/*! buddy_idx : buddy page frame numebr
+		 * buddy_idx는 page_idx와 1<<order 만큼 떨어져 있다.
+		 */
 		buddy_idx = __find_buddy_index(page_idx, order);
+		/*! buddy page 구조체는 앞서 구한 buddy_idx를 이용하여 구한다.  */
 		buddy = page + (buddy_idx - page_idx);
+
+		/*! 구한 page가 buddy 가 아니면 stop  */
 		if (!page_is_buddy(page, buddy, order))
 			break;
 		/*
 		 * Our buddy is free or it is CONFIG_DEBUG_PAGEALLOC guard page,
 		 * merge with it and move up one order.
 		 */
+		/*! CONFIG_DEBUG_PAGEALLOC이 not defined -> 무조건 false  */
 		if (page_is_guard(buddy)) {
 			clear_page_guard_flag(buddy);
 			set_page_private(page, 0);
@@ -593,11 +605,17 @@ static inline void __free_one_page(struct page *page,
 			zone->free_area[order].nr_free--;
 			rmv_page_order(buddy);
 		}
+		/*! combined_idx = buddy_idx 와 page_idx 중 작은 쪽  */
 		combined_idx = buddy_idx & page_idx;
+		/*! page - buddy page 중 앞에 있는 걸 새로운 page 로 설정,
+		 *  역시 앞에 있는 page 혹은 buddy page의 idx를 새로운
+		 *  page_idx로 설정 하고 order++ 해서 loop를 계속한다. */
 		page = page + (combined_idx - page_idx);
 		page_idx = combined_idx;
 		order++;
 	}
+	/*! 위 프로세스를 수행 후 가장 앞에 있는 page의 page->private
+	 *  값은 0이 아닌 order 로 설정 */
 	set_page_order(page, order);
 
 	/*
@@ -608,6 +626,10 @@ static inline void __free_one_page(struct page *page,
 	 * so it's less likely to be used soon and more likely to be merged
 	 * as a higher order page
 	 */
+	/*! 위의 프로세스를 전부 수행 했음에도 possible buddy가 남아 있을
+	 *  때는 higher_page 와 higher_buddy를 구해 보고 buddy가 성립
+	 *  하면, page->lru의 끝에 list add 해주고, 아니면 그냥 현재 list
+	 *  head 에 list add 한다  */
 	if ((order < MAX_ORDER-2) && pfn_valid_within(page_to_pfn(buddy))) {
 		struct page *higher_page, *higher_buddy;
 		combined_idx = buddy_idx & page_idx;
@@ -631,6 +653,7 @@ static inline int free_pages_check(struct page *page)
 	char *bad_reason = NULL;
 	unsigned long bad_flags = 0;
 
+	/*! 아래 bad page 조건에 걸리면 리턴 1  */
 	if (unlikely(page_mapcount(page)))
 		bad_reason = "nonzero mapcount";
 	if (unlikely(page->mapping != NULL))
@@ -647,6 +670,10 @@ static inline int free_pages_check(struct page *page)
 		bad_page(page, bad_reason, bad_flags);
 		return 1;
 	}
+
+	/*! bad page가 아니면 page->flags의 LAST_CPUPID를 clear.
+	 * PAGE_FLAGS_CHECK_AT_PREP 가 set 돼 있으면 역시 clear
+	 */
 	page_cpupid_reset_last(page);
 	if (page->flags & PAGE_FLAGS_CHECK_AT_PREP)
 		page->flags &= ~PAGE_FLAGS_CHECK_AT_PREP;
@@ -724,6 +751,7 @@ static void free_one_page(struct zone *zone, struct page *page, int order,
 
 	__free_one_page(page, zone, order, migratetype);
 	if (unlikely(!is_migrate_isolate(migratetype)))
+		/*! migratetype가 isolate migrate이 아니면 아래 수행   */
 		__mod_zone_freepage_state(zone, 1 << order, migratetype);
 	spin_unlock(&zone->lock);
 }
@@ -736,6 +764,7 @@ static bool free_pages_prepare(struct page *page, unsigned int order)
 	trace_mm_page_free(page, order);
 	kmemcheck_free_shadow(page, order);
 
+	/*! free_pages_check() 를 통해 해당 page가 bad page 이면 false 리턴*/
 	if (PageAnon(page))
 		page->mapping = NULL;
 	for (i = 0; i < (1 << order); i++)
@@ -744,12 +773,17 @@ static bool free_pages_prepare(struct page *page, unsigned int order)
 		return false;
 
 	if (!PageHighMem(page)) {
+		/*! page가 hige mem 이면 아래 수행.
+		 * CONFIG_LOCKDEP이 not defined 라 수행하는 일 없음.
+		 */
 		debug_check_no_locks_freed(page_address(page),
 					   PAGE_SIZE << order);
 		debug_check_no_obj_freed(page_address(page),
 					   PAGE_SIZE << order);
 	}
+	/*! arch_free_page : 하는 일 없음  */
 	arch_free_page(page, order);
+	/*! CONFIG_DEBUG_PAGEALLOC 이 not defined 라 하는 일 없음.  */
 	kernel_map_pages(page, 1 << order, 0);
 
 	return true;
@@ -777,16 +811,31 @@ void __init __free_pages_bootmem(struct page *page, unsigned int order)
 	struct page *p = page;
 	unsigned int loop;
 
+	/*! prefetchw 참조 : https://kldp.org/node/43473
+	 *  메모리상의 데이터를 캐시에 올려 놓는 명령어
+	 */
 	prefetchw(p);
+
+	/*! loop를 돌면서 다음 Page 를 먼저 prefetch 해주고, 현재 page를 __ClearPageReserved 해 준다
+	 *  마지막으로 page->_count 값을 0으로 바꿔 준다.
+	 */
 	for (loop = 0; loop < (nr_pages - 1); loop++, p++) {
 		prefetchw(p + 1);
+		/*! __ClearPageReserved : page-flags.h에서 매크로로 생성하는 inline 함수
+		 * page->flag 에서 PG_reserved - 10 (enum) 번째 bit 를 clear 해 준다.
+		 */
 		__ClearPageReserved(p);
+		/*! page->_count = 0으로 설정
+		 *  (page->_count : Usage count)
+		 */
 		set_page_count(p, 0);
 	}
 	__ClearPageReserved(p);
 	set_page_count(p, 0);
 
+	/*! 위 과정으로 clear 된 page를 managed_pages 에 포함 시켜 준다.  */
 	page_zone(page)->managed_pages += nr_pages;
+	/*! page(start 주소)의 page->_count = 1 로 설정 */
 	set_page_refcounted(page);
 	__free_pages(page, order);
 }
@@ -1395,6 +1444,11 @@ void free_hot_cold_page(struct page *page, int cold)
 		migratetype = MIGRATE_MOVABLE;
 	}
 
+	/*! 모기향 책 376p 참조
+	 * pcp 에 cpu 페이지 리스트(zone->pageset->pcp)를 얻어 온 후,
+	 * cold page 일 경우 페이지 리스트의 tail 에 추가,
+	 * hot page 일 경우 해당 페이지 리스트의 바로 다음에 추가 해 준다.
+	 */
 	pcp = &this_cpu_ptr(zone->pageset)->pcp;
 	if (cold)
 		list_add_tail(&page->lru, &pcp->lists[migratetype]);
@@ -2847,6 +2901,9 @@ EXPORT_SYMBOL(get_zeroed_page);
 
 void __free_pages(struct page *page, unsigned int order)
 {
+	/*! put_page_testzero : page->_count 를 1 감소 시키면 0이 될 때(현재 값이 1일때)
+	 *  해당 page 를 free 한다.
+	 */
 	if (put_page_testzero(page)) {
 		if (order == 0)
 			free_hot_cold_page(page, 0);
@@ -5698,8 +5755,11 @@ EXPORT_SYMBOL(free_reserved_area);
 void free_highmem_page(struct page *page)
 {
 	__free_reserved_page(page);
+	/*! free_all_bootmem 과 마찬가지로 totalram_pages++ 과
+	 *  page_zone(page)->managed_pages++ 수행  */
 	totalram_pages++;
 	page_zone(page)->managed_pages++;
+	/*! high mem free 과정에서는 totalhigh_pages++ 가 추가로 수행 됨  */
 	totalhigh_pages++;
 }
 #endif

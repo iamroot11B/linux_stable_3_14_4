@@ -1602,8 +1602,13 @@ extern void mem_init_print_info(const char *str);
 /* Free the reserved page into the buddy system, so it gets managed. */
 static inline void __free_reserved_page(struct page *page)
 {
+	/*! page-flags.h 에서 매크로를 통해 생성되는 inline 함수
+	 *  page->flag 에서 PG_reserved(10) 번째 bit를 clear
+	 */
 	ClearPageReserved(page);
+	/*! page->_count 를 1로 설정  */
 	init_page_count(page);
+	/*! __free_pages로 연결되며, 이후는 free_all_bootmem에서와 동일하다  */
 	__free_page(page);
 }
 

@@ -87,13 +87,18 @@ static void __init __free_pages_memory(unsigned long start, unsigned long end)
 	int order;
 
 	while (start < end) {
+		/*! order = start(pfn) 이 2의 몇 승수인지 구하고, 
+		 *  start + 2^order 가 end(pfn)를 안 넘어갈 때 까지 order를 줄여준다.
+		 */
 		order = min(MAX_ORDER - 1UL, __ffs(start));
 
 		while (start + (1UL << order) > end)
 			order--;
 
+		/*! 위 과정으로 구한 start pfn 의 주소와 order 값 전달  */
 		__free_pages_bootmem(pfn_to_page(start), order);
 
+		/*! start(pfn) 은 start(pfn) += 2의승수 식으로 증가  */
 		start += (1UL << order);
 	}
 }
@@ -128,9 +133,10 @@ static unsigned long __init free_low_memory_core_early(void)
 	     __next_free_mem_range(&i, nid, p_start, p_end, p_nid))
 	 *
 	 */
+	/*! 2015.10.17 study start */
 	for_each_free_mem_range(i, NUMA_NO_NODE, &start, &end, NULL)
 		count += __free_memory_core(start, end);
-
+	/*! CONFIG_ARCH_DISCARD_MEMBLOCK not defined  */
 #ifdef CONFIG_ARCH_DISCARD_MEMBLOCK
 	{
 		phys_addr_t size;
@@ -147,6 +153,7 @@ static unsigned long __init free_low_memory_core_early(void)
 	}
 #endif
 
+	/*! count = 각 region 별로 free영역의 page 갯수(end_pfn - start_pfn)의 합 */
 	return count;
 }
 
@@ -187,6 +194,7 @@ unsigned long __init free_all_bootmem(void)
 	 *  because in some case like Node0 doesn't have RAM installed
 	 *  low ram will be on Node1
 	 */
+	/*! pages = 각 region 별로 free영역의 page 갯수(end_pfn - start_pfn)의 합 */
 	pages = free_low_memory_core_early();
 	totalram_pages += pages;
 

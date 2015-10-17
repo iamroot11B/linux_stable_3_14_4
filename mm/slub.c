@@ -3626,6 +3626,7 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 	return s;
 }
 
+/*! from 'mm_init'  */
 void __init kmem_cache_init(void)
 {
 	static __initdata struct kmem_cache boot_kmem_cache,
@@ -3640,6 +3641,7 @@ void __init kmem_cache_init(void)
 	create_boot_cache(kmem_cache_node, "kmem_cache_node",
 		sizeof(struct kmem_cache_node), SLAB_HWCACHE_ALIGN);
 
+	/*! CONFIG_MEMORY_HOTPLUG가 define 안 돼있으면(우리는 안 되어 있음) do nothing.  */
 	register_hotmemory_notifier(&slab_memory_callback_nb);
 
 	/* Able to allocate the per node structures */

@@ -559,7 +559,12 @@ static void __init free_highpages(void)
 	struct memblock_region *mem, *res;
 
 	/* set highmem page free */
+	/*! memblock.memory.cnt 값 만큼 loop 수행.
+	 *  mem = memblock.memory.regions으로 시작해서 mem++ 수행
+	 *  memblock 구조체 : memory-전체 메모리, reserved-reserved 메모리들의 집합
+	 */
 	for_each_memblock(memory, mem) {
+		/*! 전체 memory 중 high mem에 속하는 region들만 선택하여 그 region의 start, end pfn을 가지고 loop 수행  */
 		unsigned long start = memblock_region_memory_base_pfn(mem);
 		unsigned long end = memblock_region_memory_end_pfn(mem);
 
@@ -572,21 +577,31 @@ static void __init free_highpages(void)
 			start = max_low;
 
 		/* Find and exclude any reserved regions */
+		/*! memblock.reserved.cnt 만큼 loop 수행.
+		 *  res = mem_block.reserved.regions를 시작으로 각 loop 단계마다 res++   */
 		for_each_memblock(reserved, res) {
 			unsigned long res_start, res_end;
 
+			/*! memblock.reserved region의 start, end pfn을 구해서 아래 loop 수행  */
 			res_start = memblock_region_reserved_base_pfn(res);
 			res_end = memblock_region_reserved_end_pfn(res);
 
 			if (res_end < start)
 				continue;
+			/*! 아래 4 if 문을 통해 reserved region의 start, end가
+			 * 상위 loop에서 구한 memblock.memory.regions의 start,end 범위 밖이면,
+			 * reserved.region의 start,end 를 memory.region의 start,end 범위 안으로 재 설정
+			 */
 			if (res_start < start)
 				res_start = start;
 			if (res_start > end)
 				res_start = end;
 			if (res_end > end)
 				res_end = end;
+
+			/*! reserved start가 memory start와 같지 않다면 free 수행 */
 			if (res_start != start)
+				/*! memory.region 의 start 부터 memory.reserved의 start 까지를 free 수행 */
 				free_area_high(start, res_start);
 			start = res_end;
 			if (start == end)
@@ -620,6 +635,7 @@ void __init mem_init(void)
 	/*! bootmem.c가 아닌 nobootmem.c로 들어감 */
 	free_all_bootmem();
 
+	/*! CONFIG_SA1111 not defined  */
 #ifdef CONFIG_SA1111
 	/* now that our DMA memory is actually so designated, we can free it */
 	free_reserved_area(__va(PHYS_OFFSET), swapper_pg_dir, -1, NULL);
@@ -627,6 +643,7 @@ void __init mem_init(void)
 
 	free_highpages();
 
+	/*! 아래는 debug print  */
 	mem_init_print_info(NULL);
 
 #define MLK(b, t) b, t, ((t) - (b)) >> 10
