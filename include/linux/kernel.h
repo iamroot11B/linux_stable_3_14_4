@@ -45,7 +45,11 @@
 #define STACK_MAGIC	0xdeadbeef
 
 #define REPEAT_BYTE(x)	((~0ul / 0xff) * (x))
-
+/*! x 를 a 단위로 align
+ * ex.  x=7, a=8 => 8.
+ *      x=9, a=8 => 16
+ */
+/*! 2015.10.24 study -ing */
 #define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
 #define __ALIGN_MASK(x, mask)	__ALIGN_KERNEL_MASK((x), (mask))
 #define PTR_ALIGN(p, a)		((typeof(p))ALIGN((unsigned long)(p), (a)))

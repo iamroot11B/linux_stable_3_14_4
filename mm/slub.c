@@ -114,6 +114,7 @@
  * 			the fast path and disables lockless freelists.
  */
 
+/*! 2015.10.24 study -ing */
 static inline int kmem_cache_debug(struct kmem_cache *s)
 {
 #ifdef CONFIG_SLUB_DEBUG
@@ -123,6 +124,7 @@ static inline int kmem_cache_debug(struct kmem_cache *s)
 #endif
 }
 
+/*! 2015.10.24 study -ing */
 static inline bool kmem_cache_has_cpu_partial(struct kmem_cache *s)
 {
 #ifdef CONFIG_SLUB_CPU_PARTIAL
@@ -317,11 +319,13 @@ static inline size_t slab_ksize(const struct kmem_cache *s)
 	return s->size;
 }
 
+/*! 2015.10.24 study -ing */
 static inline int order_objects(int order, unsigned long size, int reserved)
 {
 	return ((PAGE_SIZE << order) - reserved) / size;
 }
 
+/*! 2015.10.24 study -ing */
 static inline struct kmem_cache_order_objects oo_make(int order,
 		unsigned long size, int reserved)
 {
@@ -337,8 +341,10 @@ static inline int oo_order(struct kmem_cache_order_objects x)
 	return x.x >> OO_SHIFT;
 }
 
+/*! 2015.10.24 study -ing */
 static inline int oo_objects(struct kmem_cache_order_objects x)
 {
+    /*! OO_MASK = 0xFFFF  */
 	return x.x & OO_MASK;
 }
 
@@ -1232,6 +1238,8 @@ out:
 
 __setup("slub_debug", setup_slub_debug);
 
+/*! 2015.10.24 study -ing */
+/*! CONFIG_SLUB_DEBUG 가 define 되어 있어서 아래 함수가 선택 됨  */
 static unsigned long kmem_cache_flags(unsigned long object_size,
 	unsigned long flags, const char *name,
 	void (*ctor)(void *))
@@ -1239,6 +1247,7 @@ static unsigned long kmem_cache_flags(unsigned long object_size,
 	/*
 	 * Enable debugging if selected on the kernel commandline.
 	 */
+    /*! slub_debug = DEBUG_DEFAULT_FLAGS;  */
 	if (slub_debug && (!slub_debug_slabs || (name &&
 		!strncmp(slub_debug_slabs, name, strlen(slub_debug_slabs)))))
 		flags |= slub_debug;
@@ -2760,6 +2769,7 @@ static int slub_nomerge;
  * requested a higher mininum order then we start with that one instead of
  * the smallest order which will fit the object.
  */
+/*! 2015.10.24 study -ing */
 static inline int slab_order(int size, int min_objects,
 				int max_order, int fract_leftover, int reserved)
 {
@@ -2768,6 +2778,9 @@ static inline int slab_order(int size, int min_objects,
 	int min_order = slub_min_order;
 
 	if (order_objects(min_order, size, reserved) > MAX_OBJS_PER_PAGE)
+        /*! 위 if 만족 시,
+         * get_order(2**6 * 2**15) = 21
+         * 21 - 1 = 20. return 20 */
 		return get_order(size * MAX_OBJS_PER_PAGE) - 1;
 
 	for (order = max(min_order,
@@ -2789,6 +2802,7 @@ static inline int slab_order(int size, int min_objects,
 	return order;
 }
 
+/*! 2015.10.24 study -ing */
 static inline int calculate_order(int size, int reserved)
 {
 	int order;
@@ -2807,6 +2821,9 @@ static inline int calculate_order(int size, int reserved)
 	min_objects = slub_min_objects;
 	if (!min_objects)
 		min_objects = 4 * (fls(nr_cpu_ids) + 1);
+    /*! slub_max_order = PAGE_ALLOC_COSTLY_ORDER = 3
+     * kernel command line 에 "slub_max_order=" 값이 없다면 default 값이 3
+     */
 	max_objects = order_objects(slub_max_order, size, reserved);
 	min_objects = min(min_objects, max_objects);
 
@@ -2883,6 +2900,8 @@ static struct kmem_cache *kmem_cache_node;
  * when allocating for the kmem_cache_node. This is used for bootstrapping
  * memory on a fresh node that has no slab structures yet.
  */
+/*! node = 1(UMA) */
+/*! 2015.10.24 study -ing */
 static void early_kmem_cache_node_alloc(int node)
 {
 	struct page *page;
@@ -2890,6 +2909,7 @@ static void early_kmem_cache_node_alloc(int node)
 
 	BUG_ON(kmem_cache_node->size < sizeof(struct kmem_cache_node));
 
+    /*! 2015.10.24 study end */
 	page = new_slab(kmem_cache_node, GFP_NOWAIT, node);
 
 	BUG_ON(!page);
@@ -2934,6 +2954,7 @@ static void free_kmem_cache_nodes(struct kmem_cache *s)
 	}
 }
 
+/*! 2015.10.24 study -ing */
 static int init_kmem_cache_nodes(struct kmem_cache *s)
 {
 	int node;
@@ -2959,8 +2980,10 @@ static int init_kmem_cache_nodes(struct kmem_cache *s)
 	return 1;
 }
 
+/*! 2015.10.24 study -ing */
 static void set_min_partial(struct kmem_cache *s, unsigned long min)
 {
+    /*! min 값은 5 ~ 10 에서 결정된다 */
 	if (min < MIN_PARTIAL)
 		min = MIN_PARTIAL;
 	else if (min > MAX_PARTIAL)
@@ -2972,6 +2995,7 @@ static void set_min_partial(struct kmem_cache *s, unsigned long min)
  * calculate_sizes() determines the order and the distribution of data within
  * a slab object.
  */
+/*! 2015.10.24 study -ing */
 static int calculate_sizes(struct kmem_cache *s, int forced_order)
 {
 	unsigned long flags = s->flags;
@@ -2983,6 +3007,7 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	 * place the free pointer at word boundaries and this determines
 	 * the possible location of the free pointer.
 	 */
+    /*! size = sizeof(struct kmem_cache_node)  */
 	size = ALIGN(size, sizeof(void *));
 
 #ifdef CONFIG_SLUB_DEBUG
@@ -3051,11 +3076,14 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	 * offset 0. In order to align the objects we have to simply size
 	 * each object to conform to the alignment.
 	 */
+    /*! 우리 s->align = 64  */
 	size = ALIGN(size, s->align);
 	s->size = size;
+    /*! forced_order = -1  */
 	if (forced_order >= 0)
 		order = forced_order;
 	else
+        /*! order는 slub_max_oder=3 보다 작거나 값은 값  */
 		order = calculate_order(size, s->reserved);
 
 	if (order < 0)
@@ -3065,6 +3093,7 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	if (order)
 		s->allocflags |= __GFP_COMP;
 
+    /*! s->allocflags의 s->flas에서 해당하는 flags 들을 set 해준다.   */
 	if (s->flags & SLAB_CACHE_DMA)
 		s->allocflags |= GFP_DMA;
 
@@ -3074,6 +3103,7 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	/*
 	 * Determine the number of objects per slab
 	 */
+    /*! oo_make 의 return은 struct kmem_cache_order_objects */
 	s->oo = oo_make(order, size, s->reserved);
 	s->min = oo_make(get_order(size), size, s->reserved);
 	if (oo_objects(s->oo) > oo_objects(s->max))
@@ -3082,16 +3112,19 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	return !!oo_objects(s->oo);
 }
 
+/*! 2015.10.24 study -ing */
 static int kmem_cache_open(struct kmem_cache *s, unsigned long flags)
 {
 	s->flags = kmem_cache_flags(s->size, flags, s->name, s->ctor);
 	s->reserved = 0;
 
+    /*! SLAB_DESTROY_BY_RCU	= 0x00080000UL  */
 	if (need_reserve_slab_rcu && (s->flags & SLAB_DESTROY_BY_RCU))
 		s->reserved = sizeof(struct rcu_head);
 
 	if (!calculate_sizes(s, -1))
 		goto error;
+    /*! disable_higher_order_debug = 0  */
 	if (disable_higher_order_debug) {
 		/*
 		 * Disable debugging flags that store metadata if the min slab
@@ -3135,6 +3168,7 @@ static int kmem_cache_open(struct kmem_cache *s, unsigned long flags)
 	 *    per node list when we run out of per cpu objects. We only fetch
 	 *    50% to keep some capacity around for frees.
 	 */
+    /*! kmem_cache_has_cpu_partial = (likely)1  */
 	if (!kmem_cache_has_cpu_partial(s))
 		s->cpu_partial = 0;
 	else if (s->size >= PAGE_SIZE)
@@ -3626,6 +3660,7 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 	return s;
 }
 
+/*! 2015.10.24 study -ing */
 /*! from 'mm_init'  */
 void __init kmem_cache_init(void)
 {
@@ -3769,6 +3804,7 @@ __kmem_cache_alias(struct mem_cgroup *memcg, const char *name, size_t size,
 	return s;
 }
 
+/*! 2015.10.24 study -ing */
 int __kmem_cache_create(struct kmem_cache *s, unsigned long flags)
 {
 	int err;

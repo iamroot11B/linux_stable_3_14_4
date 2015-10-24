@@ -116,6 +116,7 @@ out:
  * Figure out what the alignment of the objects will be given a set of
  * flags, a user specified alignment and the size of the objects.
  */
+/*! 2015.10.24 study -ing */
 unsigned long calculate_alignment(unsigned long flags,
 		unsigned long align, unsigned long size)
 {
@@ -127,15 +128,22 @@ unsigned long calculate_alignment(unsigned long flags,
 	 * alignment though. If that is greater then use it.
 	 */
 	if (flags & SLAB_HWCACHE_ALIGN) {
+        /*! cache_line_size() = L1_CACHE_BYTES = 1<<6 = 64(0x40)  */
 		unsigned long ralign = cache_line_size();
+        /*! 아래 while문의 결과로 ralign은 size 보다 작거나 같은
+         *  2의 승수 배의 숫자가 구해진다.
+         */
 		while (size <= ralign / 2)
 			ralign /= 2;
 		align = max(align, ralign);
 	}
 
+    /*! ARCH_SLAB_MINALIGN = 8 */
 	if (align < ARCH_SLAB_MINALIGN)
 		align = ARCH_SLAB_MINALIGN;
 
+    /*! sizeof(void *) = 32bit : 4 , 64bit : 8
+     * ALIGN(...) = 64 */
 	return ALIGN(align, sizeof(void *));
 }
 
@@ -312,6 +320,13 @@ int slab_is_available(void)
 
 #ifndef CONFIG_SLOB
 /* Create a cache during boot when no slab services are available yet */
+/*! from kmem_cache_init()
+ * 	args = (kmem_cache_node,
+ *      "kmem_cache_node",
+ *      sizeof(struct kmem_cache_node),
+ *      SLAB_HWCACHE_ALIGN(=0x00002000UL) )
+ */
+/*! 2015.10.24 study -ing */
 void __init create_boot_cache(struct kmem_cache *s, const char *name, size_t size,
 		unsigned long flags)
 {
@@ -319,6 +334,9 @@ void __init create_boot_cache(struct kmem_cache *s, const char *name, size_t siz
 
 	s->name = name;
 	s->size = s->object_size = size;
+    /*! ARCH_KMALLOC_MINALIGN = ARCH_DMA_MINALIGN = L1_CACHE_BYTES =
+     *      (1 << L1_CACHE_SHIFT) =  1 << CONFIG_ARM_L1_CACHE_SHIFT
+     *      = 1<<6 = 64(0x40) */
 	s->align = calculate_alignment(flags, ARCH_KMALLOC_MINALIGN, size);
 	err = __kmem_cache_create(s, flags);
 

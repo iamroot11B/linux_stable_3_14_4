@@ -524,9 +524,12 @@ static void __init mm_init(void)
 	 * bigger than MAX_ORDER unless SPARSEMEM.
 	 */
 	page_cgroup_init_flatmem();
+    /*! 버디할당  */
 	mem_init();
 	/*! 2015.10.17 study end  */
 	/*! mm/slub.c 로 jump 함 */
+    /*! 2015.10.24 study start  */
+    /*! 슬랩할당  */
 	kmem_cache_init();
 	percpu_init_late();
 	pgtable_init();
