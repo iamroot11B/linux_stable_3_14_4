@@ -1247,7 +1247,7 @@ static unsigned long kmem_cache_flags(unsigned long object_size,
 	/*
 	 * Enable debugging if selected on the kernel commandline.
 	 */
-    /*! slub_debug = DEBUG_DEFAULT_FLAGS;  */
+    /*! slub_debug = 0 (CONFIG_SLUB_DEBUG_ON not defined)  */
 	if (slub_debug && (!slub_debug_slabs || (name &&
 		!strncmp(slub_debug_slabs, name, strlen(slub_debug_slabs)))))
 		flags |= slub_debug;
@@ -2818,9 +2818,11 @@ static inline int calculate_order(int size, int reserved)
 	 * First we reduce the acceptable waste in a slab. Then
 	 * we reduce the minimum objects required in a slab.
 	 */
+	/*! slub_min_objects = 0  */
 	min_objects = slub_min_objects;
 	if (!min_objects)
 		min_objects = 4 * (fls(nr_cpu_ids) + 1);
+	/*! min_objects = 4 * (4 + 1) = 20  */
     /*! slub_max_order = PAGE_ALLOC_COSTLY_ORDER = 3
      * kernel command line 에 "slub_max_order=" 값이 없다면 default 값이 3
      */
@@ -2998,7 +3000,9 @@ static void set_min_partial(struct kmem_cache *s, unsigned long min)
 /*! 2015.10.24 study -ing */
 static int calculate_sizes(struct kmem_cache *s, int forced_order)
 {
+	/*! s->flags = 0x2000  */
 	unsigned long flags = s->flags;
+	/*! s->object_size = sizeof(struct kmem_cache_node)  */
 	unsigned long size = s->object_size;
 	int order;
 
@@ -3036,8 +3040,12 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	 * With that we have determined the number of bytes in actual use
 	 * by the object. This is the potential offset to the free pointer.
 	 */
+	/*! size = sizeof(struct kmem_cache_node)  */
 	s->inuse = size;
 
+	/*! flags = s->flags = 0x2000 => (0x2000 & (0x800 | 0x800)) || 0 = 0
+	 *  아래 if 문 수행 안함
+	 */
 	if (((flags & (SLAB_DESTROY_BY_RCU | SLAB_POISON)) ||
 		s->ctor)) {
 		/*
@@ -3076,35 +3084,54 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	 * offset 0. In order to align the objects we have to simply size
 	 * each object to conform to the alignment.
 	 */
-    /*! 우리 s->align = 64  */
+    /*! 우리 s->align = 64 */
 	size = ALIGN(size, s->align);
 	s->size = size;
     /*! forced_order = -1  */
+
 	if (forced_order >= 0)
 		order = forced_order;
 	else
-        /*! order는 slub_max_oder=3 보다 작거나 값은 값  */
+        /*! order는 slub_max_oder=3 보다 작거나 값은 값
+		 * 혹은, MAX_ORDER = 11 보다 작은 값 (아니면 음수->에러)
+		 */
 		order = calculate_order(size, s->reserved);
-
+	/*! 아래 return 0으로 return 시, error.  */
 	if (order < 0)
 		return 0;
 
 	s->allocflags = 0;
+
+	/*! __GFP_COMP = 0x4000u  */
 	if (order)
 		s->allocflags |= __GFP_COMP;
 
-    /*! s->allocflags의 s->flas에서 해당하는 flags 들을 set 해준다.   */
+    /*! s->allocflags의 s->flas에서 해당하는 flags 들을 set 해준다.
+	 * s->flags = 0x2000 , SLAB_CACHE_DMA = 0x4000 => 아래 if 수행 안 함
+	 */
 	if (s->flags & SLAB_CACHE_DMA)
 		s->allocflags |= GFP_DMA;
 
+	/*! s->flags = 0x2000 , SLAB_CACHE_DMA = 0x2000 => 아래 if 수행 함 
+	 * #define ___GFP_RECLAIMABLE	0x80000u
+	 */
 	if (s->flags & SLAB_RECLAIM_ACCOUNT)
 		s->allocflags |= __GFP_RECLAIMABLE;
 
+	/*! 최종 s->allocflags = 0x80000u (__GFP_RECLAIMABLE) */
 	/*
 	 * Determine the number of objects per slab
 	 */
-    /*! oo_make 의 return은 struct kmem_cache_order_objects */
+    /*! size = 64
+	 * oo_make 의 return은 struct kmem_cache_order_objects {unsigned long x;}
+	 * 1) order = 1 : x = 0x12000
+	 * 2) order = 2 : x = 0x24000
+	 * 3) order = 3 : x = 0x34000
+	 */
 	s->oo = oo_make(order, size, s->reserved);
+	/*! size = 64, get_order(64) = 6
+	 * oo_make(6, 64, 0) = {x = 0xa0000}
+	 */	
 	s->min = oo_make(get_order(size), size, s->reserved);
 	if (oo_objects(s->oo) > oo_objects(s->max))
 		s->max = s->oo;
@@ -3113,18 +3140,23 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 }
 
 /*! 2015.10.24 study -ing */
+/*! flags = SLAB_HWCACHE_ALIGN	0x00002000UL  */
 static int kmem_cache_open(struct kmem_cache *s, unsigned long flags)
 {
+	/*! kmem_cache_flags return값은 flags 그대로.(0x2000) */
 	s->flags = kmem_cache_flags(s->size, flags, s->name, s->ctor);
 	s->reserved = 0;
 
-    /*! SLAB_DESTROY_BY_RCU	= 0x00080000UL  */
+    /*! SLAB_DESTROY_BY_RCU	= 0x00080000UL.
+	 * 0x2000 & 0x8000 = 0 -> if문 수행 안 함
+	 */
 	if (need_reserve_slab_rcu && (s->flags & SLAB_DESTROY_BY_RCU))
 		s->reserved = sizeof(struct rcu_head);
 
 	if (!calculate_sizes(s, -1))
 		goto error;
-    /*! disable_higher_order_debug = 0  */
+
+	/*! disable_higher_order_debug = 0  */
 	if (disable_higher_order_debug) {
 		/*
 		 * Disable debugging flags that store metadata if the min slab

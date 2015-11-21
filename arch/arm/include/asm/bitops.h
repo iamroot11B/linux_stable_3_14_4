@@ -276,6 +276,9 @@ static inline unsigned int __clz(unsigned int x)
  * fls() returns zero if the input is zero, otherwise returns the bit
  * position of the last set bit, where the LSB is 1 and MSB is 32.
  */
+/*! LSB에서 MSB로 가면서 마지막으로 1로 set된 bit 위치까지의 bit갯수
+ * fls(0x0100) = 3
+ */
 static inline int fls(int x)
 {
     /*!
