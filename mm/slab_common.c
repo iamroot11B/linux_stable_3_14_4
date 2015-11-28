@@ -332,6 +332,7 @@ void __init create_boot_cache(struct kmem_cache *s, const char *name, size_t siz
 {
 	int err;
 
+	idbg1("name : %s, size : %d\n",name,size);
 	s->name = name;
 	s->size = s->object_size = size;
     /*! ARCH_KMALLOC_MINALIGN = ARCH_DMA_MINALIGN = L1_CACHE_BYTES =

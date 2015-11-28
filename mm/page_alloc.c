@@ -945,10 +945,16 @@ static int prep_new_page(struct page *page, int order, gfp_t gfp_flags)
 			return 1;
 	}
 
+	/*! page->private 을 0 로 설정  */
 	set_page_private(page, 0);
+
+	/*! atmoic 변수인 page->_count를 1로 설정 */
 	set_page_refcounted(page);
 
+	/*! ARM core에서는 do nothing */
 	arch_alloc_page(page, order);
+
+	/*! do nothing */
 	kernel_map_pages(page, 1 << order, 1);
 
 	if (gfp_flags & __GFP_ZERO)
@@ -1637,6 +1643,8 @@ again:
 	__mod_zone_page_state(zone, NR_ALLOC_BATCH, -(1 << order));
 
 	__count_zone_vm_events(PGALLOC, zone, 1 << order);
+
+	/*! CONFIG_NUMA define 안 돼 있으면, do nothing  */
 	zone_statistics(preferred_zone, zone, gfp_flags);
 	local_irq_restore(flags);
 
@@ -1734,6 +1742,7 @@ static inline bool should_fail_alloc_page(gfp_t gfp_mask, unsigned int order)
 static bool __zone_watermark_ok(struct zone *z, int order, unsigned long mark,
 		      int classzone_idx, int alloc_flags, long free_pages)
 {
+	/*! 2015.11.28 study end */
 	/* free_pages my go negative - that's OK */
 	long min = mark;
 	long lowmem_reserve = z->lowmem_reserve[classzone_idx];
@@ -1963,6 +1972,9 @@ static inline void init_zone_allows_reclaim(int nid)
  * get_page_from_freelist goes through the zonelist trying to allocate
  * a page.
  */
+/*! From __alloc_pages_nodemask().
+ * alloc_flags = ALLOC_WMARK_LOW|ALLOC_CPUSET|ALLOC_FAIR  
+ */
 static struct page *
 get_page_from_freelist(gfp_t gfp_mask, nodemask_t *nodemask, unsigned int order,
 		struct zonelist *zonelist, int high_zoneidx, int alloc_flags,
@@ -1986,6 +1998,7 @@ zonelist_scan:
 						high_zoneidx, nodemask) {
 		unsigned long mark;
 
+		/*! CONFIG_NUMA 가 define 안 되어 있을때, 아래 두 if문은 모두 false  */
 		if (IS_ENABLED(CONFIG_NUMA) && zlc_active &&
 			!zlc_zone_worth_trying(zonelist, z, allowednodes))
 				continue;
@@ -2107,6 +2120,7 @@ this_zone_full:
 			zlc_mark_zone_full(zonelist, z);
 	}
 
+	/*! 우리는 CONFIG_NUMA not defined  */
 	if (unlikely(IS_ENABLED(CONFIG_NUMA) && page == NULL && zlc_active)) {
 		/* Disable zlc cache for second zonelist scan */
 		zlc_active = 0;
@@ -2821,6 +2835,9 @@ retry_cpuset:
 retry:
 	/* First allocation attempt */
 	/*! 2015-09-12. 아래 get_page_from_freelist는 간략히 살펴 봄 */
+	/*! 2015-11-28
+	 * order =0, gfp_mask != ALLOC_NO_WATERMARKS, 조건으로 get_page_from_freelist 함수 확인
+	 */
 	page = get_page_from_freelist(gfp_mask|__GFP_HARDWALL, nodemask, order,
 			zonelist, high_zoneidx, alloc_flags,
 			preferred_zone, migratetype);
@@ -2862,7 +2879,9 @@ out:
 	 * the mask is being updated. If a page allocation is about to fail,
 	 * check if the cpuset changed during allocation and if so, retry.
 	 */
-	/*! CONFIG_CPUSET not defined. -> Do nothing */
+	/*! CONFIG_CPUSETS not defined. -> Do nothing
+	 *  151128. VEXPRESS에서는 CONFIG_CPUSETS set 됨 
+	 */
 	if (unlikely(!put_mems_allowed(cpuset_mems_cookie) && !page))
 		goto retry_cpuset;
 

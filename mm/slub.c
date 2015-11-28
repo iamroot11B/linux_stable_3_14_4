@@ -320,6 +320,7 @@ static inline size_t slab_ksize(const struct kmem_cache *s)
 }
 
 /*! 2015.10.24 study -ing */
+/*! 가능한 order_objects 갯수  */
 static inline int order_objects(int order, unsigned long size, int reserved)
 {
 	return ((PAGE_SIZE << order) - reserved) / size;
@@ -1322,6 +1323,9 @@ static inline void slab_free_hook(struct kmem_cache *s, void *x)
 /*
  * Slab allocation and freeing
  */
+/*! from early_kmem_cache_node_alloc().
+ *  alloc_gfp = 0x1200, node = 0, oo.x = 64
+ */
 static inline struct page *alloc_slab_page(gfp_t flags, int node,
 					struct kmem_cache_order_objects oo)
 {
@@ -1354,6 +1358,10 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
 	 */
 	alloc_gfp = (flags | __GFP_NOWARN | __GFP_NORETRY) & ~__GFP_NOFAIL;
 
+	/*! from early_kmem_cache_node_alloc().
+	 *  alloc_gfp = 0x1200, node = 0, oo.x = 64
+	 */
+	/*! slab을 위한 page alloc  */
 	page = alloc_slab_page(alloc_gfp, node, oo);
 	if (unlikely(!page)) {
 		oo = s->min;
@@ -2902,7 +2910,7 @@ static struct kmem_cache *kmem_cache_node;
  * when allocating for the kmem_cache_node. This is used for bootstrapping
  * memory on a fresh node that has no slab structures yet.
  */
-/*! node = 1(UMA) */
+/*! node = 0(갯수가 1 - UMA) */
 /*! 2015.10.24 study -ing */
 static void early_kmem_cache_node_alloc(int node)
 {
@@ -2961,9 +2969,11 @@ static int init_kmem_cache_nodes(struct kmem_cache *s)
 {
 	int node;
 
+	/*! 우리는 MAX_NODE 1  */
 	for_each_node_state(node, N_NORMAL_MEMORY) {
 		struct kmem_cache_node *n;
 
+		/*! slab_state = default 0 으로, 아래 if 문 수행 후 for문 종료 */
 		if (slab_state == DOWN) {
 			early_kmem_cache_node_alloc(node);
 			continue;
@@ -2985,12 +2995,14 @@ static int init_kmem_cache_nodes(struct kmem_cache *s)
 /*! 2015.10.24 study -ing */
 static void set_min_partial(struct kmem_cache *s, unsigned long min)
 {
-    /*! min 값은 5 ~ 10 에서 결정된다 */
+    /*! min 값은 5 */
 	if (min < MIN_PARTIAL)
 		min = MIN_PARTIAL;
 	else if (min > MAX_PARTIAL)
 		min = MAX_PARTIAL;
+
 	s->min_partial = min;
+
 }
 
 /*
@@ -3129,13 +3141,11 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	 * 3) order = 3 : x = 0x34000
 	 */
 	s->oo = oo_make(order, size, s->reserved);
-	/*! size = 64, get_order(64) = 6
-	 * oo_make(6, 64, 0) = {x = 0xa0000}
-	 */	
 	s->min = oo_make(get_order(size), size, s->reserved);
 	if (oo_objects(s->oo) > oo_objects(s->max))
 		s->max = s->oo;
 
+	idbg1("order : %d, size:%d, s->oo:%d, s->min:%d, s->reserved:%d\n",order, size, s->oo, s->min, s->reserved);
 	return !!oo_objects(s->oo);
 }
 
