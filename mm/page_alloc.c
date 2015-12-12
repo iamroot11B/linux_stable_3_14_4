@@ -873,12 +873,21 @@ void __init init_cma_reserved_pageblock(struct page *page)
  *
  * -- nyc
  */
+/*! 2015.12.12 stuy -ing */
+/*! from __rmqueue_smallest()  */
 static inline void expand(struct zone *zone, struct page *page,
 	int low, int high, struct free_area *area,
 	int migratetype)
 {
 	unsigned long size = 1 << high;
 
+	/*! from __rmqueue_smallest()
+	 * order 에서 free_list를 얻을 수 없어서 current_order를 ++ 해 가면서
+	 * 상위 order의 free_list 에서 가져오려고 시도 해 본다.
+	 * 여기서 order = low, current_order = high
+	 * ex) high = low 이면, 현재 order의 free_list 에서 가져 온것이므로,
+	 * 아래 while을 해 줄 필요가 없게 된다.
+	 */
 	while (high > low) {
 		area--;
 		high--;
@@ -902,7 +911,11 @@ static inline void expand(struct zone *zone, struct page *page,
 			continue;
 		}
 #endif
+		/*! page 를 area->free_list에 추가
+		 *  현재 page 는 상위 order 에서 받아 온 page
+		 */
 		list_add(&page[size].lru, &area->free_list[migratetype]);
+		/*! free_list에 추가 했으니까 nr_free 갯수 ++  */
 		area->nr_free++;
 		set_page_order(&page[size], high);
 	}
@@ -981,14 +994,27 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
 	/* Find a page of the appropriate size in the preferred list */
 	for (current_order = order; current_order < MAX_ORDER; ++current_order) {
 		area = &(zone->free_area[current_order]);
+		/*! current_order의 free_area의 free_list 가 비어 있는지 확인
+		 *  비어 있으면 continue
+		 */
 		if (list_empty(&area->free_list[migratetype]))
 			continue;
 
+		/*! current_order의 free_area의 free_list 가 비어 있지 않으며,
+		 *  상위 order의 free_list 에서 page 를 가져온다.
+		 */
 		page = list_entry(area->free_list[migratetype].next,
 							struct page, lru);
+
+		/*! current_order의 page->lru list 에서 현재 가져 가는 page 를 제거.
+		 *  current_order 에서 한 page 를 현재 order로 가져간다.
+		 */
 		list_del(&page->lru);
 		rmv_page_order(page);
+		/*! page를 하나 가져 가니까 nr_free 갯수 감소  */
 		area->nr_free--;
+		/*! page를 상위 order에서 가져왔으므로 크가가 하위 order의 두배가 된다.
+		 * 나머지 page 를 하위 order의 area->free_list에 추가 하는 과정이 아래 expand. */
 		expand(zone, page, order, current_order, area, migratetype);
 		return page;
 	}
@@ -1199,6 +1225,7 @@ __rmqueue_fallback(struct zone *zone, int order, int start_migratetype)
  * Do the hard work of removing an element from the buddy allocator.
  * Call me with the zone->lock already held.
  */
+/*! 2015.12.12 study -ing  */
 static struct page *__rmqueue(struct zone *zone, unsigned int order,
 						int migratetype)
 {
@@ -1584,6 +1611,7 @@ int split_free_page(struct page *page)
  * we cheat by calling it from here, in the order > 0 path.  Saves a branch
  * or two.
  */
+/*! 2015.12.12 study -ing  */
 static inline
 struct page *buffered_rmqueue(struct zone *preferred_zone,
 			struct zone *zone, int order, gfp_t gfp_flags,
@@ -1602,7 +1630,9 @@ again:
 		local_irq_save(flags);
 		pcp = &this_cpu_ptr(zone->pageset)->pcp;
 		list = &pcp->lists[migratetype];
+		/*! pcp->batch : chunk size for buddy add/remove   */
 		if (list_empty(list)) {
+			/*! list 가 비어 있으면 rmqueue_bulk에서 list를 새로 만들어 준다. */
 			pcp->count += rmqueue_bulk(zone, 0,
 					pcp->batch, list,
 					migratetype, cold);
@@ -1610,11 +1640,13 @@ again:
 				goto failed;
 		}
 
+		/*! order 가 0일 때는 list = pcp->lists[migratetype] 에서 page를 가져간다. */
 		if (cold)
 			page = list_entry(list->prev, struct page, lru);
 		else
 			page = list_entry(list->next, struct page, lru);
 
+		/*! page->lru list 에서 현재 할당 할 page 를 제거 해 준다.  */
 		list_del(&page->lru);
 		pcp->count--;
 	} else {
@@ -1632,14 +1664,22 @@ again:
 			WARN_ON_ONCE(order > 1);
 		}
 		spin_lock_irqsave(&zone->lock, flags);
+		/*! order 가 0보다 큰 경우 = 요청하는 size가 4096 보다 경우
+		 * __rmqueue에서 Buddy를 이용하여 연속된 phisical memory를 할당
+		 */
 		page = __rmqueue(zone, order, migratetype);
 		spin_unlock(&zone->lock);
 		if (!page)
 			goto failed;
+		/*! zone의 freepage state 수정 해 준다.  */
 		__mod_zone_freepage_state(zone, -(1 << order),
 					  get_pageblock_migratetype(page));
 	}
 
+	/*! __mod_zone_page_state(zone, item, delta)
+	 * &zone->vm_stat[item] 값을 delta 만큼 더해 준다.
+	 * &vm_stat[item] 값을 delta 만큼 더해 준다.
+	 */
 	__mod_zone_page_state(zone, NR_ALLOC_BATCH, -(1 << order));
 
 	__count_zone_vm_events(PGALLOC, zone, 1 << order);
@@ -1743,13 +1783,18 @@ static bool __zone_watermark_ok(struct zone *z, int order, unsigned long mark,
 		      int classzone_idx, int alloc_flags, long free_pages)
 {
 	/*! 2015.11.28 study end */
-	/* free_pages my go negative - that's OK */
+	/*! 2015.12.12 study start */
+	/* free_pages my go negative - that's OK */	
 	long min = mark;
 	long lowmem_reserve = z->lowmem_reserve[classzone_idx];
 	int o;
 	long free_cma = 0;
 
+	/*! free_pages 가 충분한지 확인하는 것이 주 목적   */
+
+	/*! free_pages = zone_page_state(z, NR_FREE_PAGES) = zone->vm_stat[0]*/
 	free_pages -= (1 << order) - 1;
+	/*! int alloc_flags = ALLOC_WMARK_LOW|ALLOC_CPUSET|ALLOC_FAIR; */
 	if (alloc_flags & ALLOC_HIGH)
 		min -= min / 2;
 	if (alloc_flags & ALLOC_HARDER)
@@ -2051,6 +2096,10 @@ zonelist_scan:
 			goto this_zone_full;
 
 		mark = zone->watermark[alloc_flags & ALLOC_WMARK_MASK];
+		/*! free_pages = zone_page_state(z, NR_FREE_PAGES) = zone->vm_stat[0]
+		 * zone_watermark_ok 결과 : free_pages 가 충분하면 true 불충분하면 false
+		 * true 이면 아래 try_this_zone 으로 가게 된다.
+		 */
 		if (!zone_watermark_ok(zone, order, mark,
 				       classzone_idx, alloc_flags)) {
 			int ret;
@@ -2067,6 +2116,7 @@ zonelist_scan:
 				did_zlc_setup = 1;
 			}
 
+			/*! zone_allows_reclaim == true (NUMA 아닐때)  */
 			if (zone_reclaim_mode == 0 ||
 			    !zone_allows_reclaim(preferred_zone, zone))
 				goto this_zone_full;
@@ -2079,6 +2129,7 @@ zonelist_scan:
 				!zlc_zone_worth_trying(zonelist, z, allowednodes))
 				continue;
 
+			/*! zone_reclaim = 0 (NUMA 아닐 때)  */
 			ret = zone_reclaim(zone, gfp_mask, order);
 			switch (ret) {
 			case ZONE_RECLAIM_NOSCAN:
@@ -2102,6 +2153,7 @@ zonelist_scan:
 				 * when the watermark is between the low and
 				 * min watermarks.
 				 */
+				/*! alloc_flags = ALLOC_WMARK_LOW | ALLOC_CPUSET | ALLOC_FAIR   */
 				if (((alloc_flags & ALLOC_WMARK_MASK) == ALLOC_WMARK_MIN) ||
 				    ret == ZONE_RECLAIM_SOME)
 					goto this_zone_full;
@@ -2111,6 +2163,7 @@ zonelist_scan:
 		}
 
 try_this_zone:
+		/*! 2015.12.12  */
 		page = buffered_rmqueue(preferred_zone, zone, order,
 						gfp_mask, migratetype);
 		if (page)

@@ -242,6 +242,13 @@ extern asmlinkage void dump_stack(void) __cold;
 #define idbg1(fmt, ...) do{} while(0)
 #endif
 
+/*! idbg2 - 2015-12-12 study debug macro */
+#if 0
+#define idbg2(fmt, ...) printk(KERN_CONT "[IAMROOT] " fmt, ##__VA_ARGS__)
+#else
+#define idbg2(fmt, ...) do{} while(0)
+#endif
+
 
 /* pr_devel() should produce zero code unless DEBUG is defined */
 #ifdef DEBUG

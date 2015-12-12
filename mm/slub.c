@@ -1375,6 +1375,7 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
 			stat(s, ORDER_FALLBACK);
 	}
 
+	/*! kmemcheck_enabled = 0  */
 	if (kmemcheck_enabled && page
 		&& !(s->flags & (SLAB_NOTRACK | DEBUG_DEFAULT_FLAGS))) {
 		int pages = 1 << oo_order(oo);
@@ -1413,6 +1414,7 @@ static void setup_object(struct kmem_cache *s, struct page *page,
 		s->ctor(object);
 }
 
+/*! 2015.12.12 study -ing */
 static struct page *new_slab(struct kmem_cache *s, gfp_t flags, int node)
 {
 	struct page *page;
@@ -1423,11 +1425,13 @@ static struct page *new_slab(struct kmem_cache *s, gfp_t flags, int node)
 
 	BUG_ON(flags & GFP_SLAB_BUG_MASK);
 
+	/*! 2015.12.12  */
 	page = allocate_slab(s,
 		flags & (GFP_RECLAIM_MASK | GFP_CONSTRAINT_MASK), node);
 	if (!page)
 		goto out;
 
+	/*! 2015.12.12 study end */
 	order = compound_order(page);
 	inc_slabs_node(s, page_to_nid(page), page->objects);
 	memcg_bind_pages(s, order);
@@ -3225,6 +3229,7 @@ static int kmem_cache_open(struct kmem_cache *s, unsigned long flags)
 #ifdef CONFIG_NUMA
 	s->remote_node_defrag_ratio = 1000;
 #endif
+	/*! 2015.12.12 study -ing  */
 	if (!init_kmem_cache_nodes(s))
 		goto error;
 

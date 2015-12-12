@@ -103,6 +103,9 @@ extern atomic_long_t vm_stat[NR_VM_ZONE_STAT_ITEMS];
 static inline void zone_page_state_add(long x, struct zone *zone,
 				 enum zone_stat_item item)
 {
+	/*! atomic_long_add(i,v)
+	 *  v 를 i 만큼 더해 준다.
+	 */
 	atomic_long_add(x, &zone->vm_stat[item]);
 	atomic_long_add(x, &vm_stat[item]);
 }
@@ -269,6 +272,10 @@ static inline void drain_zonestat(struct zone *zone,
 static inline void __mod_zone_freepage_state(struct zone *zone, int nr_pages,
 					     int migratetype)
 {
+	/*! __mod_zone_page_state(zone, item, delta)
+	 * &zone->vm_stat[item] 값을 delta 만큼 더해 준다.
+	 * &vm_stat[item] 값을 delta 만큼 더해 준다.
+	 */
 	__mod_zone_page_state(zone, NR_FREE_PAGES, nr_pages);
 	if (is_migrate_cma(migratetype))
 		__mod_zone_page_state(zone, NR_FREE_CMA_PAGES, nr_pages);
