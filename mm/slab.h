@@ -209,7 +209,7 @@ static inline bool cache_match_memcg(struct kmem_cache *cachep,
 {
 	return true;
 }
-
+/*! 2016-01-09 study -ing  */
 static inline void memcg_bind_pages(struct kmem_cache *s, int order)
 {
 }

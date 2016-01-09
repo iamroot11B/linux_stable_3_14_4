@@ -927,7 +927,9 @@ static inline void set_page_links(struct page *page, enum zone_type zone,
  * Some inline functions in vmstat.h depend on page_zone()
  */
 #include <linux/vmstat.h>
-
+/*! 2016-01-09 study -ing
+ * versatile 기본 빌드 설정에서는 아래로 동작
+ */
 static __always_inline void *lowmem_page_address(const struct page *page)
 {
 	return __va(PFN_PHYS(page_to_pfn(page)));

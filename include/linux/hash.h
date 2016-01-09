@@ -65,8 +65,13 @@ static inline u32 hash_32(u32 val, unsigned int bits)
 	return hash >> (32 - bits);
 }
 
+/*! 2016-01-09 study -ing  */
 static inline unsigned long hash_ptr(const void *ptr, unsigned int bits)
 {
+	/*! BITS_PER_LONG == 32
+	 * (ptr * GOLDEN_RATIO_PRIME_32) >> (32 - bits) 값을 구하여 반환
+	 *
+	 */
 	return hash_long((unsigned long)ptr, bits);
 }
 

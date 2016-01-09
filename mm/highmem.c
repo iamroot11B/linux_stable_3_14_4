@@ -345,21 +345,34 @@ static struct page_address_slot *page_slot(const struct page *page)
  *
  * Returns the page's virtual address.
  */
+/*! 2016-01-09 study -ing
+ * CONFIG_HIGHMEM set 일 경우 아래 함수 선택 됨
+ * versatile의 default CONFIG_HIGHMEM not define 돼 있지만,
+ * 우리는 menuconfig 에서 설정 해서 build 한다.
+ */
 void *page_address(const struct page *page)
 {
 	unsigned long flags;
 	void *ret;
 	struct page_address_slot *pas;
 
+	/*! high mem 이 아니면 아래로  */
 	if (!PageHighMem(page))
 		return lowmem_page_address(page);
 
+	/*! *page 값을 hash화 한 후 그 값으로 page_address_htable에서
+	 *  page_address_slot을 찾아 온다.
+	 */
 	pas = page_slot(page);
 	ret = NULL;
 	spin_lock_irqsave(&pas->lock, flags);
 	if (!list_empty(&pas->lh)) {
 		struct page_address_map *pam;
 
+		/*! 위에서 찾은 page_address_slot 의 lh 리스트를 순회하며
+		 *  lh->page == page 만족하는 entry를 찾은 후,
+		 *  그 entry의 virtual 값을 찾아서 반환한다.
+		 */
 		list_for_each_entry(pam, &pas->lh, list) {
 			if (pam->page == page) {
 				ret = pam->virtual;

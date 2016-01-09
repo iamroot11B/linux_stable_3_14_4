@@ -281,6 +281,7 @@ static inline void *get_freepointer_safe(struct kmem_cache *s, void *object)
 
 static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
 {
+	/*! object + s->offset 가 가리키는 주소에 fp 를 넣는다. */
 	*(void **)(object + s->offset) = fp;
 }
 
@@ -499,16 +500,29 @@ static struct track *get_track(struct kmem_cache *s, void *object,
 	struct track *p;
 
 	if (s->offset)
+		/*! s->offset(Free pointer offset) 이 설정 돼 있으면
+		 * object의 s->offset 에 sizeof(void *) 더한 값을 p로,
+		 */
 		p = object + s->offset + sizeof(void *);
 	else
+		/*! object의 metadata 위치를 p로, */
 		p = object + s->inuse;
 
+	/*! alloc = { TRACK_ALLOC, TRACK_FREE };
+	 *  위에서 찾은 p 혹은 p+1 반환
+	 */
 	return p + alloc;
 }
 
 static void set_track(struct kmem_cache *s, void *object,
 			enum track_item alloc, unsigned long addr)
 {
+	/*! s->offset(Free pointer offset) 이 NULL이 아니면
+	 *  object + s->offset + sizeof(void *) + alloc(0 or 1)
+	 *  s->offset(Free pointer offset) 이 NULL이면
+	 *  object + s->inuse(meta data offset) + alloc(0 or 1)
+	 *   을 가져 온다.
+	 */
 	struct track *p = get_track(s, object, alloc);
 
 	if (addr) {
@@ -530,11 +544,13 @@ static void set_track(struct kmem_cache *s, void *object,
 		for (i = trace.nr_entries; i < TRACK_ADDRS_COUNT; i++)
 			p->addrs[i] = 0;
 #endif
+		/*! addr이 있으면 아래 설정  */
 		p->addr = addr;
 		p->cpu = smp_processor_id();
 		p->pid = current->pid;
 		p->when = jiffies;
 	} else
+		/*! addr 이 0이면 위에서 가져온 track p 를 전부 0으로 clear  */
 		memset(p, 0, sizeof(struct track));
 }
 
@@ -543,6 +559,9 @@ static void init_tracking(struct kmem_cache *s, void *object)
 	if (!(s->flags & SLAB_STORE_USER))
 		return;
 
+	/*! object의 tracking을 위한  TRACK_FREE track 과
+	 * TRACK_ALLOC을 모두 0으로 clear
+	 */
 	set_track(s, object, TRACK_FREE, 0UL);
 	set_track(s, object, TRACK_ALLOC, 0UL);
 }
@@ -672,12 +691,20 @@ static void init_object(struct kmem_cache *s, void *object, u8 val)
 {
 	u8 *p = object;
 
+	/*! s->flags의 __OBJECT_POISON bit이 set 되어 있으면, */
 	if (s->flags & __OBJECT_POISON) {
+		/*! object size만큼 POISON_FREE 로 memeset 후, */
 		memset(p, POISON_FREE, s->object_size - 1);
+		/*! 마지막만 POISON_END로 set  */
 		p[s->object_size - 1] = POISON_END;
 	}
 
+	/*! s->flags 의 SLAB_RED_ZONE이 set 되어 있으면,  */
 	if (s->flags & SLAB_RED_ZONE)
+		/*! object_size - The size of an object without meta data
+		 *  inuse - Offset to metadata
+		 *  -> object 끝부터 metadata 전까지 val(SLUB_RED_INACTIVE) 로 set
+		 */
 		memset(p + s->object_size, val, s->inuse - s->object_size);
 }
 
@@ -1040,6 +1067,7 @@ static inline unsigned long node_nr_slabs(struct kmem_cache_node *n)
 	return atomic_long_read(&n->nr_slabs);
 }
 
+/*! CONFIG_SLUB_DEBUG 가 define 되어 있어서 아래 함수가 선택 됨  */
 static inline void inc_slabs_node(struct kmem_cache *s, int node, int objects)
 {
 	struct kmem_cache_node *n = get_node(s, node);
@@ -1064,9 +1092,11 @@ static inline void dec_slabs_node(struct kmem_cache *s, int node, int objects)
 }
 
 /* Object debug checks for alloc/free paths */
+/*! CONFIG_SLUB_DEBUG=y  */
 static void setup_object_debug(struct kmem_cache *s, struct page *page,
 								void *object)
 {
+	/*! (SLAB_STORE_USER|SLAB_RED_ZONE|__OBJECT_POISON) 중 하나로 set 되어 있지 않으면 return  */
 	if (!(s->flags & (SLAB_STORE_USER|SLAB_RED_ZONE|__OBJECT_POISON)))
 		return;
 
@@ -1406,10 +1436,14 @@ static struct page *allocate_slab(struct kmem_cache *s, gfp_t flags, int node)
 	return page;
 }
 
+
 static void setup_object(struct kmem_cache *s, struct page *page,
 				void *object)
 {
 	setup_object_debug(s, page, object);
+	/*! ctor	A constructor function to call for each object during slab creation
+	 * constructor 함수를 가지고 있으면(NULL이 아니면) 수행
+	 */
 	if (unlikely(s->ctor))
 		s->ctor(object);
 }
@@ -1432,26 +1466,45 @@ static struct page *new_slab(struct kmem_cache *s, gfp_t flags, int node)
 		goto out;
 
 	/*! 2015.12.12 study end */
+    /*! 2016.01.09 study start */
 	order = compound_order(page);
 	inc_slabs_node(s, page_to_nid(page), page->objects);
 	memcg_bind_pages(s, order);
 	page->slab_cache = s;
+	/*! page-flags.h 의 __PAGEFLAG(Slab, slab)를 통해 정의되는 매크로
+	 * page->flags의 PG_slab(7) 번째 bit를 set
+	 */
 	__SetPageSlab(page);
+
+	/*! page->pfmemalloc 이 true 이면
+	 * page->flags 의 PG_active(6) 번째 bit를 set
+	 */
 	if (page->pfmemalloc)
 		SetPageSlabPfmemalloc(page);
 
+	/*! page의 virtual 시작 adress를 가져온다  */
 	start = page_address(page);
 
+	/*! SLAB_POISON bit 이 set 된 경우 POISON_INUSE로 memset  */
 	if (unlikely(s->flags & SLAB_POISON))
 		memset(start, POISON_INUSE, PAGE_SIZE << order);
 
 	last = start;
+	/*! slab의 모든 object loop.  */
 	for_each_object(p, s, start, page->objects) {
+		/*! p = 다음 object, last = 이전 object  */
 		setup_object(s, page, last);
+		/*! slab 의 object를 모두 돌며, 전 object의 주소 + s->offset에
+		 * 다음 object의 주소를 넣는다.  */
+		/*! 최초의 object는 이 loop의 첫번째 단계에서 자기 자신의 주소를
+		 * 넣었다가 loop의 다음 단계에서 다음 object의 주소로 업데이트 된다.
+		 */
 		set_freepointer(s, last, p);
 		last = p;
 	}
+	/*! 마지막 object 도 setup 및 set_freepointer 해 준다.  */
 	setup_object(s, page, last);
+	/*! 마지막 object의 free pointer는 slab에 더이상 object가 없으므로 NULL로 설정  */
 	set_freepointer(s, last, NULL);
 
 	page->freelist = start;
@@ -2934,8 +2987,10 @@ static void early_kmem_cache_node_alloc(int node)
 				"in order to be able to continue\n");
 	}
 
+	/*! page->freelist = page의 첫번째 object(위에서 모두 초기화 한 상태) */
 	n = page->freelist;
 	BUG_ON(!n);
+	/*! 2016-01-09 study end */
 	page->freelist = get_freepointer(kmem_cache_node, n);
 	page->inuse = 1;
 	page->frozen = 0;
