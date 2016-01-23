@@ -257,8 +257,12 @@ static inline int check_valid_pointer(struct kmem_cache *s,
 	return 1;
 }
 
+/*! 2015.01.23 study -ing */
 static inline void *get_freepointer(struct kmem_cache *s, void *object)
 {
+	/*! offset: 다음 freelist, object: 현 page내의 object
+	 * object + s->offset : 다음 freelist
+	 */
 	return *(void **)(object + s->offset);
 }
 
@@ -514,6 +518,7 @@ static struct track *get_track(struct kmem_cache *s, void *object,
 	return p + alloc;
 }
 
+/*! 2015.01.09 study -ing */
 static void set_track(struct kmem_cache *s, void *object,
 			enum track_item alloc, unsigned long addr)
 {
@@ -554,6 +559,7 @@ static void set_track(struct kmem_cache *s, void *object,
 		memset(p, 0, sizeof(struct track));
 }
 
+/*! 2015.01.093 study -ing */
 static void init_tracking(struct kmem_cache *s, void *object)
 {
 	if (!(s->flags & SLAB_STORE_USER))
@@ -687,6 +693,7 @@ static void slab_err(struct kmem_cache *s, struct page *page,
 	dump_stack();
 }
 
+/*! 2015.01.09 study -ing */
 static void init_object(struct kmem_cache *s, void *object, u8 val)
 {
 	u8 *p = object;
@@ -1592,10 +1599,21 @@ static void discard_slab(struct kmem_cache *s, struct page *page)
 /*
  * Management of partially allocated slabs.
  */
+/*! 2015.01.23 study -ing */
 static inline void
 __add_partial(struct kmem_cache_node *n, struct page *page, int tail)
 {
+	/*! slub은 partial 리스트만을 관리한다. (empty, full은 따로 없음. 단 디버그시는 full도 관리)
+	 *
+	 * partial의 의미는 cache_node가 부분적으로 used인 상태를 의미함
+	 * (전부 free->empty상태, 전무 used->full상태)
+	 *
+	 * partial 리스트의 갯수를 ++
+	 */
 	n->nr_partial++;
+	/*! partial 리스트에 page를 추가한다.
+	 * slab에서는 예외적으로 lru 리스트가 lru 알고리즘에 사용되지 않는다.
+	 */
 	if (tail == DEACTIVATE_TO_TAIL)
 		list_add_tail(&page->lru, &n->partial);
 	else
@@ -2923,6 +2941,7 @@ static inline int calculate_order(int size, int reserved)
 	return -ENOSYS;
 }
 
+/*! 2015.01.23 study -ing */
 static void
 init_kmem_cache_node(struct kmem_cache_node *n)
 {
@@ -2930,12 +2949,13 @@ init_kmem_cache_node(struct kmem_cache_node *n)
 	spin_lock_init(&n->list_lock);
 	INIT_LIST_HEAD(&n->partial);
 #ifdef CONFIG_SLUB_DEBUG
-	atomic_long_set(&n->nr_slabs, 0);
-	atomic_long_set(&n->total_objects, 0);
+	atomic_long_set(&n->nr_slabs, 0); /*! 0으로 초기화 */
+	atomic_long_set(&n->total_objects, 0); /*! 0으로 초기화 */
 	INIT_LIST_HEAD(&n->full);
 #endif
 }
 
+/*! 2015.01.23 study -ing */
 static inline int alloc_kmem_cache_cpus(struct kmem_cache *s)
 {
 	BUILD_BUG_ON(PERCPU_DYNAMIC_EARLY_SIZE <
@@ -2945,6 +2965,7 @@ static inline int alloc_kmem_cache_cpus(struct kmem_cache *s)
 	 * Must align to double word boundary for the double cmpxchg
 	 * instructions to work; see __pcpu_double_call_return_bool().
 	 */
+	/*! cmpxchg는 lock 없이 atomic 연산을 하는 기법에 활용한다. */
 	s->cpu_slab = __alloc_percpu(sizeof(struct kmem_cache_cpu),
 				     2 * sizeof(void *));
 
@@ -2991,16 +3012,21 @@ static void early_kmem_cache_node_alloc(int node)
 	n = page->freelist;
 	BUG_ON(!n);
 	/*! 2016-01-09 study end */
+	/*! 2016-01-23 study start */
+	/*! 현 freelist(n)를 chache_node로 사용할 것이므로
+	 * page->freelist를 다음 freelist로 갱신한다.
+	 */
 	page->freelist = get_freepointer(kmem_cache_node, n);
-	page->inuse = 1;
+	page->inuse = 1; /*! 사용중인 object 수를 1로 갱신 */
 	page->frozen = 0;
-	kmem_cache_node->node[node] = n;
+	kmem_cache_node->node[node] = n; /*! cache_node의 주소를 저장, node: 0임 */
 #ifdef CONFIG_SLUB_DEBUG
 	init_object(kmem_cache_node, n, SLUB_RED_ACTIVE);
 	init_tracking(kmem_cache_node, n);
 #endif
-	init_kmem_cache_node(n);
-	inc_slabs_node(kmem_cache_node, node, page->objects);
+	/*! object는 struct kmem_cache_node의 구조로 쓴다 */
+	init_kmem_cache_node(n); /*! struct kmem_cache_node *로 n을 받는다 */
+	inc_slabs_node(kmem_cache_node, node, page->objects); /*! CONFIG_SLUB_DEBUG On시 동작 */
 
 	/*
 	 * No locks need to be taken here as it has just been
@@ -3034,17 +3060,23 @@ static int init_kmem_cache_nodes(struct kmem_cache *s)
 
 		/*! slab_state = default 0 으로, 아래 if 문 수행 후 for문 종료 */
 		if (slab_state == DOWN) {
+			/*! cache_node를 생성/초기화하고 첫(0번) node로 저장한다. */
 			early_kmem_cache_node_alloc(node);
+			/*! 우리는 MAX_NODE가 1이어서 여기서 for 문은 끝난다. */
 			continue;
 		}
+
+		/*! cache_node 할당 받는다. */
 		n = kmem_cache_alloc_node(kmem_cache_node,
 						GFP_KERNEL, node);
 
 		if (!n) {
+			/*! 문제있으면 free후 함수 종료 - 상위 함수에서 error 리턴함 */
 			free_kmem_cache_nodes(s);
 			return 0;
 		}
 
+		/*! 할당 받은 cache_node를 저장하고 초기화 */
 		s->node[node] = n;
 		init_kmem_cache_node(n);
 	}

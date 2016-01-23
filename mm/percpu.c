@@ -752,6 +752,7 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
  * RETURNS:
  * Percpu pointer to the allocated area on success, NULL on failure.
  */
+/*! 2015.01.23 study -ing */
 static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 {
 	static int warn_limit = 10;
@@ -771,6 +772,7 @@ static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 	spin_lock_irqsave(&pcpu_lock, flags);
 
 	/* serve reserved allocations from the reserved chunk if available */
+	/*! __alloc_percpu()에서 reserved가 false로 들어왔음 */
 	if (reserved && pcpu_reserved_chunk) {
 		chunk = pcpu_reserved_chunk;
 
@@ -797,6 +799,7 @@ static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 	}
 
 restart:
+	/*! 2015.01.23 study end */
 	/* search through normal chunks */
 	for (slot = pcpu_size_to_slot(size); slot < pcpu_nr_slots; slot++) {
 		list_for_each_entry(chunk, &pcpu_slot[slot], list) {
@@ -884,6 +887,7 @@ fail_unlock_mutex:
  * RETURNS:
  * Percpu pointer to the allocated area on success, NULL on failure.
  */
+/*! 2015.01.23 study -ing */
 void __percpu *__alloc_percpu(size_t size, size_t align)
 {
 	return pcpu_alloc(size, align, false);
