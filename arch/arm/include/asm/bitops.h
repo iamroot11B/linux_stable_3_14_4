@@ -70,6 +70,9 @@ static inline void ____atomic_change_bit(unsigned int bit, volatile unsigned lon
 	raw_local_irq_restore(flags);
 }
 
+/*! 2015.01.30 study -ing
+ * 해당 비트를 set 하고, 해당 비트가 1 이었으면 1 리턴, 해당 비트가 0 이었으면 0 리턴
+ */
 static inline int
 ____atomic_test_and_set_bit(unsigned int bit, volatile unsigned long *p)
 {
@@ -77,6 +80,7 @@ ____atomic_test_and_set_bit(unsigned int bit, volatile unsigned long *p)
 	unsigned int res;
 	unsigned long mask = 1UL << (bit & 31);
 
+	/*! p가 address 이므로, 32 단위로 바꿔서 + 시켜주는 구문.  */
 	p += bit >> 5;
 
 	raw_local_irq_save(flags);
@@ -178,6 +182,14 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
 /*
  * The __* form of bitops are non-atomic and may be reordered.
  */
+/*! 2015.01.30 study -ing */
+/*! from test_and_set_bit -> __builtin_constant_p(nr) ? ->
+ * 1. ____atomic_test_and_set_bit(nr,p)
+ * 2. _test_and_set_bit(nr,p)
+ * 
+ * __builtin_constant_p(exp)
+ *  -> 컴파일 타임에 상수로 정해질 수 있는 경우에 1, 아닌 경우에는 0을 리턴
+ */
 #define ATOMIC_BITOP(name,nr,p)			\
 	(__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
 #else
@@ -191,6 +203,7 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
 #define set_bit(nr,p)			ATOMIC_BITOP(set_bit,nr,p)
 #define clear_bit(nr,p)			ATOMIC_BITOP(clear_bit,nr,p)
 #define change_bit(nr,p)		ATOMIC_BITOP(change_bit,nr,p)
+/*! 2015.01.30 study -ing */
 #define test_and_set_bit(nr,p)		ATOMIC_BITOP(test_and_set_bit,nr,p)
 #define test_and_clear_bit(nr,p)	ATOMIC_BITOP(test_and_clear_bit,nr,p)
 #define test_and_change_bit(nr,p)	ATOMIC_BITOP(test_and_change_bit,nr,p)

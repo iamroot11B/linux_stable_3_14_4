@@ -396,10 +396,14 @@ static inline void compound_unlock_irqrestore(struct page *page,
 	local_irq_restore(flags);
 #endif
 }
-
+/*! 2015.01.30 study -ing */
 static inline struct page *compound_head(struct page *page)
 {
+	/*! page 가 PageTail 만 아니면 그대로 return.  */
 	if (unlikely(PageTail(page))) {
+		/*! page 가 PageTail이면 page->first_page를 return
+		 *  page 구조체내의 page *first_page : Compound tail pages
+		 */
 		struct page *head = page->first_page;
 
 		/*
@@ -408,6 +412,7 @@ static inline struct page *compound_head(struct page *page)
 		 * page before returning.
 		 */
 		smp_rmb();
+		/*! 베리어 후 한번 더 체크  */
 		if (likely(PageTail(page)))
 			return head;
 	}
@@ -489,9 +494,15 @@ static inline void get_page(struct page *page)
 	atomic_inc(&page->_count);
 }
 
+/*! 2015.01.30 study -ing */
 static inline struct page *virt_to_head_page(const void *x)
 {
+	/*! x를 page로 변환 */
 	struct page *page = virt_to_page(x);
+	/*! compound_head의 결과를 리턴
+	 * 1. page 그대로.
+	 * 2. page->first_page (page 가 PageTail인 경우)
+	 */
 	return compound_head(page);
 }
 

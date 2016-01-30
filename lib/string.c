@@ -761,7 +761,8 @@ void *memchr(const void *s, int c, size_t n)
 }
 EXPORT_SYMBOL(memchr);
 #endif
-
+/*! 2015.01.30 study -ing */
+/*! start 부터 bytes 만큼 검사해서 value와 다른 값이 있으면 그 주소 리턴  */
 static void *check_bytes8(const u8 *start, u8 value, unsigned int bytes)
 {
 	while (bytes) {
@@ -781,6 +782,10 @@ static void *check_bytes8(const u8 *start, u8 value, unsigned int bytes)
  *
  * returns the address of the first character other than @c, or %NULL
  * if the whole buffer contains just @c.
+ */
+/*! 2015.01.30 study -ing */
+/*! start 부터 bytes 만큼 검사해서 c가 아닌 character가 있는지 체크
+ * 위의 과정을 사이즈 별로 한다.
  */
 void *memchr_inv(const void *start, int c, size_t bytes)
 {

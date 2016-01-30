@@ -335,6 +335,7 @@ static void __maybe_unused pcpu_next_pop(struct pcpu_chunk *chunk,
  * RETURNS:
  * Pointer to the allocated area on success, NULL on failure.
  */
+/*! 2015.01.30 study -ing */
 static void *pcpu_mem_zalloc(size_t size)
 {
 	if (WARN_ON_ONCE(!slab_is_available()))
@@ -353,6 +354,7 @@ static void *pcpu_mem_zalloc(size_t size)
  *
  * Free @ptr.  @ptr should have been allocated using pcpu_mem_zalloc().
  */
+/*! 2015.01.30 study -ing */
 static void pcpu_mem_free(void *ptr, size_t size)
 {
 	if (size <= PAGE_SIZE)
@@ -400,6 +402,8 @@ static void pcpu_chunk_relocate(struct pcpu_chunk *chunk, int oslot)
  * New target map allocation length if extension is necessary, 0
  * otherwise.
  */
+/*! 2015.01.30 study -ing */
+/*! 필요 시 pcpu chunk 를 확장 16 - 32 - 64 ... 순으로 확장 시도 */
 static int pcpu_need_to_extend(struct pcpu_chunk *chunk)
 {
 	int new_alloc;
@@ -427,6 +431,7 @@ static int pcpu_need_to_extend(struct pcpu_chunk *chunk)
  * RETURNS:
  * 0 on success, -errno on failure.
  */
+/*! 2015.01.30 study -ing */
 static int pcpu_extend_area_map(struct pcpu_chunk *chunk, int new_alloc)
 {
 	int *old = NULL, *new = NULL;
@@ -440,9 +445,13 @@ static int pcpu_extend_area_map(struct pcpu_chunk *chunk, int new_alloc)
 	/* acquire pcpu_lock and switch to new area map */
 	spin_lock_irqsave(&pcpu_lock, flags);
 
+	/*! new_alloc이 chunk->map_alloc 보다 작으면 realloc 이 필요 없으므로 바로 out_unlock으로 go. */
 	if (new_alloc <= chunk->map_alloc)
 		goto out_unlock;
 
+	/*! new_alloc이 chunk->map_alloc 보다 큰 경우,
+	 * 위에서 할당 한 new 에 old를 복사하고 new 를 chucnk->map으로 대체 (결국 realloc)
+	 */
 	old_size = chunk->map_alloc * sizeof(chunk->map[0]);
 	old = chunk->map;
 
@@ -459,6 +468,7 @@ out_unlock:
 	 * pcpu_mem_free() might end up calling vfree() which uses
 	 * IRQ-unsafe lock and thus can't be called under pcpu_lock.
 	 */
+	/*! realloc을 위해 사용한 old, new free 해 줌 */
 	pcpu_mem_free(old, old_size);
 	pcpu_mem_free(new, new_size);
 
@@ -790,6 +800,9 @@ static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 			spin_lock_irqsave(&pcpu_lock, flags);
 		}
 
+		/*! pcpu_alloc_area를 통해 alloc 성공 시 area_found 로 goto.
+		 *  alloc 실패 시 err.
+		 */
 		off = pcpu_alloc_area(chunk, size, align);
 		if (off >= 0)
 			goto area_found;

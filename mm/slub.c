@@ -223,6 +223,7 @@ static inline void sysfs_slab_remove(struct kmem_cache *s) { }
 static inline void memcg_propagate_slab_attrs(struct kmem_cache *s) { }
 #endif
 
+/*! 2015.01.30 study -ing */
 static inline void stat(const struct kmem_cache *s, enum stat_item si)
 {
 #ifdef CONFIG_SLUB_STATS
@@ -357,8 +358,10 @@ static inline int oo_objects(struct kmem_cache_order_objects x)
 /*
  * Per slab locking using the pagelock
  */
+/*! 2015.01.30 study -ing */
 static __always_inline void slab_lock(struct page *page)
 {
+	/*! page->flags의 PG_locked번째(0) bit가 1이면 0이 될 때까지 기다리고  */
 	bit_spin_lock(PG_locked, &page->flags);
 }
 
@@ -624,7 +627,7 @@ static void slab_bug(struct kmem_cache *s, char *fmt, ...)
 
 	add_taint(TAINT_BAD_PAGE, LOCKDEP_NOW_UNRELIABLE);
 }
-
+/*! page->objects 갯수가 maxobj 보다 크면 에러  */
 static void slab_fix(struct kmem_cache *s, char *fmt, ...)
 {
 	va_list args;
@@ -714,10 +717,11 @@ static void init_object(struct kmem_cache *s, void *object, u8 val)
 		 */
 		memset(p + s->object_size, val, s->inuse - s->object_size);
 }
-
+/*! 2015.01.30 study -ing */
 static void restore_bytes(struct kmem_cache *s, char *message, u8 data,
 						void *from, void *to)
 {
+	/*! print 수행  */
 	slab_fix(s, "Restoring 0x%p-0x%p=0x%x\n", from, to - 1, data);
 	memset(from, data, to - from);
 }
@@ -804,6 +808,7 @@ static int check_pad_bytes(struct kmem_cache *s, struct page *page, u8 *p)
 }
 
 /* Check the pad bytes at the end of a slab page */
+/*! 2015.01.30 study -ing */
 static int slab_pad_check(struct kmem_cache *s, struct page *page)
 {
 	u8 *start;
@@ -812,6 +817,7 @@ static int slab_pad_check(struct kmem_cache *s, struct page *page)
 	int length;
 	int remainder;
 
+	/*! s->flags & SLAB_POISON 이면 check 완료. return 1.  */
 	if (!(s->flags & SLAB_POISON))
 		return 1;
 
@@ -819,18 +825,22 @@ static int slab_pad_check(struct kmem_cache *s, struct page *page)
 	length = (PAGE_SIZE << compound_order(page)) - s->reserved;
 	end = start + length;
 	remainder = length % s->size;
+	/* remainger 없으면 check 완료. return 1  */
 	if (!remainder)
 		return 1;
 
 	fault = memchr_inv(end - remainder, POISON_INUSE, remainder);
+	/* fault가 없으면 check 완료. return 1   */
 	if (!fault)
 		return 1;
 	while (end > fault && end[-1] == POISON_INUSE)
 		end--;
 
+	/*! 위 check 들을 다 통과 하지 못하면 아래 err 출력 */
 	slab_err(s, page, "Padding overwritten. 0x%p-0x%p", fault, end - 1);
 	print_section("Padding ", end - remainder, remainder);
 
+	/* end - remainder 부터 remainder 만큼 POISON_INUSE로 memset 수행 */
 	restore_bytes(s, "slab padding", POISON_INUSE, end - remainder, end);
 	return 0;
 }
@@ -886,7 +896,7 @@ static int check_object(struct kmem_cache *s, struct page *page,
 	}
 	return 1;
 }
-
+/*! 2015.01.30 study -ing */
 static int check_slab(struct kmem_cache *s, struct page *page)
 {
 	int maxobj;
@@ -898,12 +908,15 @@ static int check_slab(struct kmem_cache *s, struct page *page)
 		return 0;
 	}
 
+	/*! 가능한 objects 갯수를 maxobj 로 저장  */
 	maxobj = order_objects(compound_order(page), s->size, s->reserved);
+	/*! page->objects 갯수가 maxobj 보다 크면 에러  */
 	if (page->objects > maxobj) {
 		slab_err(s, page, "objects %u > max %u",
 			s->name, page->objects, maxobj);
 		return 0;
 	}
+	/*! page->inuse 갯수가 maxobj 보다 크면 에러  */
 	if (page->inuse > page->objects) {
 		slab_err(s, page, "inuse %u > max %u",
 			s->name, page->inuse, page->objects);
@@ -993,7 +1006,7 @@ static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
 {
 	kmemleak_alloc(ptr, size, 1, flags);
 }
-
+/*! 2015.01.30 study -ing */
 static inline void kfree_hook(const void *x)
 {
 	kmemleak_free(x);
@@ -1146,7 +1159,7 @@ bad:
 	}
 	return 0;
 }
-
+/*! 2015.01.30 study -ing */
 static noinline struct kmem_cache_node *free_debug_processing(
 	struct kmem_cache *s, struct page *page, void *object,
 	unsigned long addr, unsigned long *flags)
@@ -1154,10 +1167,13 @@ static noinline struct kmem_cache_node *free_debug_processing(
 	struct kmem_cache_node *n = get_node(s, page_to_nid(page));
 
 	spin_lock_irqsave(&n->list_lock, *flags);
+	/*! page->flags 의 PG_locked 번째(0) bit의 상태를 보고 필요시 lock */
 	slab_lock(page);
 
 	if (!check_slab(s, page))
 		goto fail;
+
+	/*! 2015.01.30 study end */
 
 	if (!check_valid_pointer(s, page, object)) {
 		slab_err(s, page, "Invalid object pointer 0x%p", object);
@@ -1334,7 +1350,7 @@ static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
 {
 	kmemleak_alloc(ptr, size, 1, flags);
 }
-
+/*! 2015.01.30 study -ing */
 static inline void kfree_hook(const void *x)
 {
 	kmemleak_free(x);
@@ -1349,9 +1365,10 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
 	kmemleak_alloc_recursive(object, s->object_size, 1, s->flags,
 		flags & gfp_allowed_mask);
 }
-
+/*! 2015.01.30 study -ing */
 static inline void slab_free_hook(struct kmem_cache *s, void *x)
 {
+	/* CONFIG_DEBUG_KMEMLEAK 이 not define 이면 do nothing. */
 	kmemleak_free_recursive(x, s->flags);
 }
 
@@ -2625,6 +2642,7 @@ EXPORT_SYMBOL(kmem_cache_alloc_node_trace);
  * lock and free the item. If there is no additional partial page
  * handling required then we can return immediately.
  */
+/*! 2015.01.30 study -ing */
 static void __slab_free(struct kmem_cache *s, struct page *page,
 			void *x, unsigned long addr)
 {
@@ -2749,6 +2767,8 @@ slab_empty:
  * If fastpath is not possible then fall back to __slab_free where we deal
  * with all sorts of special processing.
  */
+/*! 2015.01.30 study -ing */
+/*! slab으로 할당 된 page를 free  */
 static __always_inline void slab_free(struct kmem_cache *s,
 			struct page *page, void *x, unsigned long addr)
 {
@@ -2756,6 +2776,7 @@ static __always_inline void slab_free(struct kmem_cache *s,
 	struct kmem_cache_cpu *c;
 	unsigned long tid;
 
+	/*! CONFIG_DEBUG_KMEMLEAK이 not define 이라서 do nothing.  */
 	slab_free_hook(s, x);
 
 redo:
@@ -2766,22 +2787,35 @@ redo:
 	 * during the cmpxchg then the free will succedd.
 	 */
 	preempt_disable();
+	
+	/*! 최종적으로 SHIFT_PERCPU_PTR로 연결된다.
+	 *  percpu 영역에 접근할 때는 항상 다음과 같은 accessor 매크로 중 하나로서,
+	 *  percpu 영역 내에서 현재 CPU에 할당된 변수의 포인터를 얻는다.  
+	 */
 	c = __this_cpu_ptr(s->cpu_slab);
 
 	tid = c->tid;
 	preempt_enable();
 
 	if (likely(page == c->page)) {
+		/*! c->freelist를 object + s->offset에 넣는다
+		 *  object는 free 하여는 주소. 
+		 */
 		set_freepointer(s, object, c->freelist);
 
+		/*! this_cpu_cmpxchg_double : percpu 데이터 교환에 사용되는 매크로.  */
 		if (unlikely(!this_cpu_cmpxchg_double(
 				s->cpu_slab->freelist, s->cpu_slab->tid,
 				c->freelist, tid,
 				object, next_tid(tid)))) {
 
+			/*! this_cpu_cmpxchg_double에 실패하면 아래 note.. 후 redo.  */
 			note_cmpxchg_failure("slab_free", s, tid);
 			goto redo;
 		}
+		/*! CONFIG_SLUB_STATS 이 define 돼 있으면,
+		 *  s->cpu_slab->stat[si] 를 inc.
+		 */
 		stat(s, FREE_FASTPATH);
 	} else
 		__slab_free(s, page, x, addr);
@@ -3545,6 +3579,7 @@ size_t ksize(const void *object)
 }
 EXPORT_SYMBOL(ksize);
 
+/*! 2015.01.30 study -ing */
 void kfree(const void *x)
 {
 	struct page *page;
@@ -3552,11 +3587,16 @@ void kfree(const void *x)
 
 	trace_kfree(_RET_IP_, x);
 
+	/*! from pcpu_mem_free()
+	 * NULL 일때 여기서 return 처리
+	 */
 	if (unlikely(ZERO_OR_NULL_PTR(x)))
 		return;
 
 	page = virt_to_head_page(x);
+	/*! PageSlab : page->flags 중 PG_slab bit(1<<7) 가 set 인지 체크 */
 	if (unlikely(!PageSlab(page))) {
+		/*! page->flags 의 PG_compound bit가 set이 아니면 BUG_ON(kernel panic) */
 		BUG_ON(!PageCompound(page));
 		kfree_hook(x);
 		__free_memcg_kmem_pages(page, compound_order(page));

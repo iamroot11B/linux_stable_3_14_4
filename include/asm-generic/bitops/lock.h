@@ -9,6 +9,10 @@
  * This operation is atomic and provides acquire barrier semantics.
  * It can be used to implement bit locks.
  */
+/*! 2015.01.30 study -ing */
+/*! addr의 nr 비트를 set 하고, 해당 bit의 기존값이 1 이었으면 1을 리턴,
+ *  해당 비트가 0 이었으면 0 리턴  
+ */
 #define test_and_set_bit_lock(nr, addr)	test_and_set_bit(nr, addr)
 
 /**

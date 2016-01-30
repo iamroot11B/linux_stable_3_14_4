@@ -79,6 +79,7 @@ static inline void kmemleak_free(const void *ptr)
 static inline void kmemleak_free_part(const void *ptr, size_t size)
 {
 }
+/*! 2015.01.30 study -ing */
 static inline void kmemleak_free_recursive(const void *ptr, unsigned long flags)
 {
 }

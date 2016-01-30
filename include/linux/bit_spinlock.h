@@ -23,14 +23,21 @@ static inline void bit_spin_lock(int bitnum, unsigned long *addr)
 	 */
 	preempt_disable();
 #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
+	/*! addr의 bitnum bit의 기존 값이  1 이었으면(이미 PG_locked인 상태면),
+	 * while 계속 수행 하면서 기다린다. (lock)
+	 * 0 이 되면, 여기서 1로 다시 바꿔 주고 while은 종료.
+	 */
 	while (unlikely(test_and_set_bit_lock(bitnum, addr))) {
 		preempt_enable();
 		do {
+			/*! smp_mb()  */
 			cpu_relax();
+			/*! test_bit(nr, p) - 메모리 p 의 nr 번째 비트의 값을 리턴시킴.  */
 		} while (test_bit(bitnum, addr));
 		preempt_disable();
 	}
 #endif
+	/*! __CHECKER__ 이 not define 이면 0  */
 	__acquire(bitlock);
 }
 

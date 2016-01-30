@@ -1482,12 +1482,16 @@ static void __vunmap(const void *addr, int deallocate_pages)
  *
  *	NOTE: assumes that the object at *addr has a size >= sizeof(llist_node)
  */
+/*! 2015.01.30 study -ing */
 void vfree(const void *addr)
 {
 	BUG_ON(in_nmi());
 
 	kmemleak_free(addr);
 
+	/*! from pcpu_mem_free()
+	 * NULL 일때 여기서 return 처리  
+	 */
 	if (!addr)
 		return;
 	if (unlikely(in_interrupt())) {

@@ -100,6 +100,9 @@
  */
 #define ZERO_SIZE_PTR ((void *)16)
 
+/*! x 는 void * 형식이며 16보다 작으면 NULL.
+ * (kmalloc 의 최소 단위가 32 이므로 16이하는 NULL 처리)
+ */
 #define ZERO_OR_NULL_PTR(x) ((unsigned long)(x) <= \
 				(unsigned long)ZERO_SIZE_PTR)
 

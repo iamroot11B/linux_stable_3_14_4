@@ -382,7 +382,11 @@ static inline int PageHead(struct page *page)
 {
 	return ((page->flags & PG_head_tail_mask) == PG_head_mask);
 }
-
+/*!
+ * PageTail()
+ * - page의 flags중 PG_compound, PG_reclaim 비트 가 모두 set 일 때 true
+ */
+/*! 2015.01.30 study -ing */
 static inline int PageTail(struct page *page)
 {
 	return ((page->flags & PG_head_tail_mask) == PG_head_tail_mask);

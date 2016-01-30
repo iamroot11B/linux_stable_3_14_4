@@ -11,5 +11,7 @@
 #include <asm/assembler.h>
 #include "bitops.h"
                 .text
-
+/*! 2015.01.30 study -ing
+	해당 비트를 set하고, 해당 비트가 1이었으면 1 리턴, 해당 비트가 0 이었으면 0 리턴
+	*/
 testop	_test_and_set_bit, orreq, streq

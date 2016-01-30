@@ -626,7 +626,8 @@ memcg_kmem_newpage_charge(gfp_t gfp, struct mem_cgroup **memcg, int order)
 {
 	return true;
 }
-
+/*! 2015.01.30 study -ing */
+/*! 우리는 CONFIG_MEMCG_KMEM not defined.  */
 static inline void memcg_kmem_uncharge_pages(struct page *page, int order)
 {
 }

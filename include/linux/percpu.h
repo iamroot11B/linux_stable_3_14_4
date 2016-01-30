@@ -472,6 +472,10 @@ do {									\
  * very limited hardware support for these operations, so only certain
  * sizes may work.
  */
+/*! 2015.01.30 study -ing */
+/*! pcp1 == oval1 && pcp2 == oval2 이면,
+ * pcp1 = nval1, pcv2 = nval2 를 수행
+ */
 #define _this_cpu_generic_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, nval2)	\
 ({									\
 	int ret__;							\
