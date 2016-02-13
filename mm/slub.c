@@ -241,6 +241,7 @@ static inline struct kmem_cache_node *get_node(struct kmem_cache *s, int node)
 }
 
 /* Verify that a pointer has an address that is valid within a slab page */
+/*! 2015.02.13 study -ing */
 static inline int check_valid_pointer(struct kmem_cache *s,
 				struct page *page, const void *object)
 {
@@ -249,7 +250,15 @@ static inline int check_valid_pointer(struct kmem_cache *s,
 	if (!object)
 		return 1;
 
+	/*! Get page's virtual address */
 	base = page_address(page);
+	/*!
+	 * 1. object가 base보다 작거나
+	 * 2. base + page의 크기(페이지의 오브젝트 수 * 캐시의 크기)를 벗어나거나
+	 * =>object가 page의 영역 안에 있지 않거나
+	 * 3. (object - base)가 align이 안맞으면
+	 * 에러
+	 */
 	if (object < base || object >= base + page->objects * s->size ||
 		(object - base) % s->size) {
 		return 0;
@@ -682,6 +691,8 @@ static void object_err(struct kmem_cache *s, struct page *page,
 	print_trailer(s, page, object);
 }
 
+/*! 에러 로그를 출력한다 */
+/*! 2015.02.13 study -ing */
 static void slab_err(struct kmem_cache *s, struct page *page,
 			const char *fmt, ...)
 {
@@ -726,6 +737,15 @@ static void restore_bytes(struct kmem_cache *s, char *message, u8 data,
 	memset(from, data, to - from);
 }
 
+/*! check_object()에서
+ * what = "Redzone"
+ * start = endobject(object + s->object_size)
+ * bytes = s->inuse - s->object_size
+ */
+/*! 문제가 있으면 0
+ * 문제가 없으면 1
+ */
+/*! 2015.02.13 study -ing */
 static int check_bytes_and_report(struct kmem_cache *s, struct page *page,
 			u8 *object, char *what,
 			u8 *start, unsigned int value, unsigned int bytes)
@@ -733,19 +753,24 @@ static int check_bytes_and_report(struct kmem_cache *s, struct page *page,
 	u8 *fault;
 	u8 *end;
 
+	/*! value와 다른 바이트가 있으면 그 주소를 fault에 저장 */
 	fault = memchr_inv(start, value, bytes);
 	if (!fault)
 		return 1;
 
+	/*! start는 metadata의 시작점, bytes는 metadata의 시작부터 inuse 까지의 바이트 수 */
+	/*! 어디서부터 overwrite되었는지 찾는다 */
 	end = start + bytes;
 	while (end > fault && end[-1] == value)
 		end--;
 
+	/*! 에러 로그 출력 */
 	slab_bug(s, "%s overwritten", what);
 	printk(KERN_ERR "INFO: 0x%p-0x%p. First byte 0x%x instead of 0x%x\n",
 					fault, end - 1, fault[0], value);
 	print_trailer(s, page, object);
 
+	/*! overwrite된 byte를 다시 복구한다 */
 	restore_bytes(s, what, value, fault, end);
 	return 0;
 }
@@ -845,31 +870,44 @@ static int slab_pad_check(struct kmem_cache *s, struct page *page)
 	return 0;
 }
 
+/*! free_debug_processing()에서
+ * val = SLUB_RED_ACTIVE
+ */
+/*! 2015.02.13 study -ing */
 static int check_object(struct kmem_cache *s, struct page *page,
 					void *object, u8 val)
 {
 	u8 *p = object;
+	/*! endobject는 metadata의 시작점 */
 	u8 *endobject = object + s->object_size;
 
+	/*! cache 가 SLAB_RED_ZONE이면 */
 	if (s->flags & SLAB_RED_ZONE) {
+		/*! Redzone이 침범되었는지 확인 */
+		/*! 2015.02.13 study -ing */
 		if (!check_bytes_and_report(s, page, object, "Redzone",
 			endobject, val, s->inuse - s->object_size))
 			return 0;
 	} else {
+		/*! SLAB 오염 검사 */
 		if ((s->flags & SLAB_POISON) && s->object_size < s->inuse) {
+			/*! POISON_INUSE로 안채워져있으면 채운다 */
 			check_bytes_and_report(s, page, p, "Alignment padding",
 				endobject, POISON_INUSE,
 				s->inuse - s->object_size);
 		}
 	}
 
+	/*! SLAB 오염 검사 */
 	if (s->flags & SLAB_POISON) {
+		/*! Poison 검사를 해서 문제가 있으면 Return 0 */
 		if (val != SLUB_RED_ACTIVE && (s->flags & __OBJECT_POISON) &&
 			(!check_bytes_and_report(s, page, p, "Poison", p,
 					POISON_FREE, s->object_size - 1) ||
 			 !check_bytes_and_report(s, page, p, "Poison",
 				p + s->object_size - 1, POISON_END, 1)))
 			return 0;
+		/*! 2015.02.13 study end */
 		/*
 		 * check_pad_bytes cleans up on its own.
 		 */
@@ -931,6 +969,8 @@ static int check_slab(struct kmem_cache *s, struct page *page)
  * Determine if a certain object on a page is on the freelist. Must hold the
  * slab lock to guarantee that the chains are in a consistent state.
  */
+/*! freelist에 있는지 확인하고 page의 검증을 한다 */
+/*! 2015.02.13 study -ing */
 static int on_freelist(struct kmem_cache *s, struct page *page, void *search)
 {
 	int nr = 0;
@@ -938,16 +978,21 @@ static int on_freelist(struct kmem_cache *s, struct page *page, void *search)
 	void *object = NULL;
 	unsigned long max_objects;
 
+	/*! page의 freelist에서 free하려는 object를 찾는다 */
 	fp = page->freelist;
 	while (fp && nr <= page->objects) {
+		/*! 이미 free됐으므로 TRUE 리턴 */
 		if (fp == search)
 			return 1;
+		/*! 포인터가 유효하지 않다면 */
 		if (!check_valid_pointer(s, page, fp)) {
 			if (object) {
+				/*! 현 freepointer에 문제가 있으므로, 이전 freepointer에 NULL을 Set */
 				object_err(s, page, object,
 					"Freechain corrupt");
 				set_freepointer(s, object, NULL);
 			} else {
+				/*! page가 전부 사용중이라고 초기화 */
 				slab_err(s, page, "Freepointer corrupt");
 				page->freelist = NULL;
 				page->inuse = page->objects;
@@ -961,22 +1006,28 @@ static int on_freelist(struct kmem_cache *s, struct page *page, void *search)
 		nr++;
 	}
 
+	/*! freelist에서 free하려는 object를 못찾으면 아래 */
+
+	/*! 가용한 object의 갯수 */
 	max_objects = order_objects(compound_order(page), s->size, s->reserved);
 	if (max_objects > MAX_OBJS_PER_PAGE)
 		max_objects = MAX_OBJS_PER_PAGE;
 
+	/*! 계산한 최대 object 수와 page의 object 수가 다르면 계산한 값으로 수정 */
 	if (page->objects != max_objects) {
 		slab_err(s, page, "Wrong number of objects. Found %d but "
 			"should be %d", page->objects, max_objects);
 		page->objects = max_objects;
 		slab_fix(s, "Number of objects adjusted.");
 	}
+	/*! (전체 object 수 - Free인 object 수)와 (page의 사용 중 object 수)가 다르면 계산한 값으로 수정 */
 	if (page->inuse != page->objects - nr) {
 		slab_err(s, page, "Wrong object count. Counter is %d but "
 			"counted were %d", page->inuse, page->objects - nr);
 		page->inuse = page->objects - nr;
 		slab_fix(s, "Object count adjusted.");
 	}
+	/*! search가 NULL이어도 TRUE 리턴 */
 	return search == NULL;
 }
 
@@ -1175,16 +1226,22 @@ static noinline struct kmem_cache_node *free_debug_processing(
 
 	/*! 2015.01.30 study end */
 
+	/*! 2015.02.13 study start */
+
+	/*! 2015.02.13 study -ing */
 	if (!check_valid_pointer(s, page, object)) {
+		/*! 2015.02.13 study -ing */
 		slab_err(s, page, "Invalid object pointer 0x%p", object);
 		goto fail;
 	}
 
+	/*! 2015.02.13 study -ing */
 	if (on_freelist(s, page, object)) {
 		object_err(s, page, object, "Object already free");
 		goto fail;
 	}
 
+	/*! 2015.02.13 study -ing */
 	if (!check_object(s, page, object, SLUB_RED_ACTIVE))
 		goto out;
 
