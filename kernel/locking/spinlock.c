@@ -185,6 +185,8 @@ void __lockfunc _raw_spin_unlock(raw_spinlock_t *lock)
 EXPORT_SYMBOL(_raw_spin_unlock);
 #endif
 
+/*! 2016.03.05 study -ing */
+/*! 우리는 CONFIG_INLINE_SPIN_UNLOCK_IRQRESTORE not defined.  */
 #ifndef CONFIG_INLINE_SPIN_UNLOCK_IRQRESTORE
 void __lockfunc _raw_spin_unlock_irqrestore(raw_spinlock_t *lock, unsigned long flags)
 {

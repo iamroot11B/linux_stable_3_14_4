@@ -30,6 +30,7 @@ extern void preempt_count_sub(int val);
 #define __preempt_count_inc() __preempt_count_add(1)
 #define __preempt_count_dec() __preempt_count_sub(1)
 
+/*! 2016.03.05 study -ing */
 #define preempt_count_inc() preempt_count_add(1)
 #define preempt_count_dec() preempt_count_sub(1)
 
@@ -67,6 +68,7 @@ do { \
 } while (0)
 
 #else
+/*! 2016.03.05 study -ing */
 #define preempt_enable() \
 do { \
 	barrier(); \

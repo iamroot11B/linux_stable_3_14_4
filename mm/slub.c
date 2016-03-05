@@ -235,6 +235,7 @@ static inline void stat(const struct kmem_cache *s, enum stat_item si)
  * 			Core slab cache functions
  *******************************************************************/
 
+/*! 2016.03.05 study -ing */
 static inline struct kmem_cache_node *get_node(struct kmem_cache *s, int node)
 {
 	return s->node[node];
@@ -255,7 +256,7 @@ static inline int check_valid_pointer(struct kmem_cache *s,
 	/*!
 	 * 1. object가 base보다 작거나
 	 * 2. base + page의 크기(페이지의 오브젝트 수 * 캐시의 크기)를 벗어나거나
-	 * =>object가 page의 영역 안에 있지 않거나
+	 *		=>object가 page의 영역 안에 있지 않거나
 	 * 3. (object - base)가 align이 안맞으면
 	 * 에러
 	 */
@@ -374,11 +375,14 @@ static __always_inline void slab_lock(struct page *page)
 	bit_spin_lock(PG_locked, &page->flags);
 }
 
+/*! 2016.03.05 study -ing */
 static __always_inline void slab_unlock(struct page *page)
 {
+	/*! page->flags의 PG_locked번째(0) bit를 clear(0)  */
 	__bit_spin_unlock(PG_locked, &page->flags);
 }
 
+/*! 2016.03.05 study -ing */
 static inline void set_page_slub_counters(struct page *page, unsigned long counters_new)
 {
 	struct page tmp;
@@ -389,18 +393,24 @@ static inline void set_page_slub_counters(struct page *page, unsigned long count
 	 * we run the risk of losing updates to page->_count, so
 	 * be careful and only assign to the fields we need.
 	 */
+
+	/*! frozen, inuse, objects 모두 counters의 union.
+	 *  (tmp.counters = counters_new; 를 통해 세 변수 모두 init 됨)
+	 */
 	page->frozen  = tmp.frozen;
 	page->inuse   = tmp.inuse;
 	page->objects = tmp.objects;
 }
 
 /* Interrupts must be disabled (for the fallback code to work right) */
+/*! 2016.03.05 study -ing */
 static inline bool __cmpxchg_double_slab(struct kmem_cache *s, struct page *page,
 		void *freelist_old, unsigned long counters_old,
 		void *freelist_new, unsigned long counters_new,
 		const char *n)
 {
 	VM_BUG_ON(!irqs_disabled());
+	/*! CONFIG_HAVE_CMPXCHG_DOUBLE 와 CONFIG_HAVE_ALIGNED_STRUCT_PAGE 모두 not defiend. */
 #if defined(CONFIG_HAVE_CMPXCHG_DOUBLE) && \
     defined(CONFIG_HAVE_ALIGNED_STRUCT_PAGE)
 	if (s->flags & __CMPXCHG_DOUBLE) {
@@ -412,6 +422,7 @@ static inline bool __cmpxchg_double_slab(struct kmem_cache *s, struct page *page
 #endif
 	{
 		slab_lock(page);
+		/*! 현재 page의 freelist, counters 와 freelist_old, counters_old 와 같으면,   */
 		if (page->freelist == freelist_old &&
 					page->counters == counters_old) {
 			page->freelist = freelist_new;
@@ -432,11 +443,13 @@ static inline bool __cmpxchg_double_slab(struct kmem_cache *s, struct page *page
 	return 0;
 }
 
+/*! 2016.03.05 study -ing */
 static inline bool cmpxchg_double_slab(struct kmem_cache *s, struct page *page,
 		void *freelist_old, unsigned long counters_old,
 		void *freelist_new, unsigned long counters_new,
 		const char *n)
 {
+	/*! 우리는 CONFIG_HAVE_CMPXCHG_DOUBLE 와 CONFIG_HAVE_ALIGNED_STRUCT_PAGE 모두 not defined. */
 #if defined(CONFIG_HAVE_CMPXCHG_DOUBLE) && \
     defined(CONFIG_HAVE_ALIGNED_STRUCT_PAGE)
 	if (s->flags & __CMPXCHG_DOUBLE) {
@@ -451,18 +464,25 @@ static inline bool cmpxchg_double_slab(struct kmem_cache *s, struct page *page,
 
 		local_irq_save(flags);
 		slab_lock(page);
+		/*! freelist, counters과 모두 old, current가 같으면  */
 		if (page->freelist == freelist_old &&
 					page->counters == counters_old) {
+			/*! page->freelist = freelist_new, page->counter = counters_new 로 치환  */
 			page->freelist = freelist_new;
 			set_page_slub_counters(page, counters_new);
+			/*! page slab unlock, irq resotre  */
 			slab_unlock(page);
 			local_irq_restore(flags);
 			return 1;
 		}
+		/* freelist, counters과 모두 old, currnet가 같지 않으면, slba unlock, irq restore,*/
 		slab_unlock(page);
 		local_irq_restore(flags);
 	}
 
+	/*! freelist, counters과 모두 old, currnet가 같지 않으면, slba unlock, irq restore 후,
+	 * cpu_relax (barrier) , stat 후 return 0
+	 */
 	cpu_relax();
 	stat(s, CMPXCHG_DOUBLE_FAIL);
 
@@ -813,6 +833,7 @@ static int check_bytes_and_report(struct kmem_cache *s, struct page *page,
  * may be used with merged slabcaches.
  */
 
+/*! 2016.03.05 study -ing */
 static int check_pad_bytes(struct kmem_cache *s, struct page *page, u8 *p)
 {
 	unsigned long off = s->inuse;	/* The end of info */
@@ -825,9 +846,22 @@ static int check_pad_bytes(struct kmem_cache *s, struct page *page, u8 *p)
 		/* We also have user information there */
 		off += 2 * sizeof(struct track);
 
+	/*
+	 *  s->size : object 전체 크기
+	 *  off : meta 끝 부분.
+	 *  s->size == off 이면 pad 가 없으므로 바로 1 리턴
+	 *  같지 않으면, pad 부분 check 및 overwrite 시 복구 수행.
+	 */
 	if (s->size == off)
 		return 1;
 
+	/*! p + off = meta data start point.
+	 * s->size - off : meta data 시작점 ~ inuse까지의 bytes
+	 * From check_object(). (리턴값 사용 안함)
+	 * 아래 check_bytes_and_report를 통해서
+	 * p + off 부터 s->size - off 바이트 동안 POISON_INUSE가 아닌 값이 있는지 확인을 하고,
+	 * overwrite 된 바이트가 있을 시 복구 해 준다.
+	 */
 	return check_bytes_and_report(s, page, p, "Object padding",
 				p + off, POISON_INUSE, s->size - off);
 }
@@ -900,7 +934,7 @@ static int check_object(struct kmem_cache *s, struct page *page,
 
 	/*! SLAB 오염 검사 */
 	if (s->flags & SLAB_POISON) {
-		/*! Poison 검사를 해서 문제가 있으면 Return 0 */
+		/*! Poison 검사를 해서 문제가 있으면 check_bytes_and_report 수행 후 Return 0 */
 		if (val != SLUB_RED_ACTIVE && (s->flags & __OBJECT_POISON) &&
 			(!check_bytes_and_report(s, page, p, "Poison", p,
 					POISON_FREE, s->object_size - 1) ||
@@ -908,12 +942,16 @@ static int check_object(struct kmem_cache *s, struct page *page,
 				p + s->object_size - 1, POISON_END, 1)))
 			return 0;
 		/*! 2015.02.13 study end */
+		/*! 2015.03.05 study start */
 		/*
 		 * check_pad_bytes cleans up on its own.
 		 */
 		check_pad_bytes(s, page, p);
 	}
 
+	/*! s->offset 이 없고, val 이 SLUB_RED_ACTIVE이면,
+	 * Object and freepointer overlap 으로 리턴 1
+	 */
 	if (!s->offset && val == SLUB_RED_ACTIVE)
 		/*
 		 * Object and freepointer overlap. Cannot check
@@ -922,6 +960,9 @@ static int check_object(struct kmem_cache *s, struct page *page,
 		return 1;
 
 	/* Check free pointer validity */
+	/*! freepointer가 valid 하지 않을때 아래 err message 출력 후,
+	 *  frepointer NULL 설정
+	 */
 	if (!check_valid_pointer(s, page, get_freepointer(s, p))) {
 		object_err(s, page, p, "Freepointer corrupt");
 		/*
@@ -929,6 +970,7 @@ static int check_object(struct kmem_cache *s, struct page *page,
 		 * of the free objects in this slab. May cause
 		 * another error because the object count is now wrong.
 		 */
+		/*! freepointer 에 NULL을 넣는다.  */
 		set_freepointer(s, p, NULL);
 		return 0;
 	}
@@ -1217,6 +1259,7 @@ static noinline struct kmem_cache_node *free_debug_processing(
 {
 	struct kmem_cache_node *n = get_node(s, page_to_nid(page));
 
+	/*! flags에 irq save  */
 	spin_lock_irqsave(&n->list_lock, *flags);
 	/*! page->flags 의 PG_locked 번째(0) bit의 상태를 보고 필요시 lock */
 	slab_lock(page);
@@ -1245,7 +1288,12 @@ static noinline struct kmem_cache_node *free_debug_processing(
 	if (!check_object(s, page, object, SLUB_RED_ACTIVE))
 		goto out;
 
+	/*! s != page->slab_cache 인 경우 무조건 fail. */
 	if (unlikely(s != page->slab_cache)) {
+		/*! 1. page 가 page slab 이 아닌경우 관련 debug 프린트
+		 *  2. page->slab_cache 가 NULL 이면 관련 debug 프린트
+		 *  3. 1,2 둘다 아니면, page slab pointer corrupt 프린트
+		 */
 		if (!PageSlab(page)) {
 			slab_err(s, page, "Attempt to free object(0x%p) "
 				"outside of slab", object);
@@ -1260,9 +1308,13 @@ static noinline struct kmem_cache_node *free_debug_processing(
 		goto fail;
 	}
 
+	/*! SLAB_STORE_USER flag 이 있으면 tracking 정보 저장 */
 	if (s->flags & SLAB_STORE_USER)
 		set_track(s, object, TRACK_FREE, addr);
 	trace(s, page, object, 0);
+	/*! 마지막으로 init_object.
+	 * (object size 만큼 POISON_FREE set, 마지막은 POISON_END 로 set)
+	 */
 	init_object(s, object, SLUB_RED_INACTIVE);
 out:
 	slab_unlock(page);
@@ -1274,7 +1326,9 @@ out:
 
 fail:
 	slab_unlock(page);
+	/*! spin unlock 후 flags에 세이브 된 irq 값 restore  */
 	spin_unlock_irqrestore(&n->list_lock, *flags);
+	/*! slab_fix는 이름과 다르게 단순 print  */
 	slab_fix(s, "Object at 0x%p not freed", object);
 	return NULL;
 }
@@ -1694,6 +1748,7 @@ __add_partial(struct kmem_cache_node *n, struct page *page, int tail)
 		list_add(&page->lru, &n->partial);
 }
 
+/*! 2016.03.05 study -ing */
 static inline void add_partial(struct kmem_cache_node *n,
 				struct page *page, int tail)
 {
@@ -2114,6 +2169,7 @@ redo:
  * for the cpu using c (or some other guarantee must be there
  * to guarantee no concurrent accesses).
  */
+/*! 2016.03.05 study -ing */
 static void unfreeze_partials(struct kmem_cache *s,
 		struct kmem_cache_cpu *c)
 {
@@ -2121,10 +2177,12 @@ static void unfreeze_partials(struct kmem_cache *s,
 	struct kmem_cache_node *n = NULL, *n2 = NULL;
 	struct page *page, *discard_page = NULL;
 
+	/*! c->partial이 존재하는 동안 while loop */
 	while ((page = c->partial)) {
 		struct page new;
 		struct page old;
 
+		/*! c->partial 을 현재 page의 next로 바꿔준다.  */
 		c->partial = page->next;
 
 		n2 = get_node(s, page_to_nid(page));
@@ -2137,7 +2195,7 @@ static void unfreeze_partials(struct kmem_cache *s,
 		}
 
 		do {
-
+			/*! 현재 page->freelist, counter를 old.freelist, counter에 넣는다.  */
 			old.freelist = page->freelist;
 			old.counters = page->counters;
 			VM_BUG_ON(!old.frozen);
@@ -2145,14 +2203,22 @@ static void unfreeze_partials(struct kmem_cache *s,
 			new.counters = old.counters;
 			new.freelist = old.freelist;
 
+			/*! new.~ = old.~ 이후 new.frozon 만 0 으로 바꾼다.
+			 *  (현재 new.~ 와 old.~ 의 차이는 new.frozen이 0이라는 점 뿐)
+			 */
 			new.frozen = 0;
 
+			/*! new.~ 와 old.~ 가 모두 같고, new.frozen만 0이다. : frozen만 0이 된다. */
 		} while (!__cmpxchg_double_slab(s, page,
 				old.freelist, old.counters,
 				new.freelist, new.counters,
 				"unfreezing slab"));
 
+		/*! new.inuse가 0이고, n->nr_partial > s->min_partial 경우 page->next를 discard_page로 해 준다.  */
 		if (unlikely(!new.inuse && n->nr_partial > s->min_partial)) {
+			/*! 최초 discard_page는 NULL -  page->next에 NULL, discard_page는 현재 page
+			 * 다시 들어오면, discard_page는 지금 현재 page, 다음 discard_page는 지금 page
+			 */
 			page->next = discard_page;
 			discard_page = page;
 		} else {
@@ -2164,11 +2230,14 @@ static void unfreeze_partials(struct kmem_cache *s,
 	if (n)
 		spin_unlock(&n->list_lock);
 
+	/*! 위에서 discard_page가 set 된 상태면 discard_page 처음부터 끝까지 loop 돌면서,  */
 	while (discard_page) {
 		page = discard_page;
 		discard_page = discard_page->next;
 
 		stat(s, DEACTIVATE_EMPTY);
+		/*! discard_page를 discard_slab 해 준다. */
+		/* 2016-03-05 study end */
 		discard_slab(s, page);
 		stat(s, FREE_SLAB);
 	}
@@ -2184,6 +2253,7 @@ static void unfreeze_partials(struct kmem_cache *s,
  * If we did not find a slot then simply move all the partials to the
  * per node partial list.
  */
+/*! 2016.03.05 study -ing */
 static void put_cpu_partial(struct kmem_cache *s, struct page *page, int drain)
 {
 #ifdef CONFIG_SLUB_CPU_PARTIAL
@@ -2197,8 +2267,14 @@ static void put_cpu_partial(struct kmem_cache *s, struct page *page, int drain)
 		oldpage = this_cpu_read(s->cpu_slab->partial);
 
 		if (oldpage) {
+			/*! page->pages -  Nr of partial slabs left
+			 *  page->pobjects - Approximate # of objects
+			 */
 			pobjects = oldpage->pobjects;
 			pages = oldpage->pages;
+
+			/*! kmem_cache->cpu_partial - Number of per cpu partial objects to keep around  */
+			/*! 아래 조건 만족 시 partial array가 꽉 찬걸로 보고 s내의 데이터(?)를 per node partial list로 옮겨준다. */
 			if (drain && pobjects > s->cpu_partial) {
 				unsigned long flags;
 				/*
@@ -2715,6 +2791,7 @@ static void __slab_free(struct kmem_cache *s, struct page *page,
 
 	if (kmem_cache_debug(s) &&
 		!(n = free_debug_processing(s, page, x, addr, &flags)))
+		/*! free_debug_processing에서 fail 시 NULL을 리턴  */
 		return;
 
 	do {
@@ -2727,9 +2804,14 @@ static void __slab_free(struct kmem_cache *s, struct page *page,
 		set_freepointer(s, object, prior);
 		new.counters = counters;
 		was_frozen = new.frozen;
+		/*! page의 counters 와 inuse를 포함하는 struct이 union.
+		 *	new.inuse 는 위의 new.counters = counters;에서 init 됨.
+		 */
 		new.inuse--;
 		if ((!new.inuse || !prior) && !was_frozen) {
-
+			/*! kmem_cache_has_cpu_partial()
+			 * unlikly(s->flags & SLAB_DEBUG_FLAGS) 확인
+			 */
 			if (kmem_cache_has_cpu_partial(s) && !prior) {
 
 				/*
@@ -2738,6 +2820,7 @@ static void __slab_free(struct kmem_cache *s, struct page *page,
 				 * We can defer the list move and instead
 				 * freeze it.
 				 */
+				/*! !(s->flags & SLAB_DEBUG_FLAGS)이고 !prior 일때, */
 				new.frozen = 1;
 
 			} else { /* Needs to be taken off a list */
@@ -2756,17 +2839,22 @@ static void __slab_free(struct kmem_cache *s, struct page *page,
 			}
 		}
 
+		/*! cmpxchg_double_slab 실패 시(return 0) re do.
+		 *  (cpu_relax 외에 다른 변수 변화 없이 re do 하는 걸로 확인하고 넘어감)
+		 */
 	} while (!cmpxchg_double_slab(s, page,
 		prior, counters,
 		object, new.counters,
 		"__slab_free"));
 
+	/*! cmpxchg_double_slab 성공 시(return 1), new freelist, new counters 치환 후 아래로  */
 	if (likely(!n)) {
 
 		/*
 		 * If we just froze the page then put it onto the
 		 * per cpu partial list.
 		 */
+		/*! 지금 frozen 시킨 경우 page를 per cpu partial list에 넣는다. */
 		if (new.frozen && !was_frozen) {
 			put_cpu_partial(s, page, 1);
 			stat(s, CPU_PARTIAL_FREE);

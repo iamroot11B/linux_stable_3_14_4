@@ -120,6 +120,7 @@ static inline int arch_spin_trylock(arch_spinlock_t *lock)
 	}
 }
 
+/*! 2016.03.05 study -ing */
 static inline void arch_spin_unlock(arch_spinlock_t *lock)
 {
     /*! 메모리 배리어 */
