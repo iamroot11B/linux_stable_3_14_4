@@ -413,7 +413,7 @@ static inline void lockdep_on(void)
 struct lock_class_key { };
 
 #define lockdep_depth(tsk)	(0)
-
+/*! 2016-03-19 study -ing */
 #define lockdep_assert_held(l)			do { (void)(l); } while (0)
 
 #define lockdep_recursing(tsk)			(0)

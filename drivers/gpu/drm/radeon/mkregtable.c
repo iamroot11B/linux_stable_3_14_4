@@ -112,6 +112,7 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
+/*! 2016-03-19 study -ing */
 static inline void __list_del(struct list_head *prev, struct list_head *next)
 {
 	next->prev = prev;

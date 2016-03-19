@@ -93,7 +93,7 @@ static inline void
 kmemcheck_alloc_shadow(struct page *page, int order, gfp_t flags, int node)
 {
 }
-
+/*! 2016-03-19 study -ing */
 static inline void
 kmemcheck_free_shadow(struct page *page, int order)
 {
@@ -114,7 +114,7 @@ static inline void kmemcheck_pagealloc_alloc(struct page *p,
 	unsigned int order, gfp_t gfpflags)
 {
 }
-
+/*! 2016-03-19 study -ing */
 static inline bool kmemcheck_page_is_tracked(struct page *p)
 {
 	return false;

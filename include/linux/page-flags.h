@@ -1,3 +1,4 @@
+
 /*
  * Macros for manipulating and testing page->flags
  */
@@ -482,10 +483,11 @@ static inline void SetPageSlabPfmemalloc(struct page *page)
 	/*! page->flags 의 PG_active(6) 번째 bit를 set */
 	SetPageActive(page);
 }
-
+/*! 2016-03-19 study -ing */
 static inline void __ClearPageSlabPfmemalloc(struct page *page)
 {
 	VM_BUG_ON_PAGE(!PageSlab(page), page);
+	/*! Page->flags 에서 PG_active bit를 clear 해주는 매크로  */
 	__ClearPageActive(page);
 }
 

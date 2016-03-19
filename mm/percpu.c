@@ -536,6 +536,8 @@ static void pcpu_split_block(struct pcpu_chunk *chunk, int i,
  * Allocated offset in @chunk on success, -1 if no matching area is
  * found.
  */
+/*! 2016-03-19 study -ing */
+/*! alloc 수행한다는 정도로 간단히 확인 후 넘어 감 */
 static int pcpu_alloc_area(struct pcpu_chunk *chunk, int size, int align)
 {
 	int oslot = pcpu_chunk_slot(chunk);
@@ -658,15 +660,15 @@ static void pcpu_free_area(struct pcpu_chunk *chunk, int freeme)
 	chunk->contig_hint = max(chunk->map[i], chunk->contig_hint);
 	pcpu_chunk_relocate(chunk, oslot);
 }
-
+/*! 2016-03-19 study -ing */
 static struct pcpu_chunk *pcpu_alloc_chunk(void)
 {
 	struct pcpu_chunk *chunk;
-
+	/*! 메모리 alloc 후 0으로 set  */
 	chunk = pcpu_mem_zalloc(pcpu_chunk_struct_size);
 	if (!chunk)
 		return NULL;
-
+	/*! 메모리 alloc 후 0으로 set  */
 	chunk->map = pcpu_mem_zalloc(PCPU_DFL_MAP_ALLOC *
 						sizeof(chunk->map[0]));
 	if (!chunk->map) {
@@ -674,9 +676,11 @@ static struct pcpu_chunk *pcpu_alloc_chunk(void)
 		return NULL;
 	}
 
+	/*! 추가 정보 입력 */
 	chunk->map_alloc = PCPU_DFL_MAP_ALLOC;
 	chunk->map[chunk->map_used++] = pcpu_unit_size;
 
+	/*! chunk->list 로 init  */
 	INIT_LIST_HEAD(&chunk->list);
 	chunk->free_size = pcpu_unit_size;
 	chunk->contig_hint = pcpu_unit_size;
@@ -802,6 +806,7 @@ static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 
 		/*! pcpu_alloc_area를 통해 alloc 성공 시 area_found 로 goto.
 		 *  alloc 실패 시 err.
+		 *  (alloc 수행 하는 정도로만 확인)
 		 */
 		off = pcpu_alloc_area(chunk, size, align);
 		if (off >= 0)
@@ -843,7 +848,8 @@ restart:
 
 	/* hmmm... no space left, create a new chunk */
 	spin_unlock_irqrestore(&pcpu_lock, flags);
-
+	/*! CONFIG_NEED_PER_CPU_KM not defined. -> #include "percpu-vm.c" */
+	/*! pcpu_create_chunk 함수는 create_kmalloc_caches가 call 된 이후 정상 동작한다. */
 	chunk = pcpu_create_chunk();
 	if (!chunk) {
 		err = "failed to allocate new chunk";
@@ -857,6 +863,7 @@ restart:
 area_found:
 	spin_unlock_irqrestore(&pcpu_lock, flags);
 
+	/*! 2016-03-19 study end */
 	/* populate, map and clear the area */
 	if (pcpu_populate_chunk(chunk, off, size)) {
 		spin_lock_irqsave(&pcpu_lock, flags);

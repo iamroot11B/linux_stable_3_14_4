@@ -298,6 +298,7 @@ static void pcpu_post_map_flush(struct pcpu_chunk *chunk,
  * CONTEXT:
  * pcpu_alloc_mutex, does GFP_KERNEL allocation.
  */
+/*! 2016-03-19 study -ing */
 static int pcpu_populate_chunk(struct pcpu_chunk *chunk, int off, int size)
 {
 	int page_start = PFN_DOWN(off);
@@ -407,7 +408,8 @@ static void pcpu_depopulate_chunk(struct pcpu_chunk *chunk, int off, int size)
 	/* commit new bitmap */
 	bitmap_copy(chunk->populated, populated, pcpu_unit_pages);
 }
-
+/*! 2016-03-19 study -ing */
+/*! pcpu_create_chunk 함수는 create_kmalloc_caches가 call 된 이후 정상 동작한다. */
 static struct pcpu_chunk *pcpu_create_chunk(void)
 {
 	struct pcpu_chunk *chunk;
@@ -417,6 +419,7 @@ static struct pcpu_chunk *pcpu_create_chunk(void)
 	if (!chunk)
 		return NULL;
 
+	/*! pcpu_get_vm_areas 함수는 create_kmalloc_caches가 call 된 이후 정상 동작한다. */
 	vms = pcpu_get_vm_areas(pcpu_group_offsets, pcpu_group_sizes,
 				pcpu_nr_groups, pcpu_atom_size);
 	if (!vms) {

@@ -395,12 +395,14 @@ EXPORT_SYMBOL(dec_zone_page_state);
 /*
  * Use interrupt disable to serialize counter updates
  */
+/*! 2016-03-19 study -ing */
 void mod_zone_page_state(struct zone *zone, enum zone_stat_item item,
 					int delta)
 {
 	unsigned long flags;
 
 	local_irq_save(flags);
+	/*! modify the zone and global counters  */
 	__mod_zone_page_state(zone, item, delta);
 	local_irq_restore(flags);
 }

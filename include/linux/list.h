@@ -110,10 +110,11 @@ static inline void __list_del_entry(struct list_head *entry)
 {
 	__list_del(entry->prev, entry->next);
 }
-
+/*! 2016-03-19 study -ing */
 static inline void list_del(struct list_head *entry)
 {
 	__list_del(entry->prev, entry->next);
+	/*! Debugging 용도로 NULL 이 아닌 특정값을 쓴다..  */
 	entry->next = LIST_POISON1;
 	entry->prev = LIST_POISON2;
 }

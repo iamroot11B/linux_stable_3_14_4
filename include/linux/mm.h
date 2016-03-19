@@ -424,8 +424,10 @@ static inline struct page *compound_head(struct page *page)
  * both from it and to it can be tracked, using atomic_inc_and_test
  * and atomic_add_negative(-1).
  */
+/*! 2016-03-19 study -ing */
 static inline void page_mapcount_reset(struct page *page)
 {
+	/*! page->_mapcount를 atomic 하게 -1로 set  */
 	atomic_set(&(page)->_mapcount, -1);
 }
 

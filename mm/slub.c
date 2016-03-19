@@ -1157,12 +1157,14 @@ static void add_full(struct kmem_cache *s,
 	lockdep_assert_held(&n->list_lock);
 	list_add(&page->lru, &n->full);
 }
-
+/*! 2016-03-19 study -ing */
+/*! CONFIG_SLUB_DEBUG 가 define 되어 있어서 아래 함수가 선택 됨  */
 static void remove_full(struct kmem_cache *s, struct kmem_cache_node *n, struct page *page)
 {
 	if (!(s->flags & SLAB_STORE_USER))
 		return;
 
+	/*! Do Nothig  */
 	lockdep_assert_held(&n->list_lock);
 	list_del(&page->lru);
 }
@@ -1196,11 +1198,14 @@ static inline void inc_slabs_node(struct kmem_cache *s, int node, int objects)
 		atomic_long_add(objects, &n->total_objects);
 	}
 }
+/*! 2016-03-19 study -ing */
 static inline void dec_slabs_node(struct kmem_cache *s, int node, int objects)
 {
 	struct kmem_cache_node *n = get_node(s, node);
 
+	/*! &n->nr_slabs(->counter) 를 atomic 하게 1 줄인다. */
 	atomic_long_dec(&n->nr_slabs);
+	/*! &n->total_objects(->counter) 에서 objetcs를 atomic 하게 뺀다. */
 	atomic_long_sub(objects, &n->total_objects);
 }
 
@@ -1648,32 +1653,38 @@ static struct page *new_slab(struct kmem_cache *s, gfp_t flags, int node)
 out:
 	return page;
 }
-
+/*! 2016-03-19 study -ing */
 static void __free_slab(struct kmem_cache *s, struct page *page)
 {
 	int order = compound_order(page);
 	int pages = 1 << order;
 
+	/*! likely 0, unlikely 1  */
 	if (kmem_cache_debug(s)) {
 		void *p;
-
+		/*! debug flag 켜저 있으면 아래 pad check, 오염 검사 실시  */
 		slab_pad_check(s, page);
 		for_each_object(p, s, page_address(page),
 						page->objects)
+			/*! red zone 침범 등 slab 오염 검사  */
 			check_object(s, page, p, SLUB_RED_INACTIVE);
 	}
-
+	/*! CONFIG_KMEMCHECK not defined -> Do Nothing  */
 	kmemcheck_free_shadow(page, compound_order(page));
 
+	/*! -pages 값을 전달 하여 결국 마이너스 수행 */
 	mod_zone_page_state(page_zone(page),
 		(s->flags & SLAB_RECLAIM_ACCOUNT) ?
 		NR_SLAB_RECLAIMABLE : NR_SLAB_UNRECLAIMABLE,
 		-pages);
 
 	__ClearPageSlabPfmemalloc(page);
+	/*! Page->flags 에서 PG_slab bit를 clear 해주는 매크로  */
 	__ClearPageSlab(page);
 
+	/*! CONFIG_MEMCG_KMEM not defined -> Do Nothing  */
 	memcg_release_pages(s, order);
+	/*! page->_mapcount를 atomic 하게 -1로 set  */
 	page_mapcount_reset(page);
 	if (current->reclaim_state)
 		current->reclaim_state->reclaimed_slab += pages;
@@ -1683,6 +1694,7 @@ static void __free_slab(struct kmem_cache *s, struct page *page)
 #define need_reserve_slab_rcu						\
 	(sizeof(((struct page *)NULL)->lru) < sizeof(struct rcu_head))
 
+/*! 2016-03-19 study -ing */
 static void rcu_free_slab(struct rcu_head *h)
 {
 	struct page *page;
@@ -1694,14 +1706,17 @@ static void rcu_free_slab(struct rcu_head *h)
 
 	__free_slab(page->slab_cache, page);
 }
-
+/*! 2016-03-19 study -ing */
 static void free_slab(struct kmem_cache *s, struct page *page)
 {
 	if (unlikely(s->flags & SLAB_DESTROY_BY_RCU)) {
 		struct rcu_head *head;
-
+		/*! RCU : Read Copy Update
+		 *		  잠금을 아예 하지 않으면서 동기화를 이루기 위한 구조
+		 */
 		if (need_reserve_slab_rcu) {
 			int order = compound_order(page);
+			/*! need_reserve_slab_rcu 가 true 이면 s->reserved 만큼을 offset에서 빼준다.  */
 			int offset = (PAGE_SIZE << order) - s->reserved;
 
 			VM_BUG_ON(s->reserved != sizeof(*head));
@@ -1712,12 +1727,18 @@ static void free_slab(struct kmem_cache *s, struct page *page)
 			 */
 			head = (void *)&page->lru;
 		}
-
+		/*! call_rcu :
+		 *		모든 RCU read-side critical sections들이 끝나기를 기다린 후,
+		 *		두 번째 인수에 있는 함수를 호출한다.
+		 *		(call_rcu 내부는 간단히만 확인하고, 두 번째 인수-rcu_free_slab을 보기로 한다.)
+		 *
+		 *	rcu_free_slab 에서도 매개변수 설정 후 __free_slab으로 들어간다.
+		 */
 		call_rcu(head, rcu_free_slab);
 	} else
 		__free_slab(s, page);
 }
-
+/*! 2016-03-19 study -ing */
 static void discard_slab(struct kmem_cache *s, struct page *page)
 {
 	dec_slabs_node(s, page_to_nid(page), page->objects);
@@ -2238,6 +2259,7 @@ static void unfreeze_partials(struct kmem_cache *s,
 		stat(s, DEACTIVATE_EMPTY);
 		/*! discard_page를 discard_slab 해 준다. */
 		/* 2016-03-05 study end */
+        /* 2016-03-19 study start */
 		discard_slab(s, page);
 		stat(s, FREE_SLAB);
 	}
@@ -2964,7 +2986,7 @@ redo:
 		stat(s, FREE_FASTPATH);
 	} else
 		__slab_free(s, page, x, addr);
-
+	/*! 2016-03-19 study -ing */
 }
 
 void kmem_cache_free(struct kmem_cache *s, void *x)
@@ -3325,7 +3347,7 @@ static int calculate_sizes(struct kmem_cache *s, int forced_order)
 	/*! size = sizeof(struct kmem_cache_node)  */
 	s->inuse = size;
 
-	/*! flags = s->flags = 0x2000 => (0x2000 & (0x800 | 0x800)) || 0 = 0
+	/*! flags = s->flags = 0x2000 => (0x2000 & (0x80000 | 0x800)) || 0 = 0
 	 *  아래 if 문 수행 안함
 	 */
 	if (((flags & (SLAB_DESTROY_BY_RCU | SLAB_POISON)) ||
@@ -3428,7 +3450,7 @@ static int kmem_cache_open(struct kmem_cache *s, unsigned long flags)
 	s->reserved = 0;
 
     /*! SLAB_DESTROY_BY_RCU	= 0x00080000UL.
-	 * 0x2000 & 0x8000 = 0 -> if문 수행 안 함
+	 * 0x2000 & 0x80000 = 0 -> if문 수행 안 함
 	 */
 	if (need_reserve_slab_rcu && (s->flags & SLAB_DESTROY_BY_RCU))
 		s->reserved = sizeof(struct rcu_head);
@@ -3641,14 +3663,19 @@ static int __init setup_slub_nomerge(char *str)
 
 __setup("slub_nomerge", setup_slub_nomerge);
 
+/*! 2016-03-19 study -ing */
 void *__kmalloc(size_t size, gfp_t flags)
 {
 	struct kmem_cache *s;
 	void *ret;
 
+	/*! kmalloc_large - 단순하게 page alloc 후 return  */
 	if (unlikely(size > KMALLOC_MAX_CACHE_SIZE))
 		return kmalloc_large(size, flags);
 
+	/*! kmalloc_caches가 create_kmalloc_caches에서 init 되기 전에 들어오면 안된다는 걸 확인 후,
+	 *  여기서 기존 소스 분석으로 돌아감.
+	 */
 	s = kmalloc_slab(size, flags);
 
 	if (unlikely(ZERO_OR_NULL_PTR(s)))
@@ -3748,6 +3775,7 @@ void kfree(const void *x)
 		return;
 	}
 	slab_free(page->slab_cache, page, object, _RET_IP_);
+	/*! 2016-03-19 study -ing */
 }
 EXPORT_SYMBOL(kfree);
 

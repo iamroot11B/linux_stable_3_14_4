@@ -682,6 +682,7 @@ static void rcu_preempt_do_callbacks(void)
 /*
  * Queue a preemptible-RCU callback for invocation after a grace period.
  */
+/*! 2016-03-19 study -ing */
 void call_rcu(struct rcu_head *head, void (*func)(struct rcu_head *rcu))
 {
 	__call_rcu(head, func, &rcu_preempt_state, -1, 0);

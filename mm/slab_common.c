@@ -412,19 +412,24 @@ static inline int size_index_elem(size_t bytes)
  * Find the kmem_cache structure that serves a given size of
  * allocation
  */
+/*! 2016-03-19 study -ing */
 struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
 {
 	int index;
 
+	/*! Max size 체크  */
 	if (unlikely(size > KMALLOC_MAX_SIZE)) {
 		WARN_ON_ONCE(!(flags & __GFP_NOWARN));
 		return NULL;
 	}
 
 	if (size <= 192) {
+		/*! size = 0 이면 ZERO_SIZE_PTR 리턴.   */
 		if (!size)
 			return ZERO_SIZE_PTR;
-
+		/*! size 192보다 작으면 미리 정의된 size_index 테이블에서 최적의 값을 가져온다.
+		 *  기본값이 있지만, create_kmalloc_caches 함수에서 init 된다.
+		 */
 		index = size_index[size_index_elem(size)];
 	} else
 		index = fls(size - 1);
@@ -434,6 +439,7 @@ struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
 		return kmalloc_dma_caches[index];
 
 #endif
+	/*! kmalloc_caches는 create_kmalloc_caches에서 init 된다.  */
 	return kmalloc_caches[index];
 }
 

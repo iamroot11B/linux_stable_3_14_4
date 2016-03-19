@@ -311,14 +311,14 @@ static inline void arch_alloc_page(struct page *page, int order) { }
 struct page *
 __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 		       struct zonelist *zonelist, nodemask_t *nodemask);
-
+/*! 2016-03-19 study -ing */
 static inline struct page *
 __alloc_pages(gfp_t gfp_mask, unsigned int order,
 		struct zonelist *zonelist)
 {
 	return __alloc_pages_nodemask(gfp_mask, order, zonelist, NULL);
 }
-
+/*! 2016-03-19 study -ing */
 static inline struct page *alloc_pages_node(int nid, gfp_t gfp_mask,
 						unsigned int order)
 {
@@ -353,6 +353,7 @@ extern struct page *alloc_pages_vma(gfp_t gfp_mask, int order,
 			struct vm_area_struct *vma, unsigned long addr,
 			int node);
 #else
+/*! 2016-03-19 study -ing */
 #define alloc_pages(gfp_mask, order) \
 		alloc_pages_node(numa_node_id(), gfp_mask, order)
 #define alloc_pages_vma(gfp_mask, order, vma, addr, node)	\

@@ -161,7 +161,7 @@ static inline void atomic_long_inc(atomic_long_t *l)
 
 	atomic_inc(v);
 }
-
+/*! 2016-03-19 study -ing */
 static inline void atomic_long_dec(atomic_long_t *l)
 {
 	atomic_t *v = (atomic_t *)l;
@@ -179,7 +179,7 @@ static inline void atomic_long_add(long i, atomic_long_t *l)
 
 	atomic_add(i, v);
 }
-
+/*! 2016-03-19 study -ing */
 static inline void atomic_long_sub(long i, atomic_long_t *l)
 {
 	atomic_t *v = (atomic_t *)l;

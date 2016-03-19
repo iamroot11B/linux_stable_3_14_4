@@ -61,6 +61,7 @@ static inline void kmemleak_erase(void **ptr)
 static inline void kmemleak_init(void)
 {
 }
+/*! 2016-03-19 study -ing */
 static inline void kmemleak_alloc(const void *ptr, size_t size, int min_count,
 				  gfp_t gfp)
 {

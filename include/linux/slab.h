@@ -360,7 +360,7 @@ kmem_cache_alloc_node_trace(struct kmem_cache *s,
 #ifdef CONFIG_SLUB
 #include <linux/slub_def.h>
 #endif
-
+/*! 2016-03-19 study -ing */
 static __always_inline void *
 kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 {
@@ -368,6 +368,7 @@ kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 
 	flags |= (__GFP_COMP | __GFP_KMEMCG);
 	ret = (void *) __get_free_pages(flags, order);
+	/*! CONFIG_DEBUG_KMEMLEAK not defined. Do Nothing  */
 	kmemleak_alloc(ret, size, 1, flags);
 	return ret;
 }
@@ -375,13 +376,14 @@ kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 #ifdef CONFIG_TRACING
 extern void *kmalloc_order_trace(size_t size, gfp_t flags, unsigned int order);
 #else
+/*! 2016-03-19 study -ing */
 static __always_inline void *
 kmalloc_order_trace(size_t size, gfp_t flags, unsigned int order)
 {
 	return kmalloc_order(size, flags, order);
 }
 #endif
-
+/*! 2016-03-19 study -ing */
 static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
 {
 	unsigned int order = get_order(size);
@@ -560,6 +562,7 @@ void print_slabinfo_header(struct seq_file *m);
  * @size: element size.
  * @flags: the type of memory to allocate (see kmalloc).
  */
+/*! 2016-03-19 study -ing */
 static inline void *kmalloc_array(size_t n, size_t size, gfp_t flags)
 {
 	if (size != 0 && n > SIZE_MAX / size)
@@ -573,6 +576,8 @@ static inline void *kmalloc_array(size_t n, size_t size, gfp_t flags)
  * @size: element size.
  * @flags: the type of memory to allocate (see kmalloc).
  */
+/*! 2016-03-19 study -ing
+ *  create_kmalloc_caches 함수 call 된 이후에 분석 재개 예정 */
 static inline void *kcalloc(size_t n, size_t size, gfp_t flags)
 {
 	return kmalloc_array(n, size, flags | __GFP_ZERO);

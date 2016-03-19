@@ -2358,6 +2358,7 @@ static unsigned long pvm_determine_end(struct vmap_area **pnext,
  * area.  Scanning is repeated till all the areas fit and then all
  * necessary data structres are inserted and the result is returned.
  */
+/*! 2016-03-19 study -ing */
 struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 				     const size_t *sizes, int nr_vms,
 				     size_t align)
@@ -2372,6 +2373,7 @@ struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 
 	/* verify parameters and allocate data structures */
 	BUG_ON(align & ~PAGE_MASK || !is_power_of_2(align));
+	/*! last_area를 구하기 위한 for loop  */
 	for (last_area = 0, area = 0; area < nr_vms; area++) {
 		start = offsets[area];
 		end = start + sizes[area];
@@ -2395,13 +2397,16 @@ struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 			BUG_ON(end2 <= end && end2 > start);
 		}
 	}
+	/*! 위에서 구한 last_area를 이용해서 last_end를 구한다. */
 	last_end = offsets[last_area] + sizes[last_area];
 
+	/*! last_end가 vamlloc 전체 사이즈 보다 크면 WARN_ON 후 return NULL  */
 	if (vmalloc_end - vmalloc_start < last_end) {
 		WARN_ON(true);
 		return NULL;
 	}
 
+	/*! kcalloc - alloc 함수 for array. alloc 후 0으로 set 된다.  */
 	vms = kcalloc(nr_vms, sizeof(vms[0]), GFP_KERNEL);
 	vas = kcalloc(nr_vms, sizeof(vas[0]), GFP_KERNEL);
 	if (!vas || !vms)

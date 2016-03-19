@@ -2460,6 +2460,7 @@ static void rcu_leak_callback(struct rcu_head *rhp)
  * a CPU only if that CPU is a no-CBs CPU.  Currently, only _rcu_barrier()
  * is expected to specify a CPU.
  */
+/*! 2016-03-19 study -ing */
 static void
 __call_rcu(struct rcu_head *head, void (*func)(struct rcu_head *rcu),
 	   struct rcu_state *rsp, int cpu, bool lazy)

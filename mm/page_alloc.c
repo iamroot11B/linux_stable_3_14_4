@@ -2948,6 +2948,7 @@ EXPORT_SYMBOL(__alloc_pages_nodemask);
 /*
  * Common helper functions.
  */
+/*! 2016-03-19 study -ing */
 unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order)
 {
 	struct page *page;
@@ -3007,9 +3008,11 @@ EXPORT_SYMBOL(free_pages);
  *
  * The caller knows better which flags it relies on.
  */
+/*! 2016-03-19 study -ing */
 void __free_memcg_kmem_pages(struct page *page, unsigned int order)
 {
 	memcg_kmem_uncharge_pages(page, order);
+	/*! 최종적으로 page free  */
 	__free_pages(page, order);
 }
 
