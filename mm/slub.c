@@ -223,7 +223,7 @@ static inline void sysfs_slab_remove(struct kmem_cache *s) { }
 static inline void memcg_propagate_slab_attrs(struct kmem_cache *s) { }
 #endif
 
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static inline void stat(const struct kmem_cache *s, enum stat_item si)
 {
 #ifdef CONFIG_SLUB_STATS
@@ -268,7 +268,7 @@ static inline int check_valid_pointer(struct kmem_cache *s,
 	return 1;
 }
 
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 static inline void *get_freepointer(struct kmem_cache *s, void *object)
 {
 	/*! offset: 다음 freelist, object: 현 page내의 object
@@ -368,7 +368,7 @@ static inline int oo_objects(struct kmem_cache_order_objects x)
 /*
  * Per slab locking using the pagelock
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static __always_inline void slab_lock(struct page *page)
 {
 	/*! page->flags의 PG_locked번째(0) bit가 1이면 0이 될 때까지 기다리고  */
@@ -550,7 +550,7 @@ static struct track *get_track(struct kmem_cache *s, void *object,
 	return p + alloc;
 }
 
-/*! 2015.01.09 study -ing */
+/*! 2016.01.09 study -ing */
 static void set_track(struct kmem_cache *s, void *object,
 			enum track_item alloc, unsigned long addr)
 {
@@ -591,7 +591,7 @@ static void set_track(struct kmem_cache *s, void *object,
 		memset(p, 0, sizeof(struct track));
 }
 
-/*! 2015.01.093 study -ing */
+/*! 2016.01.09 study -ing */
 static void init_tracking(struct kmem_cache *s, void *object)
 {
 	if (!(s->flags & SLAB_STORE_USER))
@@ -727,7 +727,7 @@ static void slab_err(struct kmem_cache *s, struct page *page,
 	dump_stack();
 }
 
-/*! 2015.01.09 study -ing */
+/*! 2016.01.09 study -ing */
 static void init_object(struct kmem_cache *s, void *object, u8 val)
 {
 	u8 *p = object;
@@ -748,7 +748,7 @@ static void init_object(struct kmem_cache *s, void *object, u8 val)
 		 */
 		memset(p + s->object_size, val, s->inuse - s->object_size);
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static void restore_bytes(struct kmem_cache *s, char *message, u8 data,
 						void *from, void *to)
 {
@@ -867,7 +867,7 @@ static int check_pad_bytes(struct kmem_cache *s, struct page *page, u8 *p)
 }
 
 /* Check the pad bytes at the end of a slab page */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static int slab_pad_check(struct kmem_cache *s, struct page *page)
 {
 	u8 *start;
@@ -976,7 +976,7 @@ static int check_object(struct kmem_cache *s, struct page *page,
 	}
 	return 1;
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static int check_slab(struct kmem_cache *s, struct page *page)
 {
 	int maxobj;
@@ -1099,7 +1099,7 @@ static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
 {
 	kmemleak_alloc(ptr, size, 1, flags);
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static inline void kfree_hook(const void *x)
 {
 	kmemleak_free(x);
@@ -1252,7 +1252,7 @@ bad:
 	}
 	return 0;
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static noinline struct kmem_cache_node *free_debug_processing(
 	struct kmem_cache *s, struct page *page, void *object,
 	unsigned long addr, unsigned long *flags)
@@ -1267,24 +1267,24 @@ static noinline struct kmem_cache_node *free_debug_processing(
 	if (!check_slab(s, page))
 		goto fail;
 
-	/*! 2015.01.30 study end */
+	/*! 2016.01.30 study end */
 
-	/*! 2015.02.13 study start */
+	/*! 2016.02.13 study start */
 
-	/*! 2015.02.13 study -ing */
+	/*! 2016.02.13 study -ing */
 	if (!check_valid_pointer(s, page, object)) {
-		/*! 2015.02.13 study -ing */
+		/*! 2016.02.13 study -ing */
 		slab_err(s, page, "Invalid object pointer 0x%p", object);
 		goto fail;
 	}
 
-	/*! 2015.02.13 study -ing */
+	/*! 2016.02.13 study -ing */
 	if (on_freelist(s, page, object)) {
 		object_err(s, page, object, "Object already free");
 		goto fail;
 	}
 
-	/*! 2015.02.13 study -ing */
+	/*! 2016.02.13 study -ing */
 	if (!check_object(s, page, object, SLUB_RED_ACTIVE))
 		goto out;
 
@@ -1461,7 +1461,7 @@ static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
 {
 	kmemleak_alloc(ptr, size, 1, flags);
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static inline void kfree_hook(const void *x)
 {
 	kmemleak_free(x);
@@ -1476,7 +1476,7 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
 	kmemleak_alloc_recursive(object, s->object_size, 1, s->flags,
 		flags & gfp_allowed_mask);
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static inline void slab_free_hook(struct kmem_cache *s, void *x)
 {
 	/* CONFIG_DEBUG_KMEMLEAK 이 not define 이면 do nothing. */
@@ -1727,7 +1727,7 @@ static void discard_slab(struct kmem_cache *s, struct page *page)
 /*
  * Management of partially allocated slabs.
  */
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 static inline void
 __add_partial(struct kmem_cache_node *n, struct page *page, int tail)
 {
@@ -2775,7 +2775,7 @@ EXPORT_SYMBOL(kmem_cache_alloc_node_trace);
  * lock and free the item. If there is no additional partial page
  * handling required then we can return immediately.
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static void __slab_free(struct kmem_cache *s, struct page *page,
 			void *x, unsigned long addr)
 {
@@ -2912,7 +2912,7 @@ slab_empty:
  * If fastpath is not possible then fall back to __slab_free where we deal
  * with all sorts of special processing.
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 /*! slab으로 할당 된 page를 free  */
 static __always_inline void slab_free(struct kmem_cache *s,
 			struct page *page, void *x, unsigned long addr)
@@ -3120,7 +3120,7 @@ static inline int calculate_order(int size, int reserved)
 	return -ENOSYS;
 }
 
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 static void
 init_kmem_cache_node(struct kmem_cache_node *n)
 {
@@ -3134,7 +3134,7 @@ init_kmem_cache_node(struct kmem_cache_node *n)
 #endif
 }
 
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 static inline int alloc_kmem_cache_cpus(struct kmem_cache *s)
 {
 	BUILD_BUG_ON(PERCPU_DYNAMIC_EARLY_SIZE <
@@ -3724,7 +3724,7 @@ size_t ksize(const void *object)
 }
 EXPORT_SYMBOL(ksize);
 
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 void kfree(const void *x)
 {
 	struct page *page;

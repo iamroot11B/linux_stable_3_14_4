@@ -335,7 +335,7 @@ static void __maybe_unused pcpu_next_pop(struct pcpu_chunk *chunk,
  * RETURNS:
  * Pointer to the allocated area on success, NULL on failure.
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static void *pcpu_mem_zalloc(size_t size)
 {
 	if (WARN_ON_ONCE(!slab_is_available()))
@@ -354,7 +354,7 @@ static void *pcpu_mem_zalloc(size_t size)
  *
  * Free @ptr.  @ptr should have been allocated using pcpu_mem_zalloc().
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static void pcpu_mem_free(void *ptr, size_t size)
 {
 	if (size <= PAGE_SIZE)
@@ -402,7 +402,7 @@ static void pcpu_chunk_relocate(struct pcpu_chunk *chunk, int oslot)
  * New target map allocation length if extension is necessary, 0
  * otherwise.
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 /*! 필요 시 pcpu chunk 를 확장 16 - 32 - 64 ... 순으로 확장 시도 */
 static int pcpu_need_to_extend(struct pcpu_chunk *chunk)
 {
@@ -431,7 +431,7 @@ static int pcpu_need_to_extend(struct pcpu_chunk *chunk)
  * RETURNS:
  * 0 on success, -errno on failure.
  */
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 static int pcpu_extend_area_map(struct pcpu_chunk *chunk, int new_alloc)
 {
 	int *old = NULL, *new = NULL;
@@ -762,7 +762,7 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
  * RETURNS:
  * Percpu pointer to the allocated area on success, NULL on failure.
  */
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 {
 	static int warn_limit = 10;
@@ -812,7 +812,7 @@ static void __percpu *pcpu_alloc(size_t size, size_t align, bool reserved)
 	}
 
 restart:
-	/*! 2015.01.23 study end */
+	/*! 2016.01.23 study end */
 	/* search through normal chunks */
 	for (slot = pcpu_size_to_slot(size); slot < pcpu_nr_slots; slot++) {
 		list_for_each_entry(chunk, &pcpu_slot[slot], list) {
@@ -900,7 +900,7 @@ fail_unlock_mutex:
  * RETURNS:
  * Percpu pointer to the allocated area on success, NULL on failure.
  */
-/*! 2015.01.23 study -ing */
+/*! 2016.01.23 study -ing */
 void __percpu *__alloc_percpu(size_t size, size_t align)
 {
 	return pcpu_alloc(size, align, false);
