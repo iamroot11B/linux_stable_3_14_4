@@ -110,6 +110,7 @@ struct pcpu_chunk {
 	unsigned long		populated[];	/* populated bitmap */
 };
 
+/*! pcpu_unit_pages : pcpu_setup_first_chunk에서 초기화  */
 static int pcpu_unit_pages __read_mostly;
 static int pcpu_unit_size __read_mostly;
 /*!
@@ -268,6 +269,7 @@ static int pcpu_chunk_slot(const struct pcpu_chunk *chunk)
 }
 
 /* set the pointer to a chunk in a page struct */
+/*! 2016-04-02 study -ing */
 static void pcpu_set_page_chunk(struct page *page, struct pcpu_chunk *pcpu)
 {
 	page->index = (unsigned long)pcpu;
@@ -278,30 +280,35 @@ static struct pcpu_chunk *pcpu_get_page_chunk(struct page *page)
 {
 	return (struct pcpu_chunk *)page->index;
 }
-
+/*! 2016-04-02 study -ing */
 static int __maybe_unused pcpu_page_idx(unsigned int cpu, int page_idx)
 {
+	/*! pcpu page 의 index를 찾는 과정  */
 	return pcpu_unit_map[cpu] * pcpu_unit_pages + page_idx;
 }
-
+/*! 2016-04-02 study -ing */
 static unsigned long pcpu_chunk_addr(struct pcpu_chunk *chunk,
 				     unsigned int cpu, int page_idx)
 {
 	return (unsigned long)chunk->base_addr + pcpu_unit_offsets[cpu] +
 		(page_idx << PAGE_SHIFT);
 }
-
+/*! 2016-04-02 study -ing */
 static void __maybe_unused pcpu_next_unpop(struct pcpu_chunk *chunk,
 					   int *rs, int *re, int end)
 {
+	/*! rs 부터 clear(0) 된 영역을 찾는다.  */
 	*rs = find_next_zero_bit(chunk->populated, end, *rs);
 	*re = find_next_bit(chunk->populated, end, *rs + 1);
 }
-
+/*! 2016-04-02 study -ing */
 static void __maybe_unused pcpu_next_pop(struct pcpu_chunk *chunk,
 					 int *rs, int *re, int end)
 {
+	/*! rs 부터 set(1) 된 영역을 찾는다.  */
+	/*! 메모리 p 의 off 번째 비트부터 첫번째 찾은 1 인 비트값을 돌려줌 */
 	*rs = find_next_bit(chunk->populated, end, *rs);
+	/*! 메모리 p 의 off 번째 비트부터 첫번째 찾은 0 인 비트값을 돌려줌 */
 	*re = find_next_zero_bit(chunk->populated, end, *rs + 1);
 }
 
@@ -311,6 +318,7 @@ static void __maybe_unused pcpu_next_pop(struct pcpu_chunk *chunk,
  * be integer variables and will be set to start and end page index of
  * the current region.
  */
+/*! 2016-04-02 study -ing */
 #define pcpu_for_each_unpop_region(chunk, rs, re, start, end)		    \
 	for ((rs) = (start), pcpu_next_unpop((chunk), &(rs), &(re), (end)); \
 	     (rs) < (re);						    \
@@ -864,6 +872,7 @@ area_found:
 	spin_unlock_irqrestore(&pcpu_lock, flags);
 
 	/*! 2016-03-19 study end */
+	/*! 2016-04-02 study start */
 	/* populate, map and clear the area */
 	if (pcpu_populate_chunk(chunk, off, size)) {
 		spin_lock_irqsave(&pcpu_lock, flags);

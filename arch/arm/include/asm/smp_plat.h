@@ -31,6 +31,7 @@ static inline bool is_smp(void)
 #ifndef CONFIG_MMU
 #define tlb_ops_need_broadcast()	0
 #else
+/*! 2016-04-02 study -ing */
 static inline int tlb_ops_need_broadcast(void)
 {
 	if (!is_smp())

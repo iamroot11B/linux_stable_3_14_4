@@ -18,6 +18,8 @@
 #else
 #define __AC(X,Y)	(X##Y)
 #define _AC(X,Y)	__AC(X,Y)
+/*! 2016-04-02 study -ing */
+/*!  T 형식의 X  */
 #define _AT(T,X)	((T)(X))
 #endif
 

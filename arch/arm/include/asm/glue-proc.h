@@ -247,7 +247,7 @@
 #  define CPU_NAME cpu_pj4b
 # endif
 #endif
-
+/*! 2016-04-02 study -ing */
 #ifndef MULTI_CPU
 #define cpu_proc_init			__glue(CPU_NAME,_proc_init)
 #define cpu_proc_fin			__glue(CPU_NAME,_proc_fin)

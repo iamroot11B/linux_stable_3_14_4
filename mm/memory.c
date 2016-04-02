@@ -3824,6 +3824,7 @@ int handle_mm_fault(struct mm_struct *mm, struct vm_area_struct *vma,
  * Allocate page upper directory.
  * We've already handled the fast-path in-line.
  */
+/*! 2016-04-02 study -ing */
 int __pud_alloc(struct mm_struct *mm, pgd_t *pgd, unsigned long address)
 {
 	pud_t *new = pud_alloc_one(mm, address);

@@ -1,7 +1,7 @@
 #ifndef _4LEVEL_FIXUP_H
 #define _4LEVEL_FIXUP_H
 
-#define __ARCH_HAS_4LEVEL_HACK
+#define __AReshCH_HAS_4LEVEL_HACK
 #define __PAGETABLE_PUD_FOLDED
 
 #define PUD_SIZE			PGDIR_SIZE

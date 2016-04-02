@@ -1412,14 +1412,19 @@ int __pte_alloc_kernel(pmd_t *pmd, unsigned long address);
  * Remove it when 4level-fixup.h has been removed.
  */
 #if defined(CONFIG_MMU) && !defined(__ARCH_HAS_4LEVEL_HACK)
+/*! 2016-04-02 study -ing */
 static inline pud_t *pud_alloc(struct mm_struct *mm, pgd_t *pgd, unsigned long address)
 {
+	/*! 우리는 pgd_none = 0 -> pud_offset 리턴 (pgd 를 그대로 리턴) */
 	return (unlikely(pgd_none(*pgd)) && __pud_alloc(mm, pgd, address))?
 		NULL: pud_offset(pgd, address);
 }
-
+/*! 2016-04-02 study -ing */
 static inline pmd_t *pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long address)
 {
+	/*! 우리는 pgtable 2level. pud_none() = 0
+	 *  pud = pmd 로 리턴
+	 */
 	return (unlikely(pud_none(*pud)) && __pmd_alloc(mm, pud, address))?
 		NULL: pmd_offset(pud, address);
 }
@@ -1538,7 +1543,8 @@ static inline void pgtable_page_dtor(struct page *page)
 	((unlikely(pmd_none(*(pmd))) && __pte_alloc(mm, NULL,	\
 							pmd, address))?	\
 		NULL: pte_offset_map_lock(mm, pmd, address, ptlp))
-
+/*! 2016-04-02 study -ing */
+/*! pmd_none(*(pmd) 는 0 */
 #define pte_alloc_kernel(pmd, address)			\
 	((unlikely(pmd_none(*(pmd))) && __pte_alloc_kernel(pmd, address))? \
 		NULL: pte_offset_kernel(pmd, address))

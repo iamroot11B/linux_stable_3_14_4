@@ -45,6 +45,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
 #define __pgprot(x)     ((pgprot_t) { (x) } )
 
 #else
+/*! 2016-04-02 study -ing */
 /*
  * .. while these make it easier on the compiler
  */
@@ -52,7 +53,7 @@ typedef pteval_t pte_t;
 typedef pmdval_t pmd_t;
 typedef pmdval_t pgd_t[2];
 typedef pteval_t pgprot_t;
-
+/*! 2016-04-02 study -ing */
 #define pte_val(x)      (x)
 #define pmd_val(x)      (x)
 #define pgd_val(x)	((x)[0])

@@ -219,7 +219,7 @@ static inline void __flush_icache_all(void)
  * Flush caches up to Level of Unification Inner Shareable
  */
 #define flush_cache_louis()		__cpuc_flush_kern_louis()
-
+/*! 2016-04-02 study -ing */
 #define flush_cache_all()		__cpuc_flush_kern_all()
 
 static inline void vivt_flush_cache_mm(struct mm_struct *mm)
@@ -281,6 +281,8 @@ extern void flush_cache_page(struct vm_area_struct *vma, unsigned long user_addr
  * Perform necessary cache operations to ensure that the TLB will
  * see data written in the specified area.
  */
+/*! 2016-04-02 study -ing */
+/*! cpu_v7_dcache_clean_area(start,size) 를 call 하는 매크로  */
 #define clean_dcache_area(start,size)	cpu_dcache_clean_area(start, size)
 
 /*
@@ -343,8 +345,12 @@ extern void flush_kernel_dcache_page(struct page *);
  * data, we need to do a full cache flush to ensure that writebacks
  * don't corrupt data placed into these pages via the new mappings.
  */
+/*! 2016-04-02 study -ing */
 static inline void flush_cache_vmap(unsigned long start, unsigned long end)
 {
+	/*! cache 가 nonaliasing이 아닌 경우 flush cache 해주고,
+	 *  아니면 dsb 만 하고 넘어간다.
+	 */
 	if (!cache_is_vipt_nonaliasing())
 		flush_cache_all();
 	else
@@ -354,9 +360,10 @@ static inline void flush_cache_vmap(unsigned long start, unsigned long end)
 		 */
 		dsb(ishst);
 }
-
+/*! 2016-04-02 study -ing */
 static inline void flush_cache_vunmap(unsigned long start, unsigned long end)
 {
+	/*! cache 가 nonaliasing 이 아닌 경우 flush 수행  */
 	if (!cache_is_vipt_nonaliasing())
 		flush_cache_all();
 }

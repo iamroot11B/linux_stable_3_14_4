@@ -152,7 +152,7 @@ extern int bitmap_ord_to_pos(const unsigned long *bitmap, int n, int bits);
 	((nbits) % BITS_PER_LONG) ?					\
 		(1UL<<((nbits) % BITS_PER_LONG))-1 : ~0UL		\
 )
-
+/*! 2016-04-02 study -ing */
 #define small_const_nbits(nbits) \
 	(__builtin_constant_p(nbits) && (nbits) <= BITS_PER_LONG)
 
@@ -175,10 +175,11 @@ static inline void bitmap_fill(unsigned long *dst, int nbits)
 	}
 	dst[nlongs - 1] = BITMAP_LAST_WORD_MASK(nbits);
 }
-
+/*! 2016-04-02 study -ing */
 static inline void bitmap_copy(unsigned long *dst, const unsigned long *src,
 			int nbits)
 {
+	/*! 배열이 아니면 값을 직접 넣어주고 배열 형식이면 메모리 copy를 해 준다.  */
 	if (small_const_nbits(nbits))
 		*dst = *src;
 	else {

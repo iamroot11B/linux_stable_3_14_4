@@ -73,7 +73,7 @@ ENTRY(cpu_v7_do_idle)
 	wfi
 	mov	pc, lr
 ENDPROC(cpu_v7_do_idle)
-
+/*! 2016-04-02 study -ing */
 ENTRY(cpu_v7_dcache_clean_area)
 	ALT_SMP(W(nop))			@ MP extensions imply L1 PTW
 	ALT_UP_B(1f)

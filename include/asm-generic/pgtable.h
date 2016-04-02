@@ -80,11 +80,13 @@ int pmdp_clear_flush_young(struct vm_area_struct *vma,
 #endif
 
 #ifndef __HAVE_ARCH_PTEP_GET_AND_CLEAR
+/*! 2016-04-02 study -ing */
 static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
 				       unsigned long address,
 				       pte_t *ptep)
 {
 	pte_t pte = *ptep;
+	/*! cpu_v7_set_pte_ext(mm, __pte(0), 0) 를 수행하게 된다. */
 	pte_clear(mm, address, ptep);
 	return pte;
 }
@@ -242,7 +244,7 @@ static inline int pmd_same(pmd_t pmd_a, pmd_t pmd_b)
 ({	unsigned long __boundary = ((addr) + PGDIR_SIZE) & PGDIR_MASK;	\
 	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
 })
-
+/*! 2016-04-02 study -ing */
 #ifndef pud_addr_end
 #define pud_addr_end(addr, end)						\
 ({	unsigned long __boundary = ((addr) + PUD_SIZE) & PUD_MASK;	\

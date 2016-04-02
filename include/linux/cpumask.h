@@ -215,6 +215,8 @@ int cpumask_any_but(const struct cpumask *mask, unsigned int cpu);
  *
  * After the loop, cpu is >= nr_cpu_ids.
  */
+/*! 2016-04-02 study -ing */
+/*! nr_cpu_ids = 8  */
 #define for_each_cpu(cpu, mask)				\
 	for ((cpu) = -1;				\
 		(cpu) = cpumask_next((cpu), (mask)),	\
@@ -744,7 +746,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
 
 /* First bits of cpu_bit_bitmap are in fact unset. */
 #define cpu_none_mask to_cpumask(cpu_bit_bitmap[0])
-
+/*! 2016-04-02 study -ing */
 #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
 #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
 #define for_each_present_cpu(cpu)  for_each_cpu((cpu), cpu_present_mask)

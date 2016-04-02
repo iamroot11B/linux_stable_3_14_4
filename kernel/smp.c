@@ -331,6 +331,7 @@ EXPORT_SYMBOL_GPL(__smp_call_function_single);
  * hardware interrupt handler or from a bottom half handler. Preemption
  * must be disabled when calling this function.
  */
+/*! 2016-04-02 study -ing */
 void smp_call_function_many(const struct cpumask *mask,
 			    smp_call_func_t func, void *info, bool wait)
 {
@@ -413,6 +414,7 @@ EXPORT_SYMBOL(smp_call_function_many);
  * You must not call this function with disabled interrupts or from a
  * hardware interrupt handler or from a bottom half handler.
  */
+/*! 2016-04-02 study -ing */
 int smp_call_function(smp_call_func_t func, void *info, int wait)
 {
 	preempt_disable();
@@ -533,6 +535,7 @@ void __init smp_init(void)
  * early_boot_irqs_disabled is set.  Use local_irq_save/restore() instead
  * of local_irq_disable/enable().
  */
+/*! 2016-04-02 study -ing */
 int on_each_cpu(void (*func) (void *info), void *info, int wait)
 {
 	unsigned long flags;

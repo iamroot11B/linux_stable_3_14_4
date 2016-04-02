@@ -187,7 +187,7 @@ void flush_tlb_range(struct vm_area_struct *vma,
 		local_flush_tlb_range(vma, start, end);
 	broadcast_tlb_mm_a15_erratum(vma->vm_mm);
 }
-
+/*! 2016-04-02 study -ing */
 void flush_tlb_kernel_range(unsigned long start, unsigned long end)
 {
 	if (tlb_ops_need_broadcast()) {

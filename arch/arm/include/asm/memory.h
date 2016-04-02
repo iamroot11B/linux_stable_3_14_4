@@ -39,6 +39,11 @@
  * TASK_SIZE - the maximum size of a user space task.
  * TASK_UNMAPPED_BASE - the lower boundary of the mmap VM area
  */
+/*! 2016-04-02 study -ing */
+/*! CONFIG_PAGE_OFFSET = 0xC0000000
+ *  SZ_16M			   = 0x01000000
+ *  TASK_SIZE		   = 0xBF000000
+ */
 #define TASK_SIZE		(UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
 #define TASK_UNMAPPED_BASE	ALIGN(TASK_SIZE / 3, SZ_16M)
 

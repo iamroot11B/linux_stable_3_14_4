@@ -293,7 +293,7 @@ void bitmap_set(unsigned long *map, int start, int nr)
 	}
 }
 EXPORT_SYMBOL(bitmap_set);
-
+/*! 2016-04-02 study -ing */
 void bitmap_clear(unsigned long *map, int start, int nr)
 {
 	unsigned long *p = map + BIT_WORD(start);

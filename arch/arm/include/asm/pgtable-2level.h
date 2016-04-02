@@ -124,6 +124,7 @@
  * The PTE table pointer refers to the hardware entries; the "Linux"
  * entries are stored 1024 bytes below.
  */
+/*! 2016-04-02 study -ing */
 #define L_PTE_VALID		(_AT(pteval_t, 1) << 0)		/* Valid */
 #define L_PTE_PRESENT		(_AT(pteval_t, 1) << 0)
 #define L_PTE_YOUNG		(_AT(pteval_t, 1) << 1)
@@ -159,12 +160,13 @@
  * the pud: the pud entry is never bad, always exists, and can't be set or
  * cleared.
  */
+/*! 2016-04-02 study -ing */
 #define pud_none(pud)		(0)
 #define pud_bad(pud)		(0)
 #define pud_present(pud)	(1)
 #define pud_clear(pudp)		do { } while (0)
 #define set_pud(pud,pudp)	do { } while (0)
-
+/*! 2016-04-02 study -ing */
 static inline pmd_t *pmd_offset(pud_t *pud, unsigned long addr)
 {
 	return (pmd_t *)pud;

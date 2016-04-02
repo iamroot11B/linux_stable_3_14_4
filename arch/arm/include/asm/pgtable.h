@@ -175,15 +175,16 @@ extern pgd_t swapper_pg_dir[PTRS_PER_PGD];
 
 /* to find an entry in a page-table-directory */
 #define pgd_index(addr)		((addr) >> PGDIR_SHIFT)
-
+/*! 2016-04-02 study -ing */
 #define pgd_offset(mm, addr)	((mm)->pgd + pgd_index(addr))
 
 /* to find an entry in a kernel page-table-directory */
+/*! 2016-04-02 study -ing */
 #define pgd_offset_k(addr)	pgd_offset(&init_mm, addr)
-
+/*! 2016-04-02 study -ing */
 #define pmd_none(pmd)		(!pmd_val(pmd))
 #define pmd_present(pmd)	(pmd_val(pmd))
-
+/*! 2016-04-02 study -ing */
 static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 {
     /*! pmd_val(pmd) & 0xfffff000  */
@@ -202,7 +203,7 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 
 /*! addr이 pmd 내에서 몇번째 인지 (index) 찾아 주는 매크로  */
 #define pte_index(addr)		(((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
-
+/*! 2016-04-02 study -ing */
 #define pte_offset_kernel(pmd,addr)	(pmd_page_vaddr(*(pmd)) + pte_index(addr))
 
 #define pte_offset_map(pmd,addr)	(__pte_map(pmd) + pte_index(addr))
@@ -213,17 +214,20 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 
 #define pte_page(pte)		pfn_to_page(pte_pfn(pte))
 #define mk_pte(page,prot)	pfn_pte(page_to_pfn(page), prot)
-
+/*! 2016-04-02 study -ing */
+/*! cpu_v7_set_pte_ext(ptep, __pte(0), 0) 를 수행하게 된다. */
 #define pte_clear(mm,addr,ptep)	set_pte_ext(ptep, __pte(0), 0)
-
+/*! 2016-04-02 study -ing */
 #define pte_none(pte)		(!pte_val(pte))
+/*! L_PTE_PRESENT => (pte_t)1  */
 #define pte_present(pte)	(pte_val(pte) & L_PTE_PRESENT)
 #define pte_write(pte)		(!(pte_val(pte) & L_PTE_RDONLY))
 #define pte_dirty(pte)		(pte_val(pte) & L_PTE_DIRTY)
 #define pte_young(pte)		(pte_val(pte) & L_PTE_YOUNG)
 #define pte_exec(pte)		(!(pte_val(pte) & L_PTE_XN))
 #define pte_special(pte)	(0)
-
+/*! 2016-04-02 study -ing */
+/*! L_PTE_USER => (pte_t) 1<<8  */
 #define pte_present_user(pte)  (pte_present(pte) && (pte_val(pte) & L_PTE_USER))
 
 #if __LINUX_ARM_ARCH__ < 6
@@ -233,17 +237,20 @@ static inline void __sync_icache_dcache(pte_t pteval)
 #else
 extern void __sync_icache_dcache(pte_t pteval);
 #endif
-
+/*! 2016-04-02 study -ing */
 static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
 			      pte_t *ptep, pte_t pteval)
 {
 	unsigned long ext = 0;
-
+	/*! pte_present_user => (pteval & 1<<8) && (pteval & 1)
+	 *  TASK_SIZE = 0xBF000000
+	 */
 	if (addr < TASK_SIZE && pte_present_user(pteval)) {
 		__sync_icache_dcache(pteval);
 		ext |= PTE_EXT_NG;
 	}
-
+	/*! 인자로 넘겨준 리눅스 pte 정보를 설정한후에 거기에 맞는하드웨어
+	 *  pte를 초기화하고 pte를 플러시하게 된다. (from ARM Linux 책) */
 	set_pte_ext(ptep, pteval, ext);
 }
 

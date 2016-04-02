@@ -38,16 +38,19 @@ static struct page *pcpu_chunk_page(struct pcpu_chunk *chunk,
  * RETURNS:
  * Pointer to temp pages array on success, NULL on failure.
  */
+/*! 2016-04-02 study -ing */
 static struct page **pcpu_get_pages_and_bitmap(struct pcpu_chunk *chunk,
 					       unsigned long **bitmapp,
 					       bool may_alloc)
 {
 	static struct page **pages;
 	static unsigned long *bitmap;
+	/*! pcpu_unit_pages : pcpu_setup_first_chunk에서 초기화  */
 	size_t pages_size = pcpu_nr_units * pcpu_unit_pages * sizeof(pages[0]);
 	size_t bitmap_size = BITS_TO_LONGS(pcpu_unit_pages) *
 			     sizeof(unsigned long);
 
+	/*! pages, bitmap 이 NULL 이면 alloc 해준다.  */
 	if (!pages || !bitmap) {
 		if (may_alloc && !pages)
 			pages = pcpu_mem_zalloc(pages_size);
@@ -57,6 +60,7 @@ static struct page **pcpu_get_pages_and_bitmap(struct pcpu_chunk *chunk,
 			return NULL;
 	}
 
+	/*! bitmap에 chunk->populated 를 copy 해 준다. */
 	bitmap_copy(bitmap, chunk->populated, pcpu_unit_pages);
 
 	*bitmapp = bitmap;
@@ -74,6 +78,7 @@ static struct page **pcpu_get_pages_and_bitmap(struct pcpu_chunk *chunk,
  * Free pages [@page_start and @page_end) in @pages for all units.
  * The pages were allocated for @chunk.
  */
+/*! 2016-04-02 study -ing */
 static void pcpu_free_pages(struct pcpu_chunk *chunk,
 			    struct page **pages, unsigned long *populated,
 			    int page_start, int page_end)
@@ -81,6 +86,7 @@ static void pcpu_free_pages(struct pcpu_chunk *chunk,
 	unsigned int cpu;
 	int i;
 
+	/*! page_start ~ page_end 모든 page free  */
 	for_each_possible_cpu(cpu) {
 		for (i = page_start; i < page_end; i++) {
 			struct page *page = pages[pcpu_page_idx(cpu, i)];
@@ -103,6 +109,7 @@ static void pcpu_free_pages(struct pcpu_chunk *chunk,
  * The allocation is for @chunk.  Percpu core doesn't care about the
  * content of @pages and will pass it verbatim to pcpu_map_pages().
  */
+/*! 2016-04-02 study -ing */
 static int pcpu_alloc_pages(struct pcpu_chunk *chunk,
 			    struct page **pages, unsigned long *populated,
 			    int page_start, int page_end)
@@ -113,13 +120,18 @@ static int pcpu_alloc_pages(struct pcpu_chunk *chunk,
 
 	for_each_possible_cpu(cpu) {
 		for (i = page_start; i < page_end; i++) {
+			/*! pages에서 pcpu page 의 index에 해당하는 위치를 찾는다.
+			 *  (pages 는 포인터 배열)
+			 */
 			struct page **pagep = &pages[pcpu_page_idx(cpu, i)];
 
+			/*! 해당 위치에 pages node alloc */
 			*pagep = alloc_pages_node(cpu_to_node(cpu), gfp, 0);
 			if (!*pagep) {
+				/*! alloc 실패 시 free  */
 				pcpu_free_pages(chunk, pages, populated,
 						page_start, page_end);
-				return -ENOMEM;
+				return pp-ENOMEM;
 			}
 		}
 	}
@@ -138,6 +150,7 @@ static int pcpu_alloc_pages(struct pcpu_chunk *chunk,
  * doing it for each cpu.  This could be an overkill but is more
  * scalable.
  */
+/*! 2016-04-02 study -ing */
 static void pcpu_pre_unmap_flush(struct pcpu_chunk *chunk,
 				 int page_start, int page_end)
 {
@@ -145,7 +158,7 @@ static void pcpu_pre_unmap_flush(struct pcpu_chunk *chunk,
 		pcpu_chunk_addr(chunk, pcpu_low_unit_cpu, page_start),
 		pcpu_chunk_addr(chunk, pcpu_high_unit_cpu, page_end));
 }
-
+/*! 2016-04-02 study -ing */
 static void __pcpu_unmap_pages(unsigned long addr, int nr_pages)
 {
 	unmap_kernel_range_noflush(addr, nr_pages << PAGE_SHIFT);
@@ -165,6 +178,7 @@ static void __pcpu_unmap_pages(unsigned long addr, int nr_pages)
  * called after all unmaps are finished.  The caller should call
  * proper pre/post flush functions.
  */
+/*! 2016-04-02 study -ing */
 static void pcpu_unmap_pages(struct pcpu_chunk *chunk,
 			     struct page **pages, unsigned long *populated,
 			     int page_start, int page_end)
@@ -172,6 +186,7 @@ static void pcpu_unmap_pages(struct pcpu_chunk *chunk,
 	unsigned int cpu;
 	int i;
 
+	/*! cpu 갯수 loop  */
 	for_each_possible_cpu(cpu) {
 		for (i = page_start; i < page_end; i++) {
 			struct page *page;
@@ -180,10 +195,12 @@ static void pcpu_unmap_pages(struct pcpu_chunk *chunk,
 			WARN_ON(!page);
 			pages[pcpu_page_idx(cpu, i)] = page;
 		}
+		/*! pgd->pud->pmd->pte 순으로 clear 수행 */
 		__pcpu_unmap_pages(pcpu_chunk_addr(chunk, cpu, page_start),
 				   page_end - page_start);
 	}
 
+	/*! page_start 부터 page_end - page_start 갯수 만큼 populated의 bitmap clear  */
 	bitmap_clear(populated, page_start, page_end - page_start);
 }
 
@@ -200,6 +217,7 @@ static void pcpu_unmap_pages(struct pcpu_chunk *chunk,
  * As with pcpu_pre_unmap_flush(), TLB flushing also is done at once
  * for the whole region.
  */
+/*! 2016-04-02 study -ing */
 static void pcpu_post_unmap_tlb_flush(struct pcpu_chunk *chunk,
 				      int page_start, int page_end)
 {
@@ -207,7 +225,7 @@ static void pcpu_post_unmap_tlb_flush(struct pcpu_chunk *chunk,
 		pcpu_chunk_addr(chunk, pcpu_low_unit_cpu, page_start),
 		pcpu_chunk_addr(chunk, pcpu_high_unit_cpu, page_end));
 }
-
+/*! 2016-04-02 study -ing */
 static int __pcpu_map_pages(unsigned long addr, struct page **pages,
 			    int nr_pages)
 {
@@ -231,6 +249,8 @@ static int __pcpu_map_pages(unsigned long addr, struct page **pages,
  * @chunk->populated bitmap and whatever is necessary for reverse
  * lookup (addr -> chunk).
  */
+/*! 2016-04-02 study -ing */
+/*! pages 를 chunk 에 맵핑.  */
 static int pcpu_map_pages(struct pcpu_chunk *chunk,
 			  struct page **pages, unsigned long *populated,
 			  int page_start, int page_end)
@@ -238,6 +258,9 @@ static int pcpu_map_pages(struct pcpu_chunk *chunk,
 	unsigned int cpu, tcpu;
 	int i, err;
 
+	/*! 각 cpu 별 loop 수행
+	 * pgd -> pud -> pmd -> pte 순으로 맵핑 수행
+	 */
 	for_each_possible_cpu(cpu) {
 		err = __pcpu_map_pages(pcpu_chunk_addr(chunk, cpu, page_start),
 				       &pages[pcpu_page_idx(cpu, page_start)],
@@ -260,6 +283,7 @@ err:
 	for_each_possible_cpu(tcpu) {
 		if (tcpu == cpu)
 			break;
+		/*! pgd->pud->pmd->pte 순으로 clear 수행 */
 		__pcpu_unmap_pages(pcpu_chunk_addr(chunk, tcpu, page_start),
 				   page_end - page_start);
 	}
@@ -278,9 +302,11 @@ err:
  * As with pcpu_pre_unmap_flush(), TLB flushing also is done at once
  * for the whole region.
  */
+/*! 2016-04-02 study -ing */
 static void pcpu_post_map_flush(struct pcpu_chunk *chunk,
 				int page_start, int page_end)
 {
+	/*! flush cache 수행  */
 	flush_cache_vmap(
 		pcpu_chunk_addr(chunk, pcpu_low_unit_cpu, page_start),
 		pcpu_chunk_addr(chunk, pcpu_high_unit_cpu, page_end));
@@ -312,6 +338,9 @@ static int pcpu_populate_chunk(struct pcpu_chunk *chunk, int off, int size)
 	/* quick path, check whether all pages are already there */
 	rs = page_start;
 	pcpu_next_pop(chunk, &rs, &re, page_end);
+	/*! populate 하려는 page_start, end 와 populated 의 rs, re 가 일치하면
+	 *  더 할일 없이 goto clear.
+	 */
 	if (rs == page_start && re == page_end)
 		goto clear;
 
@@ -323,13 +352,18 @@ static int pcpu_populate_chunk(struct pcpu_chunk *chunk, int off, int size)
 		return -ENOMEM;
 
 	/* alloc and map */
+	/*! rs: region start, re: region end (Page Frame number 단위)
+	 * page_start ~ page_end 까지 pcpu_next_unpop하며 loop 수행
+	 */
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, page_end) {
 		rc = pcpu_alloc_pages(chunk, pages, populated, rs, re);
+		/*! 한번이라도 alloc 실패 시 go to err_free.  */
 		if (rc)
 			goto err_free;
 		free_end = re;
 	}
 
+	/*! 위에서 alloc 성공 시 다시 한번 동일 영역 loop 돌면서 pcpu_map_pages  */
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, page_end) {
 		rc = pcpu_map_pages(chunk, pages, populated, rs, re);
 		if (rc)
@@ -346,9 +380,11 @@ clear:
 	return 0;
 
 err_unmap:
+	/*! cache flush 수행  */
 	pcpu_pre_unmap_flush(chunk, page_start, unmap_end);
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, unmap_end)
 		pcpu_unmap_pages(chunk, pages, populated, rs, re);
+	/*! 2016-04-02 study end */
 	pcpu_post_unmap_tlb_flush(chunk, page_start, unmap_end);
 err_free:
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, free_end)

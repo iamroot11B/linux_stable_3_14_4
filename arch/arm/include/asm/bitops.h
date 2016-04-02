@@ -209,12 +209,15 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
 #define test_and_change_bit(nr,p)	ATOMIC_BITOP(test_and_change_bit,nr,p)
 
 #ifndef __ARMEB__
+/*! 2016-04-02 study -ing */
 /*
  * These are the little endian, atomic definitions.
  */
+/*! 참조 : http://forum.falinux.com/zbxe/index.php?document_srl=533512&mid=Kernel_API  */
 #define find_first_zero_bit(p,sz)	_find_first_zero_bit_le(p,sz)
 #define find_next_zero_bit(p,sz,off)	_find_next_zero_bit_le(p,sz,off)
 #define find_first_bit(p,sz)		_find_first_bit_le(p,sz)
+/*! 메모리 p 의 off 번째 비트부터 첫번째 찾은 1 인 비트값을 돌려줌 */
 #define find_next_bit(p,sz,off)		_find_next_bit_le(p,sz,off)
 
 #else

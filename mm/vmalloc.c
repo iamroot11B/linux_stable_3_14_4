@@ -52,24 +52,25 @@ static void free_work(struct work_struct *w)
 }
 
 /*** Page table manipulation functions ***/
-
+/*! 2016-04-02 study -ing */
 static void vunmap_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end)
 {
 	pte_t *pte;
-
+	/*! addr 부터 end 까지 pte clear 수행 */
 	pte = pte_offset_kernel(pmd, addr);
 	do {
 		pte_t ptent = ptep_get_and_clear(&init_mm, addr, pte);
 		WARN_ON(!pte_none(ptent) && !pte_present(ptent));
 	} while (pte++, addr += PAGE_SIZE, addr != end);
 }
-
+/*! 2016-04-02 study -ing */
 static void vunmap_pmd_range(pud_t *pud, unsigned long addr, unsigned long end)
 {
 	pmd_t *pmd;
 	unsigned long next;
 
 	pmd = pmd_offset(pud, addr);
+	/*! addr 부터 end 까지 pmd->pte clear 수행 */
 	do {
 		next = pmd_addr_end(addr, end);
 		if (pmd_none_or_clear_bad(pmd))
@@ -77,13 +78,14 @@ static void vunmap_pmd_range(pud_t *pud, unsigned long addr, unsigned long end)
 		vunmap_pte_range(pmd, addr, next);
 	} while (pmd++, addr = next, addr != end);
 }
-
+/*! 2016-04-02 study -ing */
 static void vunmap_pud_range(pgd_t *pgd, unsigned long addr, unsigned long end)
 {
 	pud_t *pud;
 	unsigned long next;
 
 	pud = pud_offset(pgd, addr);
+	/*! addr 부터 end 까지 pud->pmd->pte clear 수행 */
 	do {
 		next = pud_addr_end(addr, end);
 		if (pud_none_or_clear_bad(pud))
@@ -91,7 +93,7 @@ static void vunmap_pud_range(pgd_t *pgd, unsigned long addr, unsigned long end)
 		vunmap_pmd_range(pud, addr, next);
 	} while (pud++, addr = next, addr != end);
 }
-
+/*! 2016-04-02 study -ing */
 static void vunmap_page_range(unsigned long addr, unsigned long end)
 {
 	pgd_t *pgd;
@@ -99,6 +101,7 @@ static void vunmap_page_range(unsigned long addr, unsigned long end)
 
 	BUG_ON(addr >= end);
 	pgd = pgd_offset_k(addr);
+	/*! addr 부터 end 까지 pgd->pud->pmd->pte clear 수행 */
 	do {
 		next = pgd_addr_end(addr, end);
 		if (pgd_none_or_clear_bad(pgd))
@@ -117,6 +120,7 @@ static int vmap_pte_range(pmd_t *pmd, unsigned long addr,
 	 * callers keep track of where we're up to.
 	 */
 
+	/*! pte_offset_kernel(pmd, addr) 을 수행  */
 	pte = pte_alloc_kernel(pmd, addr);
 	if (!pte)
 		return -ENOMEM;
@@ -130,40 +134,48 @@ static int vmap_pte_range(pmd_t *pmd, unsigned long addr,
 		set_pte_at(&init_mm, addr, pte, mk_pte(page, prot));
 		(*nr)++;
 	} while (pte++, addr += PAGE_SIZE, addr != end);
+	/*! pte addr ~ end까지 수행  */
 	return 0;
 }
-
+/*! 2016-04-02 study -ing */
 static int vmap_pmd_range(pud_t *pud, unsigned long addr,
 		unsigned long end, pgprot_t prot, struct page **pages, int *nr)
 {
 	pmd_t *pmd;
 	unsigned long next;
-
+	/*! 우리는 pud = pmd  */
 	pmd = pmd_alloc(&init_mm, pud, addr);
 	if (!pmd)
 		return -ENOMEM;
 	do {
+		/*! pmd end -> next  */
 		next = pmd_addr_end(addr, end);
 		if (vmap_pte_range(pmd, addr, next, prot, pages, nr))
 			return -ENOMEM;
 	} while (pmd++, addr = next, addr != end);
+	/*! pmd addr ~ end까지 수행  */
 	return 0;
 }
-
+/*! 2016-04-02 study -ing */
 static int vmap_pud_range(pgd_t *pgd, unsigned long addr,
 		unsigned long end, pgprot_t prot, struct page **pages, int *nr)
 {
 	pud_t *pud;
 	unsigned long next;
 
+	/*! pud -> pmd -> pte 순으로 들어가면서 alloc  */
+
+	/*! pud_alloc -> pgd 를 그대로 pud 로 리턴  */
 	pud = pud_alloc(&init_mm, pgd, addr);
 	if (!pud)
 		return -ENOMEM;
 	do {
+		/*! pud end -> next  */
 		next = pud_addr_end(addr, end);
 		if (vmap_pmd_range(pud, addr, next, prot, pages, nr))
 			return -ENOMEM;
 	} while (pud++, addr = next, addr != end);
+	/*! pud addr ~ end 까지 수행  */
 	return 0;
 }
 
@@ -173,6 +185,7 @@ static int vmap_pud_range(pgd_t *pgd, unsigned long addr,
  *
  * Ie. pte at addr+N*PAGE_SIZE shall point to pfn corresponding to pages[N]
  */
+/*! 2016-04-02 study -ing */
 static int vmap_page_range_noflush(unsigned long start, unsigned long end,
 				   pgprot_t prot, struct page **pages)
 {
@@ -190,7 +203,7 @@ static int vmap_page_range_noflush(unsigned long start, unsigned long end,
 		if (err)
 			return err;
 	} while (pgd++, addr = next, addr != end);
-
+	/*! pgd addr ~ end까지 수행  */
 	return nr;
 }
 
@@ -1221,9 +1234,11 @@ void __init vmalloc_init(void)
  * RETURNS:
  * The number of pages mapped on success, -errno on failure.
  */
+/*! 2016-04-02 study -ing */
 int map_kernel_range_noflush(unsigned long addr, unsigned long size,
 			     pgprot_t prot, struct page **pages)
 {
+	/*! pages를 addr 부터 size 만큼 맵핑  */
 	return vmap_page_range_noflush(addr, addr + size, prot, pages);
 }
 
@@ -1241,8 +1256,10 @@ int map_kernel_range_noflush(unsigned long addr, unsigned long size,
  * responsible for calling flush_cache_vunmap() on to-be-mapped areas
  * before calling this function and flush_tlb_kernel_range() after.
  */
+/*! 2016-04-02 study -ing */
 void unmap_kernel_range_noflush(unsigned long addr, unsigned long size)
 {
+	/*! addr 부터 addr+size 까지 pgd->pud->pmd->pte clear 수행 */
 	vunmap_page_range(addr, addr + size);
 }
 EXPORT_SYMBOL_GPL(unmap_kernel_range_noflush);

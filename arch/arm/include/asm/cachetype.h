@@ -10,7 +10,7 @@
 #define CACHEID_PIPT			(1 << 5)
 
 extern unsigned int cacheid;
-
+/*! 2016-04-02 study -ing */
 #define cache_is_vivt()			cacheid_is(CACHEID_VIVT)
 #define cache_is_vipt()			cacheid_is(CACHEID_VIPT)
 #define cache_is_vipt_nonaliasing()	cacheid_is(CACHEID_VIPT_NONALIASING)
@@ -49,7 +49,7 @@ extern unsigned int cacheid;
 #define __CACHEID_ALWAYS	(0)
 #define __CACHEID_NEVER		(0)
 #endif
-
+/*! 2016-04-02 study -ing */
 static inline unsigned int __attribute__((pure)) cacheid_is(unsigned int mask)
 {
 	return (__CACHEID_ALWAYS & mask) |

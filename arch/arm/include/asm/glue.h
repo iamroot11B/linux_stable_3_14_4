@@ -14,7 +14,7 @@
  *  when we're targeting multiple classes of TLBs.
  */
 #ifdef __KERNEL__
-
+/*! 2016-04-02 study -ing */
 #ifdef __STDC__
 #define ____glue(name,fn)	name##fn
 #else

@@ -245,6 +245,8 @@ static void __flush_dcache_aliases(struct address_space *mapping, struct page *p
 }
 
 #if __LINUX_ARM_ARCH__ >= 6
+/*! 2016-04-02 study -ing */
+/*! icahce, dcache sync를 수행한다 정도로 확인하고 넘어 감  */
 void __sync_icache_dcache(pte_t pteval)
 {
 	unsigned long pfn;

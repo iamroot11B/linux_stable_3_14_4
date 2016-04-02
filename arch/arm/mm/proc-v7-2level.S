@@ -72,8 +72,9 @@ ENDPROC(cpu_v7_switch_mm)
  *	- pte   - PTE value to store
  *	- ext	- value for extended PTE bits
  */
-/*! 인자로 넘겨준 리녹스 pte 정보를설정한후에 거기에 맞는하드웨어 pte
-를 초기화하고 pte를 플러시하게 된다. (from ARM Linux 책) */
+/*! 인자로 넘겨준 리눅스 pte 정보를설정한후에 거기에 맞는하드웨어
+ *	pte를 초기화하고 pte를 플러시하게 된다. (from ARM Linux 책)
+ */
 ENTRY(cpu_v7_set_pte_ext)
 #ifdef CONFIG_MMU
 	str	r1, [r0]			@ linux version
