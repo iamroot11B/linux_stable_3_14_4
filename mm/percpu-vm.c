@@ -131,7 +131,7 @@ static int pcpu_alloc_pages(struct pcpu_chunk *chunk,
 				/*! alloc 실패 시 free  */
 				pcpu_free_pages(chunk, pages, populated,
 						page_start, page_end);
-				return pp-ENOMEM;
+				return -ENOMEM;
 			}
 		}
 	}
@@ -221,6 +221,7 @@ static void pcpu_unmap_pages(struct pcpu_chunk *chunk,
 static void pcpu_post_unmap_tlb_flush(struct pcpu_chunk *chunk,
 				      int page_start, int page_end)
 {
+	/*! TLB (Translation lookaside buffer) is a cache for PageTableEntry  */
 	flush_tlb_kernel_range(
 		pcpu_chunk_addr(chunk, pcpu_low_unit_cpu, page_start),
 		pcpu_chunk_addr(chunk, pcpu_high_unit_cpu, page_end));
@@ -385,6 +386,7 @@ err_unmap:
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, unmap_end)
 		pcpu_unmap_pages(chunk, pages, populated, rs, re);
 	/*! 2016-04-02 study end */
+	/*! 2016-04-09 study start */
 	pcpu_post_unmap_tlb_flush(chunk, page_start, unmap_end);
 err_free:
 	pcpu_for_each_unpop_region(chunk, rs, re, page_start, free_end)

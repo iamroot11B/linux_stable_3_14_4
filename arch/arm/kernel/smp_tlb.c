@@ -190,6 +190,7 @@ void flush_tlb_range(struct vm_area_struct *vma,
 /*! 2016-04-02 study -ing */
 void flush_tlb_kernel_range(unsigned long start, unsigned long end)
 {
+	/*! 2016-04-09 study end */
 	if (tlb_ops_need_broadcast()) {
 		struct tlb_args ta;
 		ta.ta_start = start;

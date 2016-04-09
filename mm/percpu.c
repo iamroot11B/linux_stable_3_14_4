@@ -290,6 +290,7 @@ static int __maybe_unused pcpu_page_idx(unsigned int cpu, int page_idx)
 static unsigned long pcpu_chunk_addr(struct pcpu_chunk *chunk,
 				     unsigned int cpu, int page_idx)
 {
+	/*! Calc and return chunk address from page_number (=page_idx) */
 	return (unsigned long)chunk->base_addr + pcpu_unit_offsets[cpu] +
 		(page_idx << PAGE_SHIFT);
 }
