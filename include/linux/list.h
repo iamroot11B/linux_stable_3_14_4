@@ -161,6 +161,7 @@ static inline void list_del_init(struct list_head *entry)
  * @list: the entry to move
  * @head: the head that will precede our entry
  */
+/*! 2016-04-30 study -ing */
 static inline void list_move(struct list_head *list, struct list_head *head)
 {
 	__list_del_entry(list);

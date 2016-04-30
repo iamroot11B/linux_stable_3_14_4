@@ -37,6 +37,10 @@ static inline int tlb_ops_need_broadcast(void)
 	if (!is_smp())
 		return 0;
 
+	/*! #define CPUID_EXT_MMFR3	"c1, 7"  */
+	/*! tlb ops broadcast 가 필요한지 CP15 register를 읽어서 확인
+	 *  (값이 0,1 인 경우 tlb가 local에만 영향을 미치므로 broadcast 필요
+	 */
 	return ((read_cpuid_ext(CPUID_EXT_MMFR3) >> 12) & 0xf) < 2;
 }
 #endif

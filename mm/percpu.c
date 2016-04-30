@@ -246,20 +246,28 @@ static bool pcpu_addr_in_reserved_chunk(void *addr)
 	return addr >= first_start &&
 		addr < first_start + pcpu_reserved_chunk_limit;
 }
-
+/*! 2016-04-30 study -ing */
 static int __pcpu_size_to_slot(int size)
 {
 	int highbit = fls(size);	/* size is in bytes */
+
+	/*! PCPU_SLOT_BASE_SHIFT = 5
+	 *  ex.
+	 *   if size < 2^3 -> return 1
+	 *   elif size < 2^4 -> return 2
+	 *   elif size < 2^5 -> return 3
+	 *				...
+	 */
 	return max(highbit - PCPU_SLOT_BASE_SHIFT + 2, 1);
 }
-
+/*! 2016-04-30 study -ing */
 static int pcpu_size_to_slot(int size)
 {
 	if (size == pcpu_unit_size)
 		return pcpu_nr_slots - 1;
 	return __pcpu_size_to_slot(size);
 }
-
+/*! 2016-04-30 study -ing */
 static int pcpu_chunk_slot(const struct pcpu_chunk *chunk)
 {
 	if (chunk->free_size < sizeof(int) || chunk->contig_hint < sizeof(int))
@@ -385,6 +393,7 @@ static void pcpu_mem_free(void *ptr, size_t size)
  * CONTEXT:
  * pcpu_lock.
  */
+/*! 2016-04-30 study -ing */
 static void pcpu_chunk_relocate(struct pcpu_chunk *chunk, int oslot)
 {
 	int nslot = pcpu_chunk_slot(chunk);
@@ -636,11 +645,14 @@ static int pcpu_alloc_area(struct pcpu_chunk *chunk, int size, int align)
  * CONTEXT:
  * pcpu_lock.
  */
+/*! 2016-04-30 study -ing */
 static void pcpu_free_area(struct pcpu_chunk *chunk, int freeme)
 {
+	/*! chunk->free_size를 slot으로 바꿔서 리턴 */
 	int oslot = pcpu_chunk_slot(chunk);
 	int i, off;
-
+	/*! 2016-04-30 study end */
+	/*! 인자로 넘어온 freeme 를 찾는다.  */
 	for (i = 0, off = 0; i < chunk->map_used; off += abs(chunk->map[i++]))
 		if (off == freeme)
 			break;
@@ -654,6 +666,7 @@ static void pcpu_free_area(struct pcpu_chunk *chunk, int freeme)
 	if (i > 0 && chunk->map[i - 1] >= 0) {
 		chunk->map[i - 1] += chunk->map[i];
 		chunk->map_used--;
+		/*! chunk->map[i + 1] -> chunk->map[i] 로 mem move.  */
 		memmove(&chunk->map[i], &chunk->map[i + 1],
 			(chunk->map_used - i) * sizeof(chunk->map[0]));
 		i--;
@@ -662,6 +675,7 @@ static void pcpu_free_area(struct pcpu_chunk *chunk, int freeme)
 	if (i + 1 < chunk->map_used && chunk->map[i + 1] >= 0) {
 		chunk->map[i] += chunk->map[i + 1];
 		chunk->map_used--;
+		/*! chunk->map[i + 1] -> chunk->map[i + 2] 로 mem move.  */
 		memmove(&chunk->map[i + 1], &chunk->map[i + 2],
 			(chunk->map_used - (i + 1)) * sizeof(chunk->map[0]));
 	}
@@ -875,6 +889,9 @@ area_found:
 	/*! 2016-03-19 study end */
 	/*! 2016-04-02 study start */
 	/* populate, map and clear the area */
+	/*! pcpu_populate_chunk내에서 alloc 시도하는데 한번이라도 실패 시 true 리턴
+	 * alloc 실패 하여 erro 리턴 된 경우 만 if 문 수행
+	 */
 	if (pcpu_populate_chunk(chunk, off, size)) {
 		spin_lock_irqsave(&pcpu_lock, flags);
 		pcpu_free_area(chunk, off);

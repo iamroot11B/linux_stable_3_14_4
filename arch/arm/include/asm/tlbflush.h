@@ -231,8 +231,13 @@ struct cpu_tlb_fns {
 /*
  * Select the calling method
  */
+/*! MULTI_TLB is defined.  */
 #ifdef MULTI_TLB
-
+/*! 2016-04-30 study -ing */
+/*! cpu_tlb 는 setup_processor에서 초기화
+ *  cpu_tlb->flush_user_range = v7wbi_flush_user_tlb_range
+ *  cpu_tlb->flush_kern_range = v7wbi_flush_kern_tlb_range
+ */
 #define __cpu_flush_user_tlb_range	cpu_tlb.flush_user_range
 #define __cpu_flush_kern_tlb_range	cpu_tlb.flush_kern_range
 
@@ -693,6 +698,7 @@ static inline void clean_pmd_entry(void *pmd)
  * Convert calls to our calling convention.
  */
 #define local_flush_tlb_range(vma,start,end)	__cpu_flush_user_tlb_range(start,end,vma)
+/*! 2016-04-30 study -ing */
 #define local_flush_tlb_kernel_range(s,e)	__cpu_flush_kern_tlb_range(s,e)
 
 #ifndef CONFIG_SMP
@@ -765,9 +771,10 @@ extern void erratum_a15_798181_init(void);
 static inline void erratum_a15_798181_init(void) {}
 #endif
 extern bool (*erratum_a15_798181_handler)(void);
-
+/*! 2016-04-30 study -ing */
 static inline bool erratum_a15_798181(void)
 {
+	/*! CONFIG_ARM_ERRATA_798181 not defined.  */
 	if (unlikely(IS_ENABLED(CONFIG_ARM_ERRATA_798181) &&
 		erratum_a15_798181_handler))
 		return erratum_a15_798181_handler();

@@ -12,6 +12,7 @@
 #define CPUID_MPIDR	5
 #define CPUID_REVIDR	6
 
+/*! CONFIG_CPU_V7M not defined  */
 #ifdef CONFIG_CPU_V7M
 #define CPUID_EXT_PFR0	0x40
 #define CPUID_EXT_PFR1	0x44
@@ -89,7 +90,7 @@ extern unsigned int processor_id;
  *      CPUID_MPIDR 의 경우 "cc" 영향력 없음.  
  *      http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html#ss5.3
  */
-
+/*! CONFIG_CPU_CP15 defined  */
 #ifdef CONFIG_CPU_CP15
 #define read_cpuid(reg)							\
 	({								\
@@ -106,6 +107,7 @@ extern unsigned int processor_id;
  * any is_smp() tests, which can cause undefined instruction aborts on
  * ARM1136 r0 due to the missing extended CP15 registers.
  */
+/*! 2016-04-30 study -ing */
 #define read_cpuid_ext(ext_reg)						\
 	({								\
 		unsigned int __val;					\

@@ -706,6 +706,9 @@ static void __init setup_processor(void)
 #endif
 #ifdef MULTI_TLB
 	cpu_tlb = *list->tlb;
+	/*! tlb->flush_user_range = v7wbi_flush_user_tlb_range
+	 *  tlb->flush_kern_range = v7wbi_flush_kern_tlb_range
+	 */
 #endif
 #ifdef MULTI_USER
 	cpu_user = *list->user;

@@ -58,10 +58,12 @@ static inline void ipi_flush_tlb_range(void *arg)
 	local_flush_tlb_range(ta->ta_vma, ta->ta_start, ta->ta_end);
 }
 
+/*! 2016-04-30 study -ing */
 static inline void ipi_flush_tlb_kernel_range(void *arg)
 {
 	struct tlb_args *ta = (struct tlb_args *)arg;
 
+	/*! v7wbi_flush_kern_tlb_range(ta->ta_start, ta->ta_end)  */
 	local_flush_tlb_kernel_range(ta->ta_start, ta->ta_end);
 }
 
@@ -103,14 +105,15 @@ void erratum_a15_798181_init(void)
 		erratum_a15_798181_handler = erratum_a15_798181_broadcast;
 }
 #endif
-
+/*! 2016-04-30 study -ing */
 static void ipi_flush_tlb_a15_erratum(void *arg)
 {
 	dmb();
 }
-
+/*! 2016-04-30 study -ing */
 static void broadcast_tlb_a15_erratum(void)
 {
+	/*! CONFIG_ARM_ERRATA_798181 not defined -> return false  */
 	if (!erratum_a15_798181())
 		return;
 
@@ -191,13 +194,21 @@ void flush_tlb_range(struct vm_area_struct *vma,
 void flush_tlb_kernel_range(unsigned long start, unsigned long end)
 {
 	/*! 2016-04-09 study end */
+	/*! 2016-04-30 study start */
+	/*! tls ops broadcast가 필요하면 on_each_cpu를 통해 모든 cpu에 동작,
+	 *  필요 하지 않으면 local flush 동작
+	 */
 	if (tlb_ops_need_broadcast()) {
 		struct tlb_args ta;
 		ta.ta_start = start;
 		ta.ta_end = end;
+		/*! ipi_flush_tlb_kernel_range(&ta) 동작  */
 		on_each_cpu(ipi_flush_tlb_kernel_range, &ta, 1);
 	} else
 		local_flush_tlb_kernel_range(start, end);
+	/*! 우린 CONFIG_ARM_ERRATA_798181 이 not defined라서,
+	 *  do nothing.
+	 *  (define 되어 있어도 dmb() 만 수행)  */
 	broadcast_tlb_a15_erratum();
 }
 

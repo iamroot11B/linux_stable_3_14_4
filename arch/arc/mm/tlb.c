@@ -385,10 +385,12 @@ static inline void ipi_flush_tlb_range(void *arg)
 	local_flush_tlb_range(ta->ta_vma, ta->ta_start, ta->ta_end);
 }
 
+/*! 2016-04-30 study -ing */
 static inline void ipi_flush_tlb_kernel_range(void *arg)
 {
 	struct tlb_args *ta = (struct tlb_args *)arg;
 
+	/*! cpu_tlb->flush_kern_range = v7wbi_flush_kern_tlb_range 를 통해 flush 수행.  */
 	local_flush_tlb_kernel_range(ta->ta_start, ta->ta_end);
 }
 
