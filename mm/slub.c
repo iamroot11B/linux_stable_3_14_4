@@ -1110,8 +1110,11 @@ static inline int slab_pre_alloc_hook(struct kmem_cache *s, gfp_t flags)
 	flags &= gfp_allowed_mask;
 	lockdep_trace_alloc(flags);
 	might_sleep_if(flags & __GFP_WAIT);
+	/*! flag에 __GFP_WAIT 가 있을 경우sleep
+	 * 하지만, define에 의해 아무것도 하지 않음*/
 
 	return should_failslab(s->object_size, flags, s->flags);
+	/*! malloc 이 실패하는 케이스의 경우 (ref from failmalloc project) return true*/
 }
 
 static inline void slab_post_alloc_hook(struct kmem_cache *s,
@@ -1475,11 +1478,13 @@ static inline void kfree_hook(const void *x)
 static inline int slab_pre_alloc_hook(struct kmem_cache *s, gfp_t flags)
 							{ return 0; }
 
+/*! 2016-05-21 study -ing*/
 static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
 		void *object)
 {
 	kmemleak_alloc_recursive(object, s->object_size, 1, s->flags,
 		flags & gfp_allowed_mask);
+	/*! 아무것도 안함*/ 
 }
 /*! 2016.01.30 study -ing */
 static inline void slab_free_hook(struct kmem_cache *s, void *x)
@@ -2540,6 +2545,7 @@ static inline void *get_freelist(struct kmem_cache *s, struct page *page)
  * we need to allocate a new slab. This is the slowest path since it involves
  * a call to the page allocator and the setup of a new slab.
  */
+//TODO: 추후 확인해야함. 하나도 읽지 않음
 static void *__slab_alloc(struct kmem_cache *s, gfp_t gfpflags, int node,
 			  unsigned long addr, struct kmem_cache_cpu *c)
 {
@@ -2657,6 +2663,7 @@ new_slab:
  *
  * Otherwise we can simply pick the next object from the lockless free list.
  */
+/*! 2016-05-21 study -ing*/
 static __always_inline void *slab_alloc_node(struct kmem_cache *s,
 		gfp_t gfpflags, int node, unsigned long addr)
 {
@@ -2669,6 +2676,7 @@ static __always_inline void *slab_alloc_node(struct kmem_cache *s,
 		return NULL;
 
 	s = memcg_kmem_get_cache(s, gfpflags);
+	/*! define 에 의해 s = s 가 됨 */
 redo:
 	/*
 	 * Must read kmem_cache cpu data via this cpu ptr. Preemption is
@@ -2700,7 +2708,8 @@ redo:
 
 	else {
 		void *next_object = get_freepointer_safe(s, object);
-
+		/*! 새로운 해당 object 생성했다고 가정 후.
+		 *  freelist 시작 위치 지정*/
 		/*
 		 * The cmpxchg will only match if there was no additional
 		 * operation and if we are on the right processor.
@@ -2723,24 +2732,27 @@ redo:
 			note_cmpxchg_failure("slab_alloc", s, tid);
 			goto redo;
 		}
+		/*! 새로운 값 반영 */
 		prefetch_freepointer(s, next_object);
 		stat(s, ALLOC_FASTPATH);
 	}
 
 	if (unlikely(gfpflags & __GFP_ZERO) && object)
 		memset(object, 0, s->object_size);
-
+		/*!flag 에 __GFP_ZERO가 있으면, 생성과 동시에 0으로 초기화*/
 	slab_post_alloc_hook(s, gfpflags, object);
-
+		/*!define에 의해 아무것도 하지 않음*/
 	return object;
 }
 
+/*! 2016-05-21 study -ing*/
 static __always_inline void *slab_alloc(struct kmem_cache *s,
 		gfp_t gfpflags, unsigned long addr)
 {
 	return slab_alloc_node(s, gfpflags, NUMA_NO_NODE, addr);
 }
 
+/*! 2016-05-21 study -ing*/
 void *kmem_cache_alloc(struct kmem_cache *s, gfp_t gfpflags)
 {
 	void *ret = slab_alloc(s, gfpflags, _RET_IP_);

@@ -181,6 +181,7 @@ extern int _cond_resched(void);
  * be bitten later when the calling function happens to sleep when it is not
  * supposed to.
  */
+/*! 2016-05-21 study -ing*/
 # define might_sleep() \
 	do { __might_sleep(__FILE__, __LINE__, 0); might_resched(); } while (0)
 #else
@@ -189,6 +190,7 @@ extern int _cond_resched(void);
 # define might_sleep() do { might_resched(); } while (0)
 #endif
 
+/*! 2016-05-21 study -ing*/
 #define might_sleep_if(cond) do { if (cond) might_sleep(); } while (0)
 
 /*

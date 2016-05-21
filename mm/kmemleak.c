@@ -495,6 +495,8 @@ static struct kmemleak_object *find_and_get_object(unsigned long ptr, int alias)
 /*
  * Save stack trace to the given array of MAX_TRACE size.
  */
+/*! 2016-05-21 study -ing*/
+/*! 2016-05-21 studyend*/
 static int __save_stack_trace(unsigned long *trace)
 {
 	struct stack_trace stack_trace;
@@ -512,6 +514,7 @@ static int __save_stack_trace(unsigned long *trace)
  * Create the metadata (struct kmemleak_object) corresponding to an allocated
  * memory block and add it to the object_list and object_tree_root.
  */
+/*! 2016-05-21 study -ing*/
 static struct kmemleak_object *create_object(unsigned long ptr, size_t size,
 					     int min_count, gfp_t gfp)
 {
@@ -538,7 +541,7 @@ static struct kmemleak_object *create_object(unsigned long ptr, size_t size,
 	object->count = 0;			/* white color initially */
 	object->jiffies = jiffies;
 	object->checksum = 0;
-
+	/*! 새로운 오브젝트 초기화 */
 	/* task information */
 	if (in_irq()) {
 		object->pid = 0;
@@ -556,8 +559,10 @@ static struct kmemleak_object *create_object(unsigned long ptr, size_t size,
 		 */
 		strncpy(object->comm, current->comm, sizeof(object->comm));
 	}
-
+	/*! 오브젝트를 만드려 하는 것의 이름을 저장*/
 	/* kernel backtrace */
+	/*! 2016-05-21 studyend*/
+
 	object->trace_len = __save_stack_trace(object->trace);
 
 	write_lock_irqsave(&kmemleak_lock, flags);
@@ -909,6 +914,7 @@ EXPORT_SYMBOL_GPL(kmemleak_alloc);
  * (memory block) is allocated (alloc_percpu). It assumes GFP_KERNEL
  * allocation.
  */
+/*! 2016-05-21 study -ing*/
 void __ref kmemleak_alloc_percpu(const void __percpu *ptr, size_t size)
 {
 	unsigned int cpu;

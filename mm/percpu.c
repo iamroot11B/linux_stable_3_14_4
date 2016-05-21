@@ -397,12 +397,15 @@ static void pcpu_mem_free(void *ptr, size_t size)
 static void pcpu_chunk_relocate(struct pcpu_chunk *chunk, int oslot)
 {
 	int nslot = pcpu_chunk_slot(chunk);
-
+	/*! 새로운 slot 위치 계산*/
 	if (chunk != pcpu_reserved_chunk && oslot != nslot) {
+		/*chunk 가 pcpu_reserved_chunk 가 아니면서, oslot과 nslot값이 다른 경우*/
 		if (oslot < nslot)
 			list_move(&chunk->list, &pcpu_slot[nslot]);
+			/* nslot이 더 크면, nslot의 head로 이동*/`
 		else
 			list_move_tail(&chunk->list, &pcpu_slot[nslot]);
+			/* nslot이 더 작으면, nslot의 tail로 이동*/
 	}
 }
 
@@ -652,35 +655,51 @@ static void pcpu_free_area(struct pcpu_chunk *chunk, int freeme)
 	int oslot = pcpu_chunk_slot(chunk);
 	int i, off;
 	/*! 2016-04-30 study end */
-	/*! 인자로 넘어온 freeme 를 찾는다.  */
+	/*! 2016-05-21 study start */ 
+	/*! 인자로 넘어온 freeme 의 pcpu_chunk->map 배열에서의 offset 울 찾는다.  */
 	for (i = 0, off = 0; i < chunk->map_used; off += abs(chunk->map[i++]))
 		if (off == freeme)
 			break;
 	BUG_ON(off != freeme);
 	BUG_ON(chunk->map[i] > 0);
+	/*! map을 전부 확인하여도 freeme 가 없을 경우 또는, 
+	 * 해당 map의 위치가 비어있는 공간인 경우 
+	 * BUGON
+	 * (map 배열에 저장된 값은 이 때 양수 값은 비어있는 공간의 크기를, 
+	 *  음수 값은 사용 중인 공간의 크기를 의미한다. 
+	 *  http://egloos.zum.com/studyfoss/v/5377666) 
+	 */
 
 	chunk->map[i] = -chunk->map[i];
 	chunk->free_size += chunk->map[i];
+	/*!map 배열에서 크기를 양수로 만듬
+	 * 사용 가능한 공간을 free 해 줄 사이즈(해당 offset이 map 배열에서 명시된 크기) 만큼 증가
+	 */ 
 
 	/* merge with previous? */
 	if (i > 0 && chunk->map[i - 1] >= 0) {
+		/*! 앞의 공간이 비어있을 경우*/
 		chunk->map[i - 1] += chunk->map[i];
 		chunk->map_used--;
-		/*! chunk->map[i + 1] -> chunk->map[i] 로 mem move.  */
+		/*! chunk->map[i + 1] 이후부터 끝까지의 위치를 chunk->map[i] 로 mem move.*/
 		memmove(&chunk->map[i], &chunk->map[i + 1],
 			(chunk->map_used - i) * sizeof(chunk->map[0]));
 		i--;
 	}
+	/*! 앞 공간과 merge*/
 	/* merge with next? */
 	if (i + 1 < chunk->map_used && chunk->map[i + 1] >= 0) {
+		/*! 뒤의 공간이 비어있을 경우*/
 		chunk->map[i] += chunk->map[i + 1];
 		chunk->map_used--;
-		/*! chunk->map[i + 1] -> chunk->map[i + 2] 로 mem move.  */
+		/*! chunk->map[i + 1] 이후부터 끝까지의 위치를 chunk->map[i + 2] 로 mem move.*/
 		memmove(&chunk->map[i + 1], &chunk->map[i + 2],
 			(chunk->map_used - (i + 1)) * sizeof(chunk->map[0]));
 	}
+	/*! 뒤 공간과 merge */
 
 	chunk->contig_hint = max(chunk->map[i], chunk->contig_hint);
+	/*! contig_hint와 free 하고 merge 한 크기 중 더 큰 값을 contig_hint로 기억한다.*/
 	pcpu_chunk_relocate(chunk, oslot);
 }
 /*! 2016-03-19 study -ing */
@@ -897,13 +916,16 @@ area_found:
 		pcpu_free_area(chunk, off);
 		err = "failed to populate";
 		goto fail_unlock;
+	/*!chuck 안에서 공간 free, 즉 allocation 이 실패할 경우, alloc 하려던 matadata 복구*/
 	}
-
 	mutex_unlock(&pcpu_alloc_mutex);
 
 	/* return address relative to base address */
 	ptr = __addr_to_pcpu_ptr(chunk->base_addr + off);
+	/*! 성공했을 경우, memory address를 percpu ptr로 변환*/
+	/*! 2016-05-21 study -ing*/
 	kmemleak_alloc_percpu(ptr, size);
+	
 	return ptr;
 
 fail_unlock:
