@@ -496,15 +496,17 @@ static struct kmemleak_object *find_and_get_object(unsigned long ptr, int alias)
  * Save stack trace to the given array of MAX_TRACE size.
  */
 /*! 2016-05-21 study -ing*/
-/*! 2016-05-21 studyend*/
+/*! 2016-05-21 study end*/
 static int __save_stack_trace(unsigned long *trace)
 {
 	struct stack_trace stack_trace;
 
+	/*! 오브젝트의 trace를 저장하기 위해 stack_trace 초기화 */
 	stack_trace.max_entries = MAX_TRACE;
 	stack_trace.nr_entries = 0;
 	stack_trace.entries = trace;
 	stack_trace.skip = 2;
+	/*! CONFIG_STACKTRACE이 아니면 아무것도 안함 */
 	save_stack_trace(&stack_trace);
 
 	return stack_trace.nr_entries;
@@ -561,14 +563,17 @@ static struct kmemleak_object *create_object(unsigned long ptr, size_t size,
 	}
 	/*! 오브젝트를 만드려 하는 것의 이름을 저장*/
 	/* kernel backtrace */
-	/*! 2016-05-21 studyend*/
+	/*! 2016-05-21 study end*/
 
+	/*! 2016-05-28 study start */
+	/*! stack trace를 저장하고, 그 갯수를 리턴 */
 	object->trace_len = __save_stack_trace(object->trace);
 
 	write_lock_irqsave(&kmemleak_lock, flags);
 
 	min_addr = min(min_addr, ptr);
 	max_addr = max(max_addr, ptr + size);
+	/*! red-black tree에 넣어주는 과정 */
 	link = &object_tree_root.rb_node;
 	rb_parent = NULL;
 	while (*link) {

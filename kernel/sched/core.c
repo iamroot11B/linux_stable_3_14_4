@@ -6738,8 +6738,13 @@ void __init sched_init_smp(void)
 
 const_debug unsigned int sysctl_timer_migration = 1;
 
+/*! 2016-05-28 study -ing */
 int in_sched_functions(unsigned long addr)
 {
+	/*!
+	 * spinlock.c > in_lock_functions(addr) : __lockfunc 속성 함수인가?
+	 * vmlinux.lds.h > __sched_text : __schedfunc? 속성의 함수인가?
+	 */
 	return in_lock_functions(addr) ||
 		(addr >= (unsigned long)__sched_text_start
 		&& addr < (unsigned long)__sched_text_end);

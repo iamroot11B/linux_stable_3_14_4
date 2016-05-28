@@ -2006,6 +2006,7 @@ static inline unsigned long tid_to_event(unsigned long tid)
 	return tid / TID_STEP;
 }
 
+/*! 2016-05-28 study -ing */
 static inline unsigned int init_tid(int cpu)
 {
 	return cpu;
@@ -2035,6 +2036,7 @@ static inline void note_cmpxchg_failure(const char *n,
 	stat(s, CMPXCHG_DOUBLE_CPU_FAIL);
 }
 
+/*! 2016-05-28 study -ing */
 static void init_kmem_cache_cpus(struct kmem_cache *s)
 {
 	int cpu;
@@ -3001,8 +3003,10 @@ redo:
 	/*! 2016-03-19 study -ing */
 }
 
+/*! 2016-05-28 study -ing */
 void kmem_cache_free(struct kmem_cache *s, void *x)
 {
+	/*! 2016-05-28 study end */
 	s = cache_from_obj(s, x);
 	if (!s)
 		return;
@@ -3248,6 +3252,7 @@ static void early_kmem_cache_node_alloc(int node)
 	__add_partial(n, page, DEACTIVATE_TO_HEAD);
 }
 
+/*! 2016-05-28 study -ing */
 static void free_kmem_cache_nodes(struct kmem_cache *s)
 {
 	int node;

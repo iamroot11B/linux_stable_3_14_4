@@ -390,11 +390,16 @@ EXPORT_SYMBOL(_raw_spin_lock_nest_lock);
 
 #endif
 
+/*! 2016-05-28 study -ing */
 notrace int in_lock_functions(unsigned long addr)
 {
 	/* Linker adds these: start and end of __lockfunc functions */
 	extern char __lock_text_start[], __lock_text_end[];
 
+	/*!
+	 * vmlinux.lds.h의 LOCK_TEXT를 참고.
+	 * __lockfunc 속성 함수이라면 true
+	 */
 	return addr >= (unsigned long)__lock_text_start
 	&& addr < (unsigned long)__lock_text_end;
 }
