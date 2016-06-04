@@ -238,6 +238,7 @@ static __used noinline void __sched __mutex_unlock_slowpath(atomic_t *lock_count
  *
  * This function is similar to (but not equivalent to) up().
  */
+/*! 2016-06-04 study -ing */
 void __sched mutex_unlock(struct mutex *lock)
 {
 	/*
@@ -252,6 +253,7 @@ void __sched mutex_unlock(struct mutex *lock)
 	 */
 	mutex_clear_owner(lock);
 #endif
+	/*! unlikley 조건 만족 시 __mutex_unlock_slowpath(&lock->count) 를 수행한다.  */
 	__mutex_fastpath_unlock(&lock->count, __mutex_unlock_slowpath);
 }
 
@@ -750,9 +752,11 @@ __mutex_unlock_common_slowpath(atomic_t *lock_count, int nested)
 /*
  * Release the lock, slowpath:
  */
+/*! 2016-06-04 study -ing */
 static __used noinline void
 __mutex_unlock_slowpath(atomic_t *lock_count)
 {
+	/*! __mutex_unlock_common_slowpath의 자세한 내용은 추후 살펴보기로 함 */
 	__mutex_unlock_common_slowpath(lock_count, 1);
 }
 

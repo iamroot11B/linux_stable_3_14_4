@@ -213,6 +213,7 @@ enum track_item { TRACK_ALLOC, TRACK_FREE };
 static int sysfs_slab_add(struct kmem_cache *);
 static int sysfs_slab_alias(struct kmem_cache *, const char *);
 static void sysfs_slab_remove(struct kmem_cache *);
+/*! 2016-06-04 study -ing */
 static void memcg_propagate_slab_attrs(struct kmem_cache *s);
 #else
 static inline int sysfs_slab_add(struct kmem_cache *s) { return 0; }
@@ -293,7 +294,7 @@ static inline void *get_freepointer_safe(struct kmem_cache *s, void *object)
 #endif
 	return p;
 }
-
+/*! 2016-06-04 study -ing */
 static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
 {
 	/*! object + s->offset 가 가리키는 주소에 fp 를 넣는다. */
@@ -1151,6 +1152,7 @@ static inline void slab_free_hook(struct kmem_cache *s, void *x)
 /*
  * Tracking of fully allocated slabs for debugging purposes.
  */
+/*! 2016-06-04 study -ing */
 static void add_full(struct kmem_cache *s,
 	struct kmem_cache_node *n, struct page *page)
 {
@@ -1158,6 +1160,7 @@ static void add_full(struct kmem_cache *s,
 		return;
 
 	lockdep_assert_held(&n->list_lock);
+	/*! &n->full 과 &n->full->next 사이에 &page->lru를 넣는다. */
 	list_add(&page->lru, &n->full);
 }
 /*! 2016-03-19 study -ing */
@@ -1782,13 +1785,14 @@ static inline void add_partial(struct kmem_cache_node *n,
 	__add_partial(n, page, tail);
 }
 
+/*! 2016-06-04 study -ing */
 static inline void
 __remove_partial(struct kmem_cache_node *n, struct page *page)
 {
 	list_del(&page->lru);
 	n->nr_partial--;
 }
-
+/*! 2016-06-04 study -ing */
 static inline void remove_partial(struct kmem_cache_node *n,
 					struct page *page)
 {
@@ -1990,9 +1994,10 @@ static void *get_partial(struct kmem_cache *s, gfp_t flags, int node,
  */
 #define TID_STEP 1
 #endif
-
+/*! 2016-06-04 study -ing */
 static inline unsigned long next_tid(unsigned long tid)
 {
+	/*! TID_STEP - 우리는 1  */
 	return tid + TID_STEP;
 }
 
@@ -2048,6 +2053,7 @@ static void init_kmem_cache_cpus(struct kmem_cache *s)
 /*
  * Remove the cpu slab
  */
+/*! 2016-06-04 study -ing */
 static void deactivate_slab(struct kmem_cache *s, struct page *page,
 				void *freelist)
 {
@@ -2059,7 +2065,6 @@ static void deactivate_slab(struct kmem_cache *s, struct page *page,
 	int tail = DEACTIVATE_TO_HEAD;
 	struct page new;
 	struct page old;
-
 	if (page->freelist) {
 		stat(s, DEACTIVATE_REMOTE_FREES);
 		tail = DEACTIVATE_TO_TAIL;
@@ -2073,6 +2078,7 @@ static void deactivate_slab(struct kmem_cache *s, struct page *page,
 	 * There is no need to take the list->lock because the page
 	 * is still frozen.
 	 */
+	/*! freelist가 있을때, 모두 돌면서, free 시켜준다. */
 	while (freelist && (nextfree = get_freepointer(s, freelist))) {
 		void *prior;
 		unsigned long counters;
@@ -2080,6 +2086,7 @@ static void deactivate_slab(struct kmem_cache *s, struct page *page,
 		do {
 			prior = page->freelist;
 			counters = page->counters;
+			/*! 여기서 실제 free */
 			set_freepointer(s, freelist, prior);
 			new.counters = counters;
 			new.inuse--;
@@ -2151,23 +2158,26 @@ redo:
 	}
 
 	if (l != m) {
-
+		/*! freelist가 있으면 partial이고, inuse가 0이고 freelist가 없으면 full.  */
 		if (l == M_PARTIAL)
-
+			/*! page->lru 리스트를 지우고(list-prev, next를 모두 지운다),
+			 *  n->nr_partial-- 수행.
+			 */
 			remove_partial(n, page);
 
 		else if (l == M_FULL)
-
+			/*! page->lru 리스트를 지운다.(list-prev, next를 모두 지운다)  */
 			remove_full(s, n, page);
 
 		if (m == M_PARTIAL) {
-
+			/*! n->nr_partial++ 하고, partial 리스트에 page 추가  */
 			add_partial(n, page, tail);
 			stat(s, tail);
 
 		} else if (m == M_FULL) {
 
 			stat(s, DEACTIVATE_FULL);
+			/*! page->lru에 n->full을 넣는다.  */
 			add_full(s, n, page);
 
 		}
@@ -2180,6 +2190,7 @@ redo:
 				"unfreezing slab"))
 		goto redo;
 
+	/*! lock 걸려있으면 spin_unlock 수행 */
 	if (lock)
 		spin_unlock(&n->list_lock);
 
@@ -2331,7 +2342,7 @@ static void put_cpu_partial(struct kmem_cache *s, struct page *page, int drain)
 								!= oldpage);
 #endif
 }
-
+/*! 2016-06-04 study -ing */
 static inline void flush_slab(struct kmem_cache *s, struct kmem_cache_cpu *c)
 {
 	stat(s, CPUSLAB_FLUSH);
@@ -2347,10 +2358,12 @@ static inline void flush_slab(struct kmem_cache *s, struct kmem_cache_cpu *c)
  *
  * Called from IPI handler with interrupts disabled.
  */
+/*! 2016-06-04 study -ing */
 static inline void __flush_cpu_slab(struct kmem_cache *s, int cpu)
 {
 	struct kmem_cache_cpu *c = per_cpu_ptr(s->cpu_slab, cpu);
 
+	/*! c, c->page 있으면,  */
 	if (likely(c)) {
 		if (c->page)
 			flush_slab(s, c);
@@ -3007,10 +3020,14 @@ redo:
 void kmem_cache_free(struct kmem_cache *s, void *x)
 {
 	/*! 2016-05-28 study end */
+	/*! 2016-06-04 study start */
 	s = cache_from_obj(s, x);
 	if (!s)
 		return;
 	slab_free(s, virt_to_head_page(x), x, _RET_IP_);
+	/*! trace_kmem_cache_free
+	 *  DEFINE_EVENT(include/trace/events/kmem.h ) 를 통해 생성 됨.
+	 */
 	trace_kmem_cache_free(_RET_IP_, x);
 }
 EXPORT_SYMBOL(kmem_cache_free);
@@ -3672,12 +3689,17 @@ static int __init setup_slub_min_objects(char *str)
 
 __setup("slub_min_objects=", setup_slub_min_objects);
 
+/*! 2016-06-04 study -ing */
+/*! __init : 해당 함수를 .init.text 섹션에 위치 시킨다.
+ *  .init.text 섹션의 함수들은 부팅 때 init 한 후 해당 메모리는 해제된다.
+ */
 static int __init setup_slub_nomerge(char *str)
 {
 	slub_nomerge = 1;
 	return 1;
 }
 
+/*! 2016-06-04 study -ing */
 __setup("slub_nomerge", setup_slub_nomerge);
 
 /*! 2016-03-19 study -ing */
@@ -3992,12 +4014,14 @@ static struct notifier_block slab_memory_callback_nb = {
  * the page allocator. Allocate them properly then fix up the pointers
  * that may be pointing to the wrong kmem_cache structure.
  */
-
+/*! 2016-06-04 study -ing */
 static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 {
 	int node;
+	/*! kmem_cache alloc 후,  */
 	struct kmem_cache *s = kmem_cache_zalloc(kmem_cache, GFP_NOWAIT);
 
+	/*! static_cahce 에서 kmem_cache->object_size 만큼 s 에 copy  */
 	memcpy(s, static_cache, kmem_cache->object_size);
 
 	/*
@@ -4006,6 +4030,10 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 	 * IPIs around.
 	 */
 	__flush_cpu_slab(s, smp_processor_id());
+	/*! 우리는 MAX_NUMNODES = 1
+	 *  node = 0 일때 한번만 수행.
+	 */
+	/*! 2016-06-04 study end */
 	for_each_node_state(node, N_NORMAL_MEMORY) {
 		struct kmem_cache_node *n = get_node(s, node);
 		struct page *p;
@@ -4046,6 +4074,10 @@ void __init kmem_cache_init(void)
 	/* Able to allocate the per node structures */
 	slab_state = PARTIAL;
 
+	/*! offsetof - 구조체에서 member의 offset을 구한다.
+	 *  nr_node_ids - 1
+	 */
+
 	create_boot_cache(kmem_cache, "kmem_cache",
 			offsetof(struct kmem_cache, node) +
 				nr_node_ids * sizeof(struct kmem_cache_node *),
@@ -4082,8 +4114,10 @@ void __init kmem_cache_init_late(void)
 /*
  * Find a mergeable slab cache
  */
+/*! 2016-06-04 study -ing */
 static int slab_unmergeable(struct kmem_cache *s)
 {
+	/*! 우리는 slub_nomerge = 0  */
 	if (slub_nomerge || (s->flags & SLUB_NEVER_MERGE))
 		return 1;
 
@@ -4178,9 +4212,16 @@ int __kmem_cache_create(struct kmem_cache *s, unsigned long flags)
 		return err;
 
 	/* Mutex is not taken during early boot */
+	/*! 2016-06-04 study -ing */
+	/*! create_boot_cache - 현재 early boot 이며, slab_state = DOWN(0) 으로,
+	 *  여기서 리턴.
+	 */
 	if (slab_state <= UP)
 		return 0;
 
+	/*! 우리는 CONFIG_MEMCG_KMEM이 define 안 돼 있어서 do nothing.
+	 *  early boot 일때는 위에서 리턴 되지만, 아래 코드를 일부 확인 함.(2016-06-04)
+	 */
 	memcg_propagate_slab_attrs(s);
 	mutex_unlock(&slab_mutex);
 	err = sysfs_slab_add(s);
@@ -5454,9 +5495,11 @@ static ssize_t slab_attr_store(struct kobject *kobj,
 #endif
 	return err;
 }
-
+/*! 2016-06-04 study -ing */
+/*! early boot 일때 살펴 봄. (추후 다시 볼 것)  */
 static void memcg_propagate_slab_attrs(struct kmem_cache *s)
 {
+	/*! 우리는 CONFIG_MEMCG_KMEM이 not define. */
 #ifdef CONFIG_MEMCG_KMEM
 	int i;
 	char *buffer = NULL;
@@ -5538,6 +5581,7 @@ static struct kset *slab_kset;
  *
  * Format	:[flags-]size
  */
+/*! 2016-06-04 study -ing */
 static char *create_unique_id(struct kmem_cache *s)
 {
 	char *name = kmalloc(ID_STR_LENGTH, GFP_KERNEL);
@@ -5574,11 +5618,13 @@ static char *create_unique_id(struct kmem_cache *s)
 	BUG_ON(p > name + ID_STR_LENGTH - 1);
 	return name;
 }
-
+/*! 2016-06-04 study -ing */
+/*! early boot 일때 살펴 봄. (추후 다시 볼 것)  */
 static int sysfs_slab_add(struct kmem_cache *s)
 {
 	int err;
 	const char *name;
+	/*! 우리는 unmergeable는 최초 0 */
 	int unmergeable = slab_unmergeable(s);
 
 	if (unmergeable) {
@@ -5588,14 +5634,19 @@ static int sysfs_slab_add(struct kmem_cache *s)
 		 * case we can catch duplicate names easily.
 		 */
 		sysfs_remove_link(&slab_kset->kobj, s->name);
+		/*! unmergeable 이면 slab->name을 그대로 쓴다.  */
 		name = s->name;
 	} else {
 		/*
 		 * Create a unique name for the slab as a target
 		 * for the symlinks.
 		 */
+		/*! mergeable이면 unique 한 id 를 만들어서 name으로 쓴다.(ex - ":at-0000136")  */
 		name = create_unique_id(s);
 	}
+
+	/*! 2016-06-04 study -ing */
+	/*! early boot 일때 살펴 봄. (추후 다시 볼 것)  */
 
 	s->kobj.kset = slab_kset;
 	err = kobject_init_and_add(&s->kobj, &slab_ktype, NULL, "%s", name);

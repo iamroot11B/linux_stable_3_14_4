@@ -402,7 +402,7 @@ static void pcpu_chunk_relocate(struct pcpu_chunk *chunk, int oslot)
 		/*chunk 가 pcpu_reserved_chunk 가 아니면서, oslot과 nslot값이 다른 경우*/
 		if (oslot < nslot)
 			list_move(&chunk->list, &pcpu_slot[nslot]);
-			/* nslot이 더 크면, nslot의 head로 이동*/`
+			/* nslot이 더 크면, nslot의 head로 이동*/
 		else
 			list_move_tail(&chunk->list, &pcpu_slot[nslot]);
 			/* nslot이 더 작으면, nslot의 tail로 이동*/

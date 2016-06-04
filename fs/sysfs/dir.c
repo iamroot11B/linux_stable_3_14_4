@@ -59,17 +59,20 @@ void sysfs_warn_dup(struct kernfs_node *parent, const char *name)
  * @kobj: object we're creating directory for
  * @ns: the namespace tag to use
  */
+/*! 2016-06-04 study -ing */
 int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
 {
 	struct kernfs_node *parent, *kn;
 
 	BUG_ON(!kobj);
 
+	/*! parent 를 찾고,  */
 	if (kobj->parent)
 		parent = kobj->parent->sd;
 	else
 		parent = sysfs_root_kn;
 
+	/*! parent를 못 찾으면 error return  */
 	if (!parent)
 		return -ENOENT;
 
@@ -93,6 +96,7 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
  *	the directory before we remove the directory, and we've inlined
  *	what used to be sysfs_rmdir() below, instead of calling separately.
  */
+/*! 2016-06-04 study -ing */
 void sysfs_remove_dir(struct kobject *kobj)
 {
 	struct kernfs_node *kn = kobj->sd;

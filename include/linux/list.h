@@ -60,8 +60,10 @@ extern void __list_add(struct list_head *new,
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
+/*! 2016-06-04 study -ing */
 static inline void list_add(struct list_head *new, struct list_head *head)
 {
+	/*! head와 head->next 사이에 new를 넣는다. */
 	__list_add(new, head, head->next);
 }
 

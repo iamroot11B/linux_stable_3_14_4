@@ -11,6 +11,7 @@
 #include <linux/string.h>
 
 /* Simplified asprintf. */
+/*! 2016-06-04 study -ing */
 char *kvasprintf(gfp_t gfp, const char *fmt, va_list ap)
 {
 	unsigned int len;

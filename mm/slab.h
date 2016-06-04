@@ -217,7 +217,7 @@ static inline void memcg_bind_pages(struct kmem_cache *s, int order)
 static inline void memcg_release_pages(struct kmem_cache *s, int order)
 {
 }
-
+/*! 2016-06-04 study -ing */
 static inline bool slab_equal_or_root(struct kmem_cache *s,
 				      struct kmem_cache *p)
 {
@@ -241,6 +241,7 @@ static inline struct kmem_cache *memcg_root_cache(struct kmem_cache *s)
 }
 #endif
 
+/*! 2016-06-04 study -ing */
 static inline struct kmem_cache *cache_from_obj(struct kmem_cache *s, void *x)
 {
 	struct kmem_cache *cachep;
@@ -253,11 +254,13 @@ static inline struct kmem_cache *cache_from_obj(struct kmem_cache *s, void *x)
 	 * to not do even the assignment. In that case, slab_equal_or_root
 	 * will also be a constant.
 	 */
+	/*! memcg_kmem_enabled - CONFIG_MEMCG_KMEM 이 define 안 돼 있으면 무조건 false */
 	if (!memcg_kmem_enabled() && !unlikely(s->flags & SLAB_DEBUG_FREE))
 		return s;
 
 	page = virt_to_head_page(x);
 	cachep = page->slab_cache;
+	/*! slab_equal_or_root - 우리는 무조건 true. 변환한 page의 slab_cache return. */
 	if (slab_equal_or_root(cachep, s))
 		return cachep;
 

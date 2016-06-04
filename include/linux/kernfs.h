@@ -185,7 +185,7 @@ struct kernfs_ops {
 };
 
 #ifdef CONFIG_SYSFS
-
+/*! 2016-06-04 study -ing */
 static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
 {
 	return kn->flags & KERNFS_TYPE_MASK;
@@ -199,10 +199,13 @@ static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
  * under it.  All children of @kn must have non-NULL namespace tags and
  * only the ones which match the super_block's tag will be visible.
  */
+/*! 2016-06-04 study -ing */
 static inline void kernfs_enable_ns(struct kernfs_node *kn)
 {
+	/*! 조건 확인 및 warnning  */
 	WARN_ON_ONCE(kernfs_type(kn) != KERNFS_DIR);
 	WARN_ON_ONCE(!RB_EMPTY_ROOT(&kn->dir.children));
+	/*! 실질적으로 kn->flags 의 KERNFS_NS flag set 이 하는일의 전부 */
 	kn->flags |= KERNFS_NS;
 }
 
@@ -212,6 +215,7 @@ static inline void kernfs_enable_ns(struct kernfs_node *kn)
  *
  * Test whether namespace filtering is enabled for the children of @ns.
  */
+/*! 2016-06-04 study -ing */
 static inline bool kernfs_ns_enabled(struct kernfs_node *kn)
 {
 	return kn->flags & KERNFS_NS;
@@ -360,7 +364,7 @@ kernfs_create_file(struct kernfs_node *parent, const char *name, umode_t mode,
 {
 	return kernfs_create_file_ns(parent, name, mode, size, ops, priv, NULL);
 }
-
+/*! 2016-06-04 study -ing */
 static inline int kernfs_remove_by_name(struct kernfs_node *parent,
 					const char *name)
 {

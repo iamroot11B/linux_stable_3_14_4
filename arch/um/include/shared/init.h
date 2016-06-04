@@ -133,7 +133,7 @@ extern struct uml_param __uml_setup_start, __uml_setup_end;
 
 #ifndef __KERNEL__
 
-#define __define_initcall(level,fn) \
+#define __define_initcall(level,fn)			 \
 	static initcall_t __initcall_##fn __used \
 	__attribute__((__section__(".initcall" level ".init"))) = fn
 

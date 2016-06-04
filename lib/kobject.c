@@ -27,6 +27,7 @@
  * and thus @kobj should have a namespace tag associated with it.  Returns
  * %NULL otherwise.
  */
+/*! 2016-06-04 study -ing */
 const void *kobject_namespace(struct kobject *kobj)
 {
 	const struct kobj_ns_type_operations *ns_ops = kobj_ns_ops(kobj);
@@ -46,6 +47,7 @@ const void *kobject_namespace(struct kobject *kobj)
  * object registration that loops through the default attributes of the
  * subsystem and creates attributes files for them in sysfs.
  */
+/*! 2016-06-04 study -ing */
 static int populate_dir(struct kobject *kobj)
 {
 	struct kobj_type *t = get_ktype(kobj);
@@ -55,6 +57,7 @@ static int populate_dir(struct kobject *kobj)
 
 	if (t && t->default_attrs) {
 		for (i = 0; (attr = t->default_attrs[i]) != NULL; i++) {
+			/*! kobject - sysfs_create_file 은 리턴 0 */
 			error = sysfs_create_file(kobj, attr);
 			if (error)
 				break;
@@ -62,16 +65,17 @@ static int populate_dir(struct kobject *kobj)
 	}
 	return error;
 }
-
+/*! 2016-06-04 study -ing */
 static int create_dir(struct kobject *kobj)
 {
 	const struct kobj_ns_type_operations *ops;
 	int error;
 
+	/*! kobject - sysfs_create_dir_ns는 리턴 0  */
 	error = sysfs_create_dir_ns(kobj, kobject_namespace(kobj));
 	if (error)
 		return error;
-
+	/*! kobject - populate_dir 는 리턴 0  */
 	error = populate_dir(kobj);
 	if (error) {
 		sysfs_remove_dir(kobj);
@@ -94,6 +98,7 @@ static int create_dir(struct kobject *kobj)
 		BUG_ON(ops->type >= KOBJ_NS_TYPES);
 		BUG_ON(!kobj_ns_type_registered(ops->type));
 
+		/*! kobj->sd->flags |= KERNFS_NS 을 수행 */
 		kernfs_enable_ns(kobj->sd);
 	}
 
@@ -161,6 +166,7 @@ char *kobject_get_path(struct kobject *kobj, gfp_t gfp_mask)
 EXPORT_SYMBOL_GPL(kobject_get_path);
 
 /* add the kobject to its kset's list */
+/*! 2016-06-04 study -ing */
 static void kobj_kset_join(struct kobject *kobj)
 {
 	if (!kobj->kset)
@@ -183,11 +189,12 @@ static void kobj_kset_leave(struct kobject *kobj)
 	spin_unlock(&kobj->kset->list_lock);
 	kset_put(kobj->kset);
 }
-
+/*! 2016-06-04 study -ing */
 static void kobject_init_internal(struct kobject *kobj)
 {
 	if (!kobj)
 		return;
+	/*! kobj 값들 initial setting  */
 	kref_init(&kobj->kref);
 	INIT_LIST_HEAD(&kobj->entry);
 	kobj->state_in_sysfs = 0;
@@ -196,7 +203,7 @@ static void kobject_init_internal(struct kobject *kobj)
 	kobj->state_initialized = 1;
 }
 
-
+/*! 2016-06-04 study -ing */
 static int kobject_add_internal(struct kobject *kobj)
 {
 	int error = 0;
@@ -214,9 +221,11 @@ static int kobject_add_internal(struct kobject *kobj)
 	parent = kobject_get(kobj->parent);
 
 	/* join kset if set, use it as parent if we do not already have one */
+
 	if (kobj->kset) {
 		if (!parent)
 			parent = kobject_get(&kobj->kset->kobj);
+		/*! kobj->entry의 tail 에 kobj->kset->list 추가  */
 		kobj_kset_join(kobj);
 		kobj->parent = parent;
 	}
@@ -254,15 +263,18 @@ static int kobject_add_internal(struct kobject *kobj)
  * @fmt: format string used to build the name
  * @vargs: vargs to format the string.
  */
+/*! 2016-06-04 study -ing */
 int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 				  va_list vargs)
 {
 	const char *old_name = kobj->name;
 	char *s;
 
+	/*! fmt가 없으면 바로 return  */
 	if (kobj->name && !fmt)
 		return 0;
 
+	/*! kernel 용 sprintf  */
 	kobj->name = kvasprintf(GFP_KERNEL, fmt, vargs);
 	if (!kobj->name) {
 		kobj->name = old_name;
@@ -270,6 +282,7 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 	}
 
 	/* ewww... some of these buggers have '/' in the name ... */
+	/*! /가 있으면 ! 로 바꿔준다.  */
 	while ((s = strchr(kobj->name, '/')))
 		s[0] = '!';
 
@@ -311,10 +324,12 @@ EXPORT_SYMBOL(kobject_set_name);
  * to kobject_put(), not by a call to kfree directly to ensure that all of
  * the memory is cleaned up properly.
  */
+/*! 2016-06-04 study -ing */
 void kobject_init(struct kobject *kobj, struct kobj_type *ktype)
 {
 	char *err_str;
 
+	/*! kobj 나 ktype 이 NULL 이면 error */
 	if (!kobj) {
 		err_str = "invalid kobject pointer!";
 		goto error;
@@ -339,7 +354,7 @@ error:
 	dump_stack();
 }
 EXPORT_SYMBOL(kobject_init);
-
+/*! 2016-06-04 study -ing */
 static int kobject_add_varg(struct kobject *kobj, struct kobject *parent,
 			    const char *fmt, va_list vargs)
 {
@@ -414,6 +429,7 @@ EXPORT_SYMBOL(kobject_add);
  * kobject_add().  The same type of error handling after a call to
  * kobject_add() and kobject lifetime rules are the same here.
  */
+/*! 2016-06-04 study -ing */
 int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
 			 struct kobject *parent, const char *fmt, ...)
 {
@@ -574,6 +590,7 @@ void kobject_del(struct kobject *kobj)
  * kobject_get - increment refcount for object.
  * @kobj: object.
  */
+/*! 2016-06-04 study -ing */
 struct kobject *kobject_get(struct kobject *kobj)
 {
 	if (kobj)
@@ -971,17 +988,20 @@ int kobj_ns_type_registered(enum kobj_ns_type type)
 
 	return registered;
 }
-
+/*! 2016-06-04 study -ing */
 const struct kobj_ns_type_operations *kobj_child_ns_ops(struct kobject *parent)
 {
 	const struct kobj_ns_type_operations *ops = NULL;
 
+	/*! parent 가 있고 parent->ktype->child_ns_type(함수 포인터)가 지정되어 있으면,
+	 *  parent->ktype->child_ns_type(parent) 수행 후 리턴 값 -> ops
+	 */
 	if (parent && parent->ktype->child_ns_type)
 		ops = parent->ktype->child_ns_type(parent);
 
 	return ops;
 }
-
+/*! 2016-06-04 study -ing */
 const struct kobj_ns_type_operations *kobj_ns_ops(struct kobject *kobj)
 {
 	return kobj_child_ns_ops(kobj->parent);

@@ -18,7 +18,8 @@
 #include "kernfs-internal.h"
 
 DEFINE_MUTEX(kernfs_mutex);
-
+/*! 2016-06-04 study -ing */
+/*! red-black tree to kernelfs node  */
 #define rb_to_kn(X) rb_entry((X), struct kernfs_node, rb)
 
 /**
@@ -28,6 +29,7 @@ DEFINE_MUTEX(kernfs_mutex);
  *
  *	Returns 31 bit hash of ns + name (so it fits in an off_t )
  */
+/*! 2016-06-04 study -ing */
 static unsigned int kernfs_name_hash(const char *name, const void *ns)
 {
 	unsigned long hash = init_name_hash();
@@ -43,7 +45,7 @@ static unsigned int kernfs_name_hash(const char *name, const void *ns)
 		hash = INT_MAX - 1;
 	return hash;
 }
-
+/*! 2016-06-04 study -ing */
 static int kernfs_name_compare(unsigned int hash, const char *name,
 			       const void *ns, const struct kernfs_node *kn)
 {
@@ -111,11 +113,13 @@ static int kernfs_link_sibling(struct kernfs_node *kn)
  *	Locking:
  *	mutex_lock(kernfs_mutex)
  */
+/*! 2016-06-04 study -ing */
 static void kernfs_unlink_sibling(struct kernfs_node *kn)
 {
 	if (kernfs_type(kn) == KERNFS_DIR)
 		kn->parent->dir.subdirs--;
 
+	/*! red-black tree 구조를 이용하여 sibling들을 지운다.  */
 	rb_erase(&kn->rb, &kn->parent->dir.children);
 }
 
@@ -210,6 +214,7 @@ static void kernfs_deactivate(struct kernfs_node *kn)
  * kernfs_get - get a reference count on a kernfs_node
  * @kn: the target kernfs_node
  */
+/*! 2016-06-04 study -ing */
 void kernfs_get(struct kernfs_node *kn)
 {
 	if (kn) {
@@ -393,6 +398,7 @@ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
  *	Kernel thread context (may sleep).  kernfs_mutex is locked on
  *	return.
  */
+/*! 2016-06-04 study -ing */
 void kernfs_addrm_start(struct kernfs_addrm_cxt *acxt)
 	__acquires(kernfs_mutex)
 {
@@ -474,6 +480,7 @@ int kernfs_add_one(struct kernfs_addrm_cxt *acxt, struct kernfs_node *kn)
  *	LOCKING:
  *	Determined by kernfs_addrm_start().
  */
+/*! 2016-06-04 study -ing */
 static void kernfs_remove_one(struct kernfs_addrm_cxt *acxt,
 			      struct kernfs_node *kn)
 {
@@ -483,6 +490,7 @@ static void kernfs_remove_one(struct kernfs_addrm_cxt *acxt,
 	 * Removal can be called multiple times on the same node.  Only the
 	 * first invocation is effective and puts the base ref.
 	 */
+	/*! 이미 removed 면 return  */
 	if (kn->flags & KERNFS_REMOVED)
 		return;
 
@@ -497,6 +505,7 @@ static void kernfs_remove_one(struct kernfs_addrm_cxt *acxt,
 		}
 	}
 
+	/*! 지운 후 flags 등 업데이트  */
 	kn->flags |= KERNFS_REMOVED;
 	kn->u.removed_list = acxt->removed;
 	acxt->removed = kn;
@@ -513,6 +522,7 @@ static void kernfs_remove_one(struct kernfs_addrm_cxt *acxt,
  *	LOCKING:
  *	kernfs_mutex is released.
  */
+/*! 2016-06-04 study -ing */
 void kernfs_addrm_finish(struct kernfs_addrm_cxt *acxt)
 	__releases(kernfs_mutex)
 {
@@ -540,6 +550,7 @@ void kernfs_addrm_finish(struct kernfs_addrm_cxt *acxt)
  * Look for kernfs_node with name @name under @parent.  Returns pointer to
  * the found kernfs_node on success, %NULL on failure.
  */
+/*! 2016-06-04 study -ing */
 static struct kernfs_node *kernfs_find_ns(struct kernfs_node *parent,
 					  const unsigned char *name,
 					  const void *ns)
@@ -556,12 +567,15 @@ static struct kernfs_node *kernfs_find_ns(struct kernfs_node *parent,
 		return NULL;
 	}
 
+	/*! name + ns 로 31bit hash 생성하여 return */
 	hash = kernfs_name_hash(name, ns);
+	/*! hash 비교해 가면서 원하는 kn을 찾는다.  */
 	while (node) {
 		struct kernfs_node *kn;
 		int result;
 
 		kn = rb_to_kn(node);
+		/*! hash 와 kn->hash 비교  */
 		result = kernfs_name_compare(hash, name, ns, kn);
 		if (result < 0)
 			node = node->rb_left;
@@ -656,6 +670,7 @@ void kernfs_destroy_root(struct kernfs_root *root)
  *
  * Returns the created node on success, ERR_PTR() value on failure.
  */
+/*! 2016-06-04 study -ing */
 struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
 					 const char *name, umode_t mode,
 					 void *priv, const void *ns)
@@ -774,11 +789,11 @@ const struct inode_operations kernfs_dir_iops = {
 	.rmdir		= kernfs_iop_rmdir,
 	.rename		= kernfs_iop_rename,
 };
-
+/*! 2016-06-04 study -ing */
 static struct kernfs_node *kernfs_leftmost_descendant(struct kernfs_node *pos)
 {
 	struct kernfs_node *last;
-
+	/*! 최 좌측 node를 찾는다.  */
 	while (true) {
 		struct rb_node *rbn;
 
@@ -806,6 +821,7 @@ static struct kernfs_node *kernfs_leftmost_descendant(struct kernfs_node *pos)
  * descendants.  @root is included in the iteration and the last node to be
  * visited.
  */
+/*! 2016-06-04 study -ing */
 static struct kernfs_node *kernfs_next_descendant_post(struct kernfs_node *pos,
 						       struct kernfs_node *root)
 {
@@ -830,6 +846,7 @@ static struct kernfs_node *kernfs_next_descendant_post(struct kernfs_node *pos,
 	return pos->parent;
 }
 
+/*! 2016-06-04 study -ing */
 static void __kernfs_remove(struct kernfs_addrm_cxt *acxt,
 			    struct kernfs_node *kn)
 {
@@ -841,6 +858,7 @@ static void __kernfs_remove(struct kernfs_addrm_cxt *acxt,
 	pr_debug("kernfs %s: removing\n", kn->name);
 
 	next = NULL;
+	/*! next 로 넘어가면서 다 지워준다.(root에 도달하면 NULL로 while 빠져나옴)  */
 	do {
 		pos = next;
 		next = kernfs_next_descendant_post(pos, kn);
@@ -873,6 +891,7 @@ void kernfs_remove(struct kernfs_node *kn)
  * Look for the kernfs_node with @name and @ns under @parent and remove it.
  * Returns 0 on success, -ENOENT if such entry doesn't exist.
  */
+/*! 2016-06-04 study -ing */
 int kernfs_remove_by_name_ns(struct kernfs_node *parent, const char *name,
 			     const void *ns)
 {
@@ -885,12 +904,16 @@ int kernfs_remove_by_name_ns(struct kernfs_node *parent, const char *name,
 		return -ENOENT;
 	}
 
+	/*! acxt전체를 0으로 memset 후 mutex lock 건다.  */
 	kernfs_addrm_start(&acxt);
 
+	/*! name + ns 를 이용하여 원하는 kn을 찾는다.  */
 	kn = kernfs_find_ns(parent, name, ns);
+	/*! 찾으면 remove  */
 	if (kn)
 		__kernfs_remove(&acxt, kn);
 
+	/*! kernelfs add-remove 끝내기 */
 	kernfs_addrm_finish(&acxt);
 
 	if (kn)

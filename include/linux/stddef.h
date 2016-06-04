@@ -12,6 +12,7 @@ enum {
 	true	= 1
 };
 
+/*! 구조체에서 member 까지의 offset을 구한다. */
 #undef offsetof
 #ifdef __compiler_offsetof
 #define offsetof(TYPE,MEMBER) __compiler_offsetof(TYPE,MEMBER)

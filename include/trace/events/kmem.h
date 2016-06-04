@@ -140,6 +140,7 @@ DEFINE_EVENT(kmem_free, kfree,
 	TP_ARGS(call_site, ptr)
 );
 
+/*! 2016-06-04 study -ing */
 DEFINE_EVENT(kmem_free, kmem_cache_free,
 
 	TP_PROTO(unsigned long call_site, const void *ptr),

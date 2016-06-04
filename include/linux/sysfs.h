@@ -419,7 +419,7 @@ static inline int __must_check sysfs_init(void)
 }
 
 #endif /* CONFIG_SYSFS */
-
+/*! 2016-06-04 study -ing */
 static inline int __must_check sysfs_create_file(struct kobject *kobj,
 						 const struct attribute *attr)
 {
@@ -448,7 +448,7 @@ static inline struct kernfs_node *sysfs_get_dirent(struct kernfs_node *parent,
 {
 	return kernfs_find_and_get(parent, name);
 }
-
+/*! 2016-06-04 study -ing */
 static inline struct kernfs_node *sysfs_get(struct kernfs_node *kn)
 {
 	kernfs_get(kn);

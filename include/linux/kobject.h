@@ -175,11 +175,13 @@ extern struct kset * __must_check kset_create_and_add(const char *name,
 						const struct kset_uevent_ops *u,
 						struct kobject *parent_kobj);
 
+/*! 2016-06-04 study -ing */
 static inline struct kset *to_kset(struct kobject *kobj)
 {
 	return kobj ? container_of(kobj, struct kset, kobj) : NULL;
 }
 
+/*! 2016-06-04 study -ing */
 static inline struct kset *kset_get(struct kset *k)
 {
 	return k ? to_kset(kobject_get(&k->kobj)) : NULL;
@@ -189,7 +191,7 @@ static inline void kset_put(struct kset *k)
 {
 	kobject_put(&k->kobj);
 }
-
+/*! 2016-06-04 study -ing */
 static inline struct kobj_type *get_ktype(struct kobject *kobj)
 {
 	return kobj->ktype;

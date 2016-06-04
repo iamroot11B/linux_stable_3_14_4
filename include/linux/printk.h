@@ -233,7 +233,7 @@ extern asmlinkage void dump_stack(void) __cold;
 	printk(KERN_CONT fmt, ##__VA_ARGS__)
 
 /*! I am Root debug macro */
-#define idbg0(fmt, ...) printk(KERN_CONT "[IAMROOT] " fmt, ##__VA_ARGS__)
+#define idbg(fmt, ...) printk(KERN_CONT "[IAMROOT] " fmt, ##__VA_ARGS__)
 
 /*! idbg1 - 2015-11-28 study debug macro */
 #if 0
@@ -247,6 +247,13 @@ extern asmlinkage void dump_stack(void) __cold;
 #define idbg2(fmt, ...) printk(KERN_CONT "[IAMROOT] " fmt, ##__VA_ARGS__)
 #else
 #define idbg2(fmt, ...) do{} while(0)
+#endif
+
+/*! idbg3 - 2016-06-04 study debug macro */
+#if 0
+#define idbg3(fmt, ...) printk(KERN_CONT "[IAMROOT] " fmt, ##__VA_ARGS__)
+#else
+#define idbg3(fmt, ...) do{} while(0)
 #endif
 
 

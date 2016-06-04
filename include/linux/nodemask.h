@@ -466,7 +466,7 @@ static inline int num_node_state(enum node_states state)
 {
 	return 1;
 }
-
+/*! 우리는 MAX_NUMNODES이 1.  */
 #define for_each_node_state(node, __state) \
 	for ( (node) = 0; (node) == 0; (node) = 1)
 

@@ -63,6 +63,7 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
  * the prev/next entries already!
  */
 #ifndef CONFIG_DEBUG_LIST
+/*! 2016-06-04 study -ing */
 static inline void __list_add(struct list_head *new,
 			      struct list_head *prev, struct list_head *next)
 {

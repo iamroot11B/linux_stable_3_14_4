@@ -21,7 +21,7 @@ static inline void mutex_set_owner(struct mutex *lock)
 {
 	lock->owner = current;
 }
-
+/*! 2016-06-04 study -ing */
 static inline void mutex_clear_owner(struct mutex *lock)
 {
 	lock->owner = NULL;

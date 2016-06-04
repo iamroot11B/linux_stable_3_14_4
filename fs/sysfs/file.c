@@ -274,6 +274,7 @@ int sysfs_add_file(struct kernfs_node *parent, const struct attribute *attr,
  * @attr: attribute descriptor
  * @ns: namespace the new file should belong to
  */
+/*! 2016-06-04 study -ing */
 int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
 			 const void *ns)
 {

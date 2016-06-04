@@ -53,6 +53,7 @@ __mutex_fastpath_lock_retval(atomic_t *count)
  * __mutex_slowpath_needs_to_unlock() macro needs to return 1, it needs
  * to return 0 otherwise.
  */
+/*! 2016-06-04 study -ing */
 static inline void
 __mutex_fastpath_unlock(atomic_t *count, void (*fail_fn)(atomic_t *))
 {

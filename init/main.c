@@ -623,7 +623,7 @@ asmlinkage void __init start_kernel(void)
 	build_all_zonelists(NULL, NULL);
 	page_alloc_init();
 
-	idbg0("I am rooot first debug msg\n");
+	idbg("I am rooot first debug msg\n");
 	pr_notice("Kernel command line: %s\n", boot_command_line);
 
 	/*! exynos - ARM은 setup_arch에서 해 줬기 때문에,

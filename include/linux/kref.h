@@ -29,8 +29,10 @@ struct kref {
  * kref_init - initialize object.
  * @kref: object in question.
  */
+/*! 2016-06-04 study -ing */
 static inline void kref_init(struct kref *kref)
 {
+	/*! kref->refcount을 atomic 하게 1로 set  */
 	atomic_set(&kref->refcount, 1);
 }
 
@@ -38,6 +40,7 @@ static inline void kref_init(struct kref *kref)
  * kref_get - increment refcount for object.
  * @kref: object.
  */
+/*! 2016-06-04 study -ing */
 static inline void kref_get(struct kref *kref)
 {
 	/* If refcount was 0 before incrementing then we have a race
