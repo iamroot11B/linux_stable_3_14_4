@@ -43,6 +43,8 @@
 #ifdef __CHECKER__
 #define __must_be_array(arr) 0
 #else
+/*! 2016-06-18 study -ing */
+/*! &(a)[0]은 pointer로 강등된다. 따라서 a가 array가 아니라면 형이 같아진다. */
 /* &a[0] degrades to a pointer: a different type from an array */
 #define __must_be_array(a) BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
 #endif

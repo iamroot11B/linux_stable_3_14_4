@@ -151,9 +151,12 @@ size_t ksize(const void *);
  * alignment larger than the alignment of a 64-bit integer.
  * Setting ARCH_KMALLOC_MINALIGN in arch headers allows that.
  */
+/*! 2016-06-18 study -ing */
 #if defined(ARCH_DMA_MINALIGN) && ARCH_DMA_MINALIGN > 8
 #define ARCH_KMALLOC_MINALIGN ARCH_DMA_MINALIGN
+/*! ARCH_DMA_MINALIGN = 64 */
 #define KMALLOC_MIN_SIZE ARCH_DMA_MINALIGN
+/*! ARCH_DMA_MINALIGN = 6 */
 #define KMALLOC_SHIFT_LOW ilog2(ARCH_DMA_MINALIGN)
 #else
 #define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
@@ -633,8 +636,10 @@ extern void *__kmalloc_node_track_caller(size_t, gfp_t, int, unsigned long);
 /*
  * Shortcuts
  */
+/*! 2016-06-18 study -ing */
 static inline void *kmem_cache_zalloc(struct kmem_cache *k, gfp_t flags)
 {
+	/*! ZERO로 flag를 주고 cache 할당 */
 	return kmem_cache_alloc(k, flags | __GFP_ZERO);
 }
 

@@ -4,9 +4,11 @@
 #ifndef __ASMARM_CACHE_H
 #define __ASMARM_CACHE_H
 
+/*! 2016-06-18 study -ing */
+/*! vexpress a9, exynos는 CONFIG_ARM_L1_CACHE_SHIFT=6 */
 #define L1_CACHE_SHIFT		CONFIG_ARM_L1_CACHE_SHIFT
 #define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT)
-/*! 1<<6 */
+/*! 1<<6 = 64 */
 
 /*
  * Memory returned by kmalloc() may be used for DMA, so we must make
@@ -15,6 +17,7 @@
  * cache before the transfer is done, causing old data to be seen by
  * the CPU.
  */
+/*! 2016-06-18 study -ing */
 #define ARCH_DMA_MINALIGN	L1_CACHE_BYTES
 
 /*

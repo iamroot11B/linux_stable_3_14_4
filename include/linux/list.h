@@ -16,10 +16,14 @@
  * using the generic single-entry routines.
  */
 
+/*! 2016-06-18 study -ing */
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
+/*! 2016-06-18 study -ing */
+/*! list를 자기 자신을 가리키도록 해촐서 초기화+선언 */
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
+
 /*!
  * INIT_LIST_HEAD()
  * list head의 전 후에 list 대입하여 list 초기화
@@ -361,6 +365,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * @type:	the type of the struct this is embedded in.
  * @member:	the name of the list_struct within the struct.
  */
+/*! 2016-06-18 study -ing */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
 
@@ -372,6 +377,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  *
  * Note, that list is expected to be not empty.
  */
+/*! 2016-06-18 study -ing */
 #define list_first_entry(ptr, type, member) \
 	list_entry((ptr)->next, type, member)
 
@@ -456,6 +462,8 @@ static inline void list_splice_tail_init(struct list_head *list,
  * @head:	the head for your list.
  * @member:	the name of the list_struct within the struct.
  */
+/*! 2016-06-18 study -ing */
+/*! head부터 모든 list를 돈다. */
 #define list_for_each_entry(pos, head, member)				\
 	for (pos = list_first_entry(head, typeof(*pos), member);	\
 	     &pos->member != (head);					\

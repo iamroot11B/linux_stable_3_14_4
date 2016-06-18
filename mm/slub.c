@@ -4034,11 +4034,13 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 	 *  node = 0 일때 한번만 수행.
 	 */
 	/*! 2016-06-04 study end */
+	/*! 2016-06-18 study start */
 	for_each_node_state(node, N_NORMAL_MEMORY) {
 		struct kmem_cache_node *n = get_node(s, node);
 		struct page *p;
 
 		if (n) {
+			/*! 모든 partial list에서 slab_cache = s */
 			list_for_each_entry(p, &n->partial, lru)
 				p->slab_cache = s;
 
@@ -4048,6 +4050,10 @@ static struct kmem_cache * __init bootstrap(struct kmem_cache *static_cache)
 #endif
 		}
 	}
+	/*!
+	 * slab_common.c에서 선언하는 전역변수 (list를 저장하는 list임)
+	 * slab_caches에 s->list를 추가함
+	 */
 	list_add(&s->list, &slab_caches);
 	return s;
 }
@@ -4083,6 +4089,7 @@ void __init kmem_cache_init(void)
 				nr_node_ids * sizeof(struct kmem_cache_node *),
 		       SLAB_HWCACHE_ALIGN);
 
+	/*! kmem_cache 영역을 할당하고 지역변수 boot_kmem_cache의 값으로 초기화 */
 	kmem_cache = bootstrap(&boot_kmem_cache);
 
 	/*
@@ -4090,6 +4097,7 @@ void __init kmem_cache_init(void)
 	 * kmem_cache_node is separately allocated so no need to
 	 * update any list pointers.
 	 */
+	/*! kmem_cache_node 영역을 할당하고 지역변수 boot_kmem_cache_node 값으로 초기화 */
 	kmem_cache_node = bootstrap(&boot_kmem_cache_node);
 
 	/* Now we can use the kmem_cache to allocate kmalloc slabs */

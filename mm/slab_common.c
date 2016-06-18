@@ -376,6 +376,8 @@ EXPORT_SYMBOL(kmalloc_dma_caches);
  * of two cache sizes there. The size of larger slabs can be determined using
  * fls.
  */
+/*! 2016-06-18 study -ing */
+/*! 최적의 cache size */
 static s8 size_index[24] = {
 	3,	/* 8 */
 	4,	/* 16 */
@@ -403,8 +405,15 @@ static s8 size_index[24] = {
 	2	/* 192 */
 };
 
+/*! 2016-06-18 study -ing */
 static inline int size_index_elem(size_t bytes)
 {
+	/*!
+	 * 8단위로 0부터 +1
+	 * Ex: bytes 0~8 -> 0
+	 *     bytes 9~16 -> 1
+	 *     ...
+	 */
 	return (bytes - 1) / 8;
 }
 
@@ -448,6 +457,8 @@ struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
  * may already have been created because they were needed to
  * enable allocations for slab creation.
  */
+/*! 2016-06-18 study -ing */
+/*! kmalloc array를 생성한다. 일부는 slab 생성을 위해서 이미 생성되었음 */
 void __init create_kmalloc_caches(unsigned long flags)
 {
 	int i;
@@ -466,9 +477,12 @@ void __init create_kmalloc_caches(unsigned long flags)
 	BUILD_BUG_ON(KMALLOC_MIN_SIZE > 256 ||
 		(KMALLOC_MIN_SIZE & (KMALLOC_MIN_SIZE - 1)));
 
+	/*! KMALLOC_MIN_SIZE = 64 */
 	for (i = 8; i < KMALLOC_MIN_SIZE; i += 8) {
+		/*! elem은 0~6 */
 		int elem = size_index_elem(i);
 
+		/*! size_index는 slab_common.c:379(현재 파일)에 있음 */
 		if (elem >= ARRAY_SIZE(size_index))
 			break;
 		size_index[elem] = KMALLOC_SHIFT_LOW;
