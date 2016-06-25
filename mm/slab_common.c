@@ -348,15 +348,20 @@ void __init create_boot_cache(struct kmem_cache *s, const char *name, size_t siz
 	s->refcount = -1;	/* Exempt from merging for now */
 }
 
+/*! 2016.06.25 study -ing */
+/*! size 크기의 cache를 가지는 kmem_cache를 만들어서 반환한다. */
 struct kmem_cache *__init create_kmalloc_cache(const char *name, size_t size,
 				unsigned long flags)
 {
+	/*! kmem_cache를 0로 채워서 할당 */
 	struct kmem_cache *s = kmem_cache_zalloc(kmem_cache, GFP_NOWAIT);
 
 	if (!s)
 		panic("Out of memory when creating slab %s\n", name);
 
+	/*! size만큼 cache(kmalloc slab)를 생성해서 s에 연결 */
 	create_boot_cache(s, name, size, flags);
+	/*! s->list를 slab_caches에 추가 */
 	list_add(&s->list, &slab_caches);
 	s->refcount = 1;
 	return s;
@@ -377,7 +382,11 @@ EXPORT_SYMBOL(kmalloc_dma_caches);
  * fls.
  */
 /*! 2016-06-18 study -ing */
-/*! 최적의 cache size */
+/*!
+ * 최적의 cache size 테이블
+ * 2의 승수 (power of two)가 안되는 캐시에 대해서
+ * 아래 주석 관련 개념을 활용함
+ */
 static s8 size_index[24] = {
 	3,	/* 8 */
 	4,	/* 16 */
@@ -387,6 +396,8 @@ static s8 size_index[24] = {
 	6,	/* 48 */
 	6,	/* 56 */
 	6,	/* 64 */
+/*! KMALLOC_MIN_SIZE 가 64보다 작을 때
+ * 65~96 바이트는 index 1을 사용함 */
 	1,	/* 72 */
 	1,	/* 80 */
 	1,	/* 88 */
@@ -395,6 +406,8 @@ static s8 size_index[24] = {
 	7,	/* 112 */
 	7,	/* 120 */
 	7,	/* 128 */
+/*! KMALLOC_MIN_SIZE 가 64보다 작을 때
+ * 129~193 바이트는 index 2를 사용함 */
 	2,	/* 136 */
 	2,	/* 144 */
 	2,	/* 152 */
@@ -488,12 +501,22 @@ void __init create_kmalloc_caches(unsigned long flags)
 		size_index[elem] = KMALLOC_SHIFT_LOW;
 	}
 
+	/*! 2016-06-18 study end */
+	/*! 2016-06-25 study start */
+
 	if (KMALLOC_MIN_SIZE >= 64) {
 		/*
 		 * The 96 byte size cache is not used if the alignment
 		 * is 64 byte.
 		 */
+		/*!
+		 * 2의 승수가 아닌 캐시에 대하여 (65~96 바이트)
+		 * 96 바이트 캐시를 사용하지 않을 것이므로
+		 * index를 7로 고친다. (128 바이트)
+		 * (size_index를 참고)
+		 */
 		for (i = 64 + 8; i <= 96; i += 8)
+			/*! size_index_elem : 8~11 */
 			size_index[size_index_elem(i)] = 7;
 
 	}
@@ -504,11 +527,30 @@ void __init create_kmalloc_caches(unsigned long flags)
 		 * is 128 byte. Redirect kmalloc to use the 256 byte cache
 		 * instead.
 		 */
+		/*!
+		 * 2의 승수가 아닌 캐시에 대하여 (129~192 바이트)
+		 * 192 바이트 캐시를 사용하지 않을 것이므로
+		 * index를 8로 고친다. (256 바이트)
+		 * (size_index를 참고)
+		 */
 		for (i = 128 + 8; i <= 192; i += 8)
 			size_index[size_index_elem(i)] = 8;
 	}
+	/*!
+	 * kmalloc_caches를 init
+	 *
+	 * KMALLOC_SHIFT_LOW : 6
+	 * KMALLOC_SHIFT_HIGH : 13
+	 * 
+	 * kmalloc_cahces[0, 3~5]는 초기화 안될 것임
+	 * [1]이나 [2]는 될 수도 있음 (우리 환경에선 [1]은 생성 X)
+	 */
 	for (i = KMALLOC_SHIFT_LOW; i <= KMALLOC_SHIFT_HIGH; i++) {
 		if (!kmalloc_caches[i]) {
+			/*!
+			 * (2^i) 사이즈인 캐시를 생성함
+			 * 즉, 2^6 ~ 2^13
+			 */
 			kmalloc_caches[i] = create_kmalloc_cache(NULL,
 							1 << i, flags);
 		}
@@ -518,9 +560,20 @@ void __init create_kmalloc_caches(unsigned long flags)
 		 * These have to be created immediately after the
 		 * earlier power of two caches
 		 */
+		/*! 번역
+		 * 2의 승수 크기가 아닌 캐시. 이 것들은 바로 앞 2의 승수인 캐시의
+		 * 바로 다음에 생성되어야 한다.
+		 * Ex)
+		 * 96은 64 - 128 사이에 생성
+		 * 192는 128 - 256 사이에 생성
+		 */
 		if (KMALLOC_MIN_SIZE <= 32 && !kmalloc_caches[1] && i == 6)
 			kmalloc_caches[1] = create_kmalloc_cache(NULL, 96, flags);
 
+		/*!
+		 * KMALLOC_MIN_SIZE = 64
+		 * 64*3 192 이하의 바이트는 64 바이트 3개를 할당하여 처리가능
+		 */
 		if (KMALLOC_MIN_SIZE <= 64 && !kmalloc_caches[2] && i == 7)
 			kmalloc_caches[2] = create_kmalloc_cache(NULL, 192, flags);
 	}
@@ -528,6 +581,7 @@ void __init create_kmalloc_caches(unsigned long flags)
 	/* Kmalloc array is now usable */
 	slab_state = UP;
 
+	/*! NULL로 만들었던 cahce의 이름을 넣어줌 */
 	for (i = 0; i <= KMALLOC_SHIFT_HIGH; i++) {
 		struct kmem_cache *s = kmalloc_caches[i];
 		char *n;
@@ -540,6 +594,7 @@ void __init create_kmalloc_caches(unsigned long flags)
 		}
 	}
 
+	/*! 없음 */
 #ifdef CONFIG_ZONE_DMA
 	for (i = 0; i <= KMALLOC_SHIFT_HIGH; i++) {
 		struct kmem_cache *s = kmalloc_caches[i];

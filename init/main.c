@@ -532,6 +532,7 @@ static void __init mm_init(void)
     /*! 슬랩할당  */
 	kmem_cache_init();
 	percpu_init_late();
+	/*! 2016.06.25 study end */
 	pgtable_init();
 	vmalloc_init();
 }

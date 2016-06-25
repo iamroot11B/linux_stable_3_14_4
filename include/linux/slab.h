@@ -156,7 +156,7 @@ size_t ksize(const void *);
 #define ARCH_KMALLOC_MINALIGN ARCH_DMA_MINALIGN
 /*! ARCH_DMA_MINALIGN = 64 */
 #define KMALLOC_MIN_SIZE ARCH_DMA_MINALIGN
-/*! ARCH_DMA_MINALIGN = 6 */
+/*! KMALLOC_SHIFT_LOW = 6 */
 #define KMALLOC_SHIFT_LOW ilog2(ARCH_DMA_MINALIGN)
 #else
 #define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
@@ -214,8 +214,10 @@ struct kmem_cache {
  * SLUB directly allocates requests fitting in to an order-1 page
  * (PAGE_SIZE*2).  Larger requests are passed to the page allocator.
  */
+/*! PAGE_SHIFT = 12 */
 #define KMALLOC_SHIFT_HIGH	(PAGE_SHIFT + 1)
 #define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT)
+/*! KMALLOC_SHIFT_LOW는 상단에서 6으로 Define됨 */
 #ifndef KMALLOC_SHIFT_LOW
 #define KMALLOC_SHIFT_LOW	3
 #endif

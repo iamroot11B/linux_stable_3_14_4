@@ -4223,6 +4223,10 @@ int __kmem_cache_create(struct kmem_cache *s, unsigned long flags)
 	/*! 2016-06-04 study -ing */
 	/*! create_boot_cache - 현재 early boot 이며, slab_state = DOWN(0) 으로,
 	 *  여기서 리턴.
+	 *
+	 *  slub은 UP으로 변하지 않음 (enum slab_state참고)
+	 *
+	 * create_kmalloc_caches에서 UP으로 셋 해줌 (2016-06-25)
 	 */
 	if (slab_state <= UP)
 		return 0;

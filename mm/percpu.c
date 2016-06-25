@@ -2167,6 +2167,8 @@ void __init setup_per_cpu_areas(void)
  * This function is called after slab is brought up and replaces those
  * with properly allocated maps.
  */
+/*! 2016.06.25 study -ing */
+/*! slab 초기화 전에 사용하던 임시 allocation map을 map을 새로 할당하여 대체함 */
 void __init percpu_init_late(void)
 {
 	struct pcpu_chunk *target_chunks[] =
@@ -2175,18 +2177,26 @@ void __init percpu_init_late(void)
 	unsigned long flags;
 	int i;
 
+	/*!
+	 * pcpu_first_chunk와 pcpu_reserved_chunk를 대체하도록
+	 * 메모리를 할당하고 내용을 복사
+	 */
 	for (i = 0; (chunk = target_chunks[i]); i++) {
 		int *map;
+		/*! PERCPU_DYNAMIC_EARLY_SLOTS = 128 */
 		const size_t size = PERCPU_DYNAMIC_EARLY_SLOTS * sizeof(map[0]);
 
 		BUILD_BUG_ON(size > PAGE_SIZE);
 
+		/*! map 영역 할당 */
 		map = pcpu_mem_zalloc(size);
 		BUG_ON(!map);
 
 		spin_lock_irqsave(&pcpu_lock, flags);
+		/*! 할당한 map으로 대체 */
 		memcpy(map, chunk->map, size);
 		chunk->map = map;
+		/*! first chunk와 reserved chunk는 initdata에 있으므로 해제 불필요 */
 		spin_unlock_irqrestore(&pcpu_lock, flags);
 	}
 }
