@@ -54,6 +54,7 @@ struct rb_root {
 /* 'empty' nodes are nodes that are known not to be inserted in an rbree */
 #define RB_EMPTY_NODE(node)  \
 	((node)->__rb_parent_color == (unsigned long)(node))
+/*! 2016.07.09 study -ing */
 #define RB_CLEAR_NODE(node)  \
 	((node)->__rb_parent_color = (unsigned long)(node))
 
@@ -76,6 +77,7 @@ extern struct rb_node *rb_next_postorder(const struct rb_node *);
 extern void rb_replace_node(struct rb_node *victim, struct rb_node *new, 
 			    struct rb_root *root);
 
+/*! 2016.07.09 study -ing */
 static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
 				struct rb_node ** rb_link)
 {

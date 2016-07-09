@@ -382,13 +382,13 @@ static inline void dummy_rotate(struct rb_node *old, struct rb_node *new) {}
 static const struct rb_augment_callbacks dummy_callbacks = {
 	dummy_propagate, dummy_copy, dummy_rotate
 };
-
+/*! 2016.07.09 study -ing */
 void rb_insert_color(struct rb_node *node, struct rb_root *root)
 {
 	__rb_insert(node, root, dummy_rotate);
 }
 EXPORT_SYMBOL(rb_insert_color);
-
+/*! 2016.07.09 study -ing */
 void rb_erase(struct rb_node *node, struct rb_root *root)
 {
 	struct rb_node *rebalance;

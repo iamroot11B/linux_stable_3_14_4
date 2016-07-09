@@ -476,7 +476,7 @@ static inline void init_hrtick(void)
 {
 }
 #endif /* CONFIG_SMP */
-
+/*! 2016.07.09 study -ing */
 static void init_rq_hrtick(struct rq *rq)
 {
 #ifdef CONFIG_SMP
@@ -491,6 +491,7 @@ static void init_rq_hrtick(struct rq *rq)
 	rq->hrtick_timer.function = hrtick;
 }
 #else	/* CONFIG_SCHED_HRTICK */
+/*! 2016.07.09 study -ing */
 static inline void hrtick_clear(struct rq *rq)
 {
 }
@@ -739,7 +740,7 @@ int tg_nop(struct task_group *tg, void *data)
 	return 0;
 }
 #endif
-
+/*! 2016.07.09 study -ing */
 static void set_load_weight(struct task_struct *p)
 {
 	int prio = p->static_prio - MAX_RT_PRIO;
@@ -749,11 +750,13 @@ static void set_load_weight(struct task_struct *p)
 	 * SCHED_IDLE tasks get minimal weight:
 	 */
 	if (p->policy == SCHED_IDLE) {
+		/*! scale_load(w) = w  */
 		load->weight = scale_load(WEIGHT_IDLEPRIO);
 		load->inv_weight = WMULT_IDLEPRIO;
 		return;
 	}
 
+	/*! scale_load(w) = w  */
 	load->weight = scale_load(prio_to_weight[prio]);
 	load->inv_weight = prio_to_wmult[prio];
 }
@@ -1701,8 +1704,10 @@ int wake_up_state(struct task_struct *p, unsigned int state)
  *
  * __sched_fork() is basic setup used by init_idle() too:
  */
+/*! 2016.07.09 study -ing */
 static void __sched_fork(unsigned long clone_flags, struct task_struct *p)
 {
+	/*! p 멤버들 init  */
 	p->on_rq			= 0;
 
 	p->se.on_rq			= 0;
@@ -1717,7 +1722,9 @@ static void __sched_fork(unsigned long clone_flags, struct task_struct *p)
 	memset(&p->se.statistics, 0, sizeof(p->se.statistics));
 #endif
 
+	/*! p->dl.rb_node 클리어  */
 	RB_CLEAR_NODE(&p->dl.rb_node);
+	/*! p->dl.dl_timer init  */
 	hrtimer_init(&p->dl.dl_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	p->dl.dl_runtime = p->dl.runtime = 0;
 	p->dl.dl_deadline = p->dl.deadline = 0;
@@ -1875,7 +1882,7 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 	put_cpu();
 	return 0;
 }
-
+/*! 2016.07.09 study -ing */
 unsigned long to_ratio(u64 period, u64 runtime)
 {
 	if (runtime == RUNTIME_INF)
@@ -4456,6 +4463,7 @@ void init_idle_bootup_task(struct task_struct *idle)
  * NOTE: this function does not set the idle thread's NEED_RESCHED
  * flag, to make booting more robust.
  */
+/*! 2016.07.09 study -ing */
 void init_idle(struct task_struct *idle, int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -4463,8 +4471,11 @@ void init_idle(struct task_struct *idle, int cpu)
 
 	raw_spin_lock_irqsave(&rq->lock, flags);
 
+	/*! idle의 멤버들 init. (rbnode, hrtimer 등 포함)  */
 	__sched_fork(0, idle);
+	/*! idle->state이 최초로 running 상태로 설정 됨 */
 	idle->state = TASK_RUNNING;
+	/*! 커널 시작 시간 기록  */
 	idle->se.exec_start = sched_clock();
 
 	do_set_cpus_allowed(idle, cpumask_of(cpu));
@@ -4482,20 +4493,25 @@ void init_idle(struct task_struct *idle, int cpu)
 	__set_task_cpu(idle, cpu);
 	rcu_read_unlock();
 
+	/*! rq의 curr, idle 모두 idle 로 지정 해 줌  */
 	rq->curr = rq->idle = idle;
 #if defined(CONFIG_SMP)
+	/*! 현재 on_cpu는 1  */
 	idle->on_cpu = 1;
 #endif
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 
 	/* Set the preempt count _outside_ the spinlocks! */
+	/*! idle take의 preempt_count를 PREEMPT_ENABLED로 바꿔 줌 */
 	init_idle_preempt_count(idle, cpu);
 
 	/*
 	 * The idle tasks have their own, simple scheduling class:
 	 */
 	idle->sched_class = &idle_sched_class;
+	/*! do nothing.  */
 	ftrace_graph_init_idle_task(idle, cpu);
+	/*! do nothing. (CONFIG_VIRT_CPU_ACCOUNTING_GEN 가 not set) */
 	vtime_init_idle(idle, cpu);
 #if defined(CONFIG_SMP)
 	sprintf(idle->comm, "%s/%d", INIT_TASK_COMM, cpu);
@@ -4503,8 +4519,10 @@ void init_idle(struct task_struct *idle, int cpu)
 }
 
 #ifdef CONFIG_SMP
+/*! 2016.07.09 study -ing */
 void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new_mask)
 {
+	/*! set_cpus_allowed 함수를 이용하여 cpu allowed 상태로 설정  */
 	if (p->sched_class && p->sched_class->set_cpus_allowed)
 		p->sched_class->set_cpus_allowed(p, new_mask);
 
@@ -4953,32 +4971,35 @@ static void unregister_sched_domain_sysctl(void)
 {
 }
 #endif
-
+/*! 2016.07.09 study -ing */
 static void set_rq_online(struct rq *rq)
 {
 	if (!rq->online) {
 		const struct sched_class *class;
 
+		/*! rq->rd->online 의 rq->cpu번째 bit를 1로 set  */
 		cpumask_set_cpu(rq->cpu, rq->rd->online);
 		rq->online = 1;
 
+		/*! class 모두 loop 돌면서 rq_online 함수를 이용하여 rq online으로 설정 */
 		for_each_class(class) {
 			if (class->rq_online)
 				class->rq_online(rq);
 		}
 	}
 }
-
+/*! 2016.07.09 study -ing */
 static void set_rq_offline(struct rq *rq)
 {
 	if (rq->online) {
 		const struct sched_class *class;
-
+		/*! 모든 class loop 돌면서 rq_offline 함수를 이용하여 offline으로 변경  */
 		for_each_class(class) {
 			if (class->rq_offline)
 				class->rq_offline(rq);
 		}
 
+		/*! rq->rd->online 의 rq->cpu번째 bit를 0으로 clear. */
 		cpumask_clear_cpu(rq->cpu, rq->rd->online);
 		rq->online = 0;
 	}
@@ -5313,7 +5334,7 @@ static void free_rootdomain(struct rcu_head *rcu)
 	free_cpumask_var(rd->span);
 	kfree(rd);
 }
-
+/*! 2016.07.09 study -ing */
 static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 {
 	struct root_domain *old_rd = NULL;
@@ -5324,9 +5345,13 @@ static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 	if (rq->rd) {
 		old_rd = rq->rd;
 
+		/*! old_rd->online에서 rq->cpu 번째 bit가 set 인지 테스트.
+		 *  set 되어 있으면. set_rq_offline 수행.
+		 */
 		if (cpumask_test_cpu(rq->cpu, old_rd->online))
 			set_rq_offline(rq);
 
+		/*! old_rd->span의 rq->cpu 번째 bit를 0으로 clear */
 		cpumask_clear_cpu(rq->cpu, old_rd->span);
 
 		/*
@@ -5334,6 +5359,7 @@ static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 		 * set old_rd to NULL to skip the freeing later
 		 * in this function:
 		 */
+		/*! old_rd->refcount을 1 감소 시키고 결과가 0인지 확인 */
 		if (!atomic_dec_and_test(&old_rd->refcount))
 			old_rd = NULL;
 	}
@@ -5341,7 +5367,9 @@ static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 	atomic_inc(&rd->refcount);
 	rq->rd = rd;
 
+	/*! rd->span의 rq->cpu번째 bit를 1로 set  */
 	cpumask_set_cpu(rq->cpu, rd->span);
+	/*! cpu_active_mask 확인하고 set 되어 있으면 set_rq_online 수행 */
 	if (cpumask_test_cpu(rq->cpu, cpu_active_mask))
 		set_rq_online(rq);
 
@@ -5350,11 +5378,12 @@ static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 	if (old_rd)
 		call_rcu_sched(&old_rd->rcu, free_rootdomain);
 }
-
+/*! 2016.07.09 study -ing */
 static int init_rootdomain(struct root_domain *rd)
 {
 	memset(rd, 0, sizeof(*rd));
 
+	/*! alloc_cpumask_var - do nothing, true 리턴  */
 	if (!alloc_cpumask_var(&rd->span, GFP_KERNEL))
 		goto out;
 	if (!alloc_cpumask_var(&rd->online, GFP_KERNEL))
@@ -5364,6 +5393,7 @@ static int init_rootdomain(struct root_domain *rd)
 	if (!alloc_cpumask_var(&rd->rto_mask, GFP_KERNEL))
 		goto free_dlo_mask;
 
+	/*! lock 걸고 rd->dl_bw 값 init 수행  */
 	init_dl_bw(&rd->dl_bw);
 	if (cpudl_init(&rd->cpudl) != 0)
 		goto free_dlo_mask;
@@ -5389,11 +5419,12 @@ out:
  * members (mimicking the global state we have today).
  */
 struct root_domain def_root_domain;
-
+/*! 2016.07.09 study -ing */
 static void init_defrootdomain(void)
 {
 	init_rootdomain(&def_root_domain);
 
+	/*! def_root_domain.refcount을 atomic 하게 1 로 set */
 	atomic_set(&def_root_domain.refcount, 1);
 }
 
@@ -6760,25 +6791,25 @@ LIST_HEAD(task_groups);
 #endif
 
 DECLARE_PER_CPU(cpumask_var_t, load_balance_mask);
-
+/*! 2016.07.09 study -ing */
 void __init sched_init(void)
 {
 	int i, j;
 	unsigned long alloc_size = 0, ptr;
 
-#ifdef CONFIG_FAIR_GROUP_SCHED
+#ifdef CONFIG_FAIR_GROUP_SCHED	// n
 	alloc_size += 2 * nr_cpu_ids * sizeof(void **);
 #endif
-#ifdef CONFIG_RT_GROUP_SCHED
+#ifdef CONFIG_RT_GROUP_SCHED	// n
 	alloc_size += 2 * nr_cpu_ids * sizeof(void **);
 #endif
-#ifdef CONFIG_CPUMASK_OFFSTACK
+#ifdef CONFIG_CPUMASK_OFFSTACK	// n
 	alloc_size += num_possible_cpus() * cpumask_size();
 #endif
 	if (alloc_size) {
 		ptr = (unsigned long)kzalloc(alloc_size, GFP_NOWAIT);
 
-#ifdef CONFIG_FAIR_GROUP_SCHED
+#ifdef CONFIG_FAIR_GROUP_SCHED	// n
 		root_task_group.se = (struct sched_entity **)ptr;
 		ptr += nr_cpu_ids * sizeof(void **);
 
@@ -6786,7 +6817,7 @@ void __init sched_init(void)
 		ptr += nr_cpu_ids * sizeof(void **);
 
 #endif /* CONFIG_FAIR_GROUP_SCHED */
-#ifdef CONFIG_RT_GROUP_SCHED
+#ifdef CONFIG_RT_GROUP_SCHED	// n
 		root_task_group.rt_se = (struct sched_rt_entity **)ptr;
 		ptr += nr_cpu_ids * sizeof(void **);
 
@@ -6794,7 +6825,7 @@ void __init sched_init(void)
 		ptr += nr_cpu_ids * sizeof(void **);
 
 #endif /* CONFIG_RT_GROUP_SCHED */
-#ifdef CONFIG_CPUMASK_OFFSTACK
+#ifdef CONFIG_CPUMASK_OFFSTACK	// n
 		for_each_possible_cpu(i) {
 			per_cpu(load_balance_mask, i) = (void *)ptr;
 			ptr += cpumask_size();
@@ -6804,19 +6835,24 @@ void __init sched_init(void)
 
 	init_rt_bandwidth(&def_rt_bandwidth,
 			global_rt_period(), global_rt_runtime());
+	/*! dl - deadline
+	 *  dl_runtime_lock init,
+	 *  def_dl_bandwidth->dl_period = global_rt_period(),
+	 *  def_dl_bandwidth->dl_runtime = global_rt_runtime() 수행
+	 */
 	init_dl_bandwidth(&def_dl_bandwidth,
 			global_rt_period(), global_rt_runtime());
 
-#ifdef CONFIG_SMP
+#ifdef CONFIG_SMP	// y
 	init_defrootdomain();
 #endif
 
-#ifdef CONFIG_RT_GROUP_SCHED
+#ifdef CONFIG_RT_GROUP_SCHED	// n
 	init_rt_bandwidth(&root_task_group.rt_bandwidth,
 			global_rt_period(), global_rt_runtime());
 #endif /* CONFIG_RT_GROUP_SCHED */
 
-#ifdef CONFIG_CGROUP_SCHED
+#ifdef CONFIG_CGROUP_SCHED	// n
 	list_add(&root_task_group.list, &task_groups);
 	INIT_LIST_HEAD(&root_task_group.children);
 	INIT_LIST_HEAD(&root_task_group.siblings);
@@ -6824,18 +6860,22 @@ void __init sched_init(void)
 
 #endif /* CONFIG_CGROUP_SCHED */
 
+	/*! 모든 cpu에 대해 loop 수행  */
 	for_each_possible_cpu(i) {
 		struct rq *rq;
 
+		/*! rq = cpu의 runqueues  */
 		rq = cpu_rq(i);
 		raw_spin_lock_init(&rq->lock);
 		rq->nr_running = 0;
 		rq->calc_load_active = 0;
 		rq->calc_load_update = jiffies + LOAD_FREQ;
 		init_cfs_rq(&rq->cfs);
+		/*! rq->rt의 init 수행 */
 		init_rt_rq(&rq->rt, rq);
+		/*! rq->dl의 init 수행 */
 		init_dl_rq(&rq->dl, rq);
-#ifdef CONFIG_FAIR_GROUP_SCHED
+#ifdef CONFIG_FAIR_GROUP_SCHED	// n
 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
 		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);
 		/*
@@ -6862,17 +6902,19 @@ void __init sched_init(void)
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
 		rq->rt.rt_runtime = def_rt_bandwidth.rt_runtime;
-#ifdef CONFIG_RT_GROUP_SCHED
+#ifdef CONFIG_RT_GROUP_SCHED	// n
 		INIT_LIST_HEAD(&rq->leaf_rt_rq_list);
 		init_tg_rt_entry(&root_task_group, &rq->rt, NULL, i, NULL);
 #endif
 
+		/*! CPU_LOAD_IDX_MAX = 5 */
 		for (j = 0; j < CPU_LOAD_IDX_MAX; j++)
 			rq->cpu_load[j] = 0;
 
 		rq->last_load_update_tick = jiffies;
 
-#ifdef CONFIG_SMP
+#ifdef CONFIG_SMP	// y
+		/*! rq의 멤버들 init 수행 */
 		rq->sd = NULL;
 		rq->rd = NULL;
 		rq->cpu_power = SCHED_POWER_SCALE;
@@ -6889,20 +6931,22 @@ void __init sched_init(void)
 		INIT_LIST_HEAD(&rq->cfs_tasks);
 
 		rq_attach_root(rq, &def_root_domain);
-#ifdef CONFIG_NO_HZ_COMMON
+#ifdef CONFIG_NO_HZ_COMMON	 // n
 		rq->nohz_flags = 0;
 #endif
-#ifdef CONFIG_NO_HZ_FULL
+#ifdef CONFIG_NO_HZ_FULL	// n
 		rq->last_sched_tick = 0;
 #endif
 #endif
+		/*! vexpess에서는 do nothing. exynos는 enable 됨 */
 		init_rq_hrtick(rq);
 		atomic_set(&rq->nr_iowait, 0);
 	}
 
+	/*! init_task의 멤버들 init 수행  */
 	set_load_weight(&init_task);
 
-#ifdef CONFIG_PREEMPT_NOTIFIERS
+#ifdef CONFIG_PREEMPT_NOTIFIERS	 // n
 	INIT_HLIST_HEAD(&init_task.preempt_notifiers);
 #endif
 
@@ -6910,6 +6954,7 @@ void __init sched_init(void)
 	 * The boot idle thread does lazy MMU switching as well:
 	 */
 	atomic_inc(&init_mm.mm_count);
+	/*! ARM 에서는 do nothing.  */
 	enter_lazy_tlb(&init_mm, current);
 
 	/*
@@ -6920,6 +6965,7 @@ void __init sched_init(void)
 	 */
 	init_idle(current, smp_processor_id());
 
+	/*! calc_load_update 업데이트 수행 */
 	calc_load_update = jiffies + LOAD_FREQ;
 
 	/*
@@ -6927,7 +6973,8 @@ void __init sched_init(void)
 	 */
 	current->sched_class = &fair_sched_class;
 
-#ifdef CONFIG_SMP
+#ifdef CONFIG_SMP	// y
+	/*! cpumask_clear(sched_domains_tmpmask) 수행  */
 	zalloc_cpumask_var(&sched_domains_tmpmask, GFP_NOWAIT);
 	/* May be allocated at isolcpus cmdline parse time */
 	if (cpu_isolated_map == NULL)
@@ -6936,6 +6983,7 @@ void __init sched_init(void)
 #endif
 	init_sched_fair_class();
 
+	/*! scheduler_running을 1로 설정 해 주면서 sched_init 마무리.  */
 	scheduler_running = 1;
 }
 

@@ -49,7 +49,7 @@ static inline int is_leftmost(struct task_struct *p, struct dl_rq *dl_rq)
 
 	return dl_rq->rb_leftmost == &dl_se->rb_node;
 }
-
+/*! 2016.07.09 study -ing */
 void init_dl_bandwidth(struct dl_bandwidth *dl_b, u64 period, u64 runtime)
 {
 	raw_spin_lock_init(&dl_b->dl_runtime_lock);
@@ -58,19 +58,25 @@ void init_dl_bandwidth(struct dl_bandwidth *dl_b, u64 period, u64 runtime)
 }
 
 extern unsigned long to_ratio(u64 period, u64 runtime);
-
+/*! 2016.07.09 study -ing */
 void init_dl_bw(struct dl_bw *dl_b)
 {
+	/*! spin lock init 및 lock 걸고,  */
 	raw_spin_lock_init(&dl_b->lock);
 	raw_spin_lock(&def_dl_bandwidth.dl_runtime_lock);
+	/*! dl_b->bw = -1 또는, = to_ratio(...) 수행
+	 *  to_ratio = 1<<20 or 0
+	 */
 	if (global_rt_runtime() == RUNTIME_INF)
 		dl_b->bw = -1;
 	else
 		dl_b->bw = to_ratio(global_rt_period(), global_rt_runtime());
+
+	/*! spin lock unlock 후 total_bw = 0 */
 	raw_spin_unlock(&def_dl_bandwidth.dl_runtime_lock);
 	dl_b->total_bw = 0;
 }
-
+/*! 2016.07.09 study -ing */
 void init_dl_rq(struct dl_rq *dl_rq, struct rq *rq)
 {
 	dl_rq->rb_root = RB_ROOT;

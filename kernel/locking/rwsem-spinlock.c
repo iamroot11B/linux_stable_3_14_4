@@ -36,6 +36,7 @@ EXPORT_SYMBOL(rwsem_is_locked);
 /*
  * initialise the semaphore
  */
+/*! 2016.07.09 study -ing */
 void __init_rwsem(struct rw_semaphore *sem, const char *name,
 		  struct lock_class_key *key)
 {
@@ -46,6 +47,7 @@ void __init_rwsem(struct rw_semaphore *sem, const char *name,
 	debug_check_no_locks_freed((void *)sem, sizeof(*sem));
 	lockdep_init_map(&sem->dep_map, name, key, 0);
 #endif
+	/*! 세마포어, spin lock, list head 모두 init 수행  */
 	sem->activity = 0;
 	raw_spin_lock_init(&sem->wait_lock);
 	INIT_LIST_HEAD(&sem->wait_list);

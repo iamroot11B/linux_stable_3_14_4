@@ -30,6 +30,7 @@ static __always_inline void preempt_count_set(int pc)
 	task_thread_info(p)->preempt_count = PREEMPT_DISABLED; \
 } while (0)
 
+/*! 2016.07.09 study -ing */
 #define init_idle_preempt_count(p, cpu) do { \
 	task_thread_info(p)->preempt_count = PREEMPT_ENABLED; \
 } while (0)

@@ -1441,6 +1441,8 @@ static inline spinlock_t *ptlock_ptr(struct page *page)
 	return page->ptl;
 }
 #else /* ALLOC_SPLIT_PTLOCKS */
+/*! 2016.07.09 study -ing */
+/*! USE_SPLIT_PTE_PTLOCKS = 1 , ALLOC_SPLIT_PTLOCKS = 0  */
 static inline void ptlock_cache_init(void)
 {
 }
@@ -1501,9 +1503,10 @@ static inline void ptlock_cache_init(void) {}
 static inline bool ptlock_init(struct page *page) { return true; }
 static inline void pte_lock_deinit(struct page *page) {}
 #endif /* USE_SPLIT_PTE_PTLOCKS */
-
+/*! 2016.07.09 study -ing */
 static inline void pgtable_init(void)
 {
+	/*! 아래 둘다 do nothing */
 	ptlock_cache_init();
 	pgtable_cache_init();
 }

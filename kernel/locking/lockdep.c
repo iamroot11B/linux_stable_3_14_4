@@ -4082,6 +4082,7 @@ static inline int not_in_range(const void* mem_from, unsigned long mem_len,
  * is destroyed or reinitialized - this code checks whether there is
  * any held lock in the memory range of <from> to <to>:
  */
+/*! 2016.07.09 study -ing */
 void debug_check_no_locks_freed(const void *mem_from, unsigned long mem_len)
 {
 	struct task_struct *curr = current;
@@ -4093,6 +4094,7 @@ void debug_check_no_locks_freed(const void *mem_from, unsigned long mem_len)
 		return;
 
 	local_irq_save(flags);
+	/*! curr->lockdep_depth 만큼 Loop 돌면서,  */
 	for (i = 0; i < curr->lockdep_depth; i++) {
 		hlock = curr->held_locks + i;
 
@@ -4100,6 +4102,7 @@ void debug_check_no_locks_freed(const void *mem_from, unsigned long mem_len)
 					sizeof(*hlock->instance)))
 			continue;
 
+		/*! curr, mem_from, mem_from + mem_len, hlock 관련 debug print  */
 		print_freed_lock_bug(curr, mem_from, mem_from + mem_len, hlock);
 		break;
 	}

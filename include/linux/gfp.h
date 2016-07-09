@@ -386,6 +386,7 @@ extern void free_hot_cold_page_list(struct list_head *list, int cold);
 extern void __free_memcg_kmem_pages(struct page *page, unsigned int order);
 extern void free_memcg_kmem_pages(unsigned long addr, unsigned int order);
 
+/*! 2016.07.09 study -ing */
 #define __free_page(page) __free_pages((page), 0)
 #define free_page(addr) free_pages((addr), 0)
 

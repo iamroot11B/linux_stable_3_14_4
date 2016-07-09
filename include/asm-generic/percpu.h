@@ -16,7 +16,7 @@
  */
 #ifndef __per_cpu_offset
 extern unsigned long __per_cpu_offset[NR_CPUS];
-
+/*! 2016.07.09 study -ing */
 #define per_cpu_offset(x) (__per_cpu_offset[x])
 #endif
 
@@ -42,6 +42,8 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
  */
 #ifndef SHIFT_PERCPU_PTR
 /* Weird cast keeps both GCC and sparse happy. */
+/*! 2016.07.09 study -ing */
+/*! __p 가 percpu인지 확인 후, __p + offset 반환 */
 #define SHIFT_PERCPU_PTR(__p, __offset)	({				\
 	__verify_pcpu_ptr((__p));					\
 	RELOC_HIDE((typeof(*(__p)) __kernel __force *)(__p), (__offset)); \
@@ -53,10 +55,13 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
  * established ways to produce a usable pointer from the percpu variable
  * offset.
  */
+/*! 2016.07.09 study -ing */
+/*! cpu의 var 을 찾아서 리턴  */
 #define per_cpu(var, cpu) \
 	(*SHIFT_PERCPU_PTR(&(var), per_cpu_offset(cpu)))
 
 #ifndef __this_cpu_ptr
+/*! 2016.07.09 study -ing */	
 #define __this_cpu_ptr(ptr) SHIFT_PERCPU_PTR(ptr, __my_cpu_offset)
 #endif
 #ifdef CONFIG_DEBUG_PREEMPT
@@ -66,6 +71,7 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
 #endif
 
 #define __get_cpu_var(var) (*this_cpu_ptr(&(var)))
+/*! 2016.07.09 study -ing */
 #define __raw_get_cpu_var(var) (*__this_cpu_ptr(&(var)))
 
 #ifdef CONFIG_HAVE_SETUP_PER_CPU_AREA

@@ -12,16 +12,19 @@
  * If it's called on the same region of memory simultaneously, the effect
  * may be that only one operation succeeds.
  */
+/*! 2016.07.09 study -ing */
 static inline void __set_bit(int nr, volatile unsigned long *addr)
 {
+	/*! nr 번째 bit를 1로 set  */
 	unsigned long mask = BIT_MASK(nr);
 	unsigned long *p = ((unsigned long *)addr) + BIT_WORD(nr);
 
 	*p  |= mask;
 }
-
+MAX_RT_PRIO
 static inline void __clear_bit(int nr, volatile unsigned long *addr)
 {
+	/*! nr 번째 bit를 0으로 clear. */
 	unsigned long mask = BIT_MASK(nr);
 	unsigned long *p = ((unsigned long *)addr) + BIT_WORD(nr);
 
@@ -100,6 +103,8 @@ static inline int __test_and_change_bit(int nr,
  * @nr: bit number to test
  * @addr: Address to start counting from
  */
+/*! 2016.07.09 study -ing */
+/*! addr의 값중 nr 번째 bit가 set 되어 있는지 아닌지 테스트.  */
 static inline int test_bit(int nr, const volatile unsigned long *addr)
 {
 	return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));

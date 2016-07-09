@@ -147,6 +147,7 @@ extern void bitmap_copy_le(void *dst, const unsigned long *src, int nbits);
 extern int bitmap_ord_to_pos(const unsigned long *bitmap, int n, int bits);
 
 #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) % BITS_PER_LONG))
+/*! 2016.07.09 study -ing */
 #define BITMAP_LAST_WORD_MASK(nbits)					\
 (									\
 	((nbits) % BITS_PER_LONG) ?					\
@@ -155,9 +156,10 @@ extern int bitmap_ord_to_pos(const unsigned long *bitmap, int n, int bits);
 /*! 2016-04-02 study -ing */
 #define small_const_nbits(nbits) \
 	(__builtin_constant_p(nbits) && (nbits) <= BITS_PER_LONG)
-
+/*! 2016.07.09 study -ing */
 static inline void bitmap_zero(unsigned long *dst, int nbits)
 {
+	/*! dst에서 nbits로 부터 계산된 len만큼 0으로 clear  */
 	if (small_const_nbits(nbits))
 		*dst = 0UL;
 	else {
@@ -165,9 +167,10 @@ static inline void bitmap_zero(unsigned long *dst, int nbits)
 		memset(dst, 0, len);
 	}
 }
-
+/*! 2016.07.09 study -ing */
 static inline void bitmap_fill(unsigned long *dst, int nbits)
 {
+	/*! dst에서 nbits로 부터 계산된 len 크기만큼 모든 bit 1 로 set */
 	size_t nlongs = BITS_TO_LONGS(nbits);
 	if (!small_const_nbits(nbits)) {
 		int len = (nlongs - 1) * sizeof(unsigned long);

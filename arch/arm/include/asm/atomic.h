@@ -17,7 +17,7 @@
 #include <linux/irqflags.h>
 #include <asm/barrier.h>
 #include <asm/cmpxchg.h>
-
+/*! 2016.07.09 study -ing */
 #define ATOMIC_INIT(i)	{ (i) }
 
 #ifdef __KERNEL__
@@ -92,7 +92,7 @@ static inline void atomic_sub(int i, atomic_t *v)
 	: "r" (&v->counter), "Ir" (i)
 	: "cc");
 }
-
+/*! 2016.07.09 study -ing */
 static inline int atomic_sub_return(int i, atomic_t *v)
 {
 	unsigned long tmp;
@@ -204,6 +204,7 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 #define atomic_dec(v)		atomic_sub(1, v)
 
 #define atomic_inc_and_test(v)	(atomic_add_return(1, v) == 0)
+/*! 2016.07.09 study -ing */
 #define atomic_dec_and_test(v)	(atomic_sub_return(1, v) == 0)
 /*! 2016-06-04 study -ing */
 #define atomic_inc_return(v)    (atomic_add_return(1, v))
@@ -259,7 +260,7 @@ static inline long long atomic64_read(const atomic64_t *v)
 
 	return result;
 }
-
+/*! 2016.07.09 study -ing */
 static inline void atomic64_set(atomic64_t *v, long long i)
 {
 	long long tmp;

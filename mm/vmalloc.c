@@ -39,14 +39,20 @@ struct vfree_deferred {
 static DEFINE_PER_CPU(struct vfree_deferred, vfree_deferred);
 
 static void __vunmap(const void *, int);
-
+/*! 2016.07.09 study -ing */
 static void free_work(struct work_struct *w)
 {
 	struct vfree_deferred *p = container_of(w, struct vfree_deferred, wq);
+	/*! llist_del_all : entry 가 있으면 다 지우고 first entry return,
+	 *		empty 였으면 NULL 리턴
+	 */
 	struct llist_node *llnode = llist_del_all(&p->list);
+	/*! p->list 끝까지 돌면서 vunmap 수행.  */
 	while (llnode) {
 		void *p = llnode;
+		/*! p->list 를 두 번째 entry로 이동  */
 		llnode = llist_next(llnode);
+		/*! p가 속한 vmap_area free, p의 pages free, p 자체 free  */
 		__vunmap(p, 1);
 	}
 }
@@ -294,9 +300,10 @@ static unsigned long cached_vstart;
 static unsigned long cached_align;
 
 static unsigned long vmap_area_pcpu_hole;
-
+/*! 2016.07.09 study -ing */
 static struct vmap_area *__find_vmap_area(unsigned long addr)
 {
+	/*! vmap_area_root.rb_node 에서 트리 타고 검색해서 addr가 속해 있는 vmap area를 찾는다.  */
 	struct rb_node *n = vmap_area_root.rb_node;
 
 	while (n) {
@@ -313,13 +320,14 @@ static struct vmap_area *__find_vmap_area(unsigned long addr)
 
 	return NULL;
 }
-
+/*! 2016.07.09 study -ing */
 static void __insert_vmap_area(struct vmap_area *va)
 {
 	struct rb_node **p = &vmap_area_root.rb_node;
 	struct rb_node *parent = NULL;
 	struct rb_node *tmp;
 
+	/*! rb_node 트리 구성  */
 	while (*p) {
 		struct vmap_area *tmp_va;
 
@@ -480,11 +488,12 @@ overflow:
 	kfree(va);
 	return ERR_PTR(-EBUSY);
 }
-
+/*! 2016.07.09 study -ing */
 static void __free_vmap_area(struct vmap_area *va)
 {
 	BUG_ON(RB_EMPTY_NODE(&va->rb_node));
 
+	/*! free_vmap_cache 있으면 free  */
 	if (free_vmap_cache) {
 		if (va->va_end < cached_vstart) {
 			free_vmap_cache = NULL;
@@ -500,6 +509,7 @@ static void __free_vmap_area(struct vmap_area *va)
 			}
 		}
 	}
+	/*! rb tree clear  */
 	rb_erase(&va->rb_node, &vmap_area_root);
 	RB_CLEAR_NODE(&va->rb_node);
 	list_del_rcu(&va->list);
@@ -529,11 +539,13 @@ static void free_vmap_area(struct vmap_area *va)
 /*
  * Clear the pagetable entries of a given vmap_area
  */
+/*! 2016.07.09 study -ing */
 static void unmap_vmap_area(struct vmap_area *va)
 {
 	vunmap_page_range(va->va_start, va->va_end);
 }
 
+/*! 2016.07.09 study -ing */
 static void vmap_debug_free_range(unsigned long start, unsigned long end)
 {
 	/*
@@ -571,6 +583,7 @@ static void vmap_debug_free_range(unsigned long start, unsigned long end)
  * code, and it will be simple to change the scale factor if we find that it
  * becomes a problem on bigger systems.
  */
+/*! 2016.07.09 study -ing */
 static unsigned long lazy_max_pages(void)
 {
 	unsigned int log;
@@ -604,6 +617,7 @@ void set_iounmap_nonlazy(void)
  * Returns with *start = min(*start, lowest purged address)
  *              *end = max(*end, highest purged address)
  */
+/*! 2016.07.09 study -ing */
 static void __purge_vmap_area_lazy(unsigned long *start, unsigned long *end,
 					int sync, int force_flush)
 {
@@ -661,6 +675,7 @@ static void __purge_vmap_area_lazy(unsigned long *start, unsigned long *end,
  * Kick off a purge of the outstanding lazy areas. Don't bother if somebody
  * is already purging.
  */
+/*! 2016.07.09 study -ing */
 static void try_purge_vmap_area_lazy(void)
 {
 	unsigned long start = ULONG_MAX, end = 0;
@@ -675,6 +690,7 @@ static void purge_vmap_area_lazy(void)
 {
 	unsigned long start = ULONG_MAX, end = 0;
 
+	/*! lazily freed 되 vmap area free   */
 	__purge_vmap_area_lazy(&start, &end, 1, 0);
 }
 
@@ -683,6 +699,7 @@ static void purge_vmap_area_lazy(void)
  * and flush_cache_vunmap had been called for the correct range
  * previously.
  */
+/*! 2016.07.09 study -ing */
 static void free_vmap_area_noflush(struct vmap_area *va)
 {
 	va->flags |= VM_LAZY_FREE;
@@ -695,6 +712,7 @@ static void free_vmap_area_noflush(struct vmap_area *va)
  * Free and unmap a vmap area, caller ensuring flush_cache_vunmap had been
  * called for the correct range previously.
  */
+/*! 2016.07.09 study -ing */
 static void free_unmap_vmap_area_noflush(struct vmap_area *va)
 {
 	unmap_vmap_area(va);
@@ -704,17 +722,19 @@ static void free_unmap_vmap_area_noflush(struct vmap_area *va)
 /*
  * Free and unmap a vmap area
  */
+/*! 2016.07.09 study -ing */
 static void free_unmap_vmap_area(struct vmap_area *va)
 {
 	flush_cache_vunmap(va->va_start, va->va_end);
 	free_unmap_vmap_area_noflush(va);
 }
-
+/*! 2016.07.09 study -ing */
 static struct vmap_area *find_vmap_area(unsigned long addr)
 {
 	struct vmap_area *va;
 
 	spin_lock(&vmap_area_lock);
+	/*! vmap_area_root 에서 addr가 속해 있는 vmap area를 찾아서 리턴.  */
 	va = __find_vmap_area(addr);
 	spin_unlock(&vmap_area_lock);
 
@@ -779,6 +799,8 @@ struct vmap_block {
 };
 
 /* Queue of free and dirty vmap blocks, for allocation and flushing purposes */
+/*! 2016.07.09 study -ing */
+/*! vmap_block_queue 타입으로 vmap_block_queue 변수 정의  */
 static DEFINE_PER_CPU(struct vmap_block_queue, vmap_block_queue);
 
 /*
@@ -871,6 +893,7 @@ static void free_vmap_block(struct vmap_block *vb)
 	kfree_rcu(vb, rcu_head);
 }
 
+/*! 2016.07.09 study -ing */
 static void purge_fragmented_blocks(int cpu)
 {
 	LIST_HEAD(purge);
@@ -905,10 +928,11 @@ static void purge_fragmented_blocks(int cpu)
 	}
 }
 
+/*! 2016.07.09 study -ing */
 static void purge_fragmented_blocks_allcpus(void)
 {
 	int cpu;
-
+	/*! 각 cpu 별로 loop 돌면서 파편화된 블락 purge 수행 */
 	for_each_possible_cpu(cpu)
 		purge_fragmented_blocks(cpu);
 }
@@ -1182,31 +1206,44 @@ void __init vm_area_register_early(struct vm_struct *vm, size_t align)
 	vm_area_add_early(vm);
 }
 
+/*! 2016.07.09 study -ing */
 void __init vmalloc_init(void)
 {
 	struct vmap_area *va;
 	struct vm_struct *tmp;
 	int i;
 
+	/*! i = -1; i< 8; i++ */
 	for_each_possible_cpu(i) {
 		struct vmap_block_queue *vbq;
 		struct vfree_deferred *p;
 
+		/*! vmap_block_queue + i번째 cpu offset 리턴
+		 *  -> i번째 cpu의 vmap_block_queue.
+		 */
 		vbq = &per_cpu(vmap_block_queue, i);
 		spin_lock_init(&vbq->lock);
 		INIT_LIST_HEAD(&vbq->free);
+		/*! vfree_deferred + i번째 cpu offset 리턴
+		 *  -> i번째 cpu의 vfree_deferred.
+		 */
 		p = &per_cpu(vfree_deferred, i);
 		init_llist_head(&p->list);
 		INIT_WORK(&p->wq, free_work);
 	}
 
 	/* Import existing vmlist entries. */
+	/*! vmlist의 끝까지 next로 넘어가며 Loop.  */
 	for (tmp = vmlist; tmp; tmp = tmp->next) {
+		/*! vmap_area 크기 만큼 kzalloc  */
 		va = kzalloc(sizeof(struct vmap_area), GFP_NOWAIT);
+		/*! flags은 VM_VM_AREA로 set */
 		va->flags = VM_VM_AREA;
 		va->va_start = (unsigned long)tmp->addr;
 		va->va_end = va->va_start + tmp->size;
+		/*! vmlist의 현재 entry를  va->vm으로 등록 */
 		va->vm = tmp;
+		/*! 위 과정을 통해 setting한 va 를 rb tree에 추가  */
 		__insert_vmap_area(va);
 	}
 
@@ -1422,10 +1459,12 @@ struct vm_struct *find_vm_area(const void *addr)
  *	This function returns the found VM area, but using it is NOT safe
  *	on SMP machines, except for its size or flags.
  */
+/*! 2016.07.09 study -ing */
 struct vm_struct *remove_vm_area(const void *addr)
 {
 	struct vmap_area *va;
 
+	/*! vmap_area_root 에서 addr가 속해 있는 vmap area를 찾아서 리턴.  */
 	va = find_vmap_area((unsigned long)addr);
 	if (va && va->flags & VM_VM_AREA) {
 		struct vm_struct *vm = va->vm;
@@ -1435,6 +1474,7 @@ struct vm_struct *remove_vm_area(const void *addr)
 		va->flags &= ~VM_VM_AREA;
 		spin_unlock(&vmap_area_lock);
 
+		/*! do nothing  */
 		vmap_debug_free_range(va->va_start, va->va_end);
 		free_unmap_vmap_area(va);
 		vm->size -= PAGE_SIZE;
@@ -1443,7 +1483,7 @@ struct vm_struct *remove_vm_area(const void *addr)
 	}
 	return NULL;
 }
-
+/*! 2016.07.09 study -ing */
 static void __vunmap(const void *addr, int deallocate_pages)
 {
 	struct vm_struct *area;
@@ -1455,6 +1495,7 @@ static void __vunmap(const void *addr, int deallocate_pages)
 			addr))
 		return;
 
+	/*! addr가 속한 vmap area 찾아서 free(remove) 한 후 remove한 entry 리턴  */
 	area = remove_vm_area(addr);
 	if (unlikely(!area)) {
 		WARN(1, KERN_ERR "Trying to vfree() nonexistent vm area (%p)\n",
@@ -1463,11 +1504,13 @@ static void __vunmap(const void *addr, int deallocate_pages)
 	}
 
 	debug_check_no_locks_freed(addr, area->size);
+	/*! do nothing.  */
 	debug_check_no_obj_freed(addr, area->size);
 
 	if (deallocate_pages) {
 		int i;
 
+		/*! area->nr_pages 갯수만큼 Loop 돌면서 page 모두 free  */
 		for (i = 0; i < area->nr_pages; i++) {
 			struct page *page = area->pages[i];
 
@@ -1475,12 +1518,14 @@ static void __vunmap(const void *addr, int deallocate_pages)
 			__free_page(page);
 		}
 
+		/*! area->flags을 보고 vpage 면 vfree 아니면 kfree 수행. */
 		if (area->flags & VM_VPAGES)
 			vfree(area->pages);
 		else
 			kfree(area->pages);
 	}
 
+	/*! area 자체는 kfree 수행.  */
 	kfree(area);
 	return;
 }

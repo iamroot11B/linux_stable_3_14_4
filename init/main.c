@@ -533,6 +533,7 @@ static void __init mm_init(void)
 	kmem_cache_init();
 	percpu_init_late();
 	/*! 2016.06.25 study end */
+	/*! 2016.07.09 study start */
 	pgtable_init();
 	vmalloc_init();
 }
@@ -660,6 +661,7 @@ asmlinkage void __init start_kernel(void)
 	sort_main_extable();
 	/*! trap_init - arm에선 해주는게 없음 */
 	trap_init();
+	/*! 버디 할당, 슬랩 할당, vmalloc init 등 수행  */
 	mm_init();
 
 	/*
@@ -667,7 +669,9 @@ asmlinkage void __init start_kernel(void)
 	 * timer interrupt). Full topology setup happens at smp_init()
 	 * time - but meanwhile we still have a functioning scheduler.
 	 */
+	/*! 2016.07.09 study -ing */
 	sched_init();
+	/*! 2016.07.09 study end */
 	/*
 	 * Disable preemption - early bootup scheduling is extremely
 	 * fragile until we cpu_idle() for the first time.

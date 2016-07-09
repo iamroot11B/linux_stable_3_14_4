@@ -7067,7 +7067,7 @@ static void set_curr_task_fair(struct rq *rq)
 		account_cfs_rq_runtime(cfs_rq, 0);
 	}
 }
-
+/*! 2016.07.09 study -ing */
 void init_cfs_rq(struct cfs_rq *cfs_rq)
 {
 	cfs_rq->tasks_timeline = RB_ROOT;
@@ -7352,10 +7352,13 @@ void print_cfs_stats(struct seq_file *m, int cpu)
 	rcu_read_unlock();
 }
 #endif
-
+/*! 2016.07.09 study -ing */
 __init void init_sched_fair_class(void)
 {
 #ifdef CONFIG_SMP
+	/*! softirq_vec[nr].action에 run_rebalance_domains를 설정 해줌.
+	 *	run_rebalance_domains 함수는 실제 call 될 때 자세히 볼 예정.
+	 */
 	open_softirq(SCHED_SOFTIRQ, run_rebalance_domains);
 
 #ifdef CONFIG_NO_HZ_COMMON

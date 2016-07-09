@@ -192,12 +192,12 @@ void synchronize_rcu(void);
 #define rcu_preempt_depth() (current->rcu_read_lock_nesting)
 
 #else /* #ifdef CONFIG_PREEMPT_RCU */
-
+/*! 2016.07.09 study -ing */
 static inline void __rcu_read_lock(void)
 {
 	preempt_disable();
 }
-
+/*! 2016.07.09 study -ing */
 static inline void __rcu_read_unlock(void)
 {
 	preempt_enable();
@@ -813,8 +813,10 @@ static inline void rcu_preempt_sleep_check(void)
  * block, but only when acquiring spinlocks that are subject to priority
  * inheritance.
  */
+/*! 2016.07.09 study -ing */
 static inline void rcu_read_lock(void)
 {
+	/*! 선점 disable  */
 	__rcu_read_lock();
 	__acquire(RCU);
 	rcu_lock_acquire(&rcu_lock_map);
@@ -837,6 +839,7 @@ static inline void rcu_read_lock(void)
  *
  * See rcu_read_lock() for more information.
  */
+/*! 2016.07.09 study -ing */
 static inline void rcu_read_unlock(void)
 {
 	rcu_lockdep_assert(rcu_is_watching(),
@@ -990,6 +993,7 @@ static inline notrace void rcu_read_unlock_sched_notrace(void)
 /*
  * Helper macro for kfree_rcu() to prevent argument-expansion eyestrain.
  */
+/*! 2016.07.09 study -ing */
 #define __kfree_rcu(head, offset) \
 	do { \
 		BUILD_BUG_ON(!__is_kfree_rcu_offset(offset)); \
@@ -1022,6 +1026,7 @@ static inline notrace void rcu_read_unlock_sched_notrace(void)
  * The BUILD_BUG_ON check must not involve any function calls, hence the
  * checks are done in macros here.
  */
+/*! 2016.07.09 study -ing */
 #define kfree_rcu(ptr, rcu_head)					\
 	__kfree_rcu(&((ptr)->rcu_head), offsetof(typeof(*(ptr)), rcu_head))
 

@@ -103,6 +103,7 @@ static inline void debug_objects_mem_init(void) { }
 #ifdef CONFIG_DEBUG_OBJECTS_FREE
 extern void debug_check_no_obj_freed(const void *address, unsigned long size);
 #else
+/*! 2016.07.09 study -ing */
 static inline void
 debug_check_no_obj_freed(const void *address, unsigned long size) { }
 #endif

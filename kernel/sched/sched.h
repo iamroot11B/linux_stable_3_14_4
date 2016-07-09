@@ -64,6 +64,7 @@ extern void update_cpu_load_active(struct rq *this_rq);
 # define scale_load_down(w)	((w) >> SCHED_LOAD_RESOLUTION)
 #else
 # define SCHED_LOAD_RESOLUTION	0
+/*! 2016.07.09 study -ing */
 # define scale_load(w)		(w)
 # define scale_load_down(w)	(w)
 #endif
@@ -665,7 +666,7 @@ static inline int cpu_of(struct rq *rq)
 }
 
 DECLARE_PER_CPU(struct rq, runqueues);
-
+/*! 2016.07.09 study -ing */
 #define cpu_rq(cpu)		(&per_cpu(runqueues, (cpu)))
 #define this_rq()		(&__get_cpu_var(runqueues))
 #define task_rq(p)		cpu_rq(task_cpu(p))
@@ -833,6 +834,7 @@ static inline struct task_group *task_group(struct task_struct *p)
 }
 
 /* Change a task's cfs_rq and parent entity if it moves across CPUs/groups */
+/*! 2016.07.09 study -ing */
 static inline void set_task_rq(struct task_struct *p, unsigned int cpu)
 {
 #if defined(CONFIG_FAIR_GROUP_SCHED) || defined(CONFIG_RT_GROUP_SCHED)
@@ -851,7 +853,7 @@ static inline void set_task_rq(struct task_struct *p, unsigned int cpu)
 }
 
 #else /* CONFIG_CGROUP_SCHED */
-
+/*! 2016.07.09 study -ing */
 static inline void set_task_rq(struct task_struct *p, unsigned int cpu) { }
 static inline struct task_group *task_group(struct task_struct *p)
 {
@@ -859,7 +861,7 @@ static inline struct task_group *task_group(struct task_struct *p)
 }
 
 #endif /* CONFIG_CGROUP_SCHED */
-
+/*! 2016.07.09 study -ing */
 static inline void __set_task_cpu(struct task_struct *p, unsigned int cpu)
 {
 	set_task_rq(p, cpu);
@@ -869,6 +871,7 @@ static inline void __set_task_cpu(struct task_struct *p, unsigned int cpu)
 	 * successfuly executed on another CPU. We must ensure that updates of
 	 * per-task data have been completed by this moment.
 	 */
+	/*! smp_wmb = dmb */
 	smp_wmb();
 	task_thread_info(p)->cpu = cpu;
 	p->wake_cpu = cpu;
@@ -935,12 +938,12 @@ extern bool numabalancing_enabled;
 #define sched_feat_numa(x) (0)
 #define numabalancing_enabled (0)
 #endif /* CONFIG_NUMA_BALANCING */
-
+/*! 2016.07.09 study -ing */
 static inline u64 global_rt_period(void)
 {
 	return (u64)sysctl_sched_rt_period * NSEC_PER_USEC;
 }
-
+/*! 2016.07.09 study -ing */
 static inline u64 global_rt_runtime(void)
 {
 	if (sysctl_sched_rt_runtime < 0)

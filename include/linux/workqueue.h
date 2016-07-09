@@ -87,6 +87,7 @@ enum {
 	/* convenience constants */
 	WORK_STRUCT_FLAG_MASK	= (1UL << WORK_STRUCT_FLAG_BITS) - 1,
 	WORK_STRUCT_WQ_DATA_MASK = ~WORK_STRUCT_FLAG_MASK,
+	/*! WORK_STRUCT_NO_POOL = 32768 = 0x8000 */
 	WORK_STRUCT_NO_POOL	= (unsigned long)WORK_OFFQ_POOL_NONE << WORK_OFFQ_POOL_SHIFT,
 
 	/* bit mask for work_busy() return values */
@@ -105,7 +106,7 @@ struct work_struct {
 	struct lockdep_map lockdep_map;
 #endif
 };
-
+/*! 2016.07.09 study -ing */
 #define WORK_DATA_INIT()	ATOMIC_LONG_INIT(WORK_STRUCT_NO_POOL)
 #define WORK_DATA_STATIC_INIT()	\
 	ATOMIC_LONG_INIT(WORK_STRUCT_NO_POOL | WORK_STRUCT_STATIC)
@@ -180,6 +181,7 @@ struct execute_work {
 /*
  * initialize a work item's function pointer
  */
+/*! 2016.07.09 study -ing */
 #define PREPARE_WORK(_work, _func)					\
 	do {								\
 		(_work)->func = (_func);				\
@@ -196,6 +198,7 @@ static inline unsigned int work_static(struct work_struct *work)
 	return *work_data_bits(work) & WORK_STRUCT_STATIC;
 }
 #else
+/*! 2016.07.09 study -ing */
 static inline void __init_work(struct work_struct *work, int onstack) { }
 static inline void destroy_work_on_stack(struct work_struct *work) { }
 static inline unsigned int work_static(struct work_struct *work) { return 0; }
@@ -209,6 +212,12 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
  * to generate better code.
  */
 #ifdef CONFIG_LOCKDEP
+/*! WORK_DATA_INIT = 0x8000
+ *	lockdep_init_map(&(_work)->lockdep_map, #_work, &__key, 0);
+ *		-> do nothing.
+ *	PREPARE_WORK
+ *		-> _work->func = _func
+ */
 #define __INIT_WORK(_work, _func, _onstack)				\
 	do {								\
 		static struct lock_class_key __key;			\
@@ -220,6 +229,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
 		PREPARE_WORK((_work), (_func));				\
 	} while (0)
 #else
+/*! 2016.07.09 study -ing */
 #define __INIT_WORK(_work, _func, _onstack)				\
 	do {								\
 		__init_work((_work), _onstack);				\
@@ -228,7 +238,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
 		PREPARE_WORK((_work), (_func));				\
 	} while (0)
 #endif
-
+/*! 2016.07.09 study -ing */
 #define INIT_WORK(_work, _func)						\
 	do {								\
 		__INIT_WORK((_work), (_func), 0);			\

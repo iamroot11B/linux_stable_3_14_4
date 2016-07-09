@@ -32,6 +32,7 @@
  * the inline assembly constraint from =g to =r, in this particular
  * case either is valid.
  */
+/*! 2016.07.09 study -ing */
 #define RELOC_HIDE(ptr, off)					\
   ({ unsigned long __ptr;					\
     __asm__ ("" : "=r"(__ptr) : "0"(ptr));		\

@@ -188,6 +188,7 @@ out:
  * cpudl_init - initialize the cpudl structure
  * @cp: the cpudl max-heap context
  */
+/*! 2016.07.09 study -ing */
 int cpudl_init(struct cpudl *cp)
 {
 	int i;
@@ -195,6 +196,7 @@ int cpudl_init(struct cpudl *cp)
 	memset(cp, 0, sizeof(*cp));
 	raw_spin_lock_init(&cp->lock);
 	cp->size = 0;
+	/*! cpu 갯수만큼 loop 돌면서 cp->cpu_to_idx[i] 값 전부 IDX_INVALID로 set */
 	for (i = 0; i < NR_CPUS; i++)
 		cp->cpu_to_idx[i] = IDX_INVALID;
 	if (!alloc_cpumask_var(&cp->free_cpus, GFP_KERNEL))

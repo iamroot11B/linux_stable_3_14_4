@@ -101,6 +101,7 @@ static inline void finish_arch_post_lock_switch(void)
  *
  * tsk->mm will be NULL
  */
+/*! 2016.07.09 study -ing */
 static inline void
 enter_lazy_tlb(struct mm_struct *mm, struct task_struct *tsk)
 {

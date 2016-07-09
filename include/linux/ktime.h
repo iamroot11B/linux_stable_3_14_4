@@ -92,6 +92,7 @@ static inline ktime_t ktime_set(const long secs, const unsigned long nsecs)
  * Add a ktime_t variable and a scalar nanosecond value.
  * res = kt + nsval:
  */
+/*! 2016.07.09 study -ing */
 #define ktime_add_ns(kt, nsval) \
 		({ (ktime_t){ .tv64 = (kt).tv64 + (nsval) }; })
 
@@ -372,6 +373,7 @@ extern void ktime_get_ts(struct timespec *ts);
 /* Get the real (wall-) time in timespec format: */
 #define ktime_get_real_ts(ts)	getnstimeofday(ts)
 
+/*! 2016.07.09 study -ing */
 static inline ktime_t ns_to_ktime(u64 ns)
 {
 	static const ktime_t ktime_zero = { .tv64 = 0 };

@@ -2972,6 +2972,7 @@ unsigned long get_zeroed_page(gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(get_zeroed_page);
 
+/*! 2016.07.09 study -ing */
 void __free_pages(struct page *page, unsigned int order)
 {
 	/*! put_page_testzero : page->_count 를 1 감소 시키면 0이 될 때(현재 값이 1일때)

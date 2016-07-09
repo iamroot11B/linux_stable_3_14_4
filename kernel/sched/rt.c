@@ -33,16 +33,19 @@ static enum hrtimer_restart sched_rt_period_timer(struct hrtimer *timer)
 
 	return idle ? HRTIMER_NORESTART : HRTIMER_RESTART;
 }
-
+/*! 2016.07.09 study -ing */
 void init_rt_bandwidth(struct rt_bandwidth *rt_b, u64 period, u64 runtime)
 {
+	/*! 시간 기록  */
 	rt_b->rt_period = ns_to_ktime(period);
 	rt_b->rt_runtime = runtime;
 
+	/*! spin lock init  */
 	raw_spin_lock_init(&rt_b->rt_runtime_lock);
 
 	hrtimer_init(&rt_b->rt_period_timer,
 			CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+	/*! rt_period_timer 용 function으로 sched_rt_period_timer 세팅. */
 	rt_b->rt_period_timer.function = sched_rt_period_timer;
 }
 
@@ -58,25 +61,29 @@ static void start_rt_bandwidth(struct rt_bandwidth *rt_b)
 	start_bandwidth_timer(&rt_b->rt_period_timer, rt_b->rt_period);
 	raw_spin_unlock(&rt_b->rt_runtime_lock);
 }
-
+/*! 2016.07.09 study -ing */
 void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq)
 {
 	struct rt_prio_array *array;
 	int i;
 
 	array = &rt_rq->active;
+	/*! MAX_RT_PRIO = 100  */
 	for (i = 0; i < MAX_RT_PRIO; i++) {
 		INIT_LIST_HEAD(array->queue + i);
 		__clear_bit(i, array->bitmap);
 	}
 	/* delimiter for bitsearch: */
+	/*! array->bitmap에서 100번째 bit를 1로 set */
 	__set_bit(MAX_RT_PRIO, array->bitmap);
 
 #if defined CONFIG_SMP
-	rt_rq->highest_prio.curr = MAX_RT_PRIO;
+	/*! MAX_RT_PRIO = 100 */
+	rt_rq->highest_= prio.curr = MAX_RT_PRIO;
 	rt_rq->highest_prio.next = MAX_RT_PRIO;
 	rt_rq->rt_nr_migratory = 0;
 	rt_rq->overloaded = 0;
+	/*! rt_rq->pushable_tasks->node_list의 init 수행 */
 	plist_head_init(&rt_rq->pushable_tasks);
 #endif
 

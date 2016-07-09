@@ -85,7 +85,10 @@
  */
 #define DECLARE_PER_CPU_SECTION(type, name, sec)			\
 	extern __PCPU_ATTRS(sec) __typeof__(type) name
-
+/*! 2016.07.09 study -ing */
+/*! __typeof__ - compiler operator. 인자의 타입을 리턴
+ *  type 타입으로 name을 정의
+ */
 #define DEFINE_PER_CPU_SECTION(type, name, sec)				\
 	__PCPU_ATTRS(sec) PER_CPU_DEF_ATTRIBUTES			\
 	__typeof__(type) name
@@ -97,7 +100,7 @@
  */
 #define DECLARE_PER_CPU(type, name)					\
 	DECLARE_PER_CPU_SECTION(type, name, "")
-
+/*! 2016.07.09 study -ing */
 #define DEFINE_PER_CPU(type, name)					\
 	DEFINE_PER_CPU_SECTION(type, name, "")
 

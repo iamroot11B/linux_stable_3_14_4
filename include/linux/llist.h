@@ -73,6 +73,7 @@ struct llist_node {
  * init_llist_head - initialize lock-less list head
  * @head:	the head for your lock-less list
  */
+/*! 2016.07.09 study -ing */
 static inline void init_llist_head(struct llist_head *list)
 {
 	list->first = NULL;
@@ -188,6 +189,7 @@ static inline bool llist_add(struct llist_node *new, struct llist_head *head)
  * return the pointer to the first entry.  The order of entries
  * deleted is from the newest to the oldest added one.
  */
+/*! 2016.07.09 study -ing */
 static inline struct llist_node *llist_del_all(struct llist_head *head)
 {
 	return xchg(&head->first, NULL);

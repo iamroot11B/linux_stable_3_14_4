@@ -25,6 +25,7 @@ typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
  * You should only assume nr_cpu_ids bits of this mask are valid.  This is
  * a macro so it's const-correct.
  */
+/*! 2016.07.09 study -ing */
 #define cpumask_bits(maskp) ((maskp)->bits)
 
 #if NR_CPUS == 1
@@ -282,6 +283,7 @@ static inline void cpumask_set_cpu(unsigned int cpu, struct cpumask *dstp)
  * @cpu: cpu number (< nr_cpu_ids)
  * @dstp: the cpumask pointer
  */
+/*! 2016.07.09 study -ing */
 static inline void cpumask_clear_cpu(int cpu, struct cpumask *dstp)
 {
 	clear_bit(cpumask_check(cpu), cpumask_bits(dstp));
@@ -296,6 +298,7 @@ static inline void cpumask_clear_cpu(int cpu, struct cpumask *dstp)
  *
  * No static inline type checking - see Subtlety (1) above.
  */
+/*! 2016.07.09 study -ing */
 #define cpumask_test_cpu(cpu, cpumask) \
 	test_bit(cpumask_check(cpu), cpumask_bits((cpumask)))
 
@@ -331,8 +334,10 @@ static inline int cpumask_test_and_clear_cpu(int cpu, struct cpumask *cpumask)
  * cpumask_setall - set all cpus (< nr_cpu_ids) in a cpumask
  * @dstp: the cpumask pointer
  */
+/*! 2016.07.09 study -ing */
 static inline void cpumask_setall(struct cpumask *dstp)
 {
+	/*! cpumask_bits(dstp) -> dstp->bits  */
 	bitmap_fill(cpumask_bits(dstp), nr_cpumask_bits);
 }
 
@@ -340,6 +345,7 @@ static inline void cpumask_setall(struct cpumask *dstp)
  * cpumask_clear - clear all cpus (< nr_cpu_ids) in a cpumask
  * @dstp: the cpumask pointer
  */
+/*! 2016.07.09 study -ing */
 static inline void cpumask_clear(struct cpumask *dstp)
 {
 	bitmap_zero(cpumask_bits(dstp), nr_cpumask_bits);
@@ -701,7 +707,7 @@ void free_bootmem_cpumask_var(cpumask_var_t mask);
 
 #else
 typedef struct cpumask cpumask_var_t[1];
-
+/*! 2016.07.09 study -ing */
 static inline bool alloc_cpumask_var(cpumask_var_t *mask, gfp_t flags)
 {
 	return true;
@@ -712,7 +718,7 @@ static inline bool alloc_cpumask_var_node(cpumask_var_t *mask, gfp_t flags,
 {
 	return true;
 }
-
+/*! 2016.07.09 study -ing */
 static inline bool zalloc_cpumask_var(cpumask_var_t *mask, gfp_t flags)
 {
 	cpumask_clear(*mask);

@@ -113,6 +113,7 @@ struct plist_node {
  * plist_head_init - dynamic struct plist_head initializer
  * @head:	&struct plist_head pointer
  */
+/*! 2016.07.09 study -ing */
 static inline void
 plist_head_init(struct plist_head *head)
 {

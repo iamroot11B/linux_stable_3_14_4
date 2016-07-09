@@ -588,12 +588,13 @@ void destroy_timer_on_stack(struct timer_list *timer)
 EXPORT_SYMBOL_GPL(destroy_timer_on_stack);
 
 #else
+/*! 2016.07.09 study -ing */
 static inline void debug_timer_init(struct timer_list *timer) { }
 static inline void debug_timer_activate(struct timer_list *timer) { }
 static inline void debug_timer_deactivate(struct timer_list *timer) { }
 static inline void debug_timer_assert_init(struct timer_list *timer) { }
 #endif
-
+/*! 2016.07.09 study -ing */
 static inline void debug_init(struct timer_list *timer)
 {
 	debug_timer_init(timer);

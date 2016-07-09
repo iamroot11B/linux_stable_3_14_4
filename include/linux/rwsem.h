@@ -66,7 +66,7 @@ static inline int rwsem_is_locked(struct rw_semaphore *sem)
 
 extern void __init_rwsem(struct rw_semaphore *sem, const char *name,
 			 struct lock_class_key *key);
-
+/*! 2016.07.09 study -ing */
 #define init_rwsem(sem)						\
 do {								\
 	static struct lock_class_key __key;			\
