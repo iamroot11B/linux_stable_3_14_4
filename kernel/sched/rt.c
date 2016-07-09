@@ -79,7 +79,7 @@ void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq)
 
 #if defined CONFIG_SMP
 	/*! MAX_RT_PRIO = 100 */
-	rt_rq->highest_= prio.curr = MAX_RT_PRIO;
+	rt_rq->highest_prio.curr = MAX_RT_PRIO;
 	rt_rq->highest_prio.next = MAX_RT_PRIO;
 	rt_rq->rt_nr_migratory = 0;
 	rt_rq->overloaded = 0;

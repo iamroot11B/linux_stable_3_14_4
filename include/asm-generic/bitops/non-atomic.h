@@ -21,7 +21,7 @@ static inline void __set_bit(int nr, volatile unsigned long *addr)
 
 	*p  |= mask;
 }
-MAX_RT_PRIO
+
 static inline void __clear_bit(int nr, volatile unsigned long *addr)
 {
 	/*! nr 번째 bit를 0으로 clear. */
