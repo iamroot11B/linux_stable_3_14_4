@@ -848,7 +848,7 @@ void *idr_replace(struct idr *idp, void *ptr, int id)
 	return old_p;
 }
 EXPORT_SYMBOL(idr_replace);
-
+/*! 2016.07.16 study -ing */
 void __init idr_init_cache(void)
 {
 	idr_layer_cache = kmem_cache_create("idr_layer_cache",

@@ -77,6 +77,7 @@ static int kmem_cache_sanity_check(struct mem_cgroup *memcg, const char *name,
 	return 0;
 }
 #else
+/*! 2016.07.16 study -ing */
 static inline int kmem_cache_sanity_check(struct mem_cgroup *memcg,
 					  const char *name, size_t size)
 {
@@ -172,7 +173,7 @@ unsigned long calculate_alignment(unsigned long flags,
  * cacheline.  This can be beneficial if you're counting cycles as closely
  * as davem.
  */
-
+/*! 2016.07.16 study -ing */
 struct kmem_cache *
 kmem_cache_create_memcg(struct mem_cgroup *memcg, const char *name, size_t size,
 			size_t align, unsigned long flags, void (*ctor)(void *),
@@ -184,6 +185,7 @@ kmem_cache_create_memcg(struct mem_cgroup *memcg, const char *name, size_t size,
 	get_online_cpus();
 	mutex_lock(&slab_mutex);
 
+    /*! do nothing  */
 	err = kmem_cache_sanity_check(memcg, name, size);
 	if (err)
 		goto out_unlock;
@@ -206,12 +208,15 @@ kmem_cache_create_memcg(struct mem_cgroup *memcg, const char *name, size_t size,
 	 * case, and we'll just provide them with a sanitized version of the
 	 * passed flags.
 	 */
+    /*! CACHE_CREATE_MASK - (SLAB_CORE_FLAGS | SLAB_DEBUG_FLAGS | SLAB_CACHE_FLAGS)  */
 	flags &= CACHE_CREATE_MASK;
 
+    /*! find_mergeable을 통해 mergeable 한 kmem_cache가 리턴 됨.  */
 	s = __kmem_cache_alias(memcg, name, size, align, flags, ctor);
 	if (s)
 		goto out_unlock;
 
+    /*! mergeable 한 kmem_cache를 못 찾으면 아래 kmem_cache_zalloc으로 직접 alloc */
 	err = -ENOMEM;
 	s = kmem_cache_zalloc(kmem_cache, GFP_KERNEL);
 	if (!s)
@@ -221,10 +226,12 @@ kmem_cache_create_memcg(struct mem_cgroup *memcg, const char *name, size_t size,
 	s->align = calculate_alignment(flags, align, size);
 	s->ctor = ctor;
 
+    /*! name 이 NULL 일 경우 NULL, 아니면 문자열 복사 하여 리턴  */
 	s->name = kstrdup(name, GFP_KERNEL);
 	if (!s->name)
 		goto out_free_cache;
 
+    /*! 우리는 do nothing. return 0  */
 	err = memcg_alloc_cache_params(memcg, s, parent_cache);
 	if (err)
 		goto out_free_cache;
@@ -233,14 +240,17 @@ kmem_cache_create_memcg(struct mem_cgroup *memcg, const char *name, size_t size,
 	if (err)
 		goto out_free_cache;
 
+    /*! 직접 alloc 한 kmem_cache에 아래 값들 설정  */
 	s->refcount = 1;
 	list_add(&s->list, &slab_caches);
+    /*! do nothing.  */
 	memcg_register_cache(s);
 
 out_unlock:
 	mutex_unlock(&slab_mutex);
 	put_online_cpus();
 
+    /*! 에러가 있으면 아래 에러 처리 */
 	if (err) {
 		/*
 		 * There is no point in flooding logs with warnings or
@@ -262,15 +272,17 @@ out_unlock:
 		}
 		return NULL;
 	}
+    /*! 에러 없으면 설정한 kmem_cache s 를 리턴  */
 	return s;
 
 out_free_cache:
+    /*! do nothing.  */
 	memcg_free_cache_params(s);
 	kfree(s->name);
 	kmem_cache_free(kmem_cache, s);
 	goto out_unlock;
 }
-
+/*! 2016.07.16 study -ing */
 struct kmem_cache *
 kmem_cache_create(const char *name, size_t size, size_t align,
 		  unsigned long flags, void (*ctor)(void *))

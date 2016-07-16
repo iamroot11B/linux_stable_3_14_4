@@ -359,6 +359,7 @@ static inline void cpumask_clear(struct cpumask *dstp)
  *
  * If *@dstp is empty, returns 0, else returns 1
  */
+/*! 2016.07.16 study -ing */
 static inline int cpumask_and(struct cpumask *dstp,
 			       const struct cpumask *src1p,
 			       const struct cpumask *src2p)
@@ -453,6 +454,7 @@ static inline bool cpumask_intersects(const struct cpumask *src1p,
  *
  * Returns 1 if *@src1p is a subset of *@src2p, else returns 0
  */
+/*! 2016.07.16 study -ing */
 static inline int cpumask_subset(const struct cpumask *src1p,
 				 const struct cpumask *src2p)
 {
@@ -518,6 +520,7 @@ static inline void cpumask_shift_left(struct cpumask *dstp,
  * @dstp: the result
  * @srcp: the input cpumask
  */
+/*! 2016.07.16 study -ing */
 static inline void cpumask_copy(struct cpumask *dstp,
 				const struct cpumask *srcp)
 {
@@ -618,6 +621,7 @@ static inline int cpumask_parselist_user(const char __user *buf, int len,
  * If len is zero, returns zero.  Otherwise returns the length of the
  * (nul-terminated) @buf string.
  */
+/*! 2016.07.16 study -ing */
 static inline int cpulist_scnprintf(char *buf, int len,
 				    const struct cpumask *srcp)
 {

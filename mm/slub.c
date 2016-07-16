@@ -4140,16 +4140,16 @@ static int slab_unmergeable(struct kmem_cache *s)
 
 	return 0;
 }
-
+/*! 2016.07.16 study -ing */
 static struct kmem_cache *find_mergeable(struct mem_cgroup *memcg, size_t size,
 		size_t align, unsigned long flags, const char *name,
 		void (*ctor)(void *))
 {
 	struct kmem_cache *s;
-
+    /*! slub_nomerge = 0 */
 	if (slub_nomerge || (flags & SLUB_NEVER_MERGE))
 		return NULL;
-
+    /*! ctor - contructor for the object (생성자) */
 	if (ctor)
 		return NULL;
 
@@ -4158,6 +4158,7 @@ static struct kmem_cache *find_mergeable(struct mem_cgroup *memcg, size_t size,
 	size = ALIGN(size, align);
 	flags = kmem_cache_flags(size, flags, name, NULL);
 
+    /*! slab_caches 리스트를 순회하면서 mergeable 인 kmem_cache를 찾는다. */
 	list_for_each_entry(s, &slab_caches, list) {
 		if (slab_unmergeable(s))
 			continue;
@@ -4180,11 +4181,12 @@ static struct kmem_cache *find_mergeable(struct mem_cgroup *memcg, size_t size,
 		if (!cache_match_memcg(s, memcg))
 			continue;
 
+        /*! 위 조건들은 전부 통과 한 Mergeable 인 kmem_cache를 찾아서 리턴  */
 		return s;
 	}
 	return NULL;
 }
-
+/*! 2016.07.16 study -ing */
 struct kmem_cache *
 __kmem_cache_alias(struct mem_cgroup *memcg, const char *name, size_t size,
 		   size_t align, unsigned long flags, void (*ctor)(void *))
@@ -5707,10 +5709,16 @@ struct saved_alias {
 };
 
 static struct saved_alias *alias_list;
-
+/*! 2016.07.16 study -ing */
 static int sysfs_slab_alias(struct kmem_cache *s, const char *name)
 {
 	struct saved_alias *al;
+
+    /*!
+     * enum slab_state slab_state. (slab_state enum 타입의 slab_state)
+     * main.c - idr_init_cache 에서 들어온 시점에서는 slab_state = UP(4) 이다.
+     * 따라서 아래 sysfs 관련 함수는 수행이 안 됨.
+     */
 
 	if (slab_state == FULL) {
 		/*

@@ -29,6 +29,7 @@
 # define lockdep_softirq_exit()	do { current->softirq_context--; } while (0)
 # define INIT_TRACE_IRQFLAGS	.softirqs_enabled = 1,
 #else
+/*! 2016.07.16 study -ing */
 # define trace_hardirqs_on()		do { } while (0)
 # define trace_hardirqs_off()		do { } while (0)
 # define trace_softirqs_on(ip)		do { } while (0)
@@ -56,6 +57,7 @@
 /*
  * Wrap the arch provided IRQ routines to provide appropriate checks.
  */
+/*! 2016.07.16 study -ing */
 #define raw_local_irq_disable()		arch_local_irq_disable()
 #define raw_local_irq_enable()		arch_local_irq_enable()
 #define raw_local_irq_save(flags)			\
@@ -68,11 +70,14 @@
 		typecheck(unsigned long, flags);	\
 		arch_local_irq_restore(flags);		\
 	} while (0)
+/*! 2016.07.16 study -ing */
+/*! cpsr을 읽어와서 flags에 저장  */
 #define raw_local_save_flags(flags)			\
 	do {						\
 		typecheck(unsigned long, flags);	\
 		flags = arch_local_save_flags();	\
 	} while (0)
+/*! 2016.07.16 study -ing */
 #define raw_irqs_disabled_flags(flags)			\
 	({						\
 		typecheck(unsigned long, flags);	\
@@ -88,6 +93,7 @@
 #ifdef CONFIG_TRACE_IRQFLAGS_SUPPORT
 #define local_irq_enable() \
 	do { trace_hardirqs_on(); raw_local_irq_enable(); } while (0)
+/*! 2016.07.16 study -ing */
 #define local_irq_disable() \
 	do { raw_local_irq_disable(); trace_hardirqs_off(); } while (0)
 #define local_irq_save(flags)				\
@@ -116,7 +122,10 @@
 	({						\
 		raw_irqs_disabled_flags(flags);		\
 	})
-
+/*! 2016.07.16 study -ing */
+/*!
+ * _flags에 cpsr 값을 읽어온 후 IRQMASK_I_BIT 가 set 되어 있는지 체크 후 리턴
+ */
 #define irqs_disabled()					\
 	({						\
 		unsigned long _flags;			\

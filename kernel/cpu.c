@@ -61,7 +61,7 @@ static struct {
 	.lock = __MUTEX_INITIALIZER(cpu_hotplug.lock),
 	.refcount = 0,
 };
-
+/*! 2016.07.16 study -ing */
 void get_online_cpus(void)
 {
 	/*! might_sleep do nothing. */
@@ -74,7 +74,7 @@ void get_online_cpus(void)
 
 }
 EXPORT_SYMBOL_GPL(get_online_cpus);
-
+/*! 2016.07.16 study -ing */
 void put_online_cpus(void)
 {
 	if (cpu_hotplug.active_writer == current)

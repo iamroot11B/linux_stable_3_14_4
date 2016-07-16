@@ -38,7 +38,8 @@ extern void preempt_count_sub(int val);
 
 /*! 
  * http://studyfoss.egloos.com/5128961
- */ 
+ */
+/*! 2016.07.16 study -ing */
 #define preempt_disable() \
 do { \
 	preempt_count_inc(); \
@@ -117,6 +118,7 @@ do { \
  * that can cause faults and scheduling migrate into our preempt-protected
  * region.
  */
+/*! 2016.07.16 study -ing */
 #define preempt_disable()			barrier()
 #define sched_preempt_enable_no_resched()	barrier()
 #define preempt_enable_no_resched()		barrier()

@@ -228,7 +228,7 @@ static inline const char *cache_name(struct kmem_cache *s)
 {
 	return s->name;
 }
-
+/*! 2016.07.16 study -ing */
 static inline struct kmem_cache *
 cache_from_memcg_idx(struct kmem_cache *s, int idx)
 {

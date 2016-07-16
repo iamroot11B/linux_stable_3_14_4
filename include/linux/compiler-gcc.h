@@ -12,6 +12,7 @@
 
 /* Optimization barrier */
 /* The "volatile" is due to gcc bugs */
+/*! 2016.07.16 study -ing */
 #define barrier() __asm__ __volatile__("": : :"memory")
 
 /*

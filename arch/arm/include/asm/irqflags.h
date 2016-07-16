@@ -13,6 +13,7 @@
 #define IRQMASK_REG_NAME_W "primask"
 #define IRQMASK_I_BIT	1
 #else
+/*! 2016.07.16 study -ing */
 #define IRQMASK_REG_NAME_R "cpsr"
 #define IRQMASK_REG_NAME_W "cpsr_c"
 #define IRQMASK_I_BIT	PSR_I_BIT
@@ -42,7 +43,7 @@ static inline void arch_local_irq_enable(void)
 		:
 		: "memory", "cc");
 }
-
+/*! 2016.07.16 study -ing */
 static inline void arch_local_irq_disable(void)
 {
 	asm volatile(
@@ -138,6 +139,7 @@ static inline void arch_local_irq_disable(void)
 /*
  * Save the current interrupt enable state.
  */
+/*! 2016.07.16 study -ing */
 static inline unsigned long arch_local_save_flags(void)
 {
 	unsigned long flags;
@@ -158,7 +160,7 @@ static inline void arch_local_irq_restore(unsigned long flags)
 		: "r" (flags)
 		: "memory", "cc");
 }
-
+/*! 2016.07.16 study -ing */
 static inline int arch_irqs_disabled_flags(unsigned long flags)
 {
 	return flags & IRQMASK_I_BIT;

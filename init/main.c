@@ -676,10 +676,13 @@ asmlinkage void __init start_kernel(void)
 	 * Disable preemption - early bootup scheduling is extremely
 	 * fragile until we cpu_idle() for the first time.
 	 */
+    /*! 2016.07.16 study start */
 	preempt_disable();
+    /*! irqs_disabled - cpsr 에서 IRQMASK_I_BIT가 set 되어 있는지 확인 */
 	if (WARN(!irqs_disabled(), "Interrupts were enabled *very* early, fixing it\n"))
 		local_irq_disable();
 	idr_init_cache();
+    /*! 2016.07.16 study -ing */
 	rcu_init();
 	tick_nohz_init();
 	context_tracking_init();

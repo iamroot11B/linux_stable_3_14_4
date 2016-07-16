@@ -190,12 +190,13 @@ static inline void bitmap_copy(unsigned long *dst, const unsigned long *src,
 		memcpy(dst, src, len);
 	}
 }
-
+/*! 2016.07.16 study -ing */
 static inline int bitmap_and(unsigned long *dst, const unsigned long *src1,
 			const unsigned long *src2, int nbits)
 {
 	if (small_const_nbits(nbits))
 		return (*dst = *src1 & *src2) != 0;
+    /*! src1 과 src2의 모든 bit들의 and 연산을 dst에 저장 */
 	return __bitmap_and(dst, src1, src2, nbits);
 }
 
@@ -251,7 +252,11 @@ static inline int bitmap_intersects(const unsigned long *src1,
 	else
 		return __bitmap_intersects(src1, src2, nbits);
 }
-
+/*! 2016.07.16 study -ing */
+/*!
+ * src1 과 src2 를 비교하여 src1 & ~src2 가 하나라도 1이면 리턴 0,
+ * 모두 0이면 리턴 1
+ */
 static inline int bitmap_subset(const unsigned long *src1,
 			const unsigned long *src2, int nbits)
 {

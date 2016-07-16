@@ -626,7 +626,7 @@ memcg_kmem_newpage_charge(gfp_t gfp, struct mem_cgroup **memcg, int order)
 {
 	return true;
 }
-/*! 2015.01.30 study -ing */
+/*! 2016.01.30 study -ing */
 /*! 우리는 CONFIG_MEMCG_KMEM not defined.  */
 static inline void memcg_kmem_uncharge_pages(struct page *page, int order)
 {
@@ -636,22 +636,22 @@ static inline void
 memcg_kmem_commit_charge(struct page *page, struct mem_cgroup *memcg, int order)
 {
 }
-
+/*! 2016.07.16 study -ing */
 static inline int memcg_cache_id(struct mem_cgroup *memcg)
 {
 	return -1;
 }
-
+/*! 2016.07.16 study -ing */
 static inline int memcg_alloc_cache_params(struct mem_cgroup *memcg,
 		struct kmem_cache *s, struct kmem_cache *root_cache)
 {
 	return 0;
 }
-
+/*! 2016.07.16 study -ing */
 static inline void memcg_free_cache_params(struct kmem_cache *s)
 {
 }
-
+/*! 2016.07.16 study -ing */
 static inline void memcg_register_cache(struct kmem_cache *s)
 {
 }

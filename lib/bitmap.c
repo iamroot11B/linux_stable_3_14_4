@@ -180,7 +180,7 @@ void __bitmap_shift_left(unsigned long *dst,
 		memset(dst, 0, off*sizeof(unsigned long));
 }
 EXPORT_SYMBOL(__bitmap_shift_left);
-
+/*! 2016.07.16 study -ing */
 int __bitmap_and(unsigned long *dst, const unsigned long *bitmap1,
 				const unsigned long *bitmap2, int bits)
 {
@@ -243,7 +243,7 @@ int __bitmap_intersects(const unsigned long *bitmap1,
 	return 0;
 }
 EXPORT_SYMBOL(__bitmap_intersects);
-
+/*! 2016.07.16 study -ing */
 int __bitmap_subset(const unsigned long *bitmap1,
 				const unsigned long *bitmap2, int bits)
 {
@@ -548,6 +548,8 @@ static inline int bscnl_emit(char *buf, int buflen, int rbot, int rtop, int len)
  * The return value is the number of characters which were written to *buf
  * excluding the trailing '\0', as per ISO C99's scnprintf.
  */
+/*! 2016.07.16 study -ing */
+/*! bitmap 리스트를 ASCII 문자열로 변환한다.  */
 int bitmap_scnlistprintf(char *buf, unsigned int buflen,
 	const unsigned long *maskp, int nmaskbits)
 {

@@ -50,8 +50,10 @@ static char __initdata nocb_buf[NR_CPUS * 5];
  * messages about anything out of the ordinary.  If you like #ifdef, you
  * will love this function.
  */
+/*! 2016.07.16 study -ing */
 static void __init rcu_bootup_announce_oddness(void)
 {
+    /*! 아래 정보들은 print 해 준다.  */
 #ifdef CONFIG_RCU_TRACE
 	pr_info("\tRCU debugfs-based tracing is enabled.\n");
 #endif
@@ -976,6 +978,8 @@ static struct rcu_state *rcu_state = &rcu_sched_state;
 /*
  * Tell them what RCU they are running.
  */
+/*! 2016.07.16 study -ing */
+/*! CONFIG_TREE_PREEMPT_RCU : exynos=Y, vexpress=N  */
 static void __init rcu_bootup_announce(void)
 {
 	pr_info("Hierarchical RCU implementation.\n");

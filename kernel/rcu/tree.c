@@ -3388,6 +3388,7 @@ static void __init rcu_init_one(struct rcu_state *rsp,
  * replace the definitions in tree.h because those are needed to size
  * the ->node array in the rcu_state structure.
  */
+/*! 2016.07.16 study -ing */
 static void __init rcu_init_geometry(void)
 {
 	ulong d;
@@ -3396,6 +3397,8 @@ static void __init rcu_init_geometry(void)
 	int n = nr_cpu_ids;
 	int rcu_capacity[MAX_RCU_LVLS + 1];
 
+    /*! 2016.07.16 study end */
+    
 	/*
 	 * Initialize any unspecified boot parameters.
 	 * The default values of jiffies_till_first_fqs and
@@ -3459,11 +3462,11 @@ static void __init rcu_init_geometry(void)
 		rcu_num_nodes += num_rcu_lvl[i];
 	rcu_num_nodes -= n;
 }
-
+/*! 2016.07.16 study -ing */
 void __init rcu_init(void)
 {
 	int cpu;
-
+    /*! 거의 print 문 수행이 대부분.  */
 	rcu_bootup_announce();
 	rcu_init_geometry();
 	rcu_init_one(&rcu_bh_state, &rcu_bh_data);
