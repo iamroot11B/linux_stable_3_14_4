@@ -152,7 +152,7 @@ void __lockfunc _raw_spin_lock(raw_spinlock_t *lock)
 }
 EXPORT_SYMBOL(_raw_spin_lock);
 #endif
-
+/*! 2016.07.23 study -ing */
 #ifndef CONFIG_INLINE_SPIN_LOCK_IRQSAVE
 unsigned long __lockfunc _raw_spin_lock_irqsave(raw_spinlock_t *lock)
 {

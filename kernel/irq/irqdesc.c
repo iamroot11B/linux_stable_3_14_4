@@ -23,9 +23,12 @@
 static struct lock_class_key irq_desc_lock_class;
 
 #if defined(CONFIG_SMP)
+/*! 2016.07.23 study -ing */
 static void __init init_irq_default_affinity(void)
 {
+	/*! Do nothing, return true  */
 	alloc_cpumask_var(&irq_default_affinity, GFP_NOWAIT);
+
 	cpumask_setall(irq_default_affinity);
 }
 #else
@@ -35,8 +38,10 @@ static void __init init_irq_default_affinity(void)
 #endif
 
 #ifdef CONFIG_SMP
+/*! 2016.07.23 study -ing */
 static int alloc_masks(struct irq_desc *desc, gfp_t gfp, int node)
 {
+	/*! zalloc_cpumask_var_node -  cpumask_clear */
 	if (!zalloc_cpumask_var_node(&desc->irq_data.affinity, gfp, node))
 		return -ENOMEM;
 
@@ -48,10 +53,11 @@ static int alloc_masks(struct irq_desc *desc, gfp_t gfp, int node)
 #endif
 	return 0;
 }
-
+/*! 2016.07.23 study -ing */
 static void desc_smp_init(struct irq_desc *desc, int node)
 {
 	desc->irq_data.node = node;
+	/*! irq_default_affinity를 desc->irq_data.affinity에 copy */
 	cpumask_copy(desc->irq_data.affinity, irq_default_affinity);
 #ifdef CONFIG_GENERIC_PENDING_IRQ
 	cpumask_clear(desc->pending_mask);
@@ -69,12 +75,13 @@ alloc_masks(struct irq_desc *desc, gfp_t gfp, int node) { return 0; }
 static inline void desc_smp_init(struct irq_desc *desc, int node) { }
 static inline int desc_node(struct irq_desc *desc) { return 0; }
 #endif
-
+/*! 2016.07.23 study -ing */
 static void desc_set_defaults(unsigned int irq, struct irq_desc *desc, int node,
 		struct module *owner)
 {
 	int cpu;
 
+	/*! desc 멤버 변수 default 값 init. */
 	desc->irq_data.irq = irq;
 	desc->irq_data.chip = &no_irq_chip;
 	desc->irq_data.chip_data = NULL;
@@ -102,9 +109,10 @@ static DECLARE_BITMAP(allocated_irqs, IRQ_BITMAP_BITS);
 #ifdef CONFIG_SPARSE_IRQ
 
 static RADIX_TREE(irq_desc_tree, GFP_KERNEL);
-
+/*! 2016.07.23 study -ing */
 static void irq_insert_desc(unsigned int irq, struct irq_desc *desc)
 {
+	/*! irq_desc_tree 의 irq index에 desc를 insert.  */
 	radix_tree_insert(&irq_desc_tree, irq, desc);
 }
 
@@ -130,7 +138,7 @@ static void free_masks(struct irq_desc *desc)
 #else
 static inline void free_masks(struct irq_desc *desc) { }
 #endif
-
+/*! 2016.07.23 study -ing */
 static struct irq_desc *alloc_desc(int irq, int node, struct module *owner)
 {
 	struct irq_desc *desc;
@@ -147,6 +155,7 @@ static struct irq_desc *alloc_desc(int irq, int node, struct module *owner)
 	if (alloc_masks(desc, gfp, node))
 		goto err_kstat;
 
+	/*! raw spin lock init  */
 	raw_spin_lock_init(&desc->lock);
 	lockdep_set_class(&desc->lock, &irq_desc_lock_class);
 
@@ -209,7 +218,7 @@ static int irq_expand_nr_irqs(unsigned int nr)
 	nr_irqs = nr;
 	return 0;
 }
-
+/*! 2016.07.23 study -ing */
 int __init early_irq_init(void)
 {
 	int i, initcnt, node = first_online_node;
@@ -218,6 +227,7 @@ int __init early_irq_init(void)
 	init_irq_default_affinity();
 
 	/* Let arch update nr_irqs and return the nr of preallocated irqs */
+	/*! machine_desc->nr_irqs 값, 혹은 16(NR_IRQS)  */
 	initcnt = arch_probe_nr_irqs();
 	printk(KERN_INFO "NR_IRQS:%d nr_irqs:%d %d\n", NR_IRQS, nr_irqs, initcnt);
 
@@ -235,6 +245,7 @@ int __init early_irq_init(void)
 		set_bit(i, allocated_irqs);
 		irq_insert_desc(i, desc);
 	}
+	/*! arch_early_irq_init - Do nothing. */
 	return arch_early_irq_init();
 }
 

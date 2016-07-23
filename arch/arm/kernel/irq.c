@@ -132,8 +132,12 @@ void __init set_handle_irq(void (*handle_irq)(struct pt_regs *))
 #endif
 
 #ifdef CONFIG_SPARSE_IRQ
+/*! 2016.07.23 study -ing */
 int __init arch_probe_nr_irqs(void)
 {
+	/*! NR_IRQS = 16
+	 *  machine_desc->nr_irqs 값이 있으면 이 값을, 없으면 NR_IRQS define 값을 리턴.
+	 */
 	nr_irqs = machine_desc->nr_irqs ? machine_desc->nr_irqs : NR_IRQS;
 	return nr_irqs;
 }

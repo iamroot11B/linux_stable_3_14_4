@@ -225,7 +225,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #endif
 
 #else
-
+/*! 2016.07.23 study -ing */
 #define raw_spin_lock_irqsave(lock, flags)		\
 	do {						\
 		typecheck(unsigned long, flags);	\

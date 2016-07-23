@@ -394,6 +394,7 @@ out:
  *
  *	Insert an item into the radix tree at position @index.
  */
+/*! 2016.07.23 study -ing */
 int radix_tree_insert(struct radix_tree_root *root,
 			unsigned long index, void *item)
 {
@@ -1442,7 +1443,7 @@ radix_tree_node_ctor(void *node)
 {
 	memset(node, 0, sizeof(struct radix_tree_node));
 }
-
+/*! 2016.07.23 study -ing */
 static __init unsigned long __maxindex(unsigned int height)
 {
 	unsigned int width = height * RADIX_TREE_MAP_SHIFT;
@@ -1454,15 +1455,15 @@ static __init unsigned long __maxindex(unsigned int height)
 		return 0UL;
 	return ~0UL >> shift;
 }
-
+/*! 2016.07.23 study -ing */
 static __init void radix_tree_init_maxindex(void)
 {
 	unsigned int i;
-
+	/*! height_to_maxindex 배열 init.  */
 	for (i = 0; i < ARRAY_SIZE(height_to_maxindex); i++)
 		height_to_maxindex[i] = __maxindex(i);
 }
-
+/*! 2016.07.23 study -ing */
 static int radix_tree_callback(struct notifier_block *nfb,
                             unsigned long action,
                             void *hcpu)
@@ -1471,6 +1472,9 @@ static int radix_tree_callback(struct notifier_block *nfb,
        struct radix_tree_preload *rtp;
 
        /* Free per-cpu pool of perloaded nodes */
+	   /*! CPU_DEAD 나 CPU_DEAD_FROZEN 이벤트의 경우
+		*  해당 cpu의 radix_tree_preloads를 찾아서 free
+		*/
        if (action == CPU_DEAD || action == CPU_DEAD_FROZEN) {
                rtp = &per_cpu(radix_tree_preloads, cpu);
                while (rtp->nr) {
@@ -1482,13 +1486,20 @@ static int radix_tree_callback(struct notifier_block *nfb,
        }
        return NOTIFY_OK;
 }
-
+/*! 2016.07.23 study -ing */
 void __init radix_tree_init(void)
 {
+	/*! radix_tree_node_cachep - kmem_cache 타입.
+	 *  kmem_cache_create 하여 radix_tree_node_cachep에 넣어준다.
+	 */
 	radix_tree_node_cachep = kmem_cache_create("radix_tree_node",
 			sizeof(struct radix_tree_node), 0,
 			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
 			radix_tree_node_ctor);
 	radix_tree_init_maxindex();
+	/*! hotcpu_notifier
+	 *  CONFIG_HOTPLUG_CPU 가 define 되어 있으면 cpu_notifier로 동작.
+	 *  (not define 이면 do nothing)
+	 */
 	hotcpu_notifier(radix_tree_callback, 0);
 }

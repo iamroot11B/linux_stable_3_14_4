@@ -30,7 +30,7 @@ enum {
 #define IRQ_IS_POLLED		GOT_YOU_MORON
 #undef IRQF_MODIFY_MASK
 #define IRQF_MODIFY_MASK	GOT_YOU_MORON
-
+/*! 2016.07.23 study -ing */
 static inline void
 irq_settings_clr_and_set(struct irq_desc *desc, u32 clr, u32 set)
 {

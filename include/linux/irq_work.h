@@ -22,7 +22,7 @@ struct irq_work {
 	struct llist_node llnode;
 	void (*func)(struct irq_work *);
 };
-
+/*! 2016.07.23 study -ing */
 static inline
 void init_irq_work(struct irq_work *work, void (*func)(struct irq_work *))
 {

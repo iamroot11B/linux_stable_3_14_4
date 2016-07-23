@@ -684,11 +684,14 @@ asmlinkage void __init start_kernel(void)
 	idr_init_cache();
     /*! 2016.07.16 study -ing */
 	rcu_init();
+	/*! Do nothing. (CONFIG_NO_HZ_FULL이 define 안 됨)  */
 	tick_nohz_init();
+	/*! Do nothing. (CONFIG_CONTEXT_TRACKING_FORCE 이 define 안 됨)  */
 	context_tracking_init();
 	radix_tree_init();
 	/* init some links before init_ISA_irqs() */
 	early_irq_init();
+	/*! 2016.07.23 study end */
 	init_IRQ();
 	tick_init();
 	init_timers();

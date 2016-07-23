@@ -948,8 +948,11 @@ EXPORT_SYMBOL_GPL(rcu_barrier);
 /*
  * Initialize preemptible RCU's state structures.
  */
+/*! 2016.07.23 study -ing */
+/*! Exynos 는 CONFIG_TREE_PREEMPT_RCU=y */
 static void __init __rcu_init_preempt(void)
 {
+	/*! rcu_preempt_state 에 대한 init. rcu_preempt_state->rda = &rcu_preempt_data  */
 	rcu_init_one(&rcu_preempt_state, &rcu_preempt_data);
 }
 
@@ -1137,6 +1140,8 @@ EXPORT_SYMBOL_GPL(rcu_barrier);
 /*
  * Because preemptible RCU does not exist, it need not be initialized.
  */
+/*! 2016.07.23 study -ing */
+/*! vexpress에서는 CONFIG_TREE_PREEMPT_RCU=n */
 static void __init __rcu_init_preempt(void)
 {
 }
@@ -1531,7 +1536,7 @@ static int __init rcu_spawn_kthreads(void)
 	return 0;
 }
 early_initcall(rcu_spawn_kthreads);
-
+/*! 2016.07.23 study -ing */
 static void rcu_prepare_kthreads(int cpu)
 {
 	struct rcu_data *rdp = per_cpu_ptr(rcu_state->rda, cpu);
@@ -2410,7 +2415,7 @@ static void rcu_nocb_gp_cleanup(struct rcu_state *rsp, struct rcu_node *rnp)
 static void rcu_nocb_gp_set(struct rcu_node *rnp, int nrq)
 {
 }
-
+/*! 2016.07.23 study -ing */
 static void rcu_init_one_nocb(struct rcu_node *rnp)
 {
 }
@@ -2427,7 +2432,7 @@ static bool __maybe_unused rcu_nocb_adopt_orphan_cbs(struct rcu_state *rsp,
 {
 	return 0;
 }
-
+/*! 2016.07.23 study -ing */
 static void __init rcu_boot_init_nocb_percpu_data(struct rcu_data *rdp)
 {
 }
@@ -2444,7 +2449,7 @@ static void do_nocb_deferred_wakeup(struct rcu_data *rdp)
 static void __init rcu_spawn_nocb_kthreads(struct rcu_state *rsp)
 {
 }
-
+/*! 2016.07.23 study -ing */
 static bool init_nocb_callback_list(struct rcu_data *rdp)
 {
 	return false;

@@ -169,7 +169,7 @@ static inline void irqd_clear(struct irq_data *d, unsigned int mask)
 {
 	d->state_use_accessors &= ~mask;
 }
-
+/*! 2016.07.23 study -ing */
 static inline void irqd_set(struct irq_data *d, unsigned int mask)
 {
 	d->state_use_accessors |= mask;

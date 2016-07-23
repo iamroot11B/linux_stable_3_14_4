@@ -318,7 +318,7 @@ static __always_inline void *__kmalloc_node(size_t size, gfp_t flags, int node)
 {
 	return __kmalloc(size, flags);
 }
-
+/*! 2016.07.23 study -ing */
 static __always_inline void *kmem_cache_alloc_node(struct kmem_cache *s, gfp_t flags, int node)
 {
 	return kmem_cache_alloc(s, flags);
@@ -348,7 +348,7 @@ static __always_inline void *kmem_cache_alloc_trace(struct kmem_cache *s,
 {
 	return kmem_cache_alloc(s, flags);
 }
-
+/*! 2016.07.23 study -ing */
 static __always_inline void *
 kmem_cache_alloc_node_trace(struct kmem_cache *s,
 			      gfp_t gfpflags,
@@ -487,7 +487,7 @@ static __always_inline int kmalloc_size(int n)
 #endif
 	return 0;
 }
-
+/*! 2016.07.23 study -ing */
 static __always_inline void *kmalloc_node(size_t size, gfp_t flags, int node)
 {
 #ifndef CONFIG_SLOB
@@ -661,8 +661,10 @@ static inline void *kzalloc(size_t size, gfp_t flags)
  * @flags: the type of memory to allocate (see kmalloc).
  * @node: memory node from which to allocate
  */
+/*! 2016.07.23 study -ing */
 static inline void *kzalloc_node(size_t size, gfp_t flags, int node)
 {
+	/*! kmem_cache_alloc -> slab_alloc 으로 들어간다. */
 	return kmalloc_node(size, flags | __GFP_ZERO, node);
 }
 
