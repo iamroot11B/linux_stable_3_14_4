@@ -333,6 +333,8 @@ void __iomem * __arm_ioremap_pfn_caller(unsigned long pfn,
 	return (void __iomem *) (offset + addr);
 }
 
+/*! 2016.08.06 study -ing */
+/*! 내용 안봄 */
 void __iomem *__arm_ioremap_caller(phys_addr_t phys_addr, size_t size,
 	unsigned int mtype, void *caller)
 {
@@ -369,13 +371,18 @@ __arm_ioremap_pfn(unsigned long pfn, unsigned long offset, size_t size,
 }
 EXPORT_SYMBOL(__arm_ioremap_pfn);
 
+/*! 2016.08.06 study -ing */
 void __iomem * (*arch_ioremap_caller)(phys_addr_t, size_t,
 				      unsigned int, void *) =
 	__arm_ioremap_caller;
 
+/*! 2016.08.06 study -ing */
 void __iomem *
 __arm_ioremap(phys_addr_t phys_addr, size_t size, unsigned int mtype)
 {
+	/*! 바로 위에 함수 있음
+	 * 상기 주석에 따르면 Phy주소->Virt주소 변환한다
+	 */
 	return arch_ioremap_caller(phys_addr, size, mtype,
 		__builtin_return_address(0));
 }

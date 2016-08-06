@@ -76,8 +76,10 @@ static inline __be32 __cpu_to_be32p(const __u32 *p)
 {
 	return (__force __be32)__swab32p(p);
 }
+/*! 2016.08.06 study -ing */
 static inline __u32 __be32_to_cpup(const __be32 *p)
 {
+	/*! 32bit를 바이트 단위로 big->little 변환 */
 	return __swab32p((__u32 *)p);
 }
 static inline __be16 __cpu_to_be16p(const __u16 *p)

@@ -692,6 +692,7 @@ asmlinkage void __init start_kernel(void)
 	/* init some links before init_ISA_irqs() */
 	early_irq_init();
 	/*! 2016.07.23 study end */
+	/*! 2016.08.06 study start */
 	init_IRQ();
 	tick_init();
 	init_timers();

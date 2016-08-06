@@ -13,6 +13,7 @@
 	(((__u16)(x) & (__u16)0x00ffU) << 8) |			\
 	(((__u16)(x) & (__u16)0xff00U) >> 8)))
 
+/*! 2016.08.06 study -ing */
 #define ___constant_swab32(x) ((__u32)(				\
 	(((__u32)(x) & (__u32)0x000000ffUL) << 24) |		\
 	(((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |		\
@@ -111,6 +112,7 @@ static inline __attribute_const__ __u32 __fswahb32(__u32 val)
  * __swab32 - return a byteswapped 32-bit value
  * @x: value to byteswap
  */
+/*! 2016.08.06 study -ing */
 #define __swab32(x)				\
 	(__builtin_constant_p((__u32)(x)) ?	\
 	___constant_swab32(x) :			\
@@ -164,6 +166,7 @@ static inline __u16 __swab16p(const __u16 *p)
  * __swab32p - return a byteswapped 32-bit value from a pointer
  * @p: pointer to a naturally-aligned 32-bit value
  */
+/*! 2016.08.06 study -ing */
 static inline __u32 __swab32p(const __u32 *p)
 {
 #ifdef __arch_swab32p

@@ -24,7 +24,12 @@ irqchip_of_match_end __used __section(__irqchip_of_end);
 
 extern struct of_device_id __irqchip_begin[];
 
+/*! 2016.08.06 study -ing */
 void __init irqchip_init(void)
 {
+	/*!
+	 * __irqchip_begin 섹션의 주소를 넘김
+	 * vmlinux.lds.h
+	 */
 	of_irq_init(__irqchip_begin);
 }

@@ -52,6 +52,7 @@ EXPORT_SYMBOL_GPL(irq_of_parse_and_map);
  * Returns a pointer to the interrupt parent node, or NULL if the interrupt
  * parent could not be determined.
  */
+/*! 2016.08.06 study -ing */
 struct device_node *of_irq_find_parent(struct device_node *child)
 {
 	struct device_node *p;
@@ -60,11 +61,14 @@ struct device_node *of_irq_find_parent(struct device_node *child)
 	if (!of_node_get(child))
 		return NULL;
 
+	/*! 찾은 child: "interrupt-controller" node의 parent를 찾아낸다. */
 	do {
 		parp = of_get_property(child, "interrupt-parent", NULL);
 		if (parp == NULL)
+			/*! "interrupt-parent"라는 property가 없으면 child->parent로 찾음 */
 			p = of_get_parent(child);
 		else {
+			/*! of_irq_workarounds: 0, OF_IMAP_NO_PHANDLE: 0x00000002  */
 			if (of_irq_workarounds & OF_IMAP_NO_PHANDLE)
 				p = of_node_get(of_irq_dflt_pic);
 			else
@@ -428,6 +432,7 @@ struct intc_desc {
  * This function scans the device tree for matching interrupt controller nodes,
  * and calls their initialization functions in order with parents first.
  */
+/*! 2016.08.06 study -ing */
 void __init of_irq_init(const struct of_device_id *matches)
 {
 	struct device_node *np, *parent = NULL;
@@ -437,6 +442,10 @@ void __init of_irq_init(const struct of_device_id *matches)
 	INIT_LIST_HEAD(&intc_desc_list);
 	INIT_LIST_HEAD(&intc_parent_list);
 
+	/*!
+	 * "interrupt-controller"를 찾아서 모두 intc_desc_list에 추가한다.
+	 * vexpress a9 기준 vexpress-v2p-ca9.dts에 있음 
+	 */
 	for_each_matching_node(np, matches) {
 		if (!of_find_property(np, "interrupt-controller", NULL) ||
 				!of_device_is_available(np))
@@ -451,6 +460,10 @@ void __init of_irq_init(const struct of_device_id *matches)
 
 		desc->dev = np;
 		desc->interrupt_parent = of_irq_find_parent(np);
+		/*!
+		 * vexpress-v2p-ca9.dts를 봤을 때, interrupt_parent == np일 것임
+		 * 따라서, NULL
+		 */
 		if (desc->interrupt_parent == np)
 			desc->interrupt_parent = NULL;
 		list_add_tail(&desc->list, &intc_desc_list);
@@ -460,6 +473,13 @@ void __init of_irq_init(const struct of_device_id *matches)
 	 * The root irq controller is the one without an interrupt-parent.
 	 * That one goes first, followed by the controllers that reference it,
 	 * followed by the ones that reference the 2nd level controllers, etc.
+	 */
+	/*!
+	 * 찾은 interrupt-controller 리스트 중에서
+	 * (device tree; vexpress-v2p-ca9.dts)
+	 * compatible 문자열을 비교하여 일치하는 node의 init_cb 함수를 호출한다.
+	 * (matches 매개변수로 받은 __irqchip_of_table 섹션; irq-gic.c -> IRQCHIP_DECLARE()와 같이 Arch별로 Declare함)
+	 * 그리고 intc_parent_list에 추가한다.
 	 */
 	while (!list_empty(&intc_desc_list)) {
 		/*
@@ -472,6 +492,7 @@ void __init of_irq_init(const struct of_device_id *matches)
 			int ret;
 			of_irq_init_cb_t irq_init_cb;
 
+			/*! 동일 root controller를 parent로 하는 node만 처리하겠다. */
 			if (desc->interrupt_parent != parent)
 				continue;
 
@@ -487,6 +508,12 @@ void __init of_irq_init(const struct of_device_id *matches)
 			pr_debug("of_irq_init: init %s @ %p, parent %p\n",
 				 match->compatible,
 				 desc->dev, desc->interrupt_parent);
+			/*!
+			 * 위에서 찾아낸 최적 node의 init callback함수를 호출함
+			 * EX)
+			 * irq-gic.c -> gic_of_init()
+			 * exynos-combiner.c -> combiner_of_init()
+			 */
 			irq_init_cb = (of_irq_init_cb_t)match->data;
 			ret = irq_init_cb(desc->dev, desc->interrupt_parent);
 			if (ret) {

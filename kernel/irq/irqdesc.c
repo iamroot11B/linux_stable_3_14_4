@@ -200,7 +200,7 @@ static int alloc_descs(unsigned int start, unsigned int cnt, int node,
 		mutex_unlock(&sparse_irq_lock);
 	}
 	return start;
-
+IRQ_BITMAP_BITS
 err:
 	for (i--; i >= 0; i--)
 		free_desc(start + i);

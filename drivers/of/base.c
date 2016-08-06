@@ -180,6 +180,10 @@ void of_node_put(struct device_node *node)
 EXPORT_SYMBOL(of_node_put);
 #endif /* CONFIG_OF_DYNAMIC */
 
+/*! 2016.08.06 study -ing */
+/*!
+ * np의 properties 중에 name이 일치하는 녀석을 찾는다.
+ */
 static struct property *__of_find_property(const struct device_node *np,
 					   const char *name, int *lenp)
 {
@@ -199,6 +203,7 @@ static struct property *__of_find_property(const struct device_node *np,
 	return pp;
 }
 
+/*! 2016.08.06 study -ing */
 struct property *of_find_property(const struct device_node *np,
 				  const char *name,
 				  int *lenp)
@@ -207,6 +212,7 @@ struct property *of_find_property(const struct device_node *np,
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&devtree_lock, flags);
+	/*! np에서 name과 일치하는 property를 찾음 */
 	pp = __of_find_property(np, name, lenp);
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 
@@ -400,6 +406,8 @@ EXPORT_SYMBOL(of_get_cpu_node);
  * 10. type
  * 11. name
  */
+/*! 2016.08.06 study -ing */
+/*! 주어진 device가 compat, type, name 일치한다면, 상위 주석의 규칙대로 값을 반환 */
 static int __of_device_is_compatible(const struct device_node *device,
 				     const char *compat, const char *type, const char *name)
 {
@@ -483,6 +491,7 @@ EXPORT_SYMBOL(of_machine_is_compatible);
  *  Returns 1 if the status property is absent or set to "okay" or "ok",
  *  0 otherwise
  */
+/*! 2016.08.06 study -ing */
 static int __of_device_is_available(const struct device_node *device)
 {
 	const char *status;
@@ -511,6 +520,7 @@ static int __of_device_is_available(const struct device_node *device)
  *  Returns 1 if the status property is absent or set to "okay" or "ok",
  *  0 otherwise
  */
+/*! 2016.08.06 study -ing */
 int of_device_is_available(const struct device_node *device)
 {
 	unsigned long flags;
@@ -531,6 +541,7 @@ EXPORT_SYMBOL(of_device_is_available);
  *	Returns a node pointer with refcount incremented, use
  *	of_node_put() on it when done.
  */
+/*! 2016.08.06 study -ing */
 struct device_node *of_get_parent(const struct device_node *node)
 {
 	struct device_node *np;
@@ -812,6 +823,8 @@ out:
 }
 EXPORT_SYMBOL(of_find_node_with_property);
 
+/*! 2016.08.06 study -ing */
+/*! 가장 호환성이 좋은 node를 찾아냄 */
 static
 const struct of_device_id *__of_match_node(const struct of_device_id *matches,
 					   const struct device_node *node)
@@ -841,6 +854,7 @@ const struct of_device_id *__of_match_node(const struct of_device_id *matches,
  *
  *	Low level utility function used by device matching.
  */
+/*! 2016.08.06 study -ing */
 const struct of_device_id *of_match_node(const struct of_device_id *matches,
 					 const struct device_node *node)
 {
@@ -928,12 +942,14 @@ EXPORT_SYMBOL_GPL(of_modalias_node);
  * Returns a node pointer with refcount incremented, use
  * of_node_put() on it when done.
  */
+/*! 2016.08.06 study -ing */
 struct device_node *of_find_node_by_phandle(phandle handle)
 {
 	struct device_node *np;
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&devtree_lock, flags);
+	/*! 전체 node에서 handle과 일치하는 node를 찾아냄 */
 	for (np = of_allnodes; np; np = np->allnext)
 		if (np->phandle == handle)
 			break;
@@ -956,6 +972,8 @@ EXPORT_SYMBOL(of_find_node_by_phandle);
  * property data isn't large enough.
  *
  */
+/*! 2016.08.06 study -ing */
+/*! property를 찾아서 value 배열을 반환 */
 static void *of_find_property_value_of_size(const struct device_node *np,
 			const char *propname, u32 len)
 {
@@ -1083,6 +1101,7 @@ EXPORT_SYMBOL_GPL(of_property_read_u16_array);
  *
  * The out_values is modified only if a valid u32 value can be decoded.
  */
+/*! 2016.08.06 study -ing */
 int of_property_read_u32_array(const struct device_node *np,
 			       const char *propname, u32 *out_values,
 			       size_t sz)
@@ -1093,6 +1112,7 @@ int of_property_read_u32_array(const struct device_node *np,
 	if (IS_ERR(val))
 		return PTR_ERR(val);
 
+	/*! sz 길이의 values 배열을 복사함 */
 	while (sz--)
 		*out_values++ = be32_to_cpup(val++);
 	return 0;

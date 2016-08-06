@@ -974,6 +974,7 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 #ifdef CONFIG_OF
 static int gic_cnt __initdata;
 
+/*! 2016.08.06 study -ing */
 int __init gic_of_init(struct device_node *node, struct device_node *parent)
 {
 	void __iomem *cpu_base;
@@ -984,15 +985,22 @@ int __init gic_of_init(struct device_node *node, struct device_node *parent)
 	if (WARN_ON(!node))
 		return -ENODEV;
 
+	/*! GIC Distribution Register
+	 * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0425f/CACGBCHG.html
+	 */
 	dist_base = of_iomap(node, 0);
 	WARN(!dist_base, "unable to map gic dist registers\n");
 
+	/*! GIC CPU Interface
+	 * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0425f/CACFDEBC.html
+	 */
 	cpu_base = of_iomap(node, 1);
 	WARN(!cpu_base, "unable to map gic cpu registers\n");
 
 	if (of_property_read_u32(node, "cpu-offset", &percpu_offset))
 		percpu_offset = 0;
 
+	/*! 2016.08.06 study end */
 	gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset, node);
 	if (!gic_cnt)
 		gic_init_physaddr(node);

@@ -664,6 +664,10 @@ static int __of_address_to_resource(struct device_node *dev,
  * pci_address_to_pio(), that is because it's either called to early or it
  * can't be matched to any host bridge IO space
  */
+/*! 2016.08.06 study -ing */
+/*! 내용 자세히 안보고 넘어감
+ * device node의 index에 해당하는 struct resource를 매개변수로 반환한다.
+ */
 int of_address_to_resource(struct device_node *dev, int index,
 			   struct resource *r)
 {
@@ -709,13 +713,16 @@ struct device_node *of_find_matching_node_by_address(struct device_node *from,
  *
  * Returns a pointer to the mapped memory
  */
+/*! 2016.08.06 study -ing */
 void __iomem *of_iomap(struct device_node *np, int index)
 {
 	struct resource res;
 
+	/*! res에 device node의 index에 해당하는 resource를 저장함 */
 	if (of_address_to_resource(np, index, &res))
 		return NULL;
 
+	/*! Phy주소를 커널의 Virt주소로 변환함 */
 	return ioremap(res.start, resource_size(&res));
 }
 EXPORT_SYMBOL(of_iomap);
