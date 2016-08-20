@@ -597,6 +597,8 @@ int __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 		struct module *owner);
 
 /* use macros to avoid needing export.h for THIS_MODULE */
+/*! 2016.08.20 study -ing */
+/*! THIS_MODULE : ((struct module *)0) */
 #define irq_alloc_descs(irq, from, cnt, node)	\
 	__irq_alloc_descs(irq, from, cnt, node, THIS_MODULE)
 

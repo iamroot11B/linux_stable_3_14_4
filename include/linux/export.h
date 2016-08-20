@@ -33,6 +33,7 @@ struct kernel_symbol
 extern struct module __this_module;
 #define THIS_MODULE (&__this_module)
 #else
+/*! 2016.08.20 study -ing */
 #define THIS_MODULE ((struct module *)0)
 #endif
 

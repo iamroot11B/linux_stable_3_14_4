@@ -6,6 +6,7 @@
 
 #ifndef __ASSEMBLY__
 
+/*! 2016.08.20 study -ing */
 #define DECLARE_BITMAP(name,bits) \
 	unsigned long name[BITS_TO_LONGS(bits)]
 

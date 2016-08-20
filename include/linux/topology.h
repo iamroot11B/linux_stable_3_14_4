@@ -217,8 +217,10 @@ static inline void set_cpu_numa_node(int cpu, int node)
 
 /* Returns the number of the current Node. */
 #ifndef numa_node_id
+/*! 2016.08.20 study -ing */
 static inline int numa_node_id(void)
 {
+	/*! return 0 */
 	return cpu_to_node(raw_smp_processor_id());
 }
 #endif

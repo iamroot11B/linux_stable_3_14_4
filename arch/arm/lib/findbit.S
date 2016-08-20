@@ -42,7 +42,7 @@ ENDPROC(_find_first_zero_bit_le)
  * Purpose  : Find next 'zero' bit
  * Prototype: int find_next_zero_bit(void *addr, unsigned int maxbit, int offset)
  */
-/*!	메모리 p 의 off 번째 비트부터 첫번째 찾은 0 인 비트값을 돌려줌 */
+/*!	메모리 p 의 off 번째 비트부터 첫번째 찾은 0 인 비트가 몇번 째인지 돌려줌 */
 ENTRY(_find_next_zero_bit_le)
 		teq	r1, #0
 		beq	3b

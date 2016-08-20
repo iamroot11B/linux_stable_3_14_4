@@ -32,6 +32,7 @@
 /* Other architectures wishing to use this simple topology API should fill
    in the below functions as appropriate in their own <asm/topology.h> file. */
 #ifndef cpu_to_node
+/*! 2016.08.20 study -ing */
 #define cpu_to_node(cpu)	((void)(cpu),0)
 #endif
 #ifndef set_numa_node

@@ -874,6 +874,10 @@ const struct irq_domain_ops gic_irq_domain_ops = {
 	.xlate = gic_irq_domain_xlate,
 };
 
+/*! 2016.08.20 study -ing */
+/*!
+ * gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset, node);
+ */
 void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 			   void __iomem *dist_base, void __iomem *cpu_base,
 			   u32 percpu_offset, struct device_node *node)
@@ -887,6 +891,12 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 	gic = &gic_data[gic_nr];
 #ifdef CONFIG_GIC_NON_BANKED
 	if (percpu_offset) { /* Frankein-GIC without banked registers... */
+		/*!
+		 * gic의 dist_base.percpu_base, cpu_base.percpu_base에 alloc 하고
+		 * 각각 매개변수로 초기화 및 get_base 함수 포인터를 gic_get_percpu_base로 초기화
+		 * (offset이 있으면 offset을 계산해서 초기화함)
+		 */
+
 		unsigned int cpu;
 
 		gic->dist_base.percpu_base = alloc_percpu(void __iomem *);
@@ -911,6 +921,11 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 		WARN(percpu_offset,
 		     "GIC_NON_BANKED not enabled, ignoring %08x offset!",
 		     percpu_offset);
+		/*!
+		 * dist_base.common_base, cpu_base.common_base를 매개변수로 초기화 하고
+		 * get_base 함수 포인터를 gic_get_common_base로 초기화 (CONFIG_GIC_NON_BANKED=y일 때)
+		 */
+
 		gic->dist_base.common_base = dist_base;
 		gic->cpu_base.common_base = cpu_base;
 		gic_set_base_accessor(gic, gic_get_common_base);
@@ -927,11 +942,24 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 	 * For primary GICs, skip over SGIs.
 	 * For secondary GICs, skip over PPIs, too.
 	 */
+	/*!
+	 * SGI: Software-genarated Interrupt
+	 * PPI: Private Peripheral Interrupt
+	 *
+	 * irq_start: -1,
+	 * irq_start & 0x1f = 0x1f
+	 */
 	if (gic_nr == 0 && (irq_start & 31) > 0) {
+		/*! 5번째 bit만 Set */
 		hwirq_base = 16;
 		if (irq_start != -1)
+			/*!
+			 * irq_start & ~31 = 하위 5개 bit Clear
+			 * +16 = 하위 5번째 bit Set
+			 */
 			irq_start = (irq_start & ~31) + 16;
 	} else {
+		/*! 6번째 bit만 Set */
 		hwirq_base = 32;
 	}
 
@@ -939,13 +967,25 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 	 * Find out how many interrupts are supported.
 	 * The GIC only supports up to 1020 interrupt sources.
 	 */
+	/*! Interrupt Controller Type Register, GICD_TYPER를 읽어서 하위 5bit만 쓴다.
+	 * 하위 5 bit : ITLineNumber : GIC가 지원하는 인터럽트의 최대 갯수
+	 * http://www.cl.cam.ac.uk/research/srg/han/ACS-P35/zynq/arm_gic_architecture_specification.pdf
+	 * -> 88 Page 참고
+	 */
 	gic_irqs = readl_relaxed(gic_data_dist_base(gic) + GIC_DIST_CTR) & 0x1f;
+	/*!
+	 * (vexpress) gic_irqs = 2 였음 : gic Line 갯수
+	 * 각 gic Line당 4바이트
+	 */
 	gic_irqs = (gic_irqs + 1) * 32;
 	if (gic_irqs > 1020)
 		gic_irqs = 1020;
 	gic->gic_irqs = gic_irqs;
 
+	/*! (vexpress) gic_irqs = 96임 */
+
 	gic_irqs -= hwirq_base; /* calculate # of irqs to allocate */
+	/*! numa_node_id() : 0 */
 	irq_base = irq_alloc_descs(irq_start, 16, gic_irqs, numa_node_id());
 	if (IS_ERR_VALUE(irq_base)) {
 		WARN(1, "Cannot allocate irq_descs @ IRQ%d, assuming pre-allocated\n",
@@ -1001,6 +1041,7 @@ int __init gic_of_init(struct device_node *node, struct device_node *parent)
 		percpu_offset = 0;
 
 	/*! 2016.08.06 study end */
+	/*! 2016.08.20 study start */
 	gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset, node);
 	if (!gic_cnt)
 		gic_init_physaddr(node);

@@ -104,6 +104,10 @@ int nr_irqs = NR_IRQS;
 EXPORT_SYMBOL_GPL(nr_irqs);
 
 static DEFINE_MUTEX(sparse_irq_lock);
+/*! 2016.08.20 study -ing */
+/*! unsigned long allocated_irqs[BITS_TO_LONGS(IRQ_BITMAP_BITS)]
+ * unsigned long allocated_irqs[257]
+ */
 static DECLARE_BITMAP(allocated_irqs, IRQ_BITMAP_BITS);
 
 #ifdef CONFIG_SPARSE_IRQ
@@ -361,6 +365,8 @@ EXPORT_SYMBOL_GPL(irq_free_descs);
  *
  * Returns the first irq number or error code
  */
+/*! 2016.08.20 study -ing */
+/*! irq_alloc_descs(irq_start:-1, 16, gic_irqs:96, numa_node_id():0, THIS_MODULE:NULL); */
 int __ref
 __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 		  struct module *owner)
@@ -378,6 +384,10 @@ __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 
 	mutex_lock(&sparse_irq_lock);
 
+	/*!
+	 * IRQ_BITMAP_BITS: 8212
+	 * unsigned long allocated_irqs[257]
+	 */
 	start = bitmap_find_next_zero_area(allocated_irqs, IRQ_BITMAP_BITS,
 					   from, cnt, 0);
 	ret = -EEXIST;

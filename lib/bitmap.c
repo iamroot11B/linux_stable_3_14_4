@@ -327,6 +327,10 @@ EXPORT_SYMBOL(bitmap_clear);
  * the bit offset of all zero areas this function finds is multiples of that
  * power of 2. A @align_mask of 0 means no alignment is required.
  */
+/*! 2016.08.20 study -ing */
+/*! bitmap_find_next_zero_area(allocated_irqs, IRQ_BITMAP_BITS(8212), from(16), cnt(96), 0);
+ * size크기인 map의 start부터, nr개만큼 연속해서 0인 bit의 index를 찾는다. 
+ */
 unsigned long bitmap_find_next_zero_area(unsigned long *map,
 					 unsigned long size,
 					 unsigned long start,
@@ -334,6 +338,8 @@ unsigned long bitmap_find_next_zero_area(unsigned long *map,
 					 unsigned long align_mask)
 {
 	unsigned long index, end, i;
+
+	/*! 2016.08.20 study end */
 again:
 	index = find_next_zero_bit(map, size, start);
 

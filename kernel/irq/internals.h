@@ -8,6 +8,8 @@
 #include <linux/irqdesc.h>
 
 #ifdef CONFIG_SPARSE_IRQ
+/*! 2016.08.20 study -ing */
+/*! NR_IRQS(16) + 8196 = 8212 */
 # define IRQ_BITMAP_BITS	(NR_IRQS + 8196)
 #else
 # define IRQ_BITMAP_BITS	NR_IRQS
