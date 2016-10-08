@@ -180,6 +180,8 @@ struct irq_domain *irq_domain_add_legacy(struct device_node *of_node,
 	if (!domain)
 		return NULL;
 
+	/*! 2016.10.08 study end */
+
 	irq_domain_associate_many(domain, first_irq, first_hwirq, size);
 
 	return domain;
@@ -270,7 +272,6 @@ static void irq_domain_disassociate(struct irq_domain *domain, unsigned int irq)
 	}
 }
 
-/*! 2016.10.08 study -ing */
 int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 			 irq_hw_number_t hwirq)
 {
@@ -326,7 +327,6 @@ int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 }
 EXPORT_SYMBOL_GPL(irq_domain_associate);
 
-/*! 2016.10.08 study -ing */
 void irq_domain_associate_many(struct irq_domain *domain, unsigned int irq_base,
 			       irq_hw_number_t hwirq_base, int count)
 {
