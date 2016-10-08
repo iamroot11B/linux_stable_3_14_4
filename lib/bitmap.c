@@ -273,6 +273,8 @@ int __bitmap_weight(const unsigned long *bitmap, int bits)
 }
 EXPORT_SYMBOL(__bitmap_weight);
 
+/*! 2016.10.08 study -ing */
+/*! map의 start번 째 bit부터 nr개만큼 set한다 */
 void bitmap_set(unsigned long *map, int start, int nr)
 {
 	unsigned long *p = map + BIT_WORD(start);
@@ -280,6 +282,10 @@ void bitmap_set(unsigned long *map, int start, int nr)
 	int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
 	unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
 
+	/*!
+	 * BITS_PER_LONG(32)보다 set할 bit가 많이 남았으면, BITS_PER_LONG(32)개 씩 set한다.
+	 * 단, 첫번 째 set에서는, start의 위치를 고려해서 set 안하는 bit가 있음
+	 */
 	while (nr - bits_to_set >= 0) {
 		*p |= mask_to_set;
 		nr -= bits_to_set;
@@ -287,6 +293,7 @@ void bitmap_set(unsigned long *map, int start, int nr)
 		mask_to_set = ~0UL;
 		p++;
 	}
+	/*! BITS_PER_LONG(32) 보다 적은 갯수의 bit를 set함 */
 	if (nr) {
 		mask_to_set &= BITMAP_LAST_WORD_MASK(size);
 		*p |= mask_to_set;
@@ -340,17 +347,24 @@ unsigned long bitmap_find_next_zero_area(unsigned long *map,
 	unsigned long index, end, i;
 
 	/*! 2016.08.20 study end */
+	/*! 2016.10.08 study start */
 again:
+	/*! map의 start에서 부터 0을 찾아서 그 index를 리턴 */
 	index = find_next_zero_bit(map, size, start);
 
 	/* Align allocation */
+	/*! align_mask는, (x^2-1)인 수를 받아서 (x^2)의 배수로 올림(ALIGN) 한다 */
 	index = __ALIGN_MASK(index, align_mask);
 
+	/*! 탐색 범위가 map의 크기를 벗어났는가? */
 	end = index + nr;
 	if (end > size)
 		return end;
+
+	/*! map에서 index부터 end까지 1을 찾는다 */
 	i = find_next_bit(map, end, index);
 	if (i < end) {
+		/*! index~end 사이에 1이 있었으므로, 그 위치부터 다시 찾는다 */
 		start = i + 1;
 		goto again;
 	}

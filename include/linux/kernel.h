@@ -51,6 +51,7 @@
  */
 /*! 2015.10.24 study -ing */
 #define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
+/*! 2016.10.08 study -ing */
 #define __ALIGN_MASK(x, mask)	__ALIGN_KERNEL_MASK((x), (mask))
 #define PTR_ALIGN(p, a)		((typeof(p))ALIGN((unsigned long)(p), (a)))
 #define IS_ALIGNED(x, a)		(((x) & ((typeof(x))(a) - 1)) == 0)

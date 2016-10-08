@@ -36,6 +36,8 @@ static struct irq_domain *irq_default_domain;
  * register allocated irq_domain with irq_domain_register().  Returns pointer
  * to IRQ domain, or NULL on failure.
  */
+/*! 2016.10.08 study -ing */
+/*! irq domain을 동적할당하고, 초기화 해서, domain 리스트에 추가함 */
 struct irq_domain *__irq_domain_add(struct device_node *of_node, int size,
 				    irq_hw_number_t hwirq_max, int direct_max,
 				    const struct irq_domain_ops *ops,
@@ -163,6 +165,7 @@ EXPORT_SYMBOL_GPL(irq_domain_add_simple);
  * for all legacy interrupts except 0 (which is always the invalid irq for
  * a legacy controller).
  */
+/*! 2016.10.08 study -ing */
 struct irq_domain *irq_domain_add_legacy(struct device_node *of_node,
 					 unsigned int size,
 					 unsigned int first_irq,
@@ -267,6 +270,7 @@ static void irq_domain_disassociate(struct irq_domain *domain, unsigned int irq)
 	}
 }
 
+/*! 2016.10.08 study -ing */
 int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 			 irq_hw_number_t hwirq)
 {
@@ -322,6 +326,7 @@ int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 }
 EXPORT_SYMBOL_GPL(irq_domain_associate);
 
+/*! 2016.10.08 study -ing */
 void irq_domain_associate_many(struct irq_domain *domain, unsigned int irq_base,
 			       irq_hw_number_t hwirq_base, int count)
 {

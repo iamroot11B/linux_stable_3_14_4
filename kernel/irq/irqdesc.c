@@ -189,6 +189,8 @@ static void free_desc(unsigned int irq)
 	kfree(desc);
 }
 
+/*! 2016.10.08 study -ing */
+/*! start 부터 cnt 갯수 만큼 irq Descriptor를 메모리 할다하고 트리에 추가함 */
 static int alloc_descs(unsigned int start, unsigned int cnt, int node,
 		       struct module *owner)
 {
@@ -376,6 +378,7 @@ __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 	if (!cnt)
 		return -EINVAL;
 
+	/*! irq 번호를 지정했을 때, 매개변수가 올바른지 확인 */
 	if (irq >= 0) {
 		if (from > irq)
 			return -EINVAL;
@@ -385,21 +388,28 @@ __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 	mutex_lock(&sparse_irq_lock);
 
 	/*!
-	 * IRQ_BITMAP_BITS: 8212
+	 * NR_IRQS: 16
+	 * IRQ_BITMAP_BITS: (NR_IRQS + 8196) = 8212
 	 * unsigned long allocated_irqs[257]
 	 */
 	start = bitmap_find_next_zero_area(allocated_irqs, IRQ_BITMAP_BITS,
 					   from, cnt, 0);
 	ret = -EEXIST;
+	/*! irq 번호를 지정했을 때, 지정 위치의 bit가 사용 불가능한가? */
 	if (irq >=0 && start != irq)
 		goto err;
 
 	if (start + cnt > nr_irqs) {
+		/*!
+		 * 새로 추가하는 irq가 현재 irq(nr_irqs)를 넘어서면, nr_irqs를 갱신함
+		 * 그 때, 최대값(IRQ_BITMAP_BITS)보다 크면 여기서 에러난다.
+		 */
 		ret = irq_expand_nr_irqs(start + cnt);
 		if (ret)
 			goto err;
 	}
 
+	/* 찾은 빈 영역을 사용처리 */
 	bitmap_set(allocated_irqs, start, cnt);
 	mutex_unlock(&sparse_irq_lock);
 	return alloc_descs(start, cnt, node, owner);

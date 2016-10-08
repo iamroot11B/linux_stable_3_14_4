@@ -146,6 +146,7 @@ extern int bitmap_allocate_region(unsigned long *bitmap, int pos, int order);
 extern void bitmap_copy_le(void *dst, const unsigned long *src, int nbits);
 extern int bitmap_ord_to_pos(const unsigned long *bitmap, int n, int bits);
 
+/*! 2016.10.08 study -ing */
 #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) % BITS_PER_LONG))
 /*! 2016.07.09 study -ing */
 #define BITMAP_LAST_WORD_MASK(nbits)					\
