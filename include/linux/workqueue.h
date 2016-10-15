@@ -248,7 +248,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
 	do {								\
 		__INIT_WORK((_work), (_func), 1);			\
 	} while (0)
-
+/*! 2016.10.15 study -ing */
 #define __INIT_DELAYED_WORK(_work, _func, _tflags)			\
 	do {								\
 		INIT_WORK(&(_work)->work, (_func));			\
@@ -265,7 +265,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
 				       (unsigned long)(_work),		\
 				       (_tflags) | TIMER_IRQSAFE);	\
 	} while (0)
-
+/*! 2016.10.15 study -ing */
 #define INIT_DELAYED_WORK(_work, _func)					\
 	__INIT_DELAYED_WORK(_work, _func, 0)
 

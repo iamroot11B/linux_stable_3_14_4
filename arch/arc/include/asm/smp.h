@@ -14,7 +14,7 @@
 #include <linux/types.h>
 #include <linux/init.h>
 #include <linux/threads.h>
-
+/*! 2016.10.15 study -ing */
 #define raw_smp_processor_id() (current_thread_info()->cpu)
 
 /* including cpumask.h leads to cyclic deps hence this Forward declaration */

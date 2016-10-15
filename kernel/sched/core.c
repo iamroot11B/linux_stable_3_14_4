@@ -1336,6 +1336,7 @@ out:
 /*
  * The caller (fork, wakeup) owns p->pi_lock, ->cpus_allowed is stable.
  */
+/*! 2016.10.15 study -ing */
 static inline
 int select_task_rq(struct task_struct *p, int cpu, int sd_flags, int wake_flags)
 {
@@ -1581,6 +1582,7 @@ static void ttwu_queue(struct task_struct *p, int cpu)
  * Return: %true if @p was woken up, %false if it was already running.
  * or @state didn't match @p's state.
  */
+/*! 2016.10.15 study -ing */
 static int
 try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 {
@@ -1593,7 +1595,9 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 	 * reordered with p->state check below. This pairs with mb() in
 	 * set_current_state() the waiting thread does.
 	 */
+	/*! 배리어  */
 	smp_mb__before_spinlock();
+	/*! spin lock 걸고, */
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
 	if (!(p->state & state))
 		goto out;
@@ -1616,6 +1620,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 	 */
 	smp_rmb();
 
+	/*! p task_struct의 변수들 업데이트 */  */
 	p->sched_contributes_to_load = !!task_contributes_to_load(p);
 	p->state = TASK_WAKING;
 
@@ -1686,6 +1691,7 @@ out:
  * It may be assumed that this function implies a write memory barrier before
  * changing the task state if and only if any tasks are woken up.
  */
+/*! 2016.10.15 study -ing */
 int wake_up_process(struct task_struct *p)
 {
 	WARN_ON(task_is_stopped_or_traced(p));
@@ -2741,7 +2747,7 @@ need_resched:
 	if (need_resched())
 		goto need_resched;
 }
-
+/*! 2016.10.15 study -ing */
 static inline void sched_submit_work(struct task_struct *tsk)
 {
 	if (!tsk->state || tsk_is_pi_blocked(tsk))
@@ -2753,12 +2759,13 @@ static inline void sched_submit_work(struct task_struct *tsk)
 	if (blk_needs_flush_plug(tsk))
 		blk_schedule_flush_plug(tsk);
 }
-
+/*! 2016.10.15 study -ing */
+/*! schedule 자세히 안 봄 */
 asmlinkage void __sched schedule(void)
 {
 	struct task_struct *tsk = current;
 
-	sched_submit_work(tsk);
+	sched_submit_work(tsk);	
 	__schedule();
 }
 EXPORT_SYMBOL(schedule);

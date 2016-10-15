@@ -77,7 +77,7 @@ do {									\
 
 #define read_barrier_depends()		do { } while(0)
 #define smp_read_barrier_depends()	do { } while(0)
-
+/*! 2016.10.15 study -ing */
 #define set_mb(var, value)	do { var = value; smp_mb(); } while (0)
 
 #endif /* !__ASSEMBLY__ */

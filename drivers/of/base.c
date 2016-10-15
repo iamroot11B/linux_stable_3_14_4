@@ -881,10 +881,12 @@ EXPORT_SYMBOL(of_match_node);
  *	Returns a node pointer with refcount incremented, use
  *	of_node_put() on it when done.
  */
+/*! 2016.10.15 study -ing */
 struct device_node *of_find_matching_node_and_match(struct device_node *from,
 					const struct of_device_id *matches,
 					const struct of_device_id **match)
 {
+	/*! __of_match_node를 통해 matches에서 가장 호환성이 좋은 node를 찾아서 *match에 대입  */
 	struct device_node *np;
 	const struct of_device_id *m;
 	unsigned long flags;

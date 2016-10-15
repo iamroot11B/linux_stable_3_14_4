@@ -105,7 +105,7 @@ static void __init add_clocksource(struct device_node *source_timer)
 	sched_io_base = iobase + 0x04;
 	sched_rate = rate;
 }
-
+/*! 2016.10.15 study -ing */
 static u64 read_sched_clock(void)
 {
 	return ~__raw_readl(sched_io_base);

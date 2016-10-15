@@ -2534,6 +2534,7 @@ EXPORT_SYMBOL_GPL(of_clk_get_parent_name);
  * This function scans the device tree for matching clock providers and
  * calls their initialization functions
  */
+/*! 2016.10.15 study -ing */
 void __init of_clk_init(const struct of_device_id *matches)
 {
 	const struct of_device_id *match;
@@ -2542,7 +2543,9 @@ void __init of_clk_init(const struct of_device_id *matches)
 	if (!matches)
 		matches = &__clk_of_table;
 
+	/*! __of_match_node를 통해 matches에서 가장 호환성이 좋은 node를 찾아서 *match에 대입  */
 	for_each_matching_node_and_match(np, matches, &match) {
+		/*! 찾은 match의 match->data를 통해 clk_init_cb 수행  */
 		of_clk_init_cb_t clk_init_cb = match->data;
 		clk_init_cb(np);
 	}

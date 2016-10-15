@@ -293,7 +293,7 @@ static inline raw_spinlock_t *spinlock_check(spinlock_t *lock)
 {
 	return &lock->rlock;
 }
-
+/*! 2016.10.15 study -ing */
 #define spin_lock_init(_lock)				\
 do {							\
 	spinlock_check(_lock);				\

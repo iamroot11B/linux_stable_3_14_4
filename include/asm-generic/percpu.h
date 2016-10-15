@@ -69,7 +69,7 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
 #else
 #define this_cpu_ptr(ptr) __this_cpu_ptr(ptr)
 #endif
-
+/*! 2016.10.15 study -ing */
 #define __get_cpu_var(var) (*this_cpu_ptr(&(var)))
 /*! 2016.07.09 study -ing */
 #define __raw_get_cpu_var(var) (*__this_cpu_ptr(&(var)))

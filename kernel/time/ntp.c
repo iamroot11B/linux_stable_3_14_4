@@ -205,6 +205,7 @@ static inline s64 ntp_offset_chunk(s64 offset)
 }
 
 static inline void pps_reset_freq_interval(void) {}
+/*! 2016.10.15 study -ing */
 static inline void pps_clear(void) {}
 static inline void pps_dec_valid(void) {}
 static inline void pps_set_freq(s64 freq) {}
@@ -248,8 +249,10 @@ static inline int ntp_synced(void)
  * Update (tick_length, tick_length_base, tick_nsec), based
  * on (tick_usec, ntp_tick_adj, time_freq):
  */
+/*! 2016.10.15 study -ing */
 static void ntp_update_frequency(void)
 {
+	/*! tick_length, tick_length_base, tick_nsec 변수들 업데이트  */
 	u64 second_length;
 	u64 new_base;
 
@@ -338,19 +341,23 @@ static void ntp_update_offset(long offset)
 /**
  * ntp_clear - Clears the NTP state variables
  */
+/*! 2016.10.15 study -ing */
 void ntp_clear(void)
 {
+	/*! time_... 변수들 업데이트  */
 	time_adjust	= 0;		/* stop active adjtime() */
 	time_status	|= STA_UNSYNC;
 	time_maxerror	= NTP_PHASE_LIMIT;
 	time_esterror	= NTP_PHASE_LIMIT;
 
+	/*! tick_length, tick_length_base, tick_nsec 변수들 업데이트  */
 	ntp_update_frequency();
 
 	tick_length	= tick_length_base;
 	time_offset	= 0;
 
 	/* Clear PPS state variables */
+	/*! Do nothing  */
 	pps_clear();
 }
 
@@ -929,8 +936,9 @@ static int __init ntp_tick_adj_setup(char *str)
 }
 
 __setup("ntp_tick_adj=", ntp_tick_adj_setup);
-
+/*! 2016.10.15 study -ing */
 void __init ntp_init(void)
 {
+	/*! ntp.c 내 static 변수들 값 설정  */
 	ntp_clear();
 }

@@ -1068,7 +1068,7 @@ static inline void blk_flush_plug(struct task_struct *tsk)
 	if (plug)
 		blk_flush_plug_list(plug, false);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void blk_schedule_flush_plug(struct task_struct *tsk)
 {
 	struct blk_plug *plug = tsk->plug;
@@ -1076,11 +1076,12 @@ static inline void blk_schedule_flush_plug(struct task_struct *tsk)
 	if (plug)
 		blk_flush_plug_list(plug, true);
 }
-
+/*! 2016.10.15 study -ing */
 static inline bool blk_needs_flush_plug(struct task_struct *tsk)
 {
 	struct blk_plug *plug = tsk->plug;
 
+	/*! plug의 list, mq_list, cb_list 중 하나라도 empty이면 true 리턴 */
 	return plug &&
 		(!list_empty(&plug->list) ||
 		 !list_empty(&plug->mq_list) ||

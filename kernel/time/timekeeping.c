@@ -49,7 +49,7 @@ static inline void tk_normalize_xtime(struct timekeeper *tk)
 		tk->xtime_sec++;
 	}
 }
-
+/*! 2016.10.15 study -ing */
 static void tk_set_xtime(struct timekeeper *tk, const struct timespec *ts)
 {
 	tk->xtime_sec = ts->tv_sec;
@@ -62,7 +62,7 @@ static void tk_xtime_add(struct timekeeper *tk, const struct timespec *ts)
 	tk->xtime_nsec += (u64)ts->tv_nsec << tk->shift;
 	tk_normalize_xtime(tk);
 }
-
+/*! 2016.10.15 study -ing */
 static void tk_set_wall_to_mono(struct timekeeper *tk, struct timespec wtm)
 {
 	struct timespec tmp;
@@ -79,7 +79,7 @@ static void tk_set_wall_to_mono(struct timekeeper *tk, struct timespec wtm)
 	tk->offs_real = timespec_to_ktime(tmp);
 	tk->offs_tai = ktime_add(tk->offs_real, ktime_set(tk->tai_offset, 0));
 }
-
+/*! 2016.10.15 study -ing */
 static void tk_set_sleep_time(struct timekeeper *tk, struct timespec t)
 {
 	/* Verify consistency before modifying */
@@ -100,6 +100,7 @@ static void tk_set_sleep_time(struct timekeeper *tk, struct timespec t)
  *
  * Unless you're the timekeeping code, you should not be using this!
  */
+/*! 2016.10.15 study -ing */
 static void tk_setup_internals(struct timekeeper *tk, struct clocksource *clock)
 {
 	cycle_t interval;
@@ -784,6 +785,7 @@ void __attribute__((weak)) read_boot_clock(struct timespec *ts)
 /*
  * timekeeping_init - Initializes the clocksource and common timekeeping values
  */
+/*! 2016.10.15 study -ing */
 void __init timekeeping_init(void)
 {
 	struct timekeeper *tk = &timekeeper;
@@ -791,16 +793,21 @@ void __init timekeeping_init(void)
 	unsigned long flags;
 	struct timespec now, boot, tmp;
 
+	/*! now->tv_sec 과 now->tv_nsec를 0으로 설정 */
 	read_persistent_clock(&now);
 
+	/*! now->tv_sec, tv_nsec 값을 보는데, 둘다 0이므로 true 리턴  */
 	if (!timespec_valid_strict(&now)) {
 		pr_warn("WARNING: Persistent clock returned invalid value!\n"
 			"         Check your CMOS/BIOS settings.\n");
+		/*! false 리턴 되면 아래처럼 tv_sec, tv_nsec 0으로 설정.  */
 		now.tv_sec = 0;
 		now.tv_nsec = 0;
 	} else if (now.tv_sec || now.tv_nsec)
 		persistent_clock_exist = true;
+	/*! now.tv_sec, now.tv_nsec 둘 다 0 */
 
+	/*! boot->tv_sec 과 boot->tv_nsec를 0으로 설정 */
 	read_boot_clock(&boot);
 	if (!timespec_valid_strict(&boot)) {
 		pr_warn("WARNING: Boot clock returned invalid value!\n"
@@ -809,31 +816,43 @@ void __init timekeeping_init(void)
 		boot.tv_nsec = 0;
 	}
 
+	/*! spin lock 락  */
 	raw_spin_lock_irqsave(&timekeeper_lock, flags);
+	/*! timekeeper_seq->sequence 를 ++ 해준다. */
 	write_seqcount_begin(&timekeeper_seq);
 	ntp_init();
 
+	/*! clocksource_jiffies 리턴  */
 	clock = clocksource_default_clock();
+	/*! clocksource_jiffies의 enable은 NULL  */
 	if (clock->enable)
 		clock->enable(clock);
+	/*! clock을 이용해 tk 값 설정  */
 	tk_setup_internals(tk, clock);
 
+	/*! tk의 xtime_sec, xtime_nsec 설정  */
 	tk_set_xtime(tk, &now);
 	tk->raw_time.tv_sec = 0;
 	tk->raw_time.tv_nsec = 0;
+	/*! boot의 tv_sec, tv_nsec 기본값 0  -> tk를 이용해 boot 값 변경. */
 	if (boot.tv_sec == 0 && boot.tv_nsec == 0)
 		boot = tk_xtime(tk);
 
+	/*! tmp의 sec, nsec을 업데이트  */
 	set_normalized_timespec(&tmp, -boot.tv_sec, -boot.tv_nsec);
+	/*! tk의 wall_to_monotonic, offs_real, offs_tai 값을 tmp 이용해서 업데이트 */
 	tk_set_wall_to_mono(tk, tmp);
 
 	tmp.tv_sec = 0;
 	tmp.tv_nsec = 0;
+	/*! tk의 total_sleep_time, offs_boot 값을 tmp를 이용해 업데이트  */
 	tk_set_sleep_time(tk, tmp);
 
 	memcpy(&shadow_timekeeper, &timekeeper, sizeof(timekeeper));
 
+	/*! timekeeper_seq->sequence++;  */
 	write_seqcount_end(&timekeeper_seq);
+	/*! spin lock 언락  */
 	raw_spin_unlock_irqrestore(&timekeeper_lock, flags);
 }
 

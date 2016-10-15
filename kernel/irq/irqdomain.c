@@ -181,6 +181,7 @@ struct irq_domain *irq_domain_add_legacy(struct device_node *of_node,
 		return NULL;
 
 	/*! 2016.10.08 study end */
+	/*! 2016.10.15 study start */
 
 	irq_domain_associate_many(domain, first_irq, first_hwirq, size);
 
@@ -271,10 +272,15 @@ static void irq_domain_disassociate(struct irq_domain *domain, unsigned int irq)
 		mutex_unlock(&revmap_trees_mutex);
 	}
 }
-
+/*! 2016.10.15 study -ing */
 int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 			 irq_hw_number_t hwirq)
 {
+	/*!
+	 * virq 번호로 irq_desc_tree에서 해당하는 irq_desc를 찾은 후,
+	 * irq_desc->irg_data를 얻어 온다.
+	 */
+
 	struct irq_data *irq_data = irq_get_irq_data(virq);
 	int ret;
 
@@ -287,8 +293,11 @@ int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 		return -EINVAL;
 
 	mutex_lock(&irq_domain_mutex);
+	/*! 위에서 찾아온 irq_data에 hwirq, domain 대입  */
 	irq_data->hwirq = hwirq;
 	irq_data->domain = domain;
+
+	/*! from gic_init_base 함수. ops->map : gic_irq_domain_map  */
 	if (domain->ops->map) {
 		ret = domain->ops->map(domain, virq, hwirq);
 		if (ret != 0) {
@@ -312,21 +321,28 @@ int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 			domain->name = irq_data->chip->name;
 	}
 
+	/*! hwirq 번호가 domain->revmap_size보다 작으면 linear_revmap[hwirq]에 virq를 넣어주고,
+	 *  (대부분 이 구문 수행)
+	 */
 	if (hwirq < domain->revmap_size) {
 		domain->linear_revmap[hwirq] = virq;
 	} else {
+		/* hwirq >= domain->revmap_size 이면 radix tree에 irq_data insert  */
 		mutex_lock(&revmap_trees_mutex);
 		radix_tree_insert(&domain->revmap_tree, hwirq, irq_data);
 		mutex_unlock(&revmap_trees_mutex);
 	}
 	mutex_unlock(&irq_domain_mutex);
 
+	/*! virq로 해당하는 desc를 찾은 후에,
+	 *  desc->status_use_accessors의 IRQ_NOREQUEST bit를 clear
+	 */
 	irq_clear_status_flags(virq, IRQ_NOREQUEST);
 
 	return 0;
 }
 EXPORT_SYMBOL_GPL(irq_domain_associate);
-
+/*! 2016.10.15 study -ing */
 void irq_domain_associate_many(struct irq_domain *domain, unsigned int irq_base,
 			       irq_hw_number_t hwirq_base, int count)
 {
@@ -390,6 +406,7 @@ EXPORT_SYMBOL_GPL(irq_create_direct_mapping);
  * If the sense/trigger is to be specified, set_irq_type() should be called
  * on the number returned from that call.
  */
+/*! 2016.10.15 study -ing */
 unsigned int irq_create_mapping(struct irq_domain *domain,
 				irq_hw_number_t hwirq)
 {
@@ -408,8 +425,10 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
 	pr_debug("-> using domain @%p\n", domain);
 
 	/* Check if mapping already exists */
+	/*! domain에서 hwirq를 이용해 virq를 찾는다.  */
 	virq = irq_find_mapping(domain, hwirq);
 	if (virq) {
+		/*! 찾았으면(이미 존재하면) 찾은 virq 리턴  */
 		pr_debug("-> existing mapping on virq %d\n", virq);
 		return virq;
 	}
@@ -418,6 +437,7 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
 	hint = hwirq % nr_irqs;
 	if (hint == 0)
 		hint++;
+	/*! irq alloc  */
 	virq = irq_alloc_desc_from(hint, of_node_to_nid(domain->of_node));
 	if (virq <= 0)
 		virq = irq_alloc_desc_from(1, of_node_to_nid(domain->of_node));
@@ -426,7 +446,11 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
 		return 0;
 	}
 
+	/*! alloc 성공한 virq를 이용하여 irq_domain_associate 수행
+	 * 정상적으로 수행 시 0 리턴
+	 */
 	if (irq_domain_associate(domain, virq, hwirq)) {
+		/*! irq_domain_associate 실패 시 -값 리턴 -> free  수행.  */
 		irq_free_desc(virq);
 		return 0;
 	}
@@ -434,6 +458,7 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
 	pr_debug("irq %lu on domain %s mapped to virtual irq %u\n",
 		hwirq, of_node_full_name(domain->of_node), virq);
 
+	/*! irq_domain_associate까지 성공한 virq를 리턴  */
 	return virq;
 }
 EXPORT_SYMBOL_GPL(irq_create_mapping);
@@ -470,7 +495,7 @@ int irq_create_strict_mappings(struct irq_domain *domain, unsigned int irq_base,
 	return 0;
 }
 EXPORT_SYMBOL_GPL(irq_create_strict_mappings);
-
+/*! 2016.10.15 study -ing */
 unsigned int irq_create_of_mapping(struct of_phandle_args *irq_data)
 {
 	struct irq_domain *domain;
@@ -478,6 +503,7 @@ unsigned int irq_create_of_mapping(struct of_phandle_args *irq_data)
 	unsigned int type = IRQ_TYPE_NONE;
 	unsigned int virq;
 
+	/*! domain을 찾고,  */
 	domain = irq_data->np ? irq_find_host(irq_data->np) : irq_default_domain;
 	if (!domain) {
 		pr_warn("no irq domain found for %s !\n",
@@ -485,24 +511,34 @@ unsigned int irq_create_of_mapping(struct of_phandle_args *irq_data)
 		return 0;
 	}
 
+	/*! hwirq를 찾고,  */
 	/* If domain has no translation, then we assume interrupt line */
 	if (domain->ops->xlate == NULL)
 		hwirq = irq_data->args[0];
 	else {
+		/*! xlate -> gic_irq_domain_xlate
+		 *  irq_data->args[1]을 이용해 hwirq 설정,
+		 *  irq_data->args[2]를 이용해 type 설정,
+		 *  정상적으로 설정 시 0 리턴
+		 */
 		if (domain->ops->xlate(domain, irq_data->np, irq_data->args,
 					irq_data->args_count, &hwirq, &type))
 			return 0;
 	}
 
+	/*! 찾은 domain과 hwirq를 이용해 irq_create_mapping */
 	/* Create mapping */
 	virq = irq_create_mapping(domain, hwirq);
 	if (!virq)
 		return virq;
 
 	/* Set type if specified and different than the current one */
+	/*! virq의 type의 앞서 찾은 type 결과와 일치하지 않으면 set irq type 추가 수행  */
 	if (type != IRQ_TYPE_NONE &&
 	    type != irq_get_trigger_type(virq))
 		irq_set_irq_type(virq, type);
+
+	/*! 최종 설정 완료된 virq 리턴  */
 	return virq;
 }
 EXPORT_SYMBOL_GPL(irq_create_of_mapping);
@@ -533,6 +569,7 @@ EXPORT_SYMBOL_GPL(irq_dispose_mapping);
  * @domain: domain owning this hardware interrupt
  * @hwirq: hardware irq number in that domain space
  */
+/*! 2016.10.15 study -ing */
 unsigned int irq_find_mapping(struct irq_domain *domain,
 			      irq_hw_number_t hwirq)
 {
@@ -544,6 +581,7 @@ unsigned int irq_find_mapping(struct irq_domain *domain,
 	if (domain == NULL)
 		return 0;
 
+	/*! hwirq 번호가 domain->revmap_direct_max_irq보다 작으면 아래 수행 */
 	if (hwirq < domain->revmap_direct_max_irq) {
 		data = irq_get_irq_data(hwirq);
 		if (data && (data->domain == domain) && (data->hwirq == hwirq))
@@ -551,12 +589,15 @@ unsigned int irq_find_mapping(struct irq_domain *domain,
 	}
 
 	/* Check if the hwirq is in the linear revmap. */
+	/*! hwirq < domain->revmap_size 이면 domain->linear_revmap에서 찾아서 리턴 */
 	if (hwirq < domain->revmap_size)
 		return domain->linear_revmap[hwirq];
 
 	rcu_read_lock();
+	/*! 위 조건들 해당 안하면 domain->revmap_tree에서 data를 찾는다.  */
 	data = radix_tree_lookup(&domain->revmap_tree, hwirq);
 	rcu_read_unlock();
+	/*! 찾은 data의 data->irq 리턴 */
 	return data ? data->irq : 0;
 }
 EXPORT_SYMBOL_GPL(irq_find_mapping);

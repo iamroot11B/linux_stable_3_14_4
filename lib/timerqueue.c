@@ -36,6 +36,7 @@
  * Adds the timer node to the timerqueue, sorted by the
  * node's expires value.
  */
+/*! 2016.10.15 study -ing */
 void timerqueue_add(struct timerqueue_head *head, struct timerqueue_node *node)
 {
 	struct rb_node **p = &head->head.rb_node;
@@ -69,6 +70,7 @@ EXPORT_SYMBOL_GPL(timerqueue_add);
  *
  * Removes the timer node from the timerqueue.
  */
+/*! 2016.10.15 study -ing */
 void timerqueue_del(struct timerqueue_head *head, struct timerqueue_node *node)
 {
 	WARN_ON_ONCE(RB_EMPTY_NODE(&node->node));

@@ -862,6 +862,7 @@ void __init idr_init_cache(void)
  * This function is use to set up the handle (@idp) that you will pass
  * to the rest of the functions.
  */
+/*! 2016.10.15 study -ing */
 void idr_init(struct idr *idp)
 {
 	memset(idp, 0, sizeof(struct idr));

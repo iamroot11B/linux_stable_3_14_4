@@ -213,6 +213,7 @@ struct clocksource {
 #define CLOCK_SOURCE_RESELECT			0x100
 
 /* simplify initialization of mask field */
+/*! 2016.10.15 study -ing */
 #define CLOCKSOURCE_MASK(bits) (cycle_t)((bits) < 64 ? ((1ULL<<(bits))-1) : -1)
 
 /**
@@ -276,6 +277,7 @@ static inline u32 clocksource_hz2mult(u32 hz, u32 shift_constant)
  *
  * XXX - This could use some mult_lxl_ll() asm optimization
  */
+/*! 2016.10.15 study -ing */
 static inline s64 clocksource_cyc2ns(cycle_t cycles, u32 mult, u32 shift)
 {
 	return ((u64) cycles * mult) >> shift;

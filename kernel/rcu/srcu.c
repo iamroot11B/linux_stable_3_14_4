@@ -43,6 +43,7 @@
 /*
  * Initialize an rcu_batch structure to empty.
  */
+/*! 2016.10.15 study -ing */
 static inline void rcu_batch_init(struct rcu_batch *b)
 {
 	b->head = NULL;
@@ -98,8 +99,10 @@ static inline void rcu_batch_move(struct rcu_batch *to, struct rcu_batch *from)
 	}
 }
 
+/*! 2016.10.15 study -ing */
 static int init_srcu_struct_fields(struct srcu_struct *sp)
 {
+	/*! sp의 각 변수들 초기화  */
 	sp->completed = 0;
 	spin_lock_init(&sp->queue_lock);
 	sp->running = false;
@@ -134,6 +137,7 @@ EXPORT_SYMBOL_GPL(__init_srcu_struct);
  * to any other function.  Each srcu_struct represents a separate domain
  * of SRCU protection.
  */
+/*! 2016.10.15 study -ing */
 int init_srcu_struct(struct srcu_struct *sp)
 {
 	return init_srcu_struct_fields(sp);

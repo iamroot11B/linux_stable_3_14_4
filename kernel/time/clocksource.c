@@ -132,6 +132,7 @@ EXPORT_SYMBOL_GPL(timecounter_cyc2time);
  * reduce the conversion accuracy by chosing smaller mult and shift
  * factors.
  */
+/*! 2016.10.15 study -ing */
 void
 clocks_calc_mult_shift(u32 *mult, u32 *shift, u32 from, u32 to, u32 maxsec)
 {
@@ -544,6 +545,7 @@ static u32 clocksource_max_adjustment(struct clocksource *cs)
  * @maxadj:	maximum adjustment value to mult (~11%)
  * @mask:	bitmask for two's complement subtraction of non 64 bit counters
  */
+/*! 2016.10.15 study -ing */
 u64 clocks_calc_max_nsecs(u32 mult, u32 shift, u32 maxadj, u64 mask)
 {
 	u64 max_nsecs, max_cycles;

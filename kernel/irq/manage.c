@@ -562,7 +562,7 @@ int can_request_irq(unsigned int irq, unsigned long irqflags)
 	irq_put_desc_unlock(desc, flags);
 	return canrequest;
 }
-
+/*! 2016.10.15 study -ing */
 int __irq_set_trigger(struct irq_desc *desc, unsigned int irq,
 		      unsigned long flags)
 {

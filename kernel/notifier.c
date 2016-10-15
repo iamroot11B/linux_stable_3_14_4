@@ -17,7 +17,7 @@ BLOCKING_NOTIFIER_HEAD(reboot_notifier_list);
  *	Notifier chain core routines.  The exported routines below
  *	are layered on top of these, with appropriate locking added.
  */
-
+/*! 2016.10.15 study -ing */
 static int notifier_chain_register(struct notifier_block **nl,
 		struct notifier_block *n)
 {
@@ -207,6 +207,7 @@ EXPORT_SYMBOL_GPL(atomic_notifier_call_chain);
  *
  *	Currently always returns zero.
  */
+/*! 2016.10.15 study -ing */
 int blocking_notifier_chain_register(struct blocking_notifier_head *nh,
 		struct notifier_block *n)
 {
@@ -218,6 +219,7 @@ int blocking_notifier_chain_register(struct blocking_notifier_head *nh,
 	 * such times we must not call down_write().
 	 */
 	if (unlikely(system_state == SYSTEM_BOOTING))
+		/*! n->next에 nh->head 대입, nh->head에 n 대입 */
 		return notifier_chain_register(&nh->head, n);
 
 	down_write(&nh->rwsem);

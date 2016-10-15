@@ -92,7 +92,7 @@ static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
 		     : "+Qo" (*(volatile u8 __force *)addr)
 		     : "r" (val));
 }
-
+/*! 2016.10.15 study -ing */
 static inline void __raw_writel(u32 val, volatile void __iomem *addr)
 {
 	asm volatile("str %1, %0"
@@ -108,7 +108,7 @@ static inline u8 __raw_readb(const volatile void __iomem *addr)
 		       "=r" (val));
 	return val;
 }
-
+/*! 2016.10.15 study -ing */
 static inline u32 __raw_readl(const volatile void __iomem *addr)
 {
 	u32 val;
@@ -297,11 +297,13 @@ extern void _memset_io(volatile void __iomem *, int, size_t);
 #define readb_relaxed(c) ({ u8  __r = __raw_readb(c); __r; })
 #define readw_relaxed(c) ({ u16 __r = le16_to_cpu((__force __le16) \
 					__raw_readw(c)); __r; })
+/*! 2016.10.15 study -ing */
 #define readl_relaxed(c) ({ u32 __r = le32_to_cpu((__force __le32) \
 					__raw_readl(c)); __r; })
 
 #define writeb_relaxed(v,c)	__raw_writeb(v,c)
 #define writew_relaxed(v,c)	__raw_writew((__force u16) cpu_to_le16(v),c)
+/*! 2016.10.15 study -ing */
 #define writel_relaxed(v,c)	__raw_writel((__force u32) cpu_to_le32(v),c)
 
 #define readb(c)		({ u8  __v = readb_relaxed(c); __iormb(); __v; })

@@ -78,7 +78,7 @@ void timer_tick(void)
 #endif
 }
 #endif
-
+/*! 2016.10.15 study -ing */
 static void dummy_clock_access(struct timespec *ts)
 {
 	ts->tv_sec = 0;
@@ -87,14 +87,16 @@ static void dummy_clock_access(struct timespec *ts)
 
 static clock_access_fn __read_persistent_clock = dummy_clock_access;
 static clock_access_fn __read_boot_clock = dummy_clock_access;;
-
+/*! 2016.10.15 study -ing */
 void read_persistent_clock(struct timespec *ts)
 {
+	/*! ts->tv_sec 과 ts->tv_nsec를 0으로 설정 */
 	__read_persistent_clock(ts);
 }
-
+/*! 2016.10.15 study -ing */
 void read_boot_clock(struct timespec *ts)
 {
+	/*! ts->tv_sec 과 ts->tv_nsec를 0으로 설정 */
 	__read_boot_clock(ts);
 }
 
@@ -114,9 +116,10 @@ int __init register_persistent_clock(clock_access_fn read_boot,
 
 	return -EINVAL;
 }
-
+/*! 2016.10.15 study -ing */
 void __init time_init(void)
 {
+	/*! exynos, vexpress 둘다 init_time은 NULL  */
 	if (machine_desc->init_time) {
 		machine_desc->init_time();
 	} else {

@@ -92,7 +92,7 @@ asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 {
 	handle_IRQ(irq, regs);
 }
-
+/*! 2016.10.15 study -ing */
 void set_irq_flags(unsigned int irq, unsigned int iflags)
 {
 	unsigned long clr = 0, set = IRQ_NOREQUEST | IRQ_NOPROBE | IRQ_NOAUTOEN;
@@ -120,15 +120,19 @@ void __init init_IRQ(void)
 	 * setup_arch에서 machine_desc를 초기화 했음 (dev tree), OF:OpenFirmware
 	 *
 	 * exynos는 mach-exynos5-dt.c에서 init_irq SET하는 곳이 없음
-	 * vexpress는 v2m.c 또는 ct-ca9x4.c에서 init_irq가 SET되고 있음
-	 */
+	 * vexpress는 v2m.c 또는 ct-ca9x4.c에서 init_irq가 SET되고 있음(ct_ca9x4_init_irq)
+	 */	
 	if (IS_ENABLED(CONFIG_OF) && !machine_desc->init_irq)
 		irqchip_init();
 	else
 		machine_desc->init_irq();
+	/*! machine_desc->init_irq() (ct_ca9x4_init_irq) 에서도 gic_init_bases로 분기하면서,
+	 *  irqchip_init과 동일한 프로세스로 진행되고, ca9x4_twd_init 만 추가로 수행한다.
+	 */
 }
 
 #ifdef CONFIG_MULTI_IRQ_HANDLER
+/*! 2016.10.15 study -ing */
 void __init set_handle_irq(void (*handle_irq)(struct pt_regs *))
 {
 	if (handle_arch_irq)

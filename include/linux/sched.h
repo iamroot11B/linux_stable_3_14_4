@@ -236,12 +236,14 @@ extern char ___assert_task_state[1 - 2*!!(
 #define task_is_stopped(task)	((task->state & __TASK_STOPPED) != 0)
 #define task_is_stopped_or_traced(task)	\
 			((task->state & (__TASK_STOPPED | __TASK_TRACED)) != 0)
+/*! 2016.10.15 study -ing */
 #define task_contributes_to_load(task)	\
 				((task->state & TASK_UNINTERRUPTIBLE) != 0 && \
 				 (task->flags & PF_FROZEN) == 0)
 
 #define __set_task_state(tsk, state_value)		\
 	do { (tsk)->state = (state_value); } while (0)
+/*! 2016.10.15 study -ing */
 #define set_task_state(tsk, state_value)		\
 	set_mb((tsk)->state, (state_value))
 
@@ -2028,6 +2030,7 @@ extern void sched_clock_idle_wakeup_event(u64 delta_ns);
 extern void enable_sched_clock_irqtime(void);
 extern void disable_sched_clock_irqtime(void);
 #else
+/*! 2016.10.15 study -ing */
 static inline void enable_sched_clock_irqtime(void) {}
 static inline void disable_sched_clock_irqtime(void) {}
 #endif

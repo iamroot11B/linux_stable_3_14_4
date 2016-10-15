@@ -694,13 +694,15 @@ asmlinkage void __init start_kernel(void)
 	/*! 2016.07.23 study end */
 	/*! 2016.08.06 study start */
 	init_IRQ();
+	/*! 2016.10.15 study -ing */
 	tick_init();
 	init_timers();
-	hrtimers_init();
-	softirq_init();
-	timekeeping_init();
-	time_init();
+	hrtimers_init();	
+	softirq_init();	
+	timekeeping_init();	
+	time_init();	
 	sched_clock_postinit();
+	/*! 2016.10.15 study -ing */
 	perf_event_init();
 	profile_init();
 	call_function_init();

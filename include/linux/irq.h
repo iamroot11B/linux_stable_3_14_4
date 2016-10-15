@@ -212,7 +212,7 @@ static inline void irqd_mark_affinity_was_set(struct irq_data *d)
 {
 	d->state_use_accessors |= IRQD_AFFINITY_SET;
 }
-
+/*! 2016.10.15 study -ing */
 static inline u32 irqd_get_trigger_type(struct irq_data *d)
 {
 	return d->state_use_accessors & IRQD_TRIGGER_MASK;
@@ -438,7 +438,7 @@ extern struct irq_chip dummy_irq_chip;
 extern void
 irq_set_chip_and_handler_name(unsigned int irq, struct irq_chip *chip,
 			      irq_flow_handler_t handle, const char *name);
-
+/*! 2016.10.15 study -ing */
 static inline void irq_set_chip_and_handler(unsigned int irq, struct irq_chip *chip,
 					    irq_flow_handler_t handle)
 {
@@ -463,18 +463,19 @@ irq_set_handler(unsigned int irq, irq_flow_handler_t handle)
  *  IRQ_NOREQUEST, IRQ_NOPROBE, and IRQ_NOTHREAD)
  */
 static inline void
+/*! 2016.10.15 study -ing */
 irq_set_chained_handler(unsigned int irq, irq_flow_handler_t handle)
 {
 	__irq_set_handler(irq, handle, 1, NULL);
 }
 
 void irq_modify_status(unsigned int irq, unsigned long clr, unsigned long set);
-
+/*! 2016.10.15 study -ing */
 static inline void irq_set_status_flags(unsigned int irq, unsigned long set)
 {
 	irq_modify_status(irq, 0, set);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void irq_clear_status_flags(unsigned int irq, unsigned long clr)
 {
 	irq_modify_status(irq, clr, 0);
@@ -507,9 +508,10 @@ static inline void irq_set_nested_thread(unsigned int irq, bool nest)
 	else
 		irq_clear_status_flags(irq, IRQ_NESTED_THREAD);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void irq_set_percpu_devid_flags(unsigned int irq)
 {
+	/*! 해당 irq에 아래 flag 들 세팅 */
 	irq_set_status_flags(irq,
 			     IRQ_NOAUTOEN | IRQ_PER_CPU | IRQ_NOTHREAD |
 			     IRQ_NOPROBE | IRQ_PER_CPU_DEVID);
@@ -586,10 +588,11 @@ static inline struct msi_desc *irq_data_get_msi(struct irq_data *d)
 {
 	return d->msi_desc;
 }
-
+/*! 2016.10.15 study -ing */
 static inline u32 irq_get_trigger_type(unsigned int irq)
 {
 	struct irq_data *d = irq_get_irq_data(irq);
+	/*! d->state_use_accessors & IRQD_TRIGGER_MASK 결과 리턴 */
 	return d ? irqd_get_trigger_type(d) : 0;
 }
 
@@ -607,7 +610,7 @@ int __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 
 #define irq_alloc_desc_at(at, node)		\
 	irq_alloc_descs(at, at, 1, node)
-
+/*! 2016.10.15 study -ing */
 #define irq_alloc_desc_from(from, node)		\
 	irq_alloc_descs(-1, from, 1, node)
 
@@ -616,12 +619,12 @@ int __irq_alloc_descs(int irq, unsigned int from, unsigned int cnt, int node,
 
 void irq_free_descs(unsigned int irq, unsigned int cnt);
 int irq_reserve_irqs(unsigned int from, unsigned int cnt);
-
+/*! 2016.10.15 study -ing */
 static inline void irq_free_desc(unsigned int irq)
 {
 	irq_free_descs(irq, 1);
 }
-
+/*! 2016.10.15 study -ing */
 static inline int irq_reserve_irq(unsigned int irq)
 {
 	return irq_reserve_irqs(irq, 1);

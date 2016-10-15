@@ -119,24 +119,27 @@ static void irq_insert_desc(unsigned int irq, struct irq_desc *desc)
 	/*! irq_desc_tree 의 irq index에 desc를 insert.  */
 	radix_tree_insert(&irq_desc_tree, irq, desc);
 }
-
+/*! 2016.10.15 study -ing */
 struct irq_desc *irq_to_desc(unsigned int irq)
 {
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 찾는다 */
 	return radix_tree_lookup(&irq_desc_tree, irq);
 }
 EXPORT_SYMBOL(irq_to_desc);
-
+/*! 2016.10.15 study -ing */
 static void delete_irq_desc(unsigned int irq)
 {
 	radix_tree_delete(&irq_desc_tree, irq);
 }
 
 #ifdef CONFIG_SMP
+/*! 2016.10.15 study -ing */
 static void free_masks(struct irq_desc *desc)
 {
 #ifdef CONFIG_GENERIC_PENDING_IRQ
 	free_cpumask_var(desc->pending_mask);
 #endif
+	/*! Do nothing  */
 	free_cpumask_var(desc->irq_data.affinity);
 }
 #else
@@ -173,7 +176,7 @@ err_desc:
 	kfree(desc);
 	return NULL;
 }
-
+/*! 2016.10.15 study -ing */
 static void free_desc(unsigned int irq)
 {
 	struct irq_desc *desc = irq_to_desc(irq);
@@ -341,6 +344,7 @@ EXPORT_SYMBOL_GPL(generic_handle_irq);
  * @from:	Start of descriptor range
  * @cnt:	Number of consecutive irqs to free
  */
+/*! 2016.10.15 study -ing */
 void irq_free_descs(unsigned int from, unsigned int cnt)
 {
 	int i;
@@ -427,6 +431,7 @@ EXPORT_SYMBOL_GPL(__irq_alloc_descs);
  *
  * Returns 0 on success or an appropriate error code
  */
+/*! 2016.10.15 study -ing */
 int irq_reserve_irqs(unsigned int from, unsigned int cnt)
 {
 	unsigned int start;
@@ -436,7 +441,9 @@ int irq_reserve_irqs(unsigned int from, unsigned int cnt)
 		return -EINVAL;
 
 	mutex_lock(&sparse_irq_lock);
+	/*! bitmap_find_next_zero_area함수 이용해 start 찾은 후, */
 	start = bitmap_find_next_zero_area(allocated_irqs, nr_irqs, from, cnt, 0);
+	/*! start==from 이면 allocated_irqs를 업데이트  */
 	if (start == from)
 		bitmap_set(allocated_irqs, start, cnt);
 	else
@@ -455,14 +462,16 @@ unsigned int irq_get_next_irq(unsigned int offset)
 {
 	return find_next_bit(allocated_irqs, nr_irqs, offset);
 }
-
+/*! 2016.10.15 study -ing */
 struct irq_desc *
 __irq_get_desc_lock(unsigned int irq, unsigned long *flags, bool bus,
 		    unsigned int check)
 {
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 찾는다 */
 	struct irq_desc *desc = irq_to_desc(irq);
 
 	if (desc) {
+		/*! check 인자 확인, desc의 flag 확인 후 만족 안하면 NULL 리턴  */
 		if (check & _IRQ_DESC_CHECK) {
 			if ((check & _IRQ_DESC_PERCPU) &&
 			    !irq_settings_is_per_cpu_devid(desc))
@@ -479,16 +488,17 @@ __irq_get_desc_lock(unsigned int irq, unsigned long *flags, bool bus,
 	}
 	return desc;
 }
-
+/*! 2016.10.15 study -ing */
 void __irq_put_desc_unlock(struct irq_desc *desc, unsigned long flags, bool bus)
 {
 	raw_spin_unlock_irqrestore(&desc->lock, flags);
 	if (bus)
 		chip_bus_sync_unlock(desc);
 }
-
+/*! 2016.10.15 study -ing */
 int irq_set_percpu_devid(unsigned int irq)
 {
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 찾는다 */
 	struct irq_desc *desc = irq_to_desc(irq);
 
 	if (!desc)
@@ -497,11 +507,13 @@ int irq_set_percpu_devid(unsigned int irq)
 	if (desc->percpu_enabled)
 		return -EINVAL;
 
+	/*! percpu_enabled에 memory alloc   */
 	desc->percpu_enabled = kzalloc(sizeof(*desc->percpu_enabled), GFP_KERNEL);
 
 	if (!desc->percpu_enabled)
 		return -ENOMEM;
 
+	/*! flags 설정  */
 	irq_set_percpu_devid_flags(irq);
 	return 0;
 }

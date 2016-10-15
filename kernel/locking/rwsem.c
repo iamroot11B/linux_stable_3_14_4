@@ -42,11 +42,14 @@ EXPORT_SYMBOL(down_read_trylock);
 /*
  * lock for writing
  */
+/*! 2016.10.15 study -ing */
 void __sched down_write(struct rw_semaphore *sem)
 {
 	might_sleep();
+	/*! Do Nothing  */
 	rwsem_acquire(&sem->dep_map, 0, 0, _RET_IP_);
 
+	/*! __down_write(sem) 을 수행 */
 	LOCK_CONTENDED(sem, __down_write_trylock, __down_write);
 }
 
@@ -81,8 +84,10 @@ EXPORT_SYMBOL(up_read);
 /*
  * release a write lock
  */
+/*! 2016.10.15 study -ing */
 void up_write(struct rw_semaphore *sem)
 {
+	/*! Do Nothing  */
 	rwsem_release(&sem->dep_map, 1, _RET_IP_);
 
 	__up_write(sem);

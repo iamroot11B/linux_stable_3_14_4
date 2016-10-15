@@ -558,6 +558,7 @@ static inline void rcu_preempt_sleep_check(void)
  * RCU_INITIALIZER() - statically initialize an RCU-protected global variable
  * @v: The value to statically initialize with.
  */
+/*! 2016.10.15 study -ing */
 #define RCU_INITIALIZER(v) (typeof(*(v)) __force __rcu *)(v)
 
 /**
@@ -591,6 +592,8 @@ static inline void rcu_preempt_sleep_check(void)
  * please be careful when making changes to rcu_assign_pointer() and the
  * other macros that it invokes.
  */
+/*! 2016.10.15 study -ing */
+/*! 결국 p에 v를 안전하게 대입 해주는 매크로  */
 #define rcu_assign_pointer(p, v) \
 	do { \
 		smp_wmb(); \

@@ -206,13 +206,13 @@ static inline int read_seqcount_retry(const seqcount_t *s, unsigned start)
 }
 
 
-
+/*! 2016.10.15 study -ing */
 static inline void raw_write_seqcount_begin(seqcount_t *s)
 {
 	s->sequence++;
 	smp_wmb();
 }
-
+/*! 2016.10.15 study -ing */
 static inline void raw_write_seqcount_end(seqcount_t *s)
 {
 	smp_wmb();
@@ -223,20 +223,25 @@ static inline void raw_write_seqcount_end(seqcount_t *s)
  * Sequence counter only version assumes that callers are using their
  * own mutexing.
  */
+/*! 2016.10.15 study -ing */
 static inline void write_seqcount_begin_nested(seqcount_t *s, int subclass)
 {
+	/*! s->sequence++  */
 	raw_write_seqcount_begin(s);
+	/*! Do nothing  */
 	seqcount_acquire(&s->dep_map, subclass, 0, _RET_IP_);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void write_seqcount_begin(seqcount_t *s)
 {
 	write_seqcount_begin_nested(s, 0);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void write_seqcount_end(seqcount_t *s)
 {
+	/*! Do nohting  */
 	seqcount_release(&s->dep_map, 1, _RET_IP_);
+	/*! s->sequence++;  */
 	raw_write_seqcount_end(s);
 }
 

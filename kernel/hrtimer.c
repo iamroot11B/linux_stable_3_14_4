@@ -149,6 +149,7 @@ static void hrtimer_get_softirq_time(struct hrtimer_cpu_base *base)
  * possible to set timer->base = NULL and drop the lock: the timer remains
  * locked.
  */
+/*! 2016.10.15 study -ing */
 static
 struct hrtimer_clock_base *lock_hrtimer_base(const struct hrtimer *timer,
 					     unsigned long *flags)
@@ -172,12 +173,14 @@ struct hrtimer_clock_base *lock_hrtimer_base(const struct hrtimer *timer,
 /*
  * Get the preferred target CPU for NOHZ
  */
+/*! 2016.10.15 study -ing */
 static int hrtimer_get_target(int this_cpu, int pinned)
-{
+{	
 #ifdef CONFIG_NO_HZ_COMMON
 	if (!pinned && get_sysctl_timer_migration() && idle_cpu(this_cpu))
 		return get_nohz_timer_target();
 #endif
+	/*! CONFIG_NO_HZ_COMMON = Not Defiend. -> this_cpu 그대로 리턴 */
 	return this_cpu;
 }
 
@@ -188,6 +191,7 @@ static int hrtimer_get_target(int this_cpu, int pinned)
  *
  * Called with cpu_base->lock of target cpu held.
  */
+/*! 2016.10.15 study -ing */
 static int
 hrtimer_check_target(struct hrtimer *timer, struct hrtimer_clock_base *new_base)
 {
@@ -200,6 +204,7 @@ hrtimer_check_target(struct hrtimer *timer, struct hrtimer_clock_base *new_base)
 	expires = ktime_sub(hrtimer_get_expires(timer), new_base->offset);
 	return expires.tv64 <= new_base->cpu_base->expires_next.tv64;
 #else
+	/*! CONFIG_HIGH_RES_TIMERS = Not Defined. 리턴 0  */
 	return 0;
 #endif
 }
@@ -207,6 +212,7 @@ hrtimer_check_target(struct hrtimer *timer, struct hrtimer_clock_base *new_base)
 /*
  * Switch the timer base to the current CPU when possible.
  */
+/*! 2016.10.15 study -ing */
 static inline struct hrtimer_clock_base *
 switch_hrtimer_base(struct hrtimer *timer, struct hrtimer_clock_base *base,
 		    int pinned)
@@ -214,6 +220,7 @@ switch_hrtimer_base(struct hrtimer *timer, struct hrtimer_clock_base *base,
 	struct hrtimer_clock_base *new_base;
 	struct hrtimer_cpu_base *new_cpu_base;
 	int this_cpu = smp_processor_id();
+	/*! vexpress : this_cpu를 그대로 리턴  */
 	int cpu = hrtimer_get_target(this_cpu, pinned);
 	int basenum = base->index;
 
@@ -222,6 +229,7 @@ again:
 	new_base = &new_cpu_base->clock_base[basenum];
 
 	if (base != new_base) {
+		/*! base와 new_base가 같지 않으면 base 해재 후 new_base 설정 한 후 new_base 리턴  */
 		/*
 		 * We are trying to move timer to new_base.
 		 * However we can't change timer's base while it is running,
@@ -231,11 +239,13 @@ again:
 		 * completed. There is no conflict as we hold the lock until
 		 * the timer is enqueued.
 		 */
+		/*! timer->state의  HRTIMER_STATE_CALLBACK bit가 set이면 callback running 상태 */
 		if (unlikely(hrtimer_callback_running(timer)))
 			return base;
 
 		/* See the comment in lock_timer_base() */
 		timer->base = NULL;
+		/*! base의 lock을 unlock 하고 new_base의 lock을 대신 lock  */
 		raw_spin_unlock(&base->cpu_base->lock);
 		raw_spin_lock(&new_base->cpu_base->lock);
 
@@ -350,8 +360,10 @@ u64 ktime_divns(const ktime_t kt, s64 div)
 /*
  * Add two ktime values and do a safety check for overflow:
  */
+/*! 2016.10.15 study -ing */
 ktime_t ktime_add_safe(const ktime_t lhs, const ktime_t rhs)
 {
+	/*! lhs, rhs를 res에 더해서 업데이트  */
 	ktime_t res = ktime_add(lhs, rhs);
 
 	/*
@@ -361,6 +373,7 @@ ktime_t ktime_add_safe(const ktime_t lhs, const ktime_t rhs)
 	if (res.tv64 < 0 || res.tv64 < lhs.tv64 || res.tv64 < rhs.tv64)
 		res = ktime_set(KTIME_SEC_MAX, 0);
 
+	/*! 계산된 res 리턴  */
 	return res;
 }
 
@@ -449,7 +462,7 @@ static inline void debug_hrtimer_activate(struct hrtimer *timer)
 {
 	debug_object_activate(timer, &hrtimer_debug_descr);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void debug_hrtimer_deactivate(struct hrtimer *timer)
 {
 	debug_object_deactivate(timer, &hrtimer_debug_descr);
@@ -495,7 +508,7 @@ static inline void debug_activate(struct hrtimer *timer)
 	debug_hrtimer_activate(timer);
 	trace_hrtimer_start(timer);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void debug_deactivate(struct hrtimer *timer)
 {
 	debug_hrtimer_deactivate(timer);
@@ -740,17 +753,19 @@ void clock_was_set_delayed(void)
 }
 
 #else
-
+/*! 2016.10.15 study -ing */
 static inline int hrtimer_hres_active(void) { return 0; }
 static inline int hrtimer_is_hres_enabled(void) { return 0; }
 static inline int hrtimer_switch_to_hres(void) { return 0; }
 static inline void
 hrtimer_force_reprogram(struct hrtimer_cpu_base *base, int skip_equal) { }
+/*! 2016.10.15 study -ing */
 static inline int hrtimer_enqueue_reprogram(struct hrtimer *timer,
 					    struct hrtimer_clock_base *base)
 {
 	return 0;
 }
+/*! 2016.10.15 study -ing */
 static inline void hrtimer_init_hres(struct hrtimer_cpu_base *base) { }
 static inline void retrigger_next_event(void *arg) { }
 
@@ -792,9 +807,10 @@ void hrtimers_resume(void)
 	/* And schedule a retrigger for all others */
 	clock_was_set_delayed();
 }
-
+/*! 2016.10.15 study -ing */
 static inline void timer_stats_hrtimer_set_start_info(struct hrtimer *timer)
 {
+	/*! CONFIG_TIMER_STATS = Not defined.  */
 #ifdef CONFIG_TIMER_STATS
 	if (timer->start_site)
 		return;
@@ -803,7 +819,7 @@ static inline void timer_stats_hrtimer_set_start_info(struct hrtimer *timer)
 	timer->start_pid = current->pid;
 #endif
 }
-
+/*! 2016.10.15 study -ing */
 static inline void timer_stats_hrtimer_clear_start_info(struct hrtimer *timer)
 {
 #ifdef CONFIG_TIMER_STATS
@@ -824,6 +840,7 @@ static inline void timer_stats_account_hrtimer(struct hrtimer *timer)
 /*
  * Counterpart to lock_hrtimer_base above:
  */
+/*! 2016.10.15 study -ing */
 static inline
 void unlock_hrtimer_base(const struct hrtimer *timer, unsigned long *flags)
 {
@@ -879,11 +896,13 @@ EXPORT_SYMBOL_GPL(hrtimer_forward);
  *
  * Returns 1 when the new timer is the leftmost timer in the tree.
  */
+/*! 2016.10.15 study -ing */
 static int enqueue_hrtimer(struct hrtimer *timer,
 			   struct hrtimer_clock_base *base)
 {
 	debug_activate(timer);
 
+	/*! timer->node에(rb tree)에 base->active 추가. */
 	timerqueue_add(&base->active, &timer->node);
 	base->cpu_base->active_bases |= 1 << base->index;
 
@@ -906,6 +925,7 @@ static int enqueue_hrtimer(struct hrtimer *timer,
  * reprogram to zero. This is useful, when the context does a reprogramming
  * anyway (e.g. timer interrupt)
  */
+/*! 2016.10.15 study -ing */
 static void __remove_hrtimer(struct hrtimer *timer,
 			     struct hrtimer_clock_base *base,
 			     unsigned long newstate, int reprogram)
@@ -914,11 +934,14 @@ static void __remove_hrtimer(struct hrtimer *timer,
 	if (!(timer->state & HRTIMER_STATE_ENQUEUED))
 		goto out;
 
+	/*! timer queue에서 next 타이머를 찾은 후,  */
 	next_timer = timerqueue_getnext(&base->active);
+	/*! timer queue에서 base->active를 지워준다.  */
 	timerqueue_del(&base->active, &timer->node);
 	if (&timer->node == next_timer) {
 #ifdef CONFIG_HIGH_RES_TIMERS
 		/* Reprogram the clock event device. if enabled */
+		/*! hrtimer_hres_active -> return 0  */
 		if (reprogram && hrtimer_hres_active()) {
 			ktime_t expires;
 
@@ -929,6 +952,9 @@ static void __remove_hrtimer(struct hrtimer *timer,
 		}
 #endif
 	}
+	/*! 타이머 queue에서 base->active의 next를 못 찾으면,
+	 *  base->cpu_base->active_bases의 bit들 clear 해 준다.
+	 */
 	if (!timerqueue_getnext(&base->active))
 		base->cpu_base->active_bases &= ~(1 << base->index);
 out:
@@ -938,9 +964,11 @@ out:
 /*
  * remove hrtimer, called with base lock held
  */
+/*! 2016.10.15 study -ing */
 static inline int
 remove_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base)
 {
+	/*! timer->state & HRTIMER_STATE_ENQUEUED 이면 timer는 queue 된 상태  */
 	if (hrtimer_is_queued(timer)) {
 		unsigned long state;
 		int reprogram;
@@ -967,7 +995,7 @@ remove_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base)
 	}
 	return 0;
 }
-
+/*! 2016.10.15 study -ing */
 int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 		unsigned long delta_ns, const enum hrtimer_mode mode,
 		int wakeup)
@@ -985,6 +1013,7 @@ int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	new_base = switch_hrtimer_base(timer, base, mode & HRTIMER_MODE_PINNED);
 
 	if (mode & HRTIMER_MODE_REL) {
+		/*! tim + new_base->get_time() 된 값을 tim에 업데이트  */
 		tim = ktime_add_safe(tim, new_base->get_time());
 		/*
 		 * CONFIG_TIME_LOW_RES is a temporary way for architectures
@@ -993,13 +1022,16 @@ int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 		 * resolution when starting a relative timer, to avoid short
 		 * timeouts. This will go away with the GTOD framework.
 		 */
+		/*! CONFIG_TIME_LOW_RES = Not Defined. */
 #ifdef CONFIG_TIME_LOW_RES
 		tim = ktime_add_safe(tim, base->resolution);
 #endif
 	}
 
+	/*! timer->_softexpires, timer->node.expires 업데이트 */
 	hrtimer_set_expires_range_ns(timer, tim, delta_ns);
 
+	/*! CONFIG_TIMER_STATS = Not defined. -> Do Nothing. */
 	timer_stats_hrtimer_set_start_info(timer);
 
 	leftmost = enqueue_hrtimer(timer, new_base);
@@ -1010,6 +1042,7 @@ int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 	 *
 	 * XXX send_remote_softirq() ?
 	 */
+	/*! hrtimer_enqueue_reprogram : Do nothing. 리턴 0  */
 	if (leftmost && new_base->cpu_base == &__get_cpu_var(hrtimer_bases)
 		&& hrtimer_enqueue_reprogram(timer, new_base)) {
 		if (wakeup) {
@@ -1026,6 +1059,7 @@ int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 		}
 	}
 
+	/*! timer->base->cpu_base->lock 을 unlock  */
 	unlock_hrtimer_base(timer, &flags);
 
 	return ret;
@@ -1061,6 +1095,7 @@ EXPORT_SYMBOL_GPL(hrtimer_start_range_ns);
  *  0 on success
  *  1 when the timer was active
  */
+/*! 2016.10.15 study -ing */
 int
 hrtimer_start(struct hrtimer *timer, ktime_t tim, const enum hrtimer_mode mode)
 {
@@ -1666,16 +1701,20 @@ SYSCALL_DEFINE2(nanosleep, struct timespec __user *, rqtp,
 /*
  * Functions related to boot-time initialization:
  */
+/*! 2016.10.15 study -ing */
 static void init_hrtimers_cpu(int cpu)
 {
+	/*! cpu_base를 찾아서,  */
 	struct hrtimer_cpu_base *cpu_base = &per_cpu(hrtimer_bases, cpu);
 	int i;
-
+	
 	for (i = 0; i < HRTIMER_MAX_CLOCK_BASES; i++) {
+		/*! 찾은 cpu_base 업데이트 */
 		cpu_base->clock_base[i].cpu_base = cpu_base;
+		/*! timer queue head(cpu_base->clock_base[i].active) 초기화  */
 		timerqueue_init_head(&cpu_base->clock_base[i].active);
 	}
-
+	/*! Do nothing  */
 	hrtimer_init_hres(cpu_base);
 }
 
@@ -1746,14 +1785,15 @@ static void migrate_hrtimers(int scpu)
 }
 
 #endif /* CONFIG_HOTPLUG_CPU */
-
+/*! 2016.10.15 study -ing */
 static int hrtimer_cpu_notify(struct notifier_block *self,
 					unsigned long action, void *hcpu)
 {
 	int scpu = (long)hcpu;
 
 	switch (action) {
-
+		/*! 2016.10.15 study -ing */
+		/*! CPU_UP_PREPARE 겨우만 확인 함  */
 	case CPU_UP_PREPARE:
 	case CPU_UP_PREPARE_FROZEN:
 		init_hrtimers_cpu(scpu);
@@ -1783,7 +1823,7 @@ static int hrtimer_cpu_notify(struct notifier_block *self,
 static struct notifier_block hrtimers_nb = {
 	.notifier_call = hrtimer_cpu_notify,
 };
-
+/*! 2016.10.15 study -ing */
 void __init hrtimers_init(void)
 {
 	hrtimer_cpu_notify(&hrtimers_nb, (unsigned long)CPU_UP_PREPARE,

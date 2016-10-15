@@ -34,13 +34,23 @@
  * This function is a wrapper that chains of_irq_parse_one() and
  * irq_create_of_mapping() to make things easier to callers
  */
+/*! 2016.10.15 study -ing */
 unsigned int irq_of_parse_and_map(struct device_node *dev, int index)
 {
 	struct of_phandle_args oirq;
-
+	/*! dev를 순회하면서 index interrupt를 찾은 후 oirq에 업데이트 한다.
+	 *  oirq 에 업데이트 되는 내용 (index 가 0일때)
+	 *  (&oirq)->np: gic node의 주소
+	 *  (&oirq)->args_count: 3
+	 *  (&oirq)->args[0]: 0
+	 *  (&oirq)->args[1]: 0
+	 *  (&oirq)->args[2]: 0
+	 *  index interrupt를 찾아서 위 수행 후 0 리턴
+	 */
 	if (of_irq_parse_one(dev, index, &oirq))
 		return 0;
 
+	/*! of_irq_parse_one가 정상 처리되어 0 리턴 되면 아래 수행 */
 	return irq_create_of_mapping(&oirq);
 }
 EXPORT_SYMBOL_GPL(irq_of_parse_and_map);
@@ -289,6 +299,7 @@ EXPORT_SYMBOL_GPL(of_irq_parse_raw);
  * finding which interrupt controller node it is attached to, and returning the
  * interrupt specifier that can be used to retrieve a Linux IRQ number.
  */
+/*! 2016.10.15 study -ing */
 int of_irq_parse_one(struct device_node *device, int index, struct of_phandle_args *out_irq)
 {
 	struct device_node *p;
@@ -516,6 +527,8 @@ void __init of_irq_init(const struct of_device_id *matches)
 			 */
 			irq_init_cb = (of_irq_init_cb_t)match->data;
 			ret = irq_init_cb(desc->dev, desc->interrupt_parent);
+			/*! 2016.10.15 study -ing */
+			/*! irq_init_cb(git_of_init) 정상 수행 시 0 리턴  */
 			if (ret) {
 				kfree(desc);
 				continue;
@@ -540,11 +553,13 @@ void __init of_irq_init(const struct of_device_id *matches)
 		kfree(desc);
 	}
 
+	/*! intc_parent_list 를 순회하면서 desc->list를 전부 지워준다.  */
 	list_for_each_entry_safe(desc, temp_desc, &intc_parent_list, list) {
 		list_del(&desc->list);
 		kfree(desc);
 	}
 err:
+	/*! intc_desc_list 를 순회하면서 desc->list를 전부 지워준다.  */
 	list_for_each_entry_safe(desc, temp_desc, &intc_desc_list, list) {
 		list_del(&desc->list);
 		kfree(desc);

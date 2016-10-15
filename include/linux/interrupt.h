@@ -467,7 +467,7 @@ static inline void tasklet_unlock_wait(struct tasklet_struct *t)
 #endif
 
 extern void __tasklet_schedule(struct tasklet_struct *t);
-
+/*! 2016.10.15 study -ing */
 static inline void tasklet_schedule(struct tasklet_struct *t)
 {
 	if (!test_and_set_bit(TASKLET_STATE_SCHED, &t->state))

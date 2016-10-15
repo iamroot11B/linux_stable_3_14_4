@@ -804,9 +804,11 @@ void perf_cpu_hrtimer_cancel(int cpu)
 
 	local_irq_restore(flags);
 }
-
+/*! 2016.10.15 study -ing */
 static void __perf_cpu_hrtimer_init(struct perf_cpu_context *cpuctx, int cpu)
 {
+	/*! cpuctx->hrtimer 를 업데이트 한 후 init 수행 */
+
 	struct hrtimer *hr = &cpuctx->hrtimer;
 	struct pmu *pmu = cpuctx->ctx.pmu;
 	int timer;
@@ -826,6 +828,7 @@ static void __perf_cpu_hrtimer_init(struct perf_cpu_context *cpuctx, int cpu)
 	cpuctx->hrtimer_interval = ns_to_ktime(NSEC_PER_MSEC * timer);
 
 	hrtimer_init(hr, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+	/*! function(hrtimer_restart) 을 perf_cpu_hrtimer_handler로 설정 */
 	hr->function = perf_cpu_hrtimer_handler;
 }
 
@@ -3022,8 +3025,10 @@ static u64 perf_event_read(struct perf_event *event)
 /*
  * Initialize the perf_event context in a task_struct:
  */
+/*! 2016.10.15 study -ing */
 static void __perf_event_init_context(struct perf_event_context *ctx)
 {
+	/*! spin lock, mutex, 각 list init. */
 	raw_spin_lock_init(&ctx->lock);
 	mutex_init(&ctx->mutex);
 	INIT_LIST_HEAD(&ctx->pinned_groups);
@@ -5982,7 +5987,7 @@ static void perf_event_free_filter(struct perf_event *event)
 }
 
 #else
-
+/*! 2016.10.15 study -ing */
 static inline void perf_tp_register(void)
 {
 }
@@ -6294,6 +6299,7 @@ static int perf_event_idx_default(struct perf_event *event)
  * Ensures all contexts with the same task_ctx_nr have the same
  * pmu_cpu_context too.
  */
+/*! 2016.10.15 study -ing */
 static void *find_pmu_context(int ctxn)
 {
 	struct pmu *pmu;
@@ -6447,11 +6453,12 @@ free_dev:
 
 static struct lock_class_key cpuctx_mutex;
 static struct lock_class_key cpuctx_lock;
-
+/*! 2016.10.15 study -ing */
 int perf_pmu_register(struct pmu *pmu, const char *name, int type)
 {
 	int cpu, ret;
 
+	/*! pmus_lock 락을 걸고, pmu 값 업데이트 수행 */
 	mutex_lock(&pmus_lock);
 	ret = -ENOMEM;
 	pmu->pmu_disable_count = alloc_percpu(int);
@@ -6488,14 +6495,18 @@ skip_type:
 	if (!pmu->pmu_cpu_context)
 		goto free_dev;
 
+	/*! 각 cpu별로 loop 돌면서  */
 	for_each_possible_cpu(cpu) {
 		struct perf_cpu_context *cpuctx;
 
+		/*! cpu 에서 pmu->pmu_cpu_context(offset) 만큼 떨어진 값을 가져와 cpuctx에 대입 */
 		cpuctx = per_cpu_ptr(pmu->pmu_cpu_context, cpu);
 		__perf_event_init_context(&cpuctx->ctx);
+		/*! lockdep_set_class : Do nothing. */
 		lockdep_set_class(&cpuctx->ctx.mutex, &cpuctx_mutex);
 		lockdep_set_class(&cpuctx->ctx.lock, &cpuctx_lock);
 		cpuctx->ctx.type = cpu_context;
+		/*! 위에서 값 설정해준 pmu 대입  */
 		cpuctx->ctx.pmu = pmu;
 
 		__perf_cpu_hrtimer_init(cpuctx, cpu);
@@ -6505,6 +6516,7 @@ skip_type:
 	}
 
 got_cpu_context:
+	/*! pmu 값 업데이트  */
 	if (!pmu->start_txn) {
 		if (pmu->pmu_enable) {
 			/*
@@ -6533,6 +6545,7 @@ got_cpu_context:
 	list_add_rcu(&pmu->entry, &pmus);
 	ret = 0;
 unlock:
+	/*! mutext unlock하고 ret값 리턴  */
 	mutex_unlock(&pmus_lock);
 
 	return ret;
@@ -6541,7 +6554,7 @@ free_dev:
 	device_del(pmu->dev);
 	put_device(pmu->dev);
 
-free_idr:
+free_idr:ㅍ
 	if (pmu->type >= PERF_TYPE_MAX)
 		idr_remove(&pmu_idr, pmu->type);
 
@@ -7815,31 +7828,40 @@ int perf_event_init_task(struct task_struct *child)
 
 	return 0;
 }
-
+/*! 2016.10.15 study -ing */
 static void __init perf_event_init_all_cpus(void)
 {
 	struct swevent_htable *swhash;
 	int cpu;
 
+	/*! 모든 cpu에 대해 loop 돌면서  */
 	for_each_possible_cpu(cpu) {
+		/*! 각 cpu의 swevent_htable을 찾아서 swash에 대입  */
 		swhash = &per_cpu(swevent_htable, cpu);
+		/*! swhash->hlist_mutex 초기화  */
 		mutex_init(&swhash->hlist_mutex);
+		/*! cpu의 rotation_list 리스트 초기화 */
 		INIT_LIST_HEAD(&per_cpu(rotation_list, cpu));
 	}
 }
-
+/*! 2016.10.15 study -ing */
 static void perf_event_init_cpu(int cpu)
 {
+	/*! cpu의 swevent_htable 변수를 swhash에 대입  */
 	struct swevent_htable *swhash = &per_cpu(swevent_htable, cpu);
 
+	/*! mutex lock 걸고,  */
 	mutex_lock(&swhash->hlist_mutex);
 	if (swhash->hlist_refcount > 0) {
 		struct swevent_hlist *hlist;
 
+		/*! hlist에 메모리 alloc 후, */
 		hlist = kzalloc_node(sizeof(*hlist), GFP_KERNEL, cpu_to_node(cpu));
 		WARN_ON(!hlist);
+		/*! swhash->swevent_hlist에 hlist를 대입 */
 		rcu_assign_pointer(swhash->swevent_hlist, hlist);
 	}
+	/*! 위에서 걸었던 mutex lock 풀고 함수 종료  */
 	mutex_unlock(&swhash->hlist_mutex);
 }
 
@@ -7916,7 +7938,7 @@ static struct notifier_block perf_reboot_notifier = {
 	.notifier_call = perf_reboot,
 	.priority = INT_MIN,
 };
-
+/*! 2016.10.15 study -ing */
 static int
 perf_cpu_notify(struct notifier_block *self, unsigned long action, void *hcpu)
 {
@@ -7939,20 +7961,28 @@ perf_cpu_notify(struct notifier_block *self, unsigned long action, void *hcpu)
 
 	return NOTIFY_OK;
 }
-
+/*! 2016.10.15 study -ing */
 void __init perf_event_init(void)
 {
 	int ret;
-
+	/*! pmu : performance monitoring unit  */
+	/*! pmu_idr을 0으로 초기화 후 pmu_idr->lock 초기화 */
 	idr_init(&pmu_idr);
 
 	perf_event_init_all_cpus();
+	/*! 함수명 그대로 pmus_srcu struct 초기화 수행  */
 	init_srcu_struct(&pmus_srcu);
 	perf_pmu_register(&perf_swevent, "software", PERF_TYPE_SOFTWARE);
 	perf_pmu_register(&perf_cpu_clock, NULL, -1);
 	perf_pmu_register(&perf_task_clock, NULL, -1);
+	/*! CONFIG_EVENT_TRACING 이 Not Defined. Do Nothing  */
 	perf_tp_register();
+	/*! perf_cpu_notify을 수행하는데,
+	 *  CPU_UP_PREPARE, CPU_STARTING, CPU_ONLINE을 인자로 주며 차례로 수행.
+	 *  (CPU_STARTING, CPU_ONLINE은 Do Nothing)
+	 */
 	perf_cpu_notifier(perf_cpu_notify);
+	/*! 2016.10.15 study end */
 	register_reboot_notifier(&perf_reboot_notifier);
 
 	ret = init_hw_breakpoint();

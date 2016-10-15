@@ -172,6 +172,7 @@ static inline ktime_t ktime_sub(const ktime_t lhs, const ktime_t rhs)
  *
  * Return: The sum of @add1 and @add2.
  */
+/*! 2016.10.15 study -ing */
 static inline ktime_t ktime_add(const ktime_t add1, const ktime_t add2)
 {
 	ktime_t res;

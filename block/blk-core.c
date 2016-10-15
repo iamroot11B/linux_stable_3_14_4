@@ -2983,7 +2983,7 @@ static void queue_unplugged(struct request_queue *q, unsigned int depth,
 		__blk_run_queue(q);
 	spin_unlock(q->queue_lock);
 }
-
+/*! 2016.10.15 study -ing */
 static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
 {
 	LIST_HEAD(callbacks);
@@ -3025,7 +3025,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
 	return cb;
 }
 EXPORT_SYMBOL(blk_check_plugged);
-
+/*! 2016.10.15 study -ing */
 void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
 {
 	struct request_queue *q;

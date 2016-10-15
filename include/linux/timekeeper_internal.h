@@ -70,7 +70,7 @@ struct timekeeper {
 	ktime_t			offs_tai;
 
 };
-
+/*! 2016.10.15 study -ing */
 static inline struct timespec tk_xtime(struct timekeeper *tk)
 {
 	struct timespec ts;

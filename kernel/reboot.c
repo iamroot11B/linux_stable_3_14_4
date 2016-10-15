@@ -83,6 +83,7 @@ void kernel_restart_prepare(char *cmd)
  *	Currently always returns zero, as blocking_notifier_chain_register()
  *	always returns zero.
  */
+/*! 2016.10.15 study -ing */
 int register_reboot_notifier(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_register(&reboot_notifier_list, nb);

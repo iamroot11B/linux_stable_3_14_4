@@ -397,6 +397,7 @@ void tick_resume(void)
 /**
  * tick_init - initialize the tick control
  */
+/*! 2016.10.15 study -ing */
 void __init tick_init(void)
 {
 	tick_broadcast_init();

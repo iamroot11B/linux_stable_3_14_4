@@ -829,6 +829,7 @@ static inline void perf_restore_debug_store(void)			{ }
 /*
  * This has to have a higher priority than migration_notifier in sched/core.c.
  */
+/*! 2016.10.15 study -ing */
 #define perf_cpu_notifier(fn)						\
 do {									\
 	static struct notifier_block fn##_nb =				\

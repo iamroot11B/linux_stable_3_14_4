@@ -99,6 +99,7 @@ static int __init init_jiffies_clocksource(void)
 
 core_initcall(init_jiffies_clocksource);
 
+/*! 2016.10.15 study -ing */
 struct clocksource * __init __weak clocksource_default_clock(void)
 {
 	return &clocksource_jiffies;

@@ -25,9 +25,11 @@
  *	@irq:	irq number
  *	@chip:	pointer to irq chip description structure
  */
+/*! 2016.10.15 study -ing */
 int irq_set_chip(unsigned int irq, struct irq_chip *chip)
 {
 	unsigned long flags;
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 lock 걸고 찾는다 */
 	struct irq_desc *desc = irq_get_desc_lock(irq, &flags, 0);
 
 	if (!desc)
@@ -37,12 +39,14 @@ int irq_set_chip(unsigned int irq, struct irq_chip *chip)
 		chip = &no_irq_chip;
 
 	desc->irq_data.chip = chip;
+	/*! 위에서 걸은 lock 해제 */
 	irq_put_desc_unlock(desc, flags);
 	/*
 	 * For !CONFIG_SPARSE_IRQ make the irq show up in
 	 * allocated_irqs. For the CONFIG_SPARSE_IRQ case, it is
 	 * already marked, and this call is harmless.
 	 */
+	/*! 전역변수이 allocated_irqs 값을 set 하는 방식으로 resere 수행.  */
 	irq_reserve_irq(irq);
 	return 0;
 }
@@ -53,6 +57,7 @@ EXPORT_SYMBOL(irq_set_chip);
  *	@irq:	irq number
  *	@type:	IRQ_TYPE_{LEVEL,EDGE}_* value - see include/linux/irq.h
  */
+/*! 2016.10.15 study -ing */
 int irq_set_irq_type(unsigned int irq, unsigned int type)
 {
 	unsigned long flags;
@@ -76,13 +81,16 @@ EXPORT_SYMBOL(irq_set_irq_type);
  *
  *	Set the hardware irq controller data for an irq
  */
+/*! 2016.10.15 study -ing */
 int irq_set_handler_data(unsigned int irq, void *data)
 {
+	/*! irq handler 를 설정해 주는 함수  */
 	unsigned long flags;
 	struct irq_desc *desc = irq_get_desc_lock(irq, &flags, 0);
 
 	if (!desc)
 		return -EINVAL;
+	/*! 위에서 찾은 desc->irq_data.handler_data에 전달받은 data를 넣어준다.  */
 	desc->irq_data.handler_data = data;
 	irq_put_desc_unlock(desc, flags);
 	return 0;
@@ -131,56 +139,69 @@ int irq_set_msi_desc(unsigned int irq, struct msi_desc *entry)
  *
  *	Set the hardware irq chip data for an irq
  */
+/*! 2016.10.15 study -ing */
 int irq_set_chip_data(unsigned int irq, void *data)
 {
 	unsigned long flags;
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 lock을 걸고 찾는다 */
 	struct irq_desc *desc = irq_get_desc_lock(irq, &flags, 0);
 
 	if (!desc)
 		return -EINVAL;
 	desc->irq_data.chip_data = data;
+	/*! 위에서 걸은 lock 해제  */
 	irq_put_desc_unlock(desc, flags);
 	return 0;
 }
 EXPORT_SYMBOL(irq_set_chip_data);
-
+/*! 2016.10.15 study -ing */
 struct irq_data *irq_get_irq_data(unsigned int irq)
 {
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 찾는다 */
 	struct irq_desc *desc = irq_to_desc(irq);
 
+	/*! 찾은 desc의 ->irq_data를 return  */
 	return desc ? &desc->irq_data : NULL;
 }
 EXPORT_SYMBOL_GPL(irq_get_irq_data);
-
+/*! 2016.10.15 study -ing */
 static void irq_state_clr_disabled(struct irq_desc *desc)
 {
 	irqd_clear(&desc->irq_data, IRQD_IRQ_DISABLED);
 }
-
+/*! 2016.10.15 study -ing */
 static void irq_state_set_disabled(struct irq_desc *desc)
 {
 	irqd_set(&desc->irq_data, IRQD_IRQ_DISABLED);
 }
-
+/*! 2016.10.15 study -ing */
 static void irq_state_clr_masked(struct irq_desc *desc)
 {
 	irqd_clear(&desc->irq_data, IRQD_IRQ_MASKED);
 }
-
+/*! 2016.10.15 study -ing */
 static void irq_state_set_masked(struct irq_desc *desc)
 {
+	/*! desc->irq_data->state_use_accessors에 IRQD_IRQ_MASKED bit set */
 	irqd_set(&desc->irq_data, IRQD_IRQ_MASKED);
 }
-
+/*! 2016.10.15 study -ing */
 int irq_startup(struct irq_desc *desc, bool resend)
 {
 	int ret = 0;
 
+	/*! irq disabled flag을 clear  */
 	irq_state_clr_disabled(desc);
 	desc->depth = 0;
 
+	/*! from irq-gic.c(irq_set_chip_and_handler 함수),
+	 * 이 시점에서는 chip = gic_chip. chip->irq_startup = NULL.
+	 *  아래 if문은 false
+	 */  
 	if (desc->irq_data.chip->irq_startup) {
+		/*! chip->irq_startup 함수 포인터가 NULL이 아니면 chip->irq_startup 수행  */
 		ret = desc->irq_data.chip->irq_startup(&desc->irq_data);
+		/*! 수행 후 IRQD_IRQ_MASKED bit clear  */
 		irq_state_clr_masked(desc);
 	} else {
 		irq_enable(desc);
@@ -202,10 +223,15 @@ void irq_shutdown(struct irq_desc *desc)
 		desc->irq_data.chip->irq_mask(&desc->irq_data);
 	irq_state_set_masked(desc);
 }
-
+/*! 2016.10.15 study -ing */
 void irq_enable(struct irq_desc *desc)
 {
 	irq_state_clr_disabled(desc);
+	/*!
+	 * from irq-gic.c(irq_set_chip_and_handler 함수) ,
+	 * 이 시점에서는 irq_enable 가 NULL이라  아래 if문 false.
+	 * irq_unmask = gic_unmask_irq.
+	 */
 	if (desc->irq_data.chip->irq_enable)
 		desc->irq_data.chip->irq_enable(&desc->irq_data);
 	else
@@ -252,9 +278,15 @@ void irq_percpu_disable(struct irq_desc *desc, unsigned int cpu)
 		desc->irq_data.chip->irq_mask(&desc->irq_data);
 	cpumask_clear_cpu(cpu, desc->percpu_enabled);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void mask_ack_irq(struct irq_desc *desc)
 {
+	/*!
+	 * 해당 irq의 ack 관련 mask가 있으면, desc->irq_data 해당 mask 업데이트
+	 * from irq-gic.c(irq_set_chip_and_handler 함수) ,
+	 * 이 시점에서는 irq_mask_ack 가 NULL이라  아래 if문 false.
+	 * irq_mask = gic_mask_irq
+	 */
 	if (desc->irq_data.chip->irq_mask_ack)
 		desc->irq_data.chip->irq_mask_ack(&desc->irq_data);
 	else {
@@ -262,6 +294,7 @@ static inline void mask_ack_irq(struct irq_desc *desc)
 		if (desc->irq_data.chip->irq_ack)
 			desc->irq_data.chip->irq_ack(&desc->irq_data);
 	}
+	/*! desc->irq_data->state_use_accessors에 IRQD_IRQ_MASKED bit set */
 	irq_state_set_masked(desc);
 }
 
@@ -653,12 +686,13 @@ void handle_percpu_devid_irq(unsigned int irq, struct irq_desc *desc)
 	if (chip->irq_eoi)
 		chip->irq_eoi(&desc->irq_data);
 }
-
+/*! 2016.10.15 study -ing */
 void
 __irq_set_handler(unsigned int irq, irq_flow_handler_t handle, int is_chained,
 		  const char *name)
 {
 	unsigned long flags;
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 찾는다 */
 	struct irq_desc *desc = irq_get_desc_buslock(irq, &flags, 0);
 
 	if (!desc)
@@ -675,6 +709,7 @@ __irq_set_handler(unsigned int irq, irq_flow_handler_t handle, int is_chained,
 	if (handle == handle_bad_irq) {
 		if (desc->irq_data.chip != &no_irq_chip)
 			mask_ack_irq(desc);
+		/*! desc->irq_data->state_use_accessors에 IRQD_IRQ_DISABLED bit set */
 		irq_state_set_disabled(desc);
 		desc->depth = 1;
 	}
@@ -682,16 +717,18 @@ __irq_set_handler(unsigned int irq, irq_flow_handler_t handle, int is_chained,
 	desc->name = name;
 
 	if (handle != handle_bad_irq && is_chained) {
+		/*! desc->status_use_accessors flag 업데이트  */
 		irq_settings_set_noprobe(desc);
 		irq_settings_set_norequest(desc);
 		irq_settings_set_nothread(desc);
+		/*! irq startup */
 		irq_startup(desc, true);
 	}
 out:
 	irq_put_desc_busunlock(desc, flags);
 }
 EXPORT_SYMBOL_GPL(__irq_set_handler);
-
+/*! 2016.10.15 study -ing */
 void
 irq_set_chip_and_handler_name(unsigned int irq, struct irq_chip *chip,
 			      irq_flow_handler_t handle, const char *name)
@@ -700,18 +737,24 @@ irq_set_chip_and_handler_name(unsigned int irq, struct irq_chip *chip,
 	__irq_set_handler(irq, handle, 0, name);
 }
 EXPORT_SYMBOL_GPL(irq_set_chip_and_handler_name);
-
+/*! 2016.10.15 study -ing */
 void irq_modify_status(unsigned int irq, unsigned long clr, unsigned long set)
 {
 	unsigned long flags;
+	/*! irq_desc_tree에서 irq 번호로 해당하는 irq_desc를 raw_spin_lock을 걸고 찾는다. */
 	struct irq_desc *desc = irq_get_desc_lock(irq, &flags, 0);
 
 	if (!desc)
 		return;
+	/*! desc->status_use_accessors에 clr, set 값 업데이트  */
 	irq_settings_clr_and_set(desc, clr, set);
 
+	/*! &desc->irq_data에 뒤에 인자값의 bit들을 clear  */
 	irqd_clear(&desc->irq_data, IRQD_NO_BALANCING | IRQD_PER_CPU |
 		   IRQD_TRIGGER_MASK | IRQD_LEVEL | IRQD_MOVE_PCNTXT);
+	/*! desc->status_use_accessors 의 flag을 확인 후
+	 *  필요 시 desc->irq_data값을 irqd_set을 이용해 업데이트
+	 */
 	if (irq_settings_has_no_balance_set(desc))
 		irqd_set(&desc->irq_data, IRQD_NO_BALANCING);
 	if (irq_settings_is_per_cpu(desc))
@@ -723,6 +766,7 @@ void irq_modify_status(unsigned int irq, unsigned long clr, unsigned long set)
 
 	irqd_set(&desc->irq_data, irq_settings_get_trigger_mask(desc));
 
+	/*! 위에서 irq_get_desc_lock을 통해 걸은 lock 해제  */
 	irq_put_desc_unlock(desc, flags);
 }
 EXPORT_SYMBOL_GPL(irq_modify_status);

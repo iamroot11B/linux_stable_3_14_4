@@ -462,6 +462,7 @@ EXPORT_SYMBOL(radix_tree_insert);
  * is_slot == 1 : search for the slot.
  * is_slot == 0 : search for the node.
  */
+/*! 2016.10.15 study -ing */
 static void *radix_tree_lookup_element(struct radix_tree_root *root,
 				unsigned long index, int is_slot)
 {
@@ -530,6 +531,7 @@ EXPORT_SYMBOL(radix_tree_lookup_slot);
  *	them safely). No RCU barriers are required to access or modify the
  *	returned item, however.
  */
+/*! 2016.10.15 study -ing */
 void *radix_tree_lookup(struct radix_tree_root *root, unsigned long index)
 {
 	return radix_tree_lookup_element(root, index, 0);
@@ -1346,6 +1348,7 @@ static inline void radix_tree_shrink(struct radix_tree_root *root)
  *
  *	Returns the address of the deleted item, or NULL if it was not present.
  */
+/*! 2016.10.15 study -ing */
 void *radix_tree_delete(struct radix_tree_root *root, unsigned long index)
 {
 	struct radix_tree_node *node = NULL;

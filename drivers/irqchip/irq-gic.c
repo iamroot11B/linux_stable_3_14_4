@@ -126,6 +126,7 @@ static inline void gic_set_base_accessor(struct gic_chip_data *data,
 	data->get_base = f;
 }
 #else
+/*! 2016.10.15 study -ing */
 #define gic_data_dist_base(d)	((d)->dist_base.common_base)
 #define gic_data_cpu_base(d)	((d)->cpu_base.common_base)
 #define gic_set_base_accessor(d, f)
@@ -151,17 +152,19 @@ static inline unsigned int gic_irq(struct irq_data *d)
 /*
  * Routines to acknowledge, disable and enable interrupts
  */
+/*! 2016.10.15 study -ing */
 static void gic_mask_irq(struct irq_data *d)
 {
 	u32 mask = 1 << (gic_irq(d) % 32);
 
 	raw_spin_lock(&irq_controller_lock);
+	/*! mask를 두번째 인자에 업데이트  */
 	writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_CLEAR + (gic_irq(d) / 32) * 4);
 	if (gic_arch_extn.irq_mask)
 		gic_arch_extn.irq_mask(d);
 	raw_spin_unlock(&irq_controller_lock);
 }
-
+/*! 2016.10.15 study -ing */
 static void gic_unmask_irq(struct irq_data *d)
 {
 	u32 mask = 1 << (gic_irq(d) % 32);
@@ -169,6 +172,7 @@ static void gic_unmask_irq(struct irq_data *d)
 	raw_spin_lock(&irq_controller_lock);
 	if (gic_arch_extn.irq_unmask)
 		gic_arch_extn.irq_unmask(d);
+	/*! mask 를 두번째 인자에 업데이트  */
 	writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_SET + (gic_irq(d) / 32) * 4);
 	raw_spin_unlock(&irq_controller_lock);
 }
@@ -344,7 +348,7 @@ static struct irq_chip gic_chip = {
 #endif
 	.irq_set_wake		= gic_set_wake,
 };
-
+/*! 2016.10.15 study -ing */
 void __init gic_cascade_irq(unsigned int gic_nr, unsigned int irq)
 {
 	if (gic_nr >= MAX_GIC_NR)
@@ -353,12 +357,14 @@ void __init gic_cascade_irq(unsigned int gic_nr, unsigned int irq)
 		BUG();
 	irq_set_chained_handler(irq, gic_handle_cascade_irq);
 }
-
+/*! 2016.10.15 study -ing */
 static u8 gic_get_cpumask(struct gic_chip_data *gic)
 {
+	/* base = gic->dist_base.common_base */
 	void __iomem *base = gic_data_dist_base(gic);
 	u32 mask, i;
 
+	/*! 32 bit를 읽은 후 하위 8bit 에 상위 16bit, 24bit 값을 or로 모두 set 한 값을 얻는다. */
 	for (i = mask = 0; i < 32; i += 4) {
 		mask = readl_relaxed(base + GIC_DIST_TARGET + i);
 		mask |= mask >> 16;
@@ -372,14 +378,16 @@ static u8 gic_get_cpumask(struct gic_chip_data *gic)
 
 	return mask;
 }
-
+/*! 2016.10.15 study -ing */
 static void __init gic_dist_init(struct gic_chip_data *gic)
 {
 	unsigned int i;
 	u32 cpumask;
 	unsigned int gic_irqs = gic->gic_irqs;
+	/*! base = gic->dist_base.common_base  */
 	void __iomem *base = gic_data_dist_base(gic);
 
+	/*! GIC_DIST_CTRL: 0x0000 0000 (reset value)로 초기화함. */
 	writel_relaxed(0, base + GIC_DIST_CTRL);
 
 	/*
@@ -391,15 +399,18 @@ static void __init gic_dist_init(struct gic_chip_data *gic)
 	/*
 	 * Set all global interrupts to this CPU only.
 	 */
+	/*! gic->dist_base.common_base + GIC_DIST_TARGET 에서 mask 읽어 옴 */
 	cpumask = gic_get_cpumask(gic);
 	cpumask |= cpumask << 8;
 	cpumask |= cpumask << 16;
+	/*! 가져온 cpumask를 base + GIC_DIST_TARGET... 적용  */
 	for (i = 32; i < gic_irqs; i += 4)
 		writel_relaxed(cpumask, base + GIC_DIST_TARGET + i * 4 / 4);
 
 	/*
 	 * Set priority on all global interrupts.
 	 */
+	/*! 0xa0a0a0a0값을 base + GIC_DIST_PRI... 에 적용(priority 값 적용)  */
 	for (i = 32; i < gic_irqs; i += 4)
 		writel_relaxed(0xa0a0a0a0, base + GIC_DIST_PRI + i * 4 / 4);
 
@@ -407,23 +418,32 @@ static void __init gic_dist_init(struct gic_chip_data *gic)
 	 * Disable all interrupts.  Leave the PPI and SGIs alone
 	 * as these enables are banked registers.
 	 */
+	/*! 0xffffffff을 base + GIC_DIST_ENABLE_CLEAR... 에 적용(disable interrupt)  */
 	for (i = 32; i < gic_irqs; i += 32)
 		writel_relaxed(0xffffffff, base + GIC_DIST_ENABLE_CLEAR + i * 4 / 32);
 
+	/*! register: GICC_CTLR 값을 1로 설정
+	 * 1의 값의 의미: cpu에 전달되는 인터럽트를 enable함.
+	 */
 	writel_relaxed(1, base + GIC_DIST_CTRL);
 }
-
+/*! 2016.10.15 study -ing */
 static void gic_cpu_init(struct gic_chip_data *gic)
 {
+	/*! dist_base = gic->dist_base.common_base */
 	void __iomem *dist_base = gic_data_dist_base(gic);
+	/*! base = gic->cpu_base.common_base  */
 	void __iomem *base = gic_data_cpu_base(gic);
+	/*! cpu = current_thread_info()->cpu  */
 	unsigned int cpu_mask, cpu = smp_processor_id();
 	int i;
 
 	/*
 	 * Get what the GIC says our CPU mask is.
 	 */
+	/*! #define NR_GIC_CPU_IF 8  */
 	BUG_ON(cpu >= NR_GIC_CPU_IF);
+	/*! cpu_mask 찾아서 gic_cpu_map 업데이트  */
 	cpu_mask = gic_get_cpumask(gic);
 	gic_cpu_map[cpu] = cpu_mask;
 
@@ -431,6 +451,7 @@ static void gic_cpu_init(struct gic_chip_data *gic)
 	 * Clear our mask from the other map entries in case they're
 	 * still undefined.
 	 */
+	/*! #define NR_GIC_CPU_IF 8  */
 	for (i = 0; i < NR_GIC_CPU_IF; i++)
 		if (i != cpu)
 			gic_cpu_map[i] &= ~cpu_mask;
@@ -439,16 +460,21 @@ static void gic_cpu_init(struct gic_chip_data *gic)
 	 * Deal with the banked PPI and SGI interrupts - disable all
 	 * PPI interrupts, ensure all SGI interrupts are enabled.
 	 */
+	/*! dist_base +... 에 해당 값 업데이트  */
 	writel_relaxed(0xffff0000, dist_base + GIC_DIST_ENABLE_CLEAR);
 	writel_relaxed(0x0000ffff, dist_base + GIC_DIST_ENABLE_SET);
 
 	/*
 	 * Set priority on PPI and SGI interrupts
 	 */
+	/*! 0xa0a0a0a0 - priotry 관련 값 업데이트  */
 	for (i = 0; i < 32; i += 4)
 		writel_relaxed(0xa0a0a0a0, dist_base + GIC_DIST_PRI + i * 4 / 4);
 
 	writel_relaxed(0xf0, base + GIC_CPU_PRIMASK);
+	/*! register: GICC_CTLR 값을 1로 설정
+	 * 1의 값의 의미: cpu에 전달되는 인터럽트를 enable함.
+	 */
 	writel_relaxed(1, base + GIC_CPU_CTRL);
 }
 
@@ -627,7 +653,7 @@ static int gic_notifier(struct notifier_block *self, unsigned long cmd,	void *v)
 static struct notifier_block gic_notifier_block = {
 	.notifier_call = gic_notifier,
 };
-
+/*! 2016.10.15 study -ing */
 static void __init gic_pm_init(struct gic_chip_data *gic)
 {
 	gic->saved_ppi_enable = __alloc_percpu(DIV_ROUND_UP(32, 32) * 4,
@@ -638,6 +664,7 @@ static void __init gic_pm_init(struct gic_chip_data *gic)
 		sizeof(u32));
 	BUG_ON(!gic->saved_ppi_conf);
 
+	/*! lock 걸고 cpu_pm_notifier_chain에 gic_notifier_block 추가  */
 	if (gic == &gic_data[0])
 		cpu_pm_register_notifier(&gic_notifier_block);
 }
@@ -798,11 +825,12 @@ unsigned long gic_get_sgir_physaddr(void)
 		return 0;
 	return gic_dist_physaddr + GIC_DIST_SOFTINT;
 }
-
+/*! 2016.10.15 study -ing */
 void __init gic_init_physaddr(struct device_node *node)
 {
 	struct resource res;
 	if (of_address_to_resource(node, 0, &res) == 0) {
+		/*! res 를 가져와서 res.start를 gic_dist_physaddr에 대입  */
 		gic_dist_physaddr = res.start;
 		pr_info("GIC physical location is %#lx\n", gic_dist_physaddr);
 	}
@@ -811,41 +839,47 @@ void __init gic_init_physaddr(struct device_node *node)
 #else
 #define gic_init_physaddr(node)  do { } while (0)
 #endif
-
+/*! 2016.10.15 study -ing */
 static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
 				irq_hw_number_t hw)
 {
+	
 	if (hw < 32) {
 		irq_set_percpu_devid(irq);
+		/*! desc->handle_irq에 handle_percpu_devid_irq 대입 됨.  */
 		irq_set_chip_and_handler(irq, &gic_chip,
 					 handle_percpu_devid_irq);
 		set_irq_flags(irq, IRQF_VALID | IRQF_NOAUTOEN);
 	} else {
+		/*! desc->handle_irq에 handle_fasteoi_irq 대입 됨.  */
 		irq_set_chip_and_handler(irq, &gic_chip,
 					 handle_fasteoi_irq);
 		set_irq_flags(irq, IRQF_VALID | IRQF_PROBE);
 	}
+	/*! irq로 desc를 찾은 후 desc->irq_data.chip_data에 d->host_data 대입 */
 	irq_set_chip_data(irq, d->host_data);
 	return 0;
 }
-
+/*! 2016.10.15 study -ing */
 static int gic_irq_domain_xlate(struct irq_domain *d,
 				struct device_node *controller,
 				const u32 *intspec, unsigned int intsize,
 				unsigned long *out_hwirq, unsigned int *out_type)
 {
+	/*! out_hwirq 와 out_type을 설정하는 함수  */
 	if (d->of_node != controller)
 		return -EINVAL;
 	if (intsize < 3)
 		return -EINVAL;
 
 	/* Get the interrupt number and add 16 to skip over SGIs */
+	/*! 전달받은 intspec을 이용해 out_hwirq 설정  */
 	*out_hwirq = intspec[1] + 16;
 
 	/* For SPIs, we need to add 16 more to get the GIC irq ID number */
 	if (!intspec[0])
 		*out_hwirq += 16;
-
+	/*! 전달받은 intspec[2]의 IRQ_TYPE_SENSE_MASK(0x0f) bit 영역을 이용해 out_type 설정 */
 	*out_type = intspec[2] & IRQ_TYPE_SENSE_MASK;
 	return 0;
 }
@@ -994,20 +1028,25 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
 	}
 	gic->domain = irq_domain_add_legacy(node, gic_irqs, irq_base,
 				    hwirq_base, &gic_irq_domain_ops, gic);
+	/*! 2016.10.15 study -ing */
 	if (WARN_ON(!gic->domain))
 		return;
 
 	if (gic_nr == 0) {
 #ifdef CONFIG_SMP
+		/*! smp_cross_call이 NULL이면 gic_raise_softirq 함수를 대입 */
 		set_smp_cross_call(gic_raise_softirq);
+		/*! Do nothing  */
 		register_cpu_notifier(&gic_cpu_notifier);
 #endif
+		/*! handle_arch_irq가 NULL이면 gic_handle_irq 함수를 대입 */
 		set_handle_irq(gic_handle_irq);
 	}
 
 	gic_chip.flags |= gic_arch_extn.flags;
 	gic_dist_init(gic);
 	gic_cpu_init(gic);
+	/*! gic->saved_ppi_enable, gic->saved_ppi_conf 메모리 alloc  */
 	gic_pm_init(gic);
 }
 
@@ -1047,6 +1086,9 @@ int __init gic_of_init(struct device_node *node, struct device_node *parent)
 		gic_init_physaddr(node);
 
 	if (parent) {
+		/*! node에서 0번 irq를 찾아서 가져오거나,
+		 *  엎으면 새로 create 및 mapping 한후 가져온다.
+		 */
 		irq = irq_of_parse_and_map(node, 0);
 		gic_cascade_irq(gic_cnt, irq);
 	}

@@ -105,7 +105,7 @@ extern void irq_set_thread_affinity(struct irq_desc *desc);
 
 extern int irq_do_set_affinity(struct irq_data *data,
 			       const struct cpumask *dest, bool force);
-
+/*! 2016.10.15 study -ing */
 /* Inline functions for support of irq chips on slow busses */
 static inline void chip_bus_lock(struct irq_desc *desc)
 {
@@ -129,25 +129,26 @@ struct irq_desc *
 __irq_get_desc_lock(unsigned int irq, unsigned long *flags, bool bus,
 		    unsigned int check);
 void __irq_put_desc_unlock(struct irq_desc *desc, unsigned long flags, bool bus);
-
+/*! 2016.10.15 study -ing */
 static inline struct irq_desc *
 irq_get_desc_buslock(unsigned int irq, unsigned long *flags, unsigned int check)
 {
+	/*! bus가 true 이므로, chip bus lock을 걸고 desc를 가져온다. */
 	return __irq_get_desc_lock(irq, flags, true, check);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void
 irq_put_desc_busunlock(struct irq_desc *desc, unsigned long flags)
 {
 	__irq_put_desc_unlock(desc, flags, true);
 }
-
+/*! 2016.10.15 study -ing */
 static inline struct irq_desc *
 irq_get_desc_lock(unsigned int irq, unsigned long *flags, unsigned int check)
 {
 	return __irq_get_desc_lock(irq, flags, false, check);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void
 irq_put_desc_unlock(struct irq_desc *desc, unsigned long flags)
 {
@@ -166,7 +167,7 @@ static inline void irqd_clr_move_pending(struct irq_data *d)
 {
 	d->state_use_accessors &= ~IRQD_SETAFFINITY_PENDING;
 }
-
+/*! 2016.10.15 study -ing */
 static inline void irqd_clear(struct irq_data *d, unsigned int mask)
 {
 	d->state_use_accessors &= ~mask;

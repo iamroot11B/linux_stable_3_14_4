@@ -93,6 +93,7 @@ EXPORT_SYMBOL(boot_tvec_bases);
 static DEFINE_PER_CPU(struct tvec_base *, tvec_bases) = &boot_tvec_bases;
 
 /* Functions below help us manage 'deferrable' flag */
+/*! 2016.10.15 study -ing */
 static inline unsigned int tbase_get_deferrable(struct tvec_base *base)
 {
 	return ((unsigned int)(unsigned long)base & TIMER_DEFERRABLE);
@@ -1505,7 +1506,7 @@ signed long __sched schedule_timeout_uninterruptible(signed long timeout)
 	return schedule_timeout(timeout);
 }
 EXPORT_SYMBOL(schedule_timeout_uninterruptible);
-
+/*! 2016.10.15 study -ing */
 static int init_timers_cpu(int cpu)
 {
 	int j;
@@ -1519,17 +1520,20 @@ static int init_timers_cpu(int cpu)
 			/*
 			 * The APs use this path later in boot
 			 */
+			/*! base alloc  */
 			base = kzalloc_node(sizeof(*base), GFP_KERNEL,
 					    cpu_to_node(cpu));
 			if (!base)
 				return -ENOMEM;
 
 			/* Make sure that tvec_base is 2 byte aligned */
+			/*! base의 TIMER_DEFERRABLE bit 값을 &로 확인.  */
 			if (tbase_get_deferrable(base)) {
 				WARN_ON(1);
 				kfree(base);
 				return -ENOMEM;
 			}
+			/*! base의 TIMER_DEFERRABLE bit set 되어 있으면 아래 수행 */
 			per_cpu(tvec_bases, cpu) = base;
 		} else {
 			/*
@@ -1538,6 +1542,8 @@ static int init_timers_cpu(int cpu)
 			 * ready yet and because the memory allocators are not
 			 * initialised either.
 			 */
+			/*! 2016.10.15 study -ing */
+			/*! from init_timers함수. boot_done = 0 초기값  */
 			boot_done = 1;
 			base = &boot_tvec_bases;
 		}
@@ -1548,6 +1554,7 @@ static int init_timers_cpu(int cpu)
 	}
 
 
+	/*! 각 list 초기화  */
 	for (j = 0; j < TVN_SIZE; j++) {
 		INIT_LIST_HEAD(base->tv5.vec + j);
 		INIT_LIST_HEAD(base->tv4.vec + j);
@@ -1557,6 +1564,7 @@ static int init_timers_cpu(int cpu)
 	for (j = 0; j < TVR_SIZE; j++)
 		INIT_LIST_HEAD(base->tv1.vec + j);
 
+	/*! base 값 설정  */
 	base->timer_jiffies = jiffies;
 	base->next_timer = base->timer_jiffies;
 	base->active_timers = 0;
@@ -1609,7 +1617,7 @@ static void migrate_timers(int cpu)
 	put_cpu_var(tvec_bases);
 }
 #endif /* CONFIG_HOTPLUG_CPU */
-
+/*! 2016.10.15 study -ing */
 static int timer_cpu_notify(struct notifier_block *self,
 				unsigned long action, void *hcpu)
 {
@@ -1617,6 +1625,8 @@ static int timer_cpu_notify(struct notifier_block *self,
 	int err;
 
 	switch(action) {
+		/*! 2016.10.15 study -ing */
+		/*! CPU_UP_PREPARE 경우만 확인 함 */
 	case CPU_UP_PREPARE:
 	case CPU_UP_PREPARE_FROZEN:
 		err = init_timers_cpu(cpu);
@@ -1639,7 +1649,7 @@ static struct notifier_block timers_nb = {
 	.notifier_call	= timer_cpu_notify,
 };
 
-
+/*! 2016.10.15 study -ing */
 void __init init_timers(void)
 {
 	int err;
@@ -1649,6 +1659,7 @@ void __init init_timers(void)
 
 	err = timer_cpu_notify(&timers_nb, (unsigned long)CPU_UP_PREPARE,
 			       (void *)(long)smp_processor_id());
+	/*! Do nothing  */
 	init_timer_stats();
 
 	BUG_ON(err != NOTIFY_OK);

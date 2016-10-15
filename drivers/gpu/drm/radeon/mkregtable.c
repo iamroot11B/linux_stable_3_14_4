@@ -49,7 +49,7 @@ struct list_head {
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
-
+/*! 2016.10.15 study -ing */
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;

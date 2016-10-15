@@ -179,6 +179,7 @@ static inline void kick_all_cpus_sync(void) {  }
   extern unsigned int debug_smp_processor_id(void);
 # define smp_processor_id() debug_smp_processor_id()
 #else
+/*! 2016.10.15 study -ing */
 # define smp_processor_id() raw_smp_processor_id()
 #endif
 

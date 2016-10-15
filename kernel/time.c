@@ -355,6 +355,7 @@ EXPORT_SYMBOL(mktime);
  *	0 <= tv_nsec < NSEC_PER_SEC
  * For negative values only the tv_sec field is negative !
  */
+/*! 2016.10.15 study -ing */
 void set_normalized_timespec(struct timespec *ts, time_t sec, s64 nsec)
 {
 	while (nsec >= NSEC_PER_SEC) {

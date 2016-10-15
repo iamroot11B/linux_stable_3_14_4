@@ -324,7 +324,7 @@ static int twd_timer_cpu_notify(struct notifier_block *self,
 static struct notifier_block twd_timer_cpu_nb = {
 	.notifier_call = twd_timer_cpu_notify,
 };
-
+/*! 2016.10.15 study -ing */
 static int __init twd_local_timer_common_register(struct device_node *np)
 {
 	int err;
@@ -368,7 +368,7 @@ out_free:
 
 	return err;
 }
-
+/*! 2016.10.15 study -ing */
 int __init twd_local_timer_register(struct twd_local_timer *tlt)
 {
 	if (twd_base || twd_evt)

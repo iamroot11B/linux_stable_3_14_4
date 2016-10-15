@@ -162,6 +162,7 @@ static inline unsigned long of_read_ulong(const __be32 *cell, int size)
 
 #define OF_BAD_ADDR	((u64)-1)
 
+/*! 2016.10.15 study -ing */
 static inline const char *of_node_full_name(const struct device_node *np)
 {
 	return np ? np->full_name : "<no-node>";
@@ -597,6 +598,7 @@ static inline int of_property_read_u32(const struct device_node *np,
 #define for_each_matching_node(dn, matches) \
 	for (dn = of_find_matching_node(NULL, matches); dn; \
 	     dn = of_find_matching_node(dn, matches))
+/*! 2016.10.15 study -ing */
 #define for_each_matching_node_and_match(dn, matches, match) \
 	for (dn = of_find_matching_node_and_match(NULL, matches, match); \
 	     dn; dn = of_find_matching_node_and_match(dn, matches, match))

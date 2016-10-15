@@ -287,7 +287,7 @@ static inline void list_cut_position(struct list_head *list,
 	else
 		__list_cut_position(list, head, entry);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void __list_splice(const struct list_head *list,
 				 struct list_head *prev,
 				 struct list_head *next)
@@ -333,6 +333,7 @@ static inline void list_splice_tail(struct list_head *list,
  *
  * The list at @list is reinitialised
  */
+/*! 2016.10.15 study -ing */
 static inline void list_splice_init(struct list_head *list,
 				    struct list_head *head)
 {
@@ -400,6 +401,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  *
  * Note that if the list is empty, it returns NULL.
  */
+/*! 2016.10.15 study -ing */
 #define list_first_entry_or_null(ptr, type, member) \
 	(!list_empty(ptr) ? list_first_entry(ptr, type, member) : NULL)
 
@@ -538,6 +540,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * @head:	the head for your list.
  * @member:	the name of the list_struct within the struct.
  */
+/*! 2016.10.15 study -ing */
 #define list_for_each_entry_safe(pos, n, head, member)			\
 	for (pos = list_first_entry(head, typeof(*pos), member),	\
 		n = list_next_entry(pos, member);			\

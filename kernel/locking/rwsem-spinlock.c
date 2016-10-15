@@ -63,6 +63,7 @@ EXPORT_SYMBOL(__init_rwsem);
  * - woken process blocks are discarded from the list after having task zeroed
  * - writers are only woken if wakewrite is non-zero
  */
+/*! 2016.10.15 study -ing */
 static inline struct rw_semaphore *
 __rwsem_do_wake(struct rw_semaphore *sem, int wakewrite)
 {
@@ -70,8 +71,12 @@ __rwsem_do_wake(struct rw_semaphore *sem, int wakewrite)
 	struct task_struct *tsk;
 	int woken;
 
+	/*! sem->wait_list의 next를 통해 waiter를 가져오고,  */
 	waiter = list_entry(sem->wait_list.next, struct rwsem_waiter, list);
 
+	/*! 가져온 waiter의  타입이 RWSEM_WAITING_FOR_WRITE이고 wakewrite이 1이면,
+	 * wake_up_process를 수행
+	 */
 	if (waiter->type == RWSEM_WAITING_FOR_WRITE) {
 		if (wakewrite)
 			/* Wake up a writer. Note that we do not grant it the
@@ -186,18 +191,22 @@ int __down_read_trylock(struct rw_semaphore *sem)
 /*
  * get a write lock on the semaphore
  */
+/*! 2016.10.15 study -ing */
 void __sched __down_write_nested(struct rw_semaphore *sem, int subclass)
 {
 	struct rwsem_waiter waiter;
 	struct task_struct *tsk;
 	unsigned long flags;
 
+	/*! spin lock을 걸고,  */
 	raw_spin_lock_irqsave(&sem->wait_lock, flags);
 
 	/* set up my own style of waitqueue */
 	tsk = current;
 	waiter.task = tsk;
 	waiter.type = RWSEM_WAITING_FOR_WRITE;
+
+	/*! sem->wait_list에 waiter.list를 추가  */
 	list_add_tail(&waiter.list, &sem->wait_list);
 
 	/* wait for someone to release the lock */
@@ -208,8 +217,11 @@ void __sched __down_write_nested(struct rw_semaphore *sem, int subclass)
 		 * itself into sleep and waiting for system woke it or someone
 		 * else in the head of the wait list up.
 		 */
+		/*! sem->activity가 0이 될때까지 기다린다. */
 		if (sem->activity == 0)
 			break;
+
+		/*! tsk->state에 TASK_UNINTERRUPTIBLE를 대입  */
 		set_task_state(tsk, TASK_UNINTERRUPTIBLE);
 		raw_spin_unlock_irqrestore(&sem->wait_lock, flags);
 		schedule();
@@ -219,9 +231,10 @@ void __sched __down_write_nested(struct rw_semaphore *sem, int subclass)
 	sem->activity = -1;
 	list_del(&waiter.list);
 
+	/*! 위에서 건 spin lock 해제  */
 	raw_spin_unlock_irqrestore(&sem->wait_lock, flags);
 }
-
+/*! 2016.10.15 study -ing */
 void __sched __down_write(struct rw_semaphore *sem)
 {
 	__down_write_nested(sem, 0);
@@ -266,6 +279,7 @@ void __up_read(struct rw_semaphore *sem)
 /*
  * release a write lock on the semaphore
  */
+/*! 2016.10.15 study -ing */
 void __up_write(struct rw_semaphore *sem)
 {
 	unsigned long flags;
@@ -273,6 +287,7 @@ void __up_write(struct rw_semaphore *sem)
 	raw_spin_lock_irqsave(&sem->wait_lock, flags);
 
 	sem->activity = 0;
+	/*! sem->wait_list가 empty가 아니면 __rwsem_do_wake수행 */
 	if (!list_empty(&sem->wait_list))
 		sem = __rwsem_do_wake(sem, 1);
 

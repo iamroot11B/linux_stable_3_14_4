@@ -442,7 +442,7 @@ struct tasklet_head {
 
 static DEFINE_PER_CPU(struct tasklet_head, tasklet_vec);
 static DEFINE_PER_CPU(struct tasklet_head, tasklet_hi_vec);
-
+/*! 2016.10.15 study -ing */
 void __tasklet_schedule(struct tasklet_struct *t)
 {
 	unsigned long flags;
@@ -627,11 +627,12 @@ void tasklet_hrtimer_init(struct tasklet_hrtimer *ttimer,
 	ttimer->function = function;
 }
 EXPORT_SYMBOL_GPL(tasklet_hrtimer_init);
-
+/*! 2016.10.15 study -ing */
 void __init softirq_init(void)
 {
 	int cpu;
 
+	/*! 각 cpu별로 tail 에 head를 대입 (초기화) */
 	for_each_possible_cpu(cpu) {
 		per_cpu(tasklet_vec, cpu).tail =
 			&per_cpu(tasklet_vec, cpu).head;
@@ -639,7 +640,9 @@ void __init softirq_init(void)
 			&per_cpu(tasklet_hi_vec, cpu).head;
 	}
 
+	/*! softirq_vec[TASKLET_SOFTIRQ].action 에 tasklet_action 대입  */
 	open_softirq(TASKLET_SOFTIRQ, tasklet_action);
+	/*! softirq_vec[HI_SOFTIRQ].action 에 tasklet_hi_action 대입  */
 	open_softirq(HI_SOFTIRQ, tasklet_hi_action);
 }
 

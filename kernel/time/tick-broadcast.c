@@ -874,9 +874,10 @@ bool tick_broadcast_oneshot_available(void)
 }
 
 #endif
-
+/*! 2016.10.15 study -ing */
 void __init tick_broadcast_init(void)
 {
+	/*! 각 mask들 clear 수행  */
 	zalloc_cpumask_var(&tick_broadcast_mask, GFP_NOWAIT);
 	zalloc_cpumask_var(&tick_broadcast_on, GFP_NOWAIT);
 	zalloc_cpumask_var(&tmpmask, GFP_NOWAIT);

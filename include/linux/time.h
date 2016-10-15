@@ -94,6 +94,7 @@ static inline struct timespec timespec_sub(struct timespec lhs,
 /*
  * Returns true if the timespec is norm, false if denorm:
  */
+/*! 2016.10.15 study -ing */
 static inline bool timespec_valid(const struct timespec *ts)
 {
 	/* Dates before 1970 are bogus */
@@ -104,7 +105,7 @@ static inline bool timespec_valid(const struct timespec *ts)
 		return false;
 	return true;
 }
-
+/*! 2016.10.15 study -ing */
 static inline bool timespec_valid_strict(const struct timespec *ts)
 {
 	if (!timespec_valid(ts))

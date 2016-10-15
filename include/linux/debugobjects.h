@@ -87,6 +87,7 @@ static inline void
 debug_object_init_on_stack(void *addr, struct debug_obj_descr *descr) { }
 static inline int
 debug_object_activate  (void *addr, struct debug_obj_descr *descr) { return 0; }
+/*! 2016.10.15 study -ing */
 static inline void
 debug_object_deactivate(void *addr, struct debug_obj_descr *descr) { }
 static inline void

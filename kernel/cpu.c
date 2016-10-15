@@ -165,6 +165,7 @@ void cpu_hotplug_enable(void)
 /*! From cpu_notifier()
  * nb = page_alloc_cpu_notify_nb  
  */
+/*! 2016.10.15 study -ing */
 int __ref register_cpu_notifier(struct notifier_block *nb)
 {
 	int ret;

@@ -53,6 +53,7 @@ static DECLARE_TASKLET(resend_tasklet, resend_irqs, 0);
  *
  * Is called with interrupts disabled and desc->lock held.
  */
+/*! 2016.10.15 study -ing */
 void check_irq_resend(struct irq_desc *desc, unsigned int irq)
 {
 	/*
@@ -61,6 +62,7 @@ void check_irq_resend(struct irq_desc *desc, unsigned int irq)
 	 * active. Clear the pending bit so suspend/resume does not
 	 * get confused.
 	 */
+	/*! 실제 resend는 하드웨어에서 해주고 여기서는 bit clear 만 해준다. */
 	if (irq_settings_is_level(desc)) {
 		desc->istate &= ~IRQS_PENDING;
 		return;
@@ -84,6 +86,7 @@ void check_irq_resend(struct irq_desc *desc, unsigned int irq)
 				irq = desc->parent_irq;
 			/* Set it pending and activate the softirq: */
 			set_bit(irq, irqs_resend);
+			/*! 태스크릿은 등록된 함수를 나중에 실행하기 위해 스케줄할 수 있는 지연 가능 스키마  */
 			tasklet_schedule(&resend_tasklet);
 #endif
 		}

@@ -204,11 +204,11 @@ static inline void hrtimer_set_expires_range(struct hrtimer *timer, ktime_t time
 	timer->_softexpires = time;
 	timer->node.expires = ktime_add_safe(time, delta);
 }
-
+/*! 2016.10.15 study -ing */
 static inline void hrtimer_set_expires_range_ns(struct hrtimer *timer, ktime_t time, unsigned long delta)
 {
-	timer->_softexpires = time;
-	timer->node.expires = ktime_add_safe(time, ns_to_ktime(delta));
+	timer->_softexpires	= time;
+	timer->node.expires	= ktime_add_safe(time, ns_to_ktime(delta));
 }
 
 static inline void hrtimer_set_expires_tv64(struct hrtimer *timer, s64 tv64)
@@ -404,6 +404,7 @@ static inline int hrtimer_active(const struct hrtimer *timer)
 /*
  * Helper function to check, whether the timer is on one of the queues
  */
+/*! 2016.10.15 study -ing */
 static inline int hrtimer_is_queued(struct hrtimer *timer)
 {
 	return timer->state & HRTIMER_STATE_ENQUEUED;
@@ -413,6 +414,7 @@ static inline int hrtimer_is_queued(struct hrtimer *timer)
  * Helper function to check, whether the timer is running the callback
  * function
  */
+/*! 2016.10.15 study -ing */
 static inline int hrtimer_callback_running(struct hrtimer *timer)
 {
 	return timer->state & HRTIMER_STATE_CALLBACK;

@@ -85,6 +85,7 @@
 			  (unsigned long)pcpu_base_addr	+		\
 			  (unsigned long)__per_cpu_start)
 #endif
+/*! 2016.10.15 study -ing */
 #ifndef __pcpu_ptr_to_addr
 #define __pcpu_ptr_to_addr(ptr)						\
 	(void __force *)((unsigned long)(ptr) +				\
@@ -1031,6 +1032,7 @@ static void pcpu_reclaim(struct work_struct *work)
  * CONTEXT:
  * Can be called from atomic context.
  */
+/*! 2016.10.15 study -ing */
 void free_percpu(void __percpu *ptr)
 {
 	void *addr;
@@ -1041,6 +1043,7 @@ void free_percpu(void __percpu *ptr)
 	if (!ptr)
 		return;
 
+	/*! Do nothing  */
 	kmemleak_free_percpu(ptr);
 
 	addr = __pcpu_ptr_to_addr(ptr);

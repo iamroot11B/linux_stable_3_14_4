@@ -47,7 +47,7 @@ static void __init ct_ca9x4_map_io(void)
 
 #ifdef CONFIG_HAVE_ARM_TWD
 static DEFINE_TWD_LOCAL_TIMER(twd_local_timer, A9_MPCORE_TWD, IRQ_LOCALTIMER);
-
+/*! 2016.10.15 study -ing */
 static void __init ca9x4_twd_init(void)
 {
 	int err = twd_local_timer_register(&twd_local_timer);
@@ -57,7 +57,7 @@ static void __init ca9x4_twd_init(void)
 #else
 #define ca9x4_twd_init()	do {} while(0)
 #endif
-
+/*! 2016.10.15 study -ing */
 static void __init ct_ca9x4_init_irq(void)
 {
 	gic_init(0, 29, ioremap(A9_MPCORE_GIC_DIST, SZ_4K),
