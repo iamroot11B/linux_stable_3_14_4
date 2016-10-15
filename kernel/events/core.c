@@ -6554,7 +6554,7 @@ free_dev:
 	device_del(pmu->dev);
 	put_device(pmu->dev);
 
-free_idr:ㅍ
+free_idr:
 	if (pmu->type >= PERF_TYPE_MAX)
 		idr_remove(&pmu_idr, pmu->type);
 

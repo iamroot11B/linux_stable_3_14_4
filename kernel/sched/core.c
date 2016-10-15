@@ -1620,7 +1620,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 	 */
 	smp_rmb();
 
-	/*! p task_struct의 변수들 업데이트 */  */
+	/*! p task_struct의 변수들 업데이트 */
 	p->sched_contributes_to_load = !!task_contributes_to_load(p);
 	p->state = TASK_WAKING;
 
