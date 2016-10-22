@@ -197,6 +197,7 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 #define __pte_map(pmd)		pmd_page_vaddr(*(pmd))
 #define __pte_unmap(pte)	do { } while (0)
 #else
+/*! 2016.10.22 study -ing */
 #define __pte_map(pmd)		(pte_t *)kmap_atomic(pmd_page(*(pmd)))
 #define __pte_unmap(pte)	kunmap_atomic(pte)
 #endif
@@ -205,7 +206,7 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 #define pte_index(addr)		(((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
 /*! 2016-04-02 study -ing */
 #define pte_offset_kernel(pmd,addr)	(pmd_page_vaddr(*(pmd)) + pte_index(addr))
-
+/*! 2016.10.22 study -ing */
 #define pte_offset_map(pmd,addr)	(__pte_map(pmd) + pte_index(addr))
 #define pte_unmap(pte)			__pte_unmap(pte)
 

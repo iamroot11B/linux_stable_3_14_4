@@ -233,17 +233,20 @@ static struct list_head *pcpu_slot __read_mostly; /* chunk list slots */
 static void pcpu_reclaim(struct work_struct *work);
 static DECLARE_WORK(pcpu_reclaim_work, pcpu_reclaim);
 
+/*! 2016.10.22 study -ing */
 static bool pcpu_addr_in_first_chunk(void *addr)
 {
 	void *first_start = pcpu_first_chunk->base_addr;
-
+	/*! addr 이 first_start 보다 크고, first_strat + pcpu_unit_size 보다 작으면
+	 *  -> first chunk 안에 있다.
+	 */
 	return addr >= first_start && addr < first_start + pcpu_unit_size;
 }
-
+/*! 2016.10.22 study -ing */
 static bool pcpu_addr_in_reserved_chunk(void *addr)
 {
 	void *first_start = pcpu_first_chunk->base_addr;
-
+	/*! first_start <= addr >= first_start + pcpu_reserved_chunk_limit 이면. */
 	return addr >= first_start &&
 		addr < first_start + pcpu_reserved_chunk_limit;
 }
@@ -774,6 +777,7 @@ static int __init pcpu_verify_alloc_info(const struct pcpu_alloc_info *ai);
  * RETURNS:
  * The address of the found chunk.
  */
+/*! 2016.10.22 study -ing */
 static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
 {
 	/* is it in the first chunk? */
@@ -791,6 +795,7 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
 	 * space.  Note that any possible cpu id can be used here, so
 	 * there's no need to worry about preemption or cpu hotplug.
 	 */
+	/*! pcpu_unit_offsets : pcpu_setup_first_chunk 에서 초기화  */
 	addr += pcpu_unit_offsets[raw_smp_processor_id()];
 	return pcpu_get_page_chunk(pcpu_addr_to_page(addr));
 }
@@ -1046,8 +1051,10 @@ void free_percpu(void __percpu *ptr)
 	/*! Do nothing  */
 	kmemleak_free_percpu(ptr);
 
+	/*! ptr + pcpu_base_addr - __per_cpu_start */
 	addr = __pcpu_ptr_to_addr(ptr);
 
+	/*! spin lock 걸고,  */
 	spin_lock_irqsave(&pcpu_lock, flags);
 
 	chunk = pcpu_chunk_addr_search(addr);
@@ -1432,7 +1439,7 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 			/* determine low/high unit_cpu */
 			if (pcpu_low_unit_cpu == NR_CPUS ||
 			    unit_off[cpu] < unit_off[pcpu_low_unit_cpu])
-				pcpu_low_unit_cpu = cpu;
+n				pcpu_low_unit_cpu = cpu;
 			if (pcpu_high_unit_cpu == NR_CPUS ||
 			    unit_off[cpu] > unit_off[pcpu_high_unit_cpu])
 				pcpu_high_unit_cpu = cpu;

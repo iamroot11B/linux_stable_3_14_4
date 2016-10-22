@@ -538,12 +538,14 @@ struct kset *devices_kset;
  * @dev: device.
  * @attr: device attribute descriptor.
  */
+/*! 2016.10.22 study -ing */
 int device_create_file(struct device *dev,
 		       const struct device_attribute *attr)
 {
 	int error = 0;
 
 	if (dev) {
+		/*! 변수 체크 후 필요 시 warnning 메세지 출력  */
 		WARN(((attr->attr.mode & S_IWUGO) && !attr->store),
 			"Attribute %s: write permission without 'store'\n",
 			attr->attr.name);
@@ -667,20 +669,23 @@ static void klist_children_put(struct klist_node *n)
  * NOTE: Use put_device() to give up your reference instead of freeing
  * @dev directly once you have called this function.
  */
+/*! 2016.10.22 study -ing */
 void device_initialize(struct device *dev)
 {
 	dev->kobj.kset = devices_kset;
 	kobject_init(&dev->kobj, &device_ktype);
 	INIT_LIST_HEAD(&dev->dma_pools);
 	mutex_init(&dev->mutex);
+	/*! Do Nothing  */
 	lockdep_set_novalidate_class(&dev->mutex);
 	spin_lock_init(&dev->devres_lock);
 	INIT_LIST_HEAD(&dev->devres_head);
 	device_pm_init(dev);
+	/*! CONFIG_NUMA not defined -> Do Nothing  */
 	set_dev_node(dev, -1);
 }
 EXPORT_SYMBOL_GPL(device_initialize);
-
+/*! 2016.10.22 study -ing */
 struct kobject *virtual_device_parent(struct device *dev)
 {
 	static struct kobject *virtual_dir = NULL;
@@ -717,13 +722,14 @@ static struct kobj_type class_dir_ktype = {
 	.sysfs_ops	= &kobj_sysfs_ops,
 	.child_ns_type	= class_dir_child_ns_type
 };
-
+/*! 2016.10.22 study -ing */
 static struct kobject *
 class_dir_create_and_add(struct class *class, struct kobject *parent_kobj)
 {
 	struct class_dir *dir;
 	int retval;
 
+	/*! dir 에 alloc 수행  */
 	dir = kzalloc(sizeof(*dir), GFP_KERNEL);
 	if (!dir)
 		return NULL;
@@ -741,7 +747,7 @@ class_dir_create_and_add(struct class *class, struct kobject *parent_kobj)
 	return &dir->kobj;
 }
 
-
+/*! 2016.10.22 study -ing */
 static struct kobject *get_device_parent(struct device *dev,
 					 struct device *parent)
 {
@@ -752,6 +758,7 @@ static struct kobject *get_device_parent(struct device *dev,
 		struct kobject *k;
 
 #ifdef CONFIG_BLOCK
+		/*! CONFIG_BLOCK 이 define 되어있고, block class deivce 일 경우  */
 		/* block disks show up in /sys/block */
 		if (sysfs_deprecated && dev->class == &block_class) {
 			if (parent && parent->class == &block_class)
@@ -782,17 +789,23 @@ static struct kobject *get_device_parent(struct device *dev,
 				break;
 			}
 		spin_unlock(&dev->class->p->glue_dirs.list_lock);
+		/*! 여기까지 수행 후 kobj 있으면(device parent 찾았으면) kobj 리턴  */
 		if (kobj) {
 			mutex_unlock(&gdp_mutex);
 			return kobj;
 		}
 
 		/* or create a new class-directory at the parent device */
+		/*! dir을 새로 만들고 dir->class에 dev->class대입,
+		 *  dir->kobj에 parent_kobj 추가 하고 dir->kobj을 리턴
+		 */
 		k = class_dir_create_and_add(dev->class, parent_kobj);
 		/* do not emit an uevent for this simple "glue" directory */
 		mutex_unlock(&gdp_mutex);
 		return k;
 	}
+
+	/*! dev->class가 없는 경우,  */
 
 	/* subsystems can specify a default root directory for their devices */
 	if (!parent && dev->bus && dev->bus->dev_root)
@@ -881,6 +894,7 @@ static void device_remove_class_symlinks(struct device *dev)
  * @dev: device
  * @fmt: format string for the device's name
  */
+/*! 2016.10.22 study -ing */
 int dev_set_name(struct device *dev, const char *fmt, ...)
 {
 	va_list vargs;
@@ -940,7 +954,7 @@ static void device_remove_sys_dev_entry(struct device *dev)
 		sysfs_remove_link(kobj, devt_str);
 	}
 }
-
+/*! 2016.10.22 study -ing */
 int device_private_init(struct device *dev)
 {
 	dev->p = kzalloc(sizeof(*dev->p), GFP_KERNEL);
@@ -975,6 +989,7 @@ int device_private_init(struct device *dev)
  * if it returned an error! Always use put_device() to give up your
  * reference instead.
  */
+/*! 2016.10.22 study -ing */
 int device_add(struct device *dev)
 {
 	struct device *parent = NULL;
@@ -997,15 +1012,20 @@ int device_add(struct device *dev)
 	 * some day, we need to initialize the name. We prevent reading back
 	 * the name, and force the use of dev_name()
 	 */
+	/*! dev->init_name 이 있으면 dev의 name을 init_name으로 set 하고,
+	 *  dev->init_name은 NULL로 변경
+	 */
 	if (dev->init_name) {
 		dev_set_name(dev, "%s", dev->init_name);
 		dev->init_name = NULL;
 	}
 
 	/* subsystems can specify simple device enumeration */
+	/*! dev name이 없으면 dev->bus->dev_name을 이용해 dev name 설정  */
 	if (!dev_name(dev) && dev->bus && dev->bus->dev_name)
 		dev_set_name(dev, "%s%u", dev->bus->dev_name, dev->id);
 
+	/*! 여기까지도 device name이 없으면 에러처리  */
 	if (!dev_name(dev)) {
 		error = -EINVAL;
 		goto name_error;
@@ -1015,6 +1035,7 @@ int device_add(struct device *dev)
 
 	parent = get_device(dev->parent);
 	kobj = get_device_parent(dev, parent);
+	/*! device parent 찾으면 dev->kobj.parent 에 대입  */
 	if (kobj)
 		dev->kobj.parent = kobj;
 
@@ -1029,6 +1050,7 @@ int device_add(struct device *dev)
 		goto Error;
 
 	/* notify platform of device entry */
+	/*! platform_notify 펑션 포인터 init 되어 있으면 수행  */
 	if (platform_notify)
 		platform_notify(dev);
 
@@ -1154,6 +1176,7 @@ EXPORT_SYMBOL_GPL(device_register);
  * we do take care to provide for the case that we get a NULL
  * pointer passed in.
  */
+/*! 2016.10.22 study -ing */
 struct device *get_device(struct device *dev)
 {
 	return dev ? kobj_to_dev(kobject_get(&dev->kobj)) : NULL;

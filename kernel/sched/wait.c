@@ -61,11 +61,15 @@ EXPORT_SYMBOL(remove_wait_queue);
  * started to run but is not in state TASK_RUNNING. try_to_wake_up() returns
  * zero in this (rare) case, and we handle it by continuing to scan the queue.
  */
+/*! 2016.10.22 study -ing */
 static void __wake_up_common(wait_queue_head_t *q, unsigned int mode,
 			int nr_exclusive, int wake_flags, void *key)
 {
 	wait_queue_t *curr, *next;
 
+	/*! q->task_list의 첫번째 entry부터 loop 돌면서,
+	 *  각 entry(wait_queue_t)의 func 수행
+	 */
 	list_for_each_entry_safe(curr, next, &q->task_list, task_list) {
 		unsigned flags = curr->flags;
 
@@ -99,6 +103,7 @@ EXPORT_SYMBOL(__wake_up);
 /*
  * Same as __wake_up but called with the spinlock in wait_queue_head_t held.
  */
+/*! 2016.10.22 study -ing */
 void __wake_up_locked(wait_queue_head_t *q, unsigned int mode, int nr)
 {
 	__wake_up_common(q, mode, nr, 0, NULL);

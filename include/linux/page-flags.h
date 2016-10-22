@@ -240,6 +240,7 @@ PAGEFLAG(Readahead, reclaim) TESTCLEARFLAG(Readahead, reclaim)
  * Must use a macro here due to header dependency issues. page_zone() is not
  * available at this point.
  */
+/*! 2016.10.22 study -ing */
 #define PageHighMem(__p) is_highmem(page_zone(__p))
 #else
 PAGEFLAG_FALSE(HighMem)

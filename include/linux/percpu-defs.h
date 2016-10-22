@@ -11,6 +11,7 @@
  * linkage errors occur due the compiler generating the wrong code to access
  * that section.
  */
+/*! 2016.10.22 study -ing */
 #define __PCPU_ATTRS(sec)						\
 	__percpu __attribute__((section(PER_CPU_BASE_SECTION sec)))	\
 	PER_CPU_ATTRIBUTES

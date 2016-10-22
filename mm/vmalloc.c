@@ -241,10 +241,12 @@ int is_vmalloc_or_module_addr(const void *x)
 /*
  * Walk a vmap address to the struct page it maps.
  */
+/*! 2016.10.22 study -ing */
 struct page *vmalloc_to_page(const void *vmalloc_addr)
 {
 	unsigned long addr = (unsigned long) vmalloc_addr;
 	struct page *page = NULL;
+	/*! addr로 pgd 구하고,  */
 	pgd_t *pgd = pgd_offset_k(addr);
 
 	/*
@@ -253,13 +255,18 @@ struct page *vmalloc_to_page(const void *vmalloc_addr)
 	 */
 	VIRTUAL_BUG_ON(!is_vmalloc_or_module_addr(vmalloc_addr));
 
+	/*! pgd_none -> 0리턴  */
 	if (!pgd_none(*pgd)) {
+		/*! pgd 그대로 pud에 대입 */
 		pud_t *pud = pud_offset(pgd, addr);
+		/*! pud_none -> 0 리턴  */
 		if (!pud_none(*pud)) {
+			/*! Pud 그대로 pmd에 대입  */
 			pmd_t *pmd = pmd_offset(pud, addr);
+			/*! !pmd_none(*pmd) -> !!pmd -> pmd */
 			if (!pmd_none(*pmd)) {
 				pte_t *ptep, pte;
-
+				/*! 2016.10.22 study end */
 				ptep = pte_offset_map(pmd, addr);
 				pte = *ptep;
 				if (pte_present(pte))

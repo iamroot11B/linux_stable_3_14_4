@@ -6422,6 +6422,7 @@ static void pmu_dev_release(struct device *dev)
 	kfree(dev);
 }
 
+/*! 2016.10.22 study -ing */
 static int pmu_dev_alloc(struct pmu *pmu)
 {
 	int ret = -ENOMEM;
@@ -6454,6 +6455,9 @@ free_dev:
 static struct lock_class_key cpuctx_mutex;
 static struct lock_class_key cpuctx_lock;
 /*! 2016.10.15 study -ing */
+/*! 추후 pmu_bus_running이 1로 set 됐을 시,
+ *  -> pmu_dev_alloc, free_dev label 아래 부분 추가로 분석 필요
+ */
 int perf_pmu_register(struct pmu *pmu, const char *name, int type)
 {
 	int cpu, ret;
@@ -6471,6 +6475,7 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
 	pmu->name = name;
 
 	if (type < 0) {
+		/*! idr_alloc의 리턴은 alloc 한 id 번호  */
 		type = idr_alloc(&pmu_idr, pmu, PERF_TYPE_MAX, 0, GFP_KERNEL);
 		if (type < 0) {
 			ret = type;
@@ -6479,6 +6484,7 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
 	}
 	pmu->type = type;
 
+	/*! perf_event_sysfs_init 에서 1로 set 하며 현재는 0 */
 	if (pmu_bus_running) {
 		ret = pmu_dev_alloc(pmu);
 		if (ret)
@@ -6487,11 +6493,14 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
 
 skip_type:
 	pmu->pmu_cpu_context = find_pmu_context(pmu->task_ctx_nr);
+	/*! 해당하는 pmu_cpu_context 찾으면 got_cpu_context label로 분기 */
 	if (pmu->pmu_cpu_context)
 		goto got_cpu_context;
 
 	ret = -ENOMEM;
+	/*! 해당하는 pmu_cpu_context 못 찾았으면 alloc_percpu 로 alloc 수행  */
 	pmu->pmu_cpu_context = alloc_percpu(struct perf_cpu_context);
+	/*! alloc_percpu도 실패하면 free_dev로 분기 (error case)  */
 	if (!pmu->pmu_cpu_context)
 		goto free_dev;
 
@@ -7983,6 +7992,7 @@ void __init perf_event_init(void)
 	 */
 	perf_cpu_notifier(perf_cpu_notify);
 	/*! 2016.10.15 study end */
+    /*! 2016.10.22 study start */
 	register_reboot_notifier(&perf_reboot_notifier);
 
 	ret = init_hw_breakpoint();

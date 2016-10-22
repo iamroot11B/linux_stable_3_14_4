@@ -87,6 +87,7 @@ static char *pm_verb(int event)
  * device_pm_sleep_init - Initialize system suspend-related device fields.
  * @dev: Device object being initialized.
  */
+/*! 2016.10.22 study -ing */
 void device_pm_sleep_init(struct device *dev)
 {
 	dev->power.is_prepared = false;

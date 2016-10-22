@@ -396,7 +396,7 @@ static inline void lockdep_on(void)
 #define lockdep_set_class_and_subclass(lock, key, sub) \
 		do { (void)(key); } while (0)
 #define lockdep_set_subclass(lock, sub)		do { } while (0)
-
+/*! 2016.10.22 study -ing */
 #define lockdep_set_novalidate_class(lock) do { } while (0)
 
 /*

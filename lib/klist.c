@@ -82,6 +82,7 @@ static void knode_kill(struct klist_node *knode)
  * functions that take and release references on the embedding
  * objects.
  */
+/*! 2016.10.22 study -ing */
 void klist_init(struct klist *k, void (*get)(struct klist_node *),
 		void (*put)(struct klist_node *))
 {

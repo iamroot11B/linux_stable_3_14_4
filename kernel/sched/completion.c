@@ -46,6 +46,7 @@ EXPORT_SYMBOL(complete);
  * It may be assumed that this function implies a write memory barrier before
  * changing the task state if and only if any tasks are woken up.
  */
+/*! 2016.10.22 study -ing */
 void complete_all(struct completion *x)
 {
 	unsigned long flags;

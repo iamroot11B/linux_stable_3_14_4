@@ -878,6 +878,7 @@ static inline int is_highmem_idx(enum zone_type idx)
  *              to ZONE_{DMA/NORMAL/HIGHMEM/etc} in general code to a minimum.
  * @zone - pointer to struct zone variable
  */
+/*! 2016.10.22 study -ing */
 static inline int is_highmem(struct zone *zone)
 {
 #ifdef CONFIG_HIGHMEM

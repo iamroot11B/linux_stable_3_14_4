@@ -22,6 +22,7 @@ typedef struct { pgd_t pgd; } pud_t;
  * setup: the pud is never bad, and a pud always exists (as it's folded
  * into the pgd entry)
  */
+/*! 2016.10.22 study -ing */
 static inline int pgd_none(pgd_t pgd)		{ return 0; }
 static inline int pgd_bad(pgd_t pgd)		{ return 0; }
 static inline int pgd_present(pgd_t pgd)	{ return 1; }
@@ -34,7 +35,7 @@ static inline void pgd_clear(pgd_t *pgd)	{ }
  * but the define is needed for a generic inline function.)
  */
 #define set_pgd(pgdptr, pgdval)			set_pud((pud_t *)(pgdptr), (pud_t) { pgdval })
-
+/*! 2016.10.22 study -ing */
 static inline pud_t * pud_offset(pgd_t * pgd, unsigned long address)
 {
 	return (pud_t *)pgd;

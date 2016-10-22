@@ -13,6 +13,7 @@
  * no other way to make the pagefault handlers do this. So we do
  * disable preemption but we don't necessarily care about that.
  */
+/*! 2016.10.22 study -ing */
 static inline void pagefault_disable(void)
 {
 	preempt_count_inc();

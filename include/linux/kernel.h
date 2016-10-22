@@ -185,12 +185,14 @@ extern int _cond_resched(void);
  * be bitten later when the calling function happens to sleep when it is not
  * supposed to.
  */
-/*! 2016-05-21 study -ing*/
+
 # define might_sleep() \
 	do { __might_sleep(__FILE__, __LINE__, 0); might_resched(); } while (0)
 #else
+/*! 2016.10.22 study -ing */
   static inline void __might_sleep(const char *file, int line,
 				   int preempt_offset) { }
+/*! 2016.10.22 study -ing */
 # define might_sleep() do { might_resched(); } while (0)
 #endif
 
@@ -784,6 +786,7 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
  *
  * Or not use min/max/clamp at all, of course.
  */
+/*! 2016.10.22 study -ing */
 #define min_t(type, x, y) ({			\
 	type __min1 = (x);			\
 	type __min2 = (y);			\

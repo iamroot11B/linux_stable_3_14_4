@@ -68,6 +68,7 @@ static inline void kref_get(struct kref *kref)
  * memory.  Only use the return value if you want to see if the kref is now
  * gone, not present.
  */
+/*! 2016.10.22 study -ing */
 static inline int kref_sub(struct kref *kref, unsigned int count,
 	     void (*release)(struct kref *kref))
 {
@@ -97,6 +98,7 @@ static inline int kref_sub(struct kref *kref, unsigned int count,
  * memory.  Only use the return value if you want to see if the kref is now
  * gone, not present.
  */
+/*! 2016.10.22 study -ing */
 static inline int kref_put(struct kref *kref, void (*release)(struct kref *kref))
 {
 	return kref_sub(kref, 1, release);

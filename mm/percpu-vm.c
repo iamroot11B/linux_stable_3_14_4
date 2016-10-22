@@ -476,7 +476,7 @@ static void pcpu_destroy_chunk(struct pcpu_chunk *chunk)
 		pcpu_free_vm_areas(chunk->data, pcpu_nr_groups);
 	pcpu_free_chunk(chunk);
 }
-
+/*! 2016.10.22 study -ing */
 static struct page *pcpu_addr_to_page(void *addr)
 {
 	return vmalloc_to_page(addr);

@@ -4,7 +4,7 @@
 #include <linux/thread_info.h>
 
 #define PREEMPT_ENABLED	(0)
-
+/*! 2016.10.22 study -ing */
 static __always_inline int preempt_count(void)
 {
 	return current_thread_info()->preempt_count;

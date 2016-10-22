@@ -38,6 +38,7 @@
 #include <linux/percpu.h>
 #include <linux/hardirq.h>
 
+/*! 2016.10.22 study -ing */
 #define MAX_IDR_SHIFT		(sizeof(int) * 8 - 1)
 #define MAX_IDR_BIT		(1U << MAX_IDR_SHIFT)
 
@@ -48,11 +49,13 @@
 #define MAX_IDR_FREE (MAX_IDR_LEVEL * 2)
 
 static struct kmem_cache *idr_layer_cache;
+/*! 2016.10.22 study -ing */
 static DEFINE_PER_CPU(struct idr_layer *, idr_preload_head);
 static DEFINE_PER_CPU(int, idr_preload_cnt);
 static DEFINE_SPINLOCK(simple_ida_lock);
 
 /* the maximum ID which can be allocated given idr->layers */
+/*! 2016.10.22 study -ing */
 static int idr_max(int layers)
 {
 	int bits = min_t(int, layers * IDR_BITS, MAX_IDR_SHIFT);
@@ -65,11 +68,12 @@ static int idr_max(int layers)
  * all bits except for the lower IDR_BITS.  For layer 1, 2 * IDR_BITS, and
  * so on.
  */
+/*! 2016.10.22 study -ing */
 static int idr_layer_prefix_mask(int layer)
 {
 	return ~idr_max(layer + 1);
 }
-
+/*! 2016.10.22 study -ing */
 static struct idr_layer *get_from_free_list(struct idr *idp)
 {
 	struct idr_layer *p;
@@ -98,6 +102,7 @@ static struct idr_layer *get_from_free_list(struct idr *idp)
  * interface - idr_pre_get() and idr_get_new*() - and will be removed
  * together with per-pool preload buffer.
  */
+/*! 2016.10.22 study -ing */
 static struct idr_layer *idr_layer_alloc(gfp_t gfp_mask, struct idr *layer_idr)
 {
 	struct idr_layer *new;
@@ -113,6 +118,7 @@ static struct idr_layer *idr_layer_alloc(gfp_t gfp_mask, struct idr *layer_idr)
 	 * following is allowed to fail for preloaded cases, suppress
 	 * warning this time.
 	 */
+	/*! kmem cache에서 alloc 가능하면 alloc 후 리턴  */
 	new = kmem_cache_zalloc(idr_layer_cache, gfp_mask | __GFP_NOWARN);
 	if (new)
 		return new;
@@ -121,11 +127,18 @@ static struct idr_layer *idr_layer_alloc(gfp_t gfp_mask, struct idr *layer_idr)
 	 * Try to fetch one from the per-cpu preload buffer if in process
 	 * context.  See idr_preload() for details.
 	 */
+	/*! in_interrupt 아니면,  */
 	if (!in_interrupt()) {
 		preempt_disable();
+		/*! struct idr_layer *idr_preload_head  */
+		/*! 현재 내 cpu의 idr_preload_head 주소를 리턴  */
 		new = __this_cpu_read(idr_preload_head);
 		if (new) {
+			/*! 현재 내 cpu의 idr_preload_head 주소에 new->ary[0] 값 write  
+			 *  -> 매크로 통해 idr_preload_head = new->ary[0] 으로 치환 됨
+			 */
 			__this_cpu_write(idr_preload_head, new->ary[0]);
+			/*! 현재 내 cpu의 idr_preload_cnt 값 -1  */
 			__this_cpu_dec(idr_preload_cnt);
 			new->ary[0] = NULL;
 		}
@@ -138,6 +151,7 @@ static struct idr_layer *idr_layer_alloc(gfp_t gfp_mask, struct idr *layer_idr)
 	 * Both failed.  Try kmem_cache again w/o adding __GFP_NOWARN so
 	 * that memory allocation failure warning is printed as intended.
 	 */
+	/*! __GFP_NOWARN maks 없이 kmem cache alloc 재 시도  */
 	return kmem_cache_zalloc(idr_layer_cache, gfp_mask);
 }
 
@@ -157,6 +171,7 @@ static inline void free_layer(struct idr *idr, struct idr_layer *p)
 }
 
 /* only called when idp->lock is held */
+/*! 2016.10.22 study -ing */
 static void __move_to_free_list(struct idr *idp, struct idr_layer *p)
 {
 	p->ary[0] = idp->id_free;
@@ -175,12 +190,13 @@ static void move_to_free_list(struct idr *idp, struct idr_layer *p)
 	__move_to_free_list(idp, p);
 	spin_unlock_irqrestore(&idp->lock, flags);
 }
-
+/*! 2016.10.22 study -ing */
 static void idr_mark_full(struct idr_layer **pa, int id)
 {
 	struct idr_layer *p = pa[0];
 	int l = 0;
 
+	/*! p->bitmap의 id & IDR_MASK 번째 bit을 1로 set  */
 	__set_bit(id & IDR_MASK, p->bitmap);
 	/*
 	 * If this layer is full mark the bit in the layer above to
@@ -192,6 +208,7 @@ static void idr_mark_full(struct idr_layer **pa, int id)
 		if (!(p = pa[++l]))
 			break;
 		id = id >> IDR_BITS;
+		/*! p->bitmap의 id & IDR_MASK 번째 bit를 1로 set  */
 		__set_bit((id & IDR_MASK), p->bitmap);
 	}
 }
@@ -225,6 +242,7 @@ EXPORT_SYMBOL(__idr_pre_get);
  *  -ENOSPC if the id space is exhausted,
  *  -ENOMEM if more idr_layers need to be allocated.
  */
+/*! 2016.10.22 study -ing */
 static int sub_alloc(struct idr *idp, int *starting_id, struct idr_layer **pa,
 		     gfp_t gfp_mask, struct idr *layer_idr)
 {
@@ -293,7 +311,7 @@ static int sub_alloc(struct idr *idp, int *starting_id, struct idr_layer **pa,
 	pa[l] = p;
 	return id;
 }
-
+/*! 2016.10.22 study -ing */
 static int idr_get_empty_slot(struct idr *idp, int starting_id,
 			      struct idr_layer **pa, gfp_t gfp_mask,
 			      struct idr *layer_idr)
@@ -306,6 +324,7 @@ static int idr_get_empty_slot(struct idr *idp, int starting_id,
 build_up:
 	p = idp->top;
 	layers = idp->layers;
+	/*! idp->top 이 NULL이면 idr_layer_alloc 수행  */
 	if (unlikely(!p)) {
 		if (!(p = idr_layer_alloc(gfp_mask, layer_idr)))
 			return -ENOMEM;
@@ -316,9 +335,12 @@ build_up:
 	 * Add a new layer to the top of the tree if the requested
 	 * id is larger than the currently allocated space.
 	 */
+	/*! id 가 현재 alloc된 영역보다 크면 새로운 layer 계속 추가 */
 	while (id > idr_max(layers)) {
+		/*! layers 갯수 증가  */
 		layers++;
 		if (!p->count) {
+			/*! p->count가 0이면 트리가 비어있는 경우  */
 			/* special case: if the tree is currently empty,
 			 * then we grow the tree by moving the top node
 			 * upwards.
@@ -327,6 +349,7 @@ build_up:
 			WARN_ON_ONCE(p->prefix);
 			continue;
 		}
+		/*! idr_layer_alloc 통해 새로운 layer alloc  */
 		if (!(new = idr_layer_alloc(gfp_mask, layer_idr))) {
 			/*
 			 * The allocation failed.  If we built part of
@@ -343,16 +366,20 @@ build_up:
 			spin_unlock_irqrestore(&idp->lock, flags);
 			return -ENOMEM;
 		}
+		/*! idr_layer_alloc 통해 새로운 layer alloc 성공 시 */
 		new->ary[0] = p;
 		new->count = 1;
 		new->layer = layers-1;
 		new->prefix = id & idr_layer_prefix_mask(new->layer);
 		if (bitmap_full(p->bitmap, IDR_SIZE))
+			/*! new->bitmap의 0번째 bit를 1로 set  */
 			__set_bit(0, new->bitmap);
 		p = new;
 	}
+	/*! idp->top 에 p 대입  */
 	rcu_assign_pointer(idp->top, p);
 	idp->layers = layers;
+	/*! tree 뎁스를 늘리지 않고 range 내에서 id를 alloc 시도후 성공 시 alloc 성공한 id 리턴  */
 	v = sub_alloc(idp, &id, pa, gfp_mask, layer_idr);
 	if (v == -EAGAIN)
 		goto build_up;
@@ -363,12 +390,16 @@ build_up:
  * @id and @pa are from a successful allocation from idr_get_empty_slot().
  * Install the user pointer @ptr and mark the slot full.
  */
+/*! 2016.10.22 study -ing */
 static void idr_fill_slot(struct idr *idr, void *ptr, int id,
 			  struct idr_layer **pa)
 {
 	/* update hint used for lookup, cleared from free_layer() */
+	/*! idr->hint에 pa[0] 대입 */
 	rcu_assign_pointer(idr->hint, pa[0]);
 
+	/*! pa[0]->ary[id & IDR_MASK]에 (struct idr_layer *)ptr을 안전하게 대입 */
+	/*! From perf_pmu_register, ptr은 pmu */
 	rcu_assign_pointer(pa[0]->ary[id & IDR_MASK], (struct idr_layer *)ptr);
 	pa[0]->count++;
 	idr_mark_full(pa, id);
@@ -469,12 +500,14 @@ EXPORT_SYMBOL(idr_preload);
  * or iteration can be performed under RCU read lock provided the user
  * destroys @ptr in RCU-safe way after removal from idr.
  */
+/*! 2016.10.22 study -ing */
 int idr_alloc(struct idr *idr, void *ptr, int start, int end, gfp_t gfp_mask)
 {
 	int max = end > 0 ? end - 1 : INT_MAX;	/* inclusive upper limit */
 	struct idr_layer *pa[MAX_IDR_LEVEL + 1];
 	int id;
 
+	/*! Do Nothing (CONFIG_DEBUG_ATOMIC_SLEEP define 안됨) */
 	might_sleep_if(gfp_mask & __GFP_WAIT);
 
 	/* sanity checks */
@@ -865,6 +898,7 @@ void __init idr_init_cache(void)
 /*! 2016.10.15 study -ing */
 void idr_init(struct idr *idp)
 {
+	/*! IDR은 radix tree의 일종으로 정수 ID와 특정한 포인터 값을 연결시키는 역할을 해 준다. */
 	memset(idp, 0, sizeof(struct idr));
 	spin_lock_init(&idp->lock);
 }

@@ -149,6 +149,7 @@ extern int bitmap_ord_to_pos(const unsigned long *bitmap, int n, int bits);
 /*! 2016.10.08 study -ing */
 #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) % BITS_PER_LONG))
 /*! 2016.07.09 study -ing */
+/*! 0 부터 nbit까지 1로 set된 수를 리턴  */
 #define BITMAP_LAST_WORD_MASK(nbits)					\
 (									\
 	((nbits) % BITS_PER_LONG) ?					\
@@ -274,7 +275,7 @@ static inline int bitmap_empty(const unsigned long *src, int nbits)
 	else
 		return __bitmap_empty(src, nbits);
 }
-
+/*! 2016.10.22 study -ing */
 static inline int bitmap_full(const unsigned long *src, int nbits)
 {
 	if (small_const_nbits(nbits))

@@ -35,7 +35,7 @@ void kunmap(struct page *page)
 	kunmap_high(page);
 }
 EXPORT_SYMBOL(kunmap);
-
+/*! 2016.10.22 study -ing */
 void *kmap_atomic(struct page *page)
 {
 	unsigned int idx;

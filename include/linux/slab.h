@@ -343,6 +343,7 @@ kmem_cache_alloc_node_trace(struct kmem_cache *s,
 #endif /* CONFIG_NUMA */
 
 #else /* CONFIG_TRACING */
+/*! 2016.10.22 study -ing */
 static __always_inline void *kmem_cache_alloc_trace(struct kmem_cache *s,
 		gfp_t flags, size_t size)
 {
@@ -448,8 +449,14 @@ static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
  * for general use, and so are not documented here. For a full list of
  * potential flags, always refer to linux/gfp.h.
  */
+/*! 2016.10.22 study -ing */
+/*! kernel에서 page size보다 작은 크기를 alloc할때 일반적으로 쓰이는 alloc 함수  */
 static __always_inline void *kmalloc(size_t size, gfp_t flags)
 {
+	/*!
+     * __builtin_constant_p
+     *  - 컴파일 타임에 x를 상수로 만들 수 있으면 1 아니면 0
+     */
 	if (__builtin_constant_p(size)) {
 		if (size > KMALLOC_MAX_CACHE_SIZE)
 			return kmalloc_large(size, flags);
@@ -460,11 +467,13 @@ static __always_inline void *kmalloc(size_t size, gfp_t flags)
 			if (!index)
 				return ZERO_SIZE_PTR;
 
+			/*! CONFIG_TRACING이 not define이라 kmem_cache_alloc을 그대로 수행.  */
 			return kmem_cache_alloc_trace(kmalloc_caches[index],
 					flags, size);
 		}
 #endif
 	}
+	/*! 대부분(size를 컴파일 타임에 결정 못 할때) 아래 __kzmalloc 수행  */
 	return __kmalloc(size, flags);
 }
 
@@ -650,6 +659,7 @@ static inline void *kmem_cache_zalloc(struct kmem_cache *k, gfp_t flags)
  * @size: how many bytes of memory are required.
  * @flags: the type of memory to allocate (see kmalloc).
  */
+/*! 2016.10.22 study -ing */
 static inline void *kzalloc(size_t size, gfp_t flags)
 {
 	return kmalloc(size, flags | __GFP_ZERO);

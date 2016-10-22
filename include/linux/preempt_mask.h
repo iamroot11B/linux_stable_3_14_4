@@ -52,6 +52,7 @@
 
 #define hardirq_count()	(preempt_count() & HARDIRQ_MASK)
 #define softirq_count()	(preempt_count() & SOFTIRQ_MASK)
+/*! 2016.10.22 study -ing */
 #define irq_count()	(preempt_count() & (HARDIRQ_MASK | SOFTIRQ_MASK \
 				 | NMI_MASK))
 
@@ -63,6 +64,7 @@
  */
 #define in_irq()		(hardirq_count())
 #define in_softirq()		(softirq_count())
+/*! 2016.10.22 study -ing */
 #define in_interrupt()		(irq_count())
 #define in_serving_softirq()	(softirq_count() & SOFTIRQ_OFFSET)
 

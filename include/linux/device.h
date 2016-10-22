@@ -787,6 +787,7 @@ struct device {
 	bool			offline:1;
 };
 
+/*! 2016.10.22 study -ing */
 static inline struct device *kobj_to_dev(struct kobject *kobj)
 {
 	return container_of(kobj, struct device, kobj);
@@ -794,10 +795,13 @@ static inline struct device *kobj_to_dev(struct kobject *kobj)
 
 /* Get the wakeup routines, which depend on struct device */
 #include <linux/pm_wakeup.h>
-
+/*! 2016.10.22 study -ing */
 static inline const char *dev_name(const struct device *dev)
 {
 	/* Use the init name until the kobject becomes available */
+	/*! dev->init_name 이 있으면 최초에 dev name으로 설정 하고 NULL로 바꾼다.
+	 *  -> device_add 이후 dev->init_name은 NULL
+	 */
 	if (dev->init_name)
 		return dev->init_name;
 
@@ -821,6 +825,7 @@ static inline int dev_to_node(struct device *dev)
 {
 	return -1;
 }
+/*! 2016.10.22 study -ing */
 static inline void set_dev_node(struct device *dev, int node)
 {
 }

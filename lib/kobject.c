@@ -338,6 +338,9 @@ void kobject_init(struct kobject *kobj, struct kobj_type *ktype)
 		err_str = "must have a ktype to be initialized properly!\n";
 		goto error;
 	}
+	/*! init 하는데 kobj->state_initialized 된 상태라도 error 메세지 출력만 하고 계속 진행
+	 *  -> 복구 가능성이 있어서
+	 */
 	if (kobj->state_initialized) {
 		/* do not error out as sometimes we can recover */
 		printk(KERN_ERR "kobject (%p): tried to init an initialized "
@@ -394,6 +397,7 @@ static int kobject_add_varg(struct kobject *kobj, struct kobject *parent,
  * kobject_uevent() with the UEVENT_ADD parameter to ensure that
  * userspace is properly notified of this kobject's creation.
  */
+/*! 2016.10.22 study -ing */
 int kobject_add(struct kobject *kobj, struct kobject *parent,
 		const char *fmt, ...)
 {
@@ -403,6 +407,7 @@ int kobject_add(struct kobject *kobj, struct kobject *parent,
 	if (!kobj)
 		return -EINVAL;
 
+	/*! state_initialized 안 된 상태면 error   */
 	if (!kobj->state_initialized) {
 		printk(KERN_ERR "kobject '%s' (%p): tried to add an "
 		       "uninitialized object, something is seriously wrong.\n",
@@ -678,6 +683,7 @@ static void kobject_release(struct kref *kref)
  *
  * Decrement the refcount, and if 0, call kobject_cleanup().
  */
+/*! 2016.10.22 study -ing */
 void kobject_put(struct kobject *kobj)
 {
 	if (kobj) {
@@ -711,9 +717,11 @@ static struct kobj_type dynamic_kobj_ktype = {
  * call to kobject_put() and not kfree(), as kobject_init() has
  * already been called on this structure.
  */
+/*! 2016.10.22 study -ing */
 struct kobject *kobject_create(void)
 {
 	struct kobject *kobj;
+	/*! alloc 및 init 하여 return */
 
 	kobj = kzalloc(sizeof(*kobj), GFP_KERNEL);
 	if (!kobj)
@@ -736,6 +744,7 @@ struct kobject *kobject_create(void)
  *
  * If the kobject was not able to be created, NULL will be returned.
  */
+/*! 2016.10.22 study -ing */
 struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
 {
 	struct kobject *kobj;

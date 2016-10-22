@@ -582,7 +582,7 @@ void *dev_get_drvdata(const struct device *dev)
 	return NULL;
 }
 EXPORT_SYMBOL(dev_get_drvdata);
-
+/*! 2016.10.22 study -ing */
 int dev_set_drvdata(struct device *dev, void *data)
 {
 	int error;

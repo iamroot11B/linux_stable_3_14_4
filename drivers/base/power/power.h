@@ -1,8 +1,9 @@
 #include <linux/pm_qos.h>
-
+/*! 2016.10.22 study -ing */
 static inline void device_pm_init_common(struct device *dev)
 {
 	if (!dev->power.early_init) {
+		/*! spin lock 만 Init 하고 early_init true 설정  */
 		spin_lock_init(&dev->power.lock);
 		dev->power.qos = NULL;
 		dev->power.early_init = true;
@@ -26,7 +27,7 @@ static inline void pm_runtime_early_init(struct device *dev)
 {
 	device_pm_init_common(dev);
 }
-
+/*! 2016.10.22 study -ing */
 static inline void pm_runtime_init(struct device *dev) {}
 static inline void pm_runtime_remove(struct device *dev) {}
 
@@ -70,11 +71,12 @@ static inline void device_pm_move_after(struct device *deva,
 static inline void device_pm_move_last(struct device *dev) {}
 
 #endif /* !CONFIG_PM_SLEEP */
-
+/*! 2016.10.22 study -ing */
 static inline void device_pm_init(struct device *dev)
 {
 	device_pm_init_common(dev);
 	device_pm_sleep_init(dev);
+	/*! Do nothing  */
 	pm_runtime_init(dev);
 }
 
