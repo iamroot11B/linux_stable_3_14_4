@@ -1439,7 +1439,7 @@ int __init pcpu_setup_first_chunk(const struct pcpu_alloc_info *ai,
 			/* determine low/high unit_cpu */
 			if (pcpu_low_unit_cpu == NR_CPUS ||
 			    unit_off[cpu] < unit_off[pcpu_low_unit_cpu])
-n				pcpu_low_unit_cpu = cpu;
+				pcpu_low_unit_cpu = cpu;
 			if (pcpu_high_unit_cpu == NR_CPUS ||
 			    unit_off[cpu] > unit_off[pcpu_high_unit_cpu])
 				pcpu_high_unit_cpu = cpu;
