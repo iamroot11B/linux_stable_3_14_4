@@ -28,21 +28,25 @@ struct call_function_data {
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct call_function_data, cfd_data);
 
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct llist_head, call_single_queue);
-
+/*! 2016.10.29 study -ing */
 static int
 hotplug_cfd(struct notifier_block *nfb, unsigned long action, void *hcpu)
 {
 	long cpu = (long)hcpu;
+	/*! cpu의 cfd_data를 찾아서 cfd에 대입  */
 	struct call_function_data *cfd = &per_cpu(cfd_data, cpu);
 
 	switch (action) {
 	case CPU_UP_PREPARE:
 	case CPU_UP_PREPARE_FROZEN:
+		/*! cfd->cpumask를 clear. 우리는 무조건 true */
 		if (!zalloc_cpumask_var_node(&cfd->cpumask, GFP_KERNEL,
 				cpu_to_node(cpu)))
 			return notifier_from_errno(-ENOMEM);
+		/*! cfd->csd에 percpu alloc 수행 */
 		cfd->csd = alloc_percpu(struct call_single_data);
 		if (!cfd->csd) {
+			/* Do Nothing. */
 			free_cpumask_var(cfd->cpumask);
 			return notifier_from_errno(-ENOMEM);
 		}
@@ -66,16 +70,19 @@ hotplug_cfd(struct notifier_block *nfb, unsigned long action, void *hcpu)
 static struct notifier_block hotplug_cfd_notifier = {
 	.notifier_call		= hotplug_cfd,
 };
-
+/*! 2016.10.29 study -ing */
 void __init call_function_init(void)
 {
+	/*! current_thread_info()->cpu를 가져온다.   */
 	void *cpu = (void *)(long)smp_processor_id();
 	int i;
-
+	/*! nr_cpu_ids = 8. 8번 loop 돌면서,
+	 *  각 cpu의 call_single_queue 멤버를 찾아서 list 초기화 */
 	for_each_possible_cpu(i)
 		init_llist_head(&per_cpu(call_single_queue, i));
 
 	hotplug_cfd(&hotplug_cfd_notifier, CPU_UP_PREPARE, cpu);
+	/*! cpu chain에 hotplug_cfd_notifier를 등록시켜준다. */
 	register_cpu_notifier(&hotplug_cfd_notifier);
 }
 

@@ -93,7 +93,7 @@ void vmalloc_sync_all(void);
 /*
  *	Lowlevel-APIs (not for driver use!)
  */
-
+/*! 2016.10.29 study -ing */
 static inline size_t get_vm_area_size(const struct vm_struct *area)
 {
 	/* return actual size without guard page */

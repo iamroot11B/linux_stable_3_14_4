@@ -89,6 +89,7 @@ static void __wake_up_common(wait_queue_head_t *q, unsigned int mode,
  * It may be assumed that this function implies a write memory barrier before
  * changing the task state if and only if any tasks are woken up.
  */
+/*! 2016.10.29 study -ing */
 void __wake_up(wait_queue_head_t *q, unsigned int mode,
 			int nr_exclusive, void *key)
 {

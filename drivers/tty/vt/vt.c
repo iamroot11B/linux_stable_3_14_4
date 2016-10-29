@@ -2858,7 +2858,8 @@ static void vc_init(struct vc_data *vc, unsigned int rows,
  * else. If you want the screen to clear, call tty_write with
  * the appropriate escape-sequence.
  */
-
+/*! 2016.10.29 study -ing */
+/*! 자세히 분석하지 않음.  */
 static int __init con_init(void)
 {
 	const char *display_desc = NULL;

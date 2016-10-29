@@ -43,6 +43,7 @@
  *
  * This function is obsolete. Please use kstrtoull instead.
  */
+/*! 2016.10.29 study -ing */
 unsigned long long simple_strtoull(const char *cp, char **endp, unsigned int base)
 {
 	unsigned long long result;
@@ -68,6 +69,7 @@ EXPORT_SYMBOL(simple_strtoull);
  *
  * This function is obsolete. Please use kstrtoul instead.
  */
+/*! 2016.10.29 study -ing */
 unsigned long simple_strtoul(const char *cp, char **endp, unsigned int base)
 {
 	return simple_strtoull(cp, endp, base);
@@ -82,6 +84,7 @@ EXPORT_SYMBOL(simple_strtoul);
  *
  * This function is obsolete. Please use kstrtol instead.
  */
+/*! 2016.10.29 study -ing */
 long simple_strtol(const char *cp, char **endp, unsigned int base)
 {
 	if (*cp == '-')

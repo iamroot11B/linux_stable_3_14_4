@@ -92,7 +92,10 @@ extern void warn_slowpath_null(const char *file, const int line);
 	unlikely(__ret_warn_on);					\
 })
 #endif
-
+/*! 2016.10.29 study -ing */
+/*! CONFIG_BUG define 되어 있으면 warnning msg print.
+ *  define 안 돼있으면 Do Nothing.
+ */
 #ifndef WARN
 #define WARN(condition, format...) ({						\
 	int __ret_warn_on = !!(condition);				\
@@ -124,7 +127,7 @@ extern void warn_slowpath_null(const char *file, const int line);
 	unlikely(__ret_warn_on);					\
 })
 #endif
-
+/*! 2016.10.29 study -ing */
 #ifndef WARN
 #define WARN(condition, format...) ({					\
 	int __ret_warn_on = !!(condition);				\

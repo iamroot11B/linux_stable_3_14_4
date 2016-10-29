@@ -20,6 +20,7 @@
 #include <asm/uaccess.h>
 #include "kstrtox.h"
 
+/*! 2016.10.29 study -ing */
 const char *_parse_integer_fixup_radix(const char *s, unsigned int *base)
 {
 	if (*base == 0) {
@@ -44,6 +45,7 @@ const char *_parse_integer_fixup_radix(const char *s, unsigned int *base)
  *
  * Don't you dare use this function.
  */
+/*! 2016.10.29 study -ing */
 unsigned int _parse_integer(const char *s, unsigned int base, unsigned long long *p)
 {
 	unsigned long long res;

@@ -100,7 +100,7 @@ init_waitqueue_func_entry(wait_queue_t *q, wait_queue_func_t func)
 	q->private	= NULL;
 	q->func		= func;
 }
-
+/*! 2016.10.29 study -ing */
 static inline int waitqueue_active(wait_queue_head_t *q)
 {
 	return !list_empty(&q->task_list);
@@ -158,7 +158,7 @@ int out_of_line_wait_on_bit(void *, int, int (*)(void *), unsigned);
 int out_of_line_wait_on_bit_lock(void *, int, int (*)(void *), unsigned);
 int out_of_line_wait_on_atomic_t(atomic_t *, int (*)(atomic_t *), unsigned);
 wait_queue_head_t *bit_waitqueue(void *, int);
-
+/*! 2016.10.29 study -ing */
 #define wake_up(x)			__wake_up(x, TASK_NORMAL, 1, NULL)
 #define wake_up_nr(x, nr)		__wake_up(x, TASK_NORMAL, nr, NULL)
 #define wake_up_all(x)			__wake_up(x, TASK_NORMAL, 0, NULL)

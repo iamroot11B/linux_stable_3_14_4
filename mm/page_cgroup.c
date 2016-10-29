@@ -109,38 +109,47 @@ struct page_cgroup *lookup_page_cgroup(struct page *page)
 #endif
 	return section->page_cgroup + pfn;
 }
-
+/*! 2016.10.29 study -ing */
 static void *__meminit alloc_page_cgroup(size_t size, int nid)
 {
 	gfp_t flags = GFP_KERNEL | __GFP_ZERO | __GFP_NOWARN;
 	void *addr = NULL;
 
-	addr = alloc_pages_exact_nid(nid, size, flags);
+	addr = alloc_pages_exact_nid(nid, size, flags);	
 	if (addr) {
+		/*! addr alloc 성공 시 addr 리턴 */
 		kmemleak_alloc(addr, size, 1, flags);
 		return addr;
 	}
 
+	/*! 우리는 무조건 0,
+	 * vzalloc_node 나 vzalloc이나 모두 __vmalloc_node_flags를 수행하게 된다.
+	 */
 	if (node_state(nid, N_HIGH_MEMORY))
 		addr = vzalloc_node(size, nid);
 	else
 		addr = vzalloc(size);
 
+	/*! alloc 후 리턴  */
 	return addr;
 }
-
+/*! 2016.10.29 study -ing */
 static int __meminit init_section_page_cgroup(unsigned long pfn, int nid)
 {
 	struct mem_section *section;
 	struct page_cgroup *base;
 	unsigned long table_size;
 
+	/*! pfn으로 섹션을 구한다.  */
 	section = __pfn_to_section(pfn);
 
+	/*! 해당 section의 page_cgroup이 이미 있으면 리턴  */
 	if (section->page_cgroup)
 		return 0;
 
+	/*! table_size 구하고,  */
 	table_size = sizeof(struct page_cgroup) * PAGES_PER_SECTION;
+	/*! base 에 table_size를 이용하여 page_cgroup alloc  */
 	base = alloc_page_cgroup(table_size, nid);
 
 	/*
@@ -148,8 +157,10 @@ static int __meminit init_section_page_cgroup(unsigned long pfn, int nid)
 	 * and it does not point to the memory block allocated above,
 	 * causing kmemleak false positives.
 	 */
+	/*! Do Nothing.  */
 	kmemleak_not_leak(base);
 
+	/*! base에 alloc 실패했으면 에러 리턴  */
 	if (!base) {
 		printk(KERN_ERR "page cgroup allocation failure\n");
 		return -ENOMEM;
@@ -159,6 +170,7 @@ static int __meminit init_section_page_cgroup(unsigned long pfn, int nid)
 	 * The passed "pfn" may not be aligned to SECTION.  For the calculation
 	 * we need to apply a mask.
 	 */
+	/*! base에 alloc 성공 시 section->page_cgroup과 total_usage 업데이트  */
 	pfn &= PAGE_SECTION_MASK;
 	section->page_cgroup = base - pfn;
 	total_usage += table_size;
@@ -276,23 +288,28 @@ void __init page_cgroup_init(void)
 	unsigned long pfn;
 	int nid;
 
+	/*! 우리는 아래 true로 리턴이지만, 그 아래도 분석 진행  */
 	if (mem_cgroup_disabled())
 		return;
 
+	/*! 우리는 MAX_NODES가 1이라 한번만 loop 수행  */
 	for_each_node_state(nid, N_MEMORY) {
 		unsigned long start_pfn, end_pfn;
 
 		start_pfn = node_start_pfn(nid);
+		/*! node_start_pfn + node_spanned_pages 으로 end pfn 구한다.  */
 		end_pfn = node_end_pfn(nid);
 		/*
 		 * start_pfn and end_pfn may not be aligned to SECTION and the
 		 * page->flags of out of node pages are not initialized.  So we
 		 * scan [start_pfn, the biggest section's pfn < end_pfn) here.
 		 */
+		/*! strat pfn부터 end pfn 까지 loop 돌면서,  */
 		for (pfn = start_pfn;
 		     pfn < end_pfn;
                      pfn = ALIGN(pfn + 1, PAGES_PER_SECTION)) {
 
+			/*! 실패 시(invalid 시) -1 리턴  */
 			if (!pfn_valid(pfn))
 				continue;
 			/*
@@ -307,12 +324,14 @@ void __init page_cgroup_init(void)
 				goto oom;
 		}
 	}
+	/*! Do Nothing.  */
 	hotplug_memory_notifier(page_cgroup_callback, 0);
 	printk(KERN_INFO "allocated %ld bytes of page_cgroup\n", total_usage);
 	printk(KERN_INFO "please try 'cgroup_disable=memory' option if you "
 			 "don't want memory cgroups\n");
 	return;
 oom:
+	/*! 실패 시 paninc  */
 	printk(KERN_CRIT "try 'cgroup_disable=memory' boot option\n");
 	panic("Out of memory");
 }

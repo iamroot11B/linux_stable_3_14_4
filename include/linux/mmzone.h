@@ -783,10 +783,11 @@ typedef struct pglist_data {
 #define pgdat_page_nr(pgdat, pagenr)	pfn_to_page((pgdat)->node_start_pfn + (pagenr))
 #endif
 #define nid_page_nr(nid, pagenr) 	pgdat_page_nr(NODE_DATA(nid),(pagenr))
-
+/*! 2016.10.29 study -ing */
 #define node_start_pfn(nid)	(NODE_DATA(nid)->node_start_pfn)
 #define node_end_pfn(nid) pgdat_end_pfn(NODE_DATA(nid))
 
+/*! 2016.10.29 study -ing */
 static inline unsigned long pgdat_end_pfn(pg_data_t *pgdat)
 {
 	return pgdat->node_start_pfn + pgdat->node_spanned_pages;
@@ -853,6 +854,7 @@ static inline int populated_zone(struct zone *zone)
 
 extern int movable_zone;
 
+/*! 2016.10.29 study -ing */
 static inline int zone_movable_is_highmem(void)
 {
 #if defined(CONFIG_HIGHMEM) && defined(CONFIG_HAVE_MEMBLOCK_NODE_MAP)
@@ -883,6 +885,9 @@ static inline int is_highmem(struct zone *zone)
 {
 #ifdef CONFIG_HIGHMEM
 	int zone_off = (char *)zone - (char *)zone->zone_pgdat->node_zones;
+	/*! zone_off 가 ZONE_HIGMEM 이거나,
+	 * zone_off가 ZONE_MOVABLE 이면서, ZONE_MOVABLE이 HIGME이면 1 리턴 
+	 */
 	return zone_off == ZONE_HIGHMEM * sizeof(*zone) ||
 	       (zone_off == ZONE_MOVABLE * sizeof(*zone) &&
 		zone_movable_is_highmem());
@@ -913,6 +918,7 @@ extern char numa_zonelist_order[];
 #ifndef CONFIG_NEED_MULTIPLE_NODES
 
 extern struct pglist_data contig_page_data;
+/*! 2016.10.29 study -ing */
 #define NODE_DATA(nid)		(&contig_page_data)
 #define NODE_MEM_MAP(nid)	mem_map
 

@@ -340,7 +340,7 @@ static inline void mem_cgroup_iter_break(struct mem_cgroup *root,
 					 struct mem_cgroup *prev)
 {
 }
-
+/*! 2016.10.29 study -ing */
 static inline bool mem_cgroup_disabled(void)
 {
 	return true;

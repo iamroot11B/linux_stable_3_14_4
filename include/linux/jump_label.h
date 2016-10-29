@@ -52,6 +52,7 @@
 
 extern bool static_key_initialized;
 
+/*! 2016.10.29 study -ing */
 #define STATIC_KEY_CHECK_USE() WARN(!static_key_initialized,		      \
 				    "%s used before call to jump_label_init", \
 				    __func__)

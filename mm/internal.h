@@ -16,6 +16,7 @@
 void free_pgtables(struct mmu_gather *tlb, struct vm_area_struct *start_vma,
 		unsigned long floor, unsigned long ceiling);
 
+/*! 2016.10.29 study -ing */
 static inline void set_page_count(struct page *page, int v)
 {
 	atomic_set(&page->_count, v);
@@ -25,6 +26,7 @@ static inline void set_page_count(struct page *page, int v)
  * Turn a non-refcounted page (->_count == 0) into refcounted with
  * a count of one.
  */
+/*! 2016.10.29 study -ing */
 static inline void set_page_refcounted(struct page *page)
 {
 	VM_BUG_ON_PAGE(PageTail(page), page);

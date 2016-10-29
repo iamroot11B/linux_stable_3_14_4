@@ -49,7 +49,7 @@ static DEFINE_PER_CPU(struct profile_hit *[2], cpu_profile_hits);
 static DEFINE_PER_CPU(int, cpu_profile_flip);
 static DEFINE_MUTEX(profile_flip_mutex);
 #endif /* CONFIG_SMP */
-
+/*! 2016.10.29 study -ing */
 int profile_setup(char *str)
 {
 	static char schedstr[] = "schedule";
@@ -58,10 +58,15 @@ int profile_setup(char *str)
 	int par;
 
 	if (!strncmp(str, sleepstr, strlen(sleepstr))) {
+		/*! str == "schedule" 인 경우,  */
+		/*! CONFIG_SCHEDSTATS Not define  */
 #ifdef CONFIG_SCHEDSTATS
 		prof_on = SLEEP_PROFILING;
+		/*! 뒤어 , 가 있는경우,  */
 		if (str[strlen(sleepstr)] == ',')
+			/*! , 앞에를 짤라낸다.  */
 			str += strlen(sleepstr) + 1;
+		/*! schdule, 뒤에 숫자가 오는지 확인. 숫자면 par에 대입-> prof_shift에 대입  */
 		if (get_option(&str, &par))
 			prof_shift = par;
 		printk(KERN_INFO
@@ -90,6 +95,9 @@ int profile_setup(char *str)
 			"kernel KVM profiling enabled (shift: %ld)\n",
 			prof_shift);
 	} else if (get_option(&str, &par)) {
+		/*! str 값이 "schedule","sleep","kvm" 에 모두 해당하지 않고,
+		 *  숫자인 경우 prof_shit에 par 대입
+		 */
 		prof_shift = par;
 		prof_on = CPU_PROFILING;
 		printk(KERN_INFO "kernel profiling enabled (shift: %ld)\n",
@@ -97,12 +105,16 @@ int profile_setup(char *str)
 	}
 	return 1;
 }
+
+/*! 2016.10.29 study -ing */
 __setup("profile=", profile_setup);
 
-
+/*! 2016.10.29 study -ing */
+/*! 위 __setup("profile=", profile_setup); 을 통해 profile_setup 먼저 수행 됨 */
 int __ref profile_init(void)
 {
 	int buffer_bytes;
+	/*! profile_setup에서 prof_on 값 set  */
 	if (!prof_on)
 		return 0;
 
@@ -110,24 +122,33 @@ int __ref profile_init(void)
 	prof_len = (_etext - _stext) >> prof_shift;
 	buffer_bytes = prof_len*sizeof(atomic_t);
 
+	/*! alloc_cpumask_var : 무조건 true. */
 	if (!alloc_cpumask_var(&prof_cpu_mask, GFP_KERNEL))
 		return -ENOMEM;
 
+	/*! prof_cpu_mask 에 cpu_possible_mask를 bitmap copy  */
 	cpumask_copy(prof_cpu_mask, cpu_possible_mask);
 
+	/*! prof_buffer에 memory alloc  */
 	prof_buffer = kzalloc(buffer_bytes, GFP_KERNEL|__GFP_NOWARN);
 	if (prof_buffer)
 		return 0;
 
+	/*! alloc_pages_exact - 물리적으로 연속적인 page 할당  */
 	prof_buffer = alloc_pages_exact(buffer_bytes,
 					GFP_KERNEL|__GFP_ZERO|__GFP_NOWARN);
+
+	/*! 성공 시 리턴  */
 	if (prof_buffer)
 		return 0;
 
+	/*! vzalloc 가상으로 연속적인 memory alloc 후 0으로 초기화  */
 	prof_buffer = vzalloc(buffer_bytes);
+	/*! 성공 시 여기서 정상적으로 0 리턴  */
 	if (prof_buffer)
 		return 0;
 
+	/*! Do Nothing. 에러 리턴 */
 	free_cpumask_var(prof_cpu_mask);
 	return -ENOMEM;
 }

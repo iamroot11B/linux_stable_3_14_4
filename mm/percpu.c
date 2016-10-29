@@ -288,6 +288,7 @@ static void pcpu_set_page_chunk(struct page *page, struct pcpu_chunk *pcpu)
 }
 
 /* obtain pointer to a chunk from a page struct */
+/*! 2016.10.29 study -ing */
 static struct pcpu_chunk *pcpu_get_page_chunk(struct page *page)
 {
 	return (struct pcpu_chunk *)page->index;
@@ -797,6 +798,7 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
 	 */
 	/*! pcpu_unit_offsets : pcpu_setup_first_chunk 에서 초기화  */
 	addr += pcpu_unit_offsets[raw_smp_processor_id()];
+	/*! addr를 page로 바꾼 후 page->index를 리턴 */
 	return pcpu_get_page_chunk(pcpu_addr_to_page(addr));
 }
 
@@ -1057,9 +1059,11 @@ void free_percpu(void __percpu *ptr)
 	/*! spin lock 걸고,  */
 	spin_lock_irqsave(&pcpu_lock, flags);
 
+	/*! chunk와 off 구해서,  */
 	chunk = pcpu_chunk_addr_search(addr);
 	off = addr - chunk->base_addr;
 
+	/*! 구한 chunck의 offset으로부터 free */
 	pcpu_free_area(chunk, off);
 
 	/* if there are more than one fully free chunks, wake up grim reaper */
@@ -1068,11 +1072,13 @@ void free_percpu(void __percpu *ptr)
 
 		list_for_each_entry(pos, &pcpu_slot[pcpu_nr_slots - 1], list)
 			if (pos != chunk) {
+				/*! schedule_work는 추후 분석  */
 				schedule_work(&pcpu_reclaim_work);
 				break;
 			}
 	}
 
+	/*! 위에서 걸은 spin lock 해제  */
 	spin_unlock_irqrestore(&pcpu_lock, flags);
 }
 EXPORT_SYMBOL_GPL(free_percpu);

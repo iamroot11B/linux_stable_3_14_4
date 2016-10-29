@@ -59,7 +59,7 @@ static struct tty_ldisc_ops *tty_ldiscs[NR_LDISCS];
  *	Locking:
  *		takes tty_ldiscs_lock to guard against ldisc races
  */
-
+/*! 2016.10.29 study -ing */
 int tty_register_ldisc(int disc, struct tty_ldisc_ops *new_ldisc)
 {
 	unsigned long flags;
@@ -68,6 +68,7 @@ int tty_register_ldisc(int disc, struct tty_ldisc_ops *new_ldisc)
 	if (disc < N_TTY || disc >= NR_LDISCS)
 		return -EINVAL;
 
+	/*! lock 걸고 값 설정  */
 	raw_spin_lock_irqsave(&tty_ldiscs_lock, flags);
 	tty_ldiscs[disc] = new_ldisc;
 	new_ldisc->num = disc;
@@ -820,6 +821,7 @@ void tty_ldisc_deinit(struct tty_struct *tty)
 	tty->ldisc = NULL;
 }
 
+/*! 2016.10.29 study -ing */
 void tty_ldisc_begin(void)
 {
 	/* Setup the default TTY line discipline. */

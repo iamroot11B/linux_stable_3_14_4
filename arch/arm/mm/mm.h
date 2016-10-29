@@ -18,10 +18,14 @@ extern pmd_t *top_pmd;
 /* PFN alias flushing, for VIPT caches */
 #define FLUSH_ALIAS_START	0xffff4000
 
+/*! 2016.10.29 study -ing */
 static inline void set_top_pte(unsigned long va, pte_t pte)
 {
+	/*! pmd 엔트리 주소 값과 vaddr 값을 사용하여 pte 엔트리 주소를 알아온다.  */
 	pte_t *ptep = pte_offset_kernel(top_pmd, va);
+	/*! pte 엔트리 주소에 pte 값을 저장한다.  */
 	set_pte_ext(ptep, pte, 0);
+	/*! va에 해당하는 tlb 캐시를 flush한다. */
 	local_flush_tlb_kernel_page(va);
 }
 

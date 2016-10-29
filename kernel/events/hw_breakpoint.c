@@ -61,6 +61,7 @@ struct bp_cpuinfo {
 static DEFINE_PER_CPU(struct bp_cpuinfo, bp_cpuinfo[TYPE_MAX]);
 static int nr_slots[TYPE_MAX];
 
+/*! 2016.10.29 study -ing */
 static struct bp_cpuinfo *get_bp_info(int cpu, enum bp_type_idx type)
 {
 	return per_cpu_ptr(bp_cpuinfo + type, cpu);
@@ -623,11 +624,13 @@ static struct pmu perf_breakpoint = {
 	.event_idx	= hw_breakpoint_event_idx,
 };
 
+/*! 2016.10.29 study -ing */
 int __init init_hw_breakpoint(void)
 {
 	int cpu, err_cpu;
 	int i;
 
+	/*! debug 지원 안하면 모두 0  */
 	for (i = 0; i < TYPE_MAX; i++)
 		nr_slots[i] = hw_breakpoint_slots(i);
 
@@ -644,11 +647,13 @@ int __init init_hw_breakpoint(void)
 
 	constraints_initialized = 1;
 
+	/*! breakpoint register  */
 	perf_pmu_register(&perf_breakpoint, "breakpoint", PERF_TYPE_BREAKPOINT);
 
 	return register_die_notifier(&hw_breakpoint_exceptions_nb);
 
  err_alloc:
+	/*! alloc error 발생 시 free  */
 	for_each_possible_cpu(err_cpu) {
 		for (i = 0; i < TYPE_MAX; i++)
 			kfree(get_bp_info(err_cpu, i)->tsk_pinned);

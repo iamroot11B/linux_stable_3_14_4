@@ -264,8 +264,10 @@ static void __init zone_sizes_init(unsigned long min, unsigned long max_low,
 }
 
 #ifdef CONFIG_HAVE_ARCH_PFN_VALID
+/*! 2016.10.29 study -ing */
 int pfn_valid(unsigned long pfn)
 {
+	/*! 성공 시 해당 index 값, 실패 시 -1 리턴  */
 	return memblock_is_memory(__pfn_to_phys(pfn));
 }
 EXPORT_SYMBOL(pfn_valid);

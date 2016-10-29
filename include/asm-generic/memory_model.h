@@ -27,6 +27,7 @@
  */
 #if defined(CONFIG_FLATMEM)
 
+/*! 2016.10.29 study -ing */
 #define __pfn_to_page(pfn)	(mem_map + ((pfn) - ARCH_PFN_OFFSET))
 #define __page_to_pfn(page)	((unsigned long)((page) - mem_map) + \
 				 ARCH_PFN_OFFSET)
@@ -69,6 +70,7 @@
 })
 #endif /* CONFIG_FLATMEM/DISCONTIGMEM/SPARSEMEM */
 
+/*! 2016.10.29 study -ing */
 #define page_to_pfn __page_to_pfn
 #define pfn_to_page __pfn_to_page
 

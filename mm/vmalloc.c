@@ -192,6 +192,7 @@ static int vmap_pud_range(pgd_t *pgd, unsigned long addr,
  * Ie. pte at addr+N*PAGE_SIZE shall point to pfn corresponding to pages[N]
  */
 /*! 2016-04-02 study -ing */
+/*! 요청 가상 주소 범위에 해당하는 커널 페이지 테이블을 **pages 와 속성 정보를 사용하여 매핑한다. */
 static int vmap_page_range_noflush(unsigned long start, unsigned long end,
 				   pgprot_t prot, struct page **pages)
 {
@@ -212,12 +213,12 @@ static int vmap_page_range_noflush(unsigned long start, unsigned long end,
 	/*! pgd addr ~ end까지 수행  */
 	return nr;
 }
-
+/*! 2016.10.29 study -ing */
 static int vmap_page_range(unsigned long start, unsigned long end,
 			   pgprot_t prot, struct page **pages)
 {
 	int ret;
-
+	/*! start - end 에 해당하는 커널 페이지 테이블을 pages 와 속성 정보를 사용하여 매핑한다. */
 	ret = vmap_page_range_noflush(start, end, prot, pages);
 	flush_cache_vmap(start, end);
 	return ret;
@@ -267,6 +268,7 @@ struct page *vmalloc_to_page(const void *vmalloc_addr)
 			if (!pmd_none(*pmd)) {
 				pte_t *ptep, pte;
 				/*! 2016.10.22 study end */
+				/*! 2016.10.29 study start */
 				ptep = pte_offset_map(pmd, addr);
 				pte = *ptep;
 				if (pte_present(pte))
@@ -367,6 +369,7 @@ static void purge_vmap_area_lazy(void);
  * Allocate a region of KVA of the specified size and alignment, within the
  * vstart and vend.
  */
+/*! 2016.10.29 study -ing */
 static struct vmap_area *alloc_vmap_area(unsigned long size,
 				unsigned long align,
 				unsigned long vstart, unsigned long vend,
@@ -382,6 +385,7 @@ static struct vmap_area *alloc_vmap_area(unsigned long size,
 	BUG_ON(size & ~PAGE_MASK);
 	BUG_ON(!is_power_of_2(align));
 
+	/*! vmap_area 먼저 할당  */
 	va = kmalloc_node(sizeof(struct vmap_area),
 			gfp_mask & GFP_RECLAIM_MASK, node);
 	if (unlikely(!va))
@@ -391,9 +395,11 @@ static struct vmap_area *alloc_vmap_area(unsigned long size,
 	 * Only scan the relevant parts containing pointers to other objects
 	 * to avoid false negatives.
 	 */
+	/*! Do Nothing.  */
 	kmemleak_scan_area(&va->rb_node, SIZE_MAX, gfp_mask & GFP_RECLAIM_MASK);
 
 retry:
+	/*! lock 걸고,  */
 	spin_lock(&vmap_area_lock);
 	/*
 	 * Invalidate cache if we have more permissive parameters.
@@ -418,6 +424,7 @@ nocache:
 
 	/* find starting point for our search */
 	if (free_vmap_cache) {
+		/*! 시작 entry 찾아서,  */
 		first = rb_entry(free_vmap_cache, struct vmap_area, rb_node);
 		addr = ALIGN(first->va_end, align);
 		if (addr < vstart)
@@ -433,6 +440,7 @@ nocache:
 		n = vmap_area_root.rb_node;
 		first = NULL;
 
+		/*! 시작 entry 찾아서, */
 		while (n) {
 			struct vmap_area *tmp;
 			tmp = rb_entry(n, struct vmap_area, rb_node);
@@ -445,10 +453,12 @@ nocache:
 				n = n->rb_right;
 		}
 
+		/*! 시작 entry 찾으면 found로  */
 		if (!first)
 			goto found;
 	}
 
+	/*! 위에서 못 찾으면 한번 더 try  */
 	/* from the starting point, walk areas until a suitable hole is found */
 	while (addr + size > first->va_start && addr + size <= vend) {
 		if (addr + cached_hole_size < first->va_start)
@@ -473,6 +483,7 @@ found:
 	va->flags = 0;
 	__insert_vmap_area(va);
 	free_vmap_cache = &va->rb_node;
+	/*! lock 풀고,  */
 	spin_unlock(&vmap_area_lock);
 
 	BUG_ON(va->va_start & (align-1));
@@ -484,6 +495,7 @@ found:
 overflow:
 	spin_unlock(&vmap_area_lock);
 	if (!purged) {
+		/*! purged안 됐으면  purge 후 재 시도.  */
 		purge_vmap_area_lazy();
 		purged = 1;
 		goto retry;
@@ -492,6 +504,7 @@ overflow:
 		printk(KERN_WARNING
 			"vmap allocation for size %lu failed: "
 			"use vmalloc=<size> to increase size.\n", size);
+	/*! free 후 error 리턴  */
 	kfree(va);
 	return ERR_PTR(-EBUSY);
 }
@@ -693,11 +706,12 @@ static void try_purge_vmap_area_lazy(void)
 /*
  * Kick off a purge of the outstanding lazy areas.
  */
+/*! 2016.10.29 study -ing */
 static void purge_vmap_area_lazy(void)
 {
 	unsigned long start = ULONG_MAX, end = 0;
 
-	/*! lazily freed 되 vmap area free   */
+	/*! lazily freed 되는 vmap area free  */
 	__purge_vmap_area_lazy(&start, &end, 1, 0);
 }
 
@@ -1325,12 +1339,16 @@ void unmap_kernel_range(unsigned long addr, unsigned long size)
 	flush_tlb_kernel_range(addr, end);
 }
 
+/*! 2016.10.29 study -ing */
 int map_vm_area(struct vm_struct *area, pgprot_t prot, struct page ***pages)
 {
 	unsigned long addr = (unsigned long)area->addr;
 	unsigned long end = addr + get_vm_area_size(area);
 	int err;
 
+	/*! addr ~ end 에 해당하는 커널 페이지 테이블을 pages를 이용하여 매핑,
+	 *  맵핑 후 cache flush
+	 */
 	err = vmap_page_range(addr, end, prot, *pages);
 	if (err > 0) {
 		*pages += err;
@@ -1340,20 +1358,23 @@ int map_vm_area(struct vm_struct *area, pgprot_t prot, struct page ***pages)
 	return err;
 }
 EXPORT_SYMBOL_GPL(map_vm_area);
-
+/*! 2016.10.29 study -ing */
 static void setup_vmalloc_vm(struct vm_struct *vm, struct vmap_area *va,
 			      unsigned long flags, const void *caller)
 {
+	/*! lock 걸고,  */
 	spin_lock(&vmap_area_lock);
+	/*! vm 멤버들 값 설정  */
 	vm->flags = flags;
 	vm->addr = (void *)va->va_start;
 	vm->size = va->va_end - va->va_start;
 	vm->caller = caller;
 	va->vm = vm;
 	va->flags |= VM_VM_AREA;
+	/*! lock 해제  */
 	spin_unlock(&vmap_area_lock);
 }
-
+/*! 2016.10.29 study -ing */
 static void clear_vm_uninitialized_flag(struct vm_struct *vm)
 {
 	/*
@@ -1362,9 +1383,11 @@ static void clear_vm_uninitialized_flag(struct vm_struct *vm)
 	 * Pair with smp_rmb() in show_numa_info().
 	 */
 	smp_wmb();
+	/*! VM_UNINITIALIZED bit를 clear  */
 	vm->flags &= ~VM_UNINITIALIZED;
 }
 
+/*! 2016.10.29 study -ing */
 static struct vm_struct *__get_vm_area_node(unsigned long size,
 		unsigned long align, unsigned long flags, unsigned long start,
 		unsigned long end, int node, gfp_t gfp_mask, const void *caller)
@@ -1380,6 +1403,7 @@ static struct vm_struct *__get_vm_area_node(unsigned long size,
 	if (unlikely(!size))
 		return NULL;
 
+	/*! kzalloc_node 시도 후 실패 시 NULL 리턴  */
 	area = kzalloc_node(sizeof(*area), gfp_mask & GFP_RECLAIM_MASK, node);
 	if (unlikely(!area))
 		return NULL;
@@ -1390,6 +1414,7 @@ static struct vm_struct *__get_vm_area_node(unsigned long size,
 	size += PAGE_SIZE;
 
 	va = alloc_vmap_area(size, align, start, end, node, gfp_mask);
+	/*! alloc 실패 시 free 후 리턴 NULL  */
 	if (IS_ERR(va)) {
 		kfree(area);
 		return NULL;
@@ -1627,6 +1652,8 @@ EXPORT_SYMBOL(vmap);
 static void *__vmalloc_node(unsigned long size, unsigned long align,
 			    gfp_t gfp_mask, pgprot_t prot,
 			    int node, const void *caller);
+
+/*! 2016.10.29 study -ing */
 static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 				 pgprot_t prot, int node)
 {
@@ -1635,11 +1662,16 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 	unsigned int nr_pages, array_size, i;
 	gfp_t nested_gfp = (gfp_mask & GFP_RECLAIM_MASK) | __GFP_ZERO;
 
+	/*! vm area size를 PAGE_SHIFT 해서 nr_pages 구하고,  */
 	nr_pages = get_vm_area_size(area) >> PAGE_SHIFT;
 	array_size = (nr_pages * sizeof(struct page *));
 
+	/*! area의 nr_pages에 대입  */
 	area->nr_pages = nr_pages;
 	/* Please note that the recursion is strictly bounded. */
+	/*! array_size가 PAGE_SIZE 크면 __vmalloc_node,
+	 *	작으면 kmalloc_node로 page 에 메모리 alloc
+	 */
 	if (array_size > PAGE_SIZE) {
 		pages = __vmalloc_node(array_size, 1, nested_gfp|__GFP_HIGHMEM,
 				PAGE_KERNEL, node, area->caller);
@@ -1648,16 +1680,20 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 		pages = kmalloc_node(array_size, nested_gfp, node);
 	}
 	area->pages = pages;
+	/*! page에 메모리 alloc 실패 시 vm area 지우고, area free후 NULL 리턴  */
 	if (!area->pages) {
 		remove_vm_area(area->addr);
 		kfree(area);
 		return NULL;
 	}
 
+	/*! area의 nr_pages 갯수만큼 loop 돌면서,  */
 	for (i = 0; i < area->nr_pages; i++) {
 		struct page *page;
 		gfp_t tmp_mask = gfp_mask | __GFP_NOWARN;
 
+		/*! page에 메모리 할당 */
+		/*! 우리는 node == NUMA_NO_NODE  */
 		if (node == NUMA_NO_NODE)
 			page = alloc_page(tmp_mask);
 		else
@@ -1668,6 +1704,8 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 			area->nr_pages = i;
 			goto fail;
 		}
+
+		/*! area->pages 배열에 넣어준다 */
 		area->pages[i] = page;
 	}
 
@@ -1676,6 +1714,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 	return area->addr;
 
 fail:
+	/*! 실패 시 warnning print 후 area->addr free 후 NULL 리턴  */
 	warn_alloc_failed(gfp_mask, order,
 			  "vmalloc: allocation failure, allocated %ld of %ld bytes\n",
 			  (area->nr_pages*PAGE_SIZE), area->size);
@@ -1698,6 +1737,7 @@ fail:
  *	allocator with @gfp_mask flags.  Map them into contiguous
  *	kernel virtual space, using a pagetable protection of @prot.
  */
+/*! 2016.10.29 study -ing */
 void *__vmalloc_node_range(unsigned long size, unsigned long align,
 			unsigned long start, unsigned long end, gfp_t gfp_mask,
 			pgprot_t prot, int node, const void *caller)
@@ -1712,10 +1752,12 @@ void *__vmalloc_node_range(unsigned long size, unsigned long align,
 
 	area = __get_vm_area_node(size, align, VM_ALLOC | VM_UNINITIALIZED,
 				  start, end, node, gfp_mask, caller);
+	/*! area alloc 실패 시 fail로 점프  */
 	if (!area)
 		goto fail;
 
 	addr = __vmalloc_area_node(area, gfp_mask, prot, node);
+	/*! addr alloc 실패 시 NULL 리턴  */
 	if (!addr)
 		return NULL;
 
@@ -1731,11 +1773,13 @@ void *__vmalloc_node_range(unsigned long size, unsigned long align,
 	 * __get_vm_area_node() contains a reference to the virtual address of
 	 * the vmalloc'ed block.
 	 */
+	/*! Do Nothing.  */
 	kmemleak_alloc(addr, real_size, 2, gfp_mask);
 
 	return addr;
 
 fail:
+	/*! 실패 시 warnning 메세지 출력 후 NULL 리턴  */
 	warn_alloc_failed(gfp_mask, 0,
 			  "vmalloc: allocation failure: %lu bytes\n",
 			  real_size);
@@ -1755,6 +1799,7 @@ fail:
  *	allocator with @gfp_mask flags.  Map them into contiguous
  *	kernel virtual space, using a pagetable protection of @prot.
  */
+/*! 2016.10.29 study -ing */
 static void *__vmalloc_node(unsigned long size, unsigned long align,
 			    gfp_t gfp_mask, pgprot_t prot,
 			    int node, const void *caller)
@@ -1770,6 +1815,7 @@ void *__vmalloc(unsigned long size, gfp_t gfp_mask, pgprot_t prot)
 }
 EXPORT_SYMBOL(__vmalloc);
 
+/*! 2016.10.29 study -ing */
 static inline void *__vmalloc_node_flags(unsigned long size,
 					int node, gfp_t flags)
 {
@@ -1803,6 +1849,7 @@ EXPORT_SYMBOL(vmalloc);
  *	For tight control over page level allocator and protection flags
  *	use __vmalloc() instead.
  */
+/*! 2016.10.29 study -ing */
 void *vzalloc(unsigned long size)
 {
 	return __vmalloc_node_flags(size, NUMA_NO_NODE,
@@ -1864,6 +1911,7 @@ EXPORT_SYMBOL(vmalloc_node);
  * For tight control over page level allocator and protection flags
  * use __vmalloc_node() instead.
  */
+/*! 2016.10.29 study -ing */
 void *vzalloc_node(unsigned long size, int node)
 {
 	return __vmalloc_node_flags(size, node,
@@ -2257,6 +2305,7 @@ EXPORT_SYMBOL(remap_vmalloc_range);
  * Implement a stub for vmalloc_sync_all() if the architecture chose not to
  * have one.
  */
+/*! 2016.10.29 study -ing */
 void  __attribute__((weak)) vmalloc_sync_all(void)
 {
 }

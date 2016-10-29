@@ -3,9 +3,11 @@
 
 #include <asm/kmap_types.h>
 
+/*! 2016.10.29 study -ing */
 #define PKMAP_BASE		(PAGE_OFFSET - PMD_SIZE)
 #define LAST_PKMAP		PTRS_PER_PTE
 #define LAST_PKMAP_MASK		(LAST_PKMAP - 1)
+/*! 2016.10.29 study -ing */
 #define PKMAP_NR(virt)		(((virt) - PKMAP_BASE) >> PAGE_SHIFT)
 #define PKMAP_ADDR(nr)		(PKMAP_BASE + ((nr) << PAGE_SHIFT))
 

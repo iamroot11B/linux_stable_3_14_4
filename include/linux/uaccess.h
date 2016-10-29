@@ -24,6 +24,7 @@ static inline void pagefault_disable(void)
 	barrier();
 }
 
+/*! 2016.10.29 study -ing */
 static inline void pagefault_enable(void)
 {
 #ifndef CONFIG_PREEMPT

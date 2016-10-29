@@ -44,9 +44,11 @@ void *kmap_atomic(struct page *page)
 	int type;
 
 	pagefault_disable();
+	/*! page가 HIGMEM이 아니면 page address 리턴  */
 	if (!PageHighMem(page))
 		return page_address(page);
 
+	/*! CONFIG_DEBUG_HIGHMEM not defined.  */
 #ifdef CONFIG_DEBUG_HIGHMEM
 	/*
 	 * There is no cache coherency issue when non VIVT, so force the
@@ -56,6 +58,7 @@ void *kmap_atomic(struct page *page)
 		kmap = NULL;
 	else
 #endif
+		/*! lock 걸고 page_address(page) 수행이 메인 프로세스 */
 		kmap = kmap_high_get(page);
 	if (kmap)
 		return kmap;
@@ -63,6 +66,7 @@ void *kmap_atomic(struct page *page)
 	type = kmap_atomic_idx_push();
 
 	idx = type + KM_TYPE_NR * smp_processor_id();
+	/*! fixmap 에서 해당 idx 번호로 가상 주소를 가져온다.  */
 	vaddr = __fix_to_virt(FIX_KMAP_BEGIN + idx);
 #ifdef CONFIG_DEBUG_HIGHMEM
 	/*
@@ -81,16 +85,19 @@ void *kmap_atomic(struct page *page)
 	return (void *)vaddr;
 }
 EXPORT_SYMBOL(kmap_atomic);
-
+/*! 2016.10.29 study -ing */
 void __kunmap_atomic(void *kvaddr)
 {
+	/*! fixmap 영역에 매핑되어 있는 highmem 영역을 해제한다. */
 	unsigned long vaddr = (unsigned long) kvaddr & PAGE_MASK;
 	int idx, type;
 
 	if (kvaddr >= (void *)FIXADDR_START) {
+		/*! idx 찾고,  */
 		type = kmap_atomic_idx();
 		idx = type + KM_TYPE_NR * smp_processor_id();
 
+		/*! __cpuc_flush_dcache_area -> v7_flush_kern_cache_all 로 연결  */
 		if (cache_is_vivt())
 			__cpuc_flush_dcache_area((void *)vaddr, PAGE_SIZE);
 #ifdef CONFIG_DEBUG_HIGHMEM

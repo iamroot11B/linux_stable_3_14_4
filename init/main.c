@@ -703,13 +703,15 @@ asmlinkage void __init start_kernel(void)
 	time_init();	
 	sched_clock_postinit();
 	/*! 2016.10.15 study -ing */
-	perf_event_init();
-	profile_init();
+	perf_event_init();	
+	profile_init();	
 	call_function_init();
 	WARN(!irqs_disabled(), "Interrupts were enabled early\n");
-	early_boot_irqs_disabled = false;
+	early_boot_irqs_disabled = false;	
+	/*! arch_local_irq_enable 를 통해 irq enable 수행  */
 	local_irq_enable();
 
+	/*! Do Nothing. */
 	kmem_cache_init_late();
 
 	/*
@@ -718,10 +720,14 @@ asmlinkage void __init start_kernel(void)
 	 * this. But we do want output early, in case something goes wrong.
 	 */
 	console_init();
+	/*! panic_later가 set 되어있었으면, print 후 panic 돌입
+	 *  panic_later는 unknown bootoption일때만 set 된다.
+	 */
 	if (panic_later)
 		panic("Too many boot %s vars at `%s'", panic_later,
 		      panic_param);
 
+	/*! Do Nothing. */
 	lockdep_info();
 
 	/*
@@ -729,11 +735,18 @@ asmlinkage void __init start_kernel(void)
 	 * to self-test [hard/soft]-irqs on/off lock inversion bugs
 	 * too:
 	 */
+	/*! CONFIG_DEBUG_LOCKING_API_SELFTESTS 이 Not define.
+	 *  -> Do Nothing.
+	 */
 	locking_selftest();
 
 #ifdef CONFIG_BLK_DEV_INITRD
+	/*! initrd_start 값이 있는데 나머지 조건들을 만족하지 않으면,
+	 *  critical message 출력 후 initrd_start 값 0으로 변경
+	 */
 	if (initrd_start && !initrd_below_start_ok &&
 	    page_to_pfn(virt_to_page((void *)initrd_start)) < min_low_pfn) {
+		/*! critical print message 수행. */
 		pr_crit("initrd overwritten (0x%08lx < 0x%08lx) - disabling it.\n",
 		    page_to_pfn(virt_to_page((void *)initrd_start)),
 		    min_low_pfn);
@@ -741,6 +754,8 @@ asmlinkage void __init start_kernel(void)
 	}
 #endif
 	page_cgroup_init();
+	/*! 2016.10.29 study end */
+
 	debug_objects_mem_init();
 	kmemleak_init();
 	setup_per_cpu_pageset();

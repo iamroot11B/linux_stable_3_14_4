@@ -1531,11 +1531,13 @@ void split_page(struct page *page, unsigned int order)
 	 * Split shadow pages too, because free(page[0]) would
 	 * otherwise free the whole shadow.
 	 */
+	/*! 무조건 false 리턴  */
 	if (kmemcheck_page_is_tracked(page))
 		split_page(virt_to_page(page[0].shadow), order);
 #endif
 
 	for (i = 1; i < (1 << order); i++)
+		/*! page->_count를 atomic 하게 1로 set  */
 		set_page_refcounted(page + i);
 }
 EXPORT_SYMBOL_GPL(split_page);
@@ -2210,7 +2212,7 @@ static inline bool should_suppress_show_mem(void)
 static DEFINE_RATELIMIT_STATE(nopage_rs,
 		DEFAULT_RATELIMIT_INTERVAL,
 		DEFAULT_RATELIMIT_BURST);
-
+/*! 2016.10.29 study -ing */
 void warn_alloc_failed(gfp_t gfp_mask, int order, const char *fmt, ...)
 {
 	unsigned int filter = SHOW_MEM_FILTER_NODES;
@@ -3024,16 +3026,19 @@ void free_memcg_kmem_pages(unsigned long addr, unsigned int order)
 		__free_memcg_kmem_pages(virt_to_page((void *)addr), order);
 	}
 }
-
+/*! 2016.10.29 study -ing */
 static void *make_alloc_exact(unsigned long addr, unsigned order, size_t size)
 {
+	/*! 우리는 실제로 addr이 변경되지는 않는다.  */
 	if (addr) {
 		unsigned long alloc_end = addr + (PAGE_SIZE << order);
 		unsigned long used = addr + PAGE_ALIGN(size);
 
 		split_page(virt_to_page((void *)addr), order);
+		/*! used 가 alloc_end보다 작으면 계속 page free  */
 		while (used < alloc_end) {
 			free_page(used);
+			/*! free 하고 PAGE_SIZE만큼 증가  */
 			used += PAGE_SIZE;
 		}
 	}
@@ -3078,8 +3083,10 @@ EXPORT_SYMBOL(alloc_pages_exact);
  * Note this is not alloc_pages_exact_node() which allocates on a specific node,
  * but is not exact.
  */
+/*! 2016.10.29 study -ing */
 void *alloc_pages_exact_nid(int nid, size_t size, gfp_t gfp_mask)
 {
+	/*! 물리적으로 연속적인 pages 들을 alloc 시도  */
 	unsigned order = get_order(size);
 	struct page *p = alloc_pages_node(nid, gfp_mask, order);
 	if (!p)

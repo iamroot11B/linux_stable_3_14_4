@@ -46,6 +46,7 @@ static inline void decode_ctrl_reg(u32 reg,
 
 /* Debug architecture numbers. */
 #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. */
+/*! 2016.10.29 study -ing */
 #define ARM_DEBUG_ARCH_V6	1
 #define ARM_DEBUG_ARCH_V6_1	2
 #define ARM_DEBUG_ARCH_V7_ECP14	3
@@ -101,6 +102,7 @@ static inline void decode_ctrl_reg(u32 reg,
 #define ARM_BASE_WCR		112
 
 /* Accessor macros for the debug registers. */
+/*! 2016.10.29 study -ing */
 #define ARM_DBG_READ(N, M, OP2, VAL) do {\
 	asm volatile("mrc p14, 0, %0, " #N "," #M ", " #OP2 : "=r" (VAL));\
 } while (0)

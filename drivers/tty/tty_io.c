@@ -3484,6 +3484,7 @@ void tty_default_fops(struct file_operations *fops)
  * Just do some early initializations, and do the complex setup
  * later.
  */
+/*! 2016.10.29 study -ing */
 void __init console_init(void)
 {
 	initcall_t *call;
@@ -3494,6 +3495,9 @@ void __init console_init(void)
 	/*
 	 * set up the console device so that later boot sequences can
 	 * inform about problems etc..
+	 */
+	/*! __con_initcall_start ~ __con_initcall_end 사이(con_initcall.init 섹션)에 있는
+	 *  함수들을 수행하는데, 우리는 con_init 함수 하나가 수행 된다.
 	 */
 	call = __con_initcall_start;
 	while (call < __con_initcall_end) {

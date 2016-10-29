@@ -48,13 +48,20 @@ static int get_range(char **str, int *pint)
  *	2 - int found including a subsequent comma
  *	3 - hyphen found to denote a range
  */
-
+/*! 2016.10.29 study -ing */
+/*! str 문자열을 정수 변환해서 pint에 저장하고 다음 값 리턴
+ *  변환 안되면 0,
+ *  옵션 문자열이 없으면 1,
+ *  옵션 문자열이 ','면 2,
+ *  옵션 문자열이 '-'면 3 리턴
+ */
 int get_option(char **str, int *pint)
 {
 	char *cur = *str;
 
 	if (!cur || !(*cur))
 		return 0;
+	/*! str이 숫자면 pint에 숫자로 변환해서 대입  */
 	*pint = simple_strtol(cur, str, 0);
 	if (cur == *str)
 		return 0;

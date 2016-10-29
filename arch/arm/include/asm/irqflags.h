@@ -34,7 +34,7 @@ static inline unsigned long arch_local_irq_save(void)
 		: "=r" (flags) : : "memory", "cc");
 	return flags;
 }
-
+/*! 2016.10.29 study -ing */
 static inline void arch_local_irq_enable(void)
 {
 	asm volatile(

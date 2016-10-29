@@ -337,7 +337,7 @@ extern struct cpu_tlb_fns cpu_tlb;
 				 fa_always_flags & \
 				 v6wbi_always_flags & \
 				 v7wbi_always_flags)
-
+/*! 2016.10.29 study -ing */
 #define tlb_flag(f)	((always_tlb_flags & (f)) || (__tlb_flag & possible_tlb_flags & (f)))
 
 /*!
@@ -355,7 +355,7 @@ extern struct cpu_tlb_fns cpu_tlb;
 			    : : "r" (arg), "r" (__tlb_flag), "Ir" (f)	\
 			    : "cc");					\
 	} while (0)
-
+/*! 2016.10.29 study -ing */
 #define tlb_op(f, regs, arg)	__tlb_op(f, "p15, 0, %0, " regs, arg)
 #define tlb_l2_op(f, regs, arg)	__tlb_op(f, "p15, 1, %0, " regs, arg)
 
@@ -529,7 +529,7 @@ __flush_tlb_page(struct vm_area_struct *vma, unsigned long uaddr)
 	if (tlb_flag(TLB_BARRIER))
 		dsb(ish);
 }
-
+/*! 2016.10.29 study -ing */
 static inline void __local_flush_tlb_kernel_page(unsigned long kaddr)
 {
 	const int zero = 0;
@@ -546,6 +546,7 @@ static inline void __local_flush_tlb_kernel_page(unsigned long kaddr)
 	tlb_op(TLB_V6_I_PAGE, "c8, c5, 1", kaddr);
 }
 
+/*! 2016.10.29 study -ing */
 static inline void local_flush_tlb_kernel_page(unsigned long kaddr)
 {
 	const unsigned int __tlb_flag = __cpu_tlb_flags;

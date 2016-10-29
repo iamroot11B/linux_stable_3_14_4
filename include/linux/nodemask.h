@@ -448,7 +448,7 @@ static inline void node_set_offline(int nid)
 }
 
 #else
-
+/*! 2016.10.29 study -ing */
 static inline int node_state(int node, enum node_states state)
 {
 	return node == 0;

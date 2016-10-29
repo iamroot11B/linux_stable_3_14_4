@@ -190,7 +190,7 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
     /*! pmd_val(pmd) & 0xfffff000  */
 	return __va(pmd_val(pmd) & PHYS_MASK & (s32)PAGE_MASK);
 }
-
+/*! 2016.10.29 study -ing */
 #define pmd_page(pmd)		pfn_to_page(__phys_to_pfn(pmd_val(pmd) & PHYS_MASK))
 
 #ifndef CONFIG_HIGHPTE
@@ -210,10 +210,12 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
 #define pte_offset_map(pmd,addr)	(__pte_map(pmd) + pte_index(addr))
 #define pte_unmap(pte)			__pte_unmap(pte)
 
+/*! 2016.10.29 study -ing */
 #define pte_pfn(pte)		((pte_val(pte) & PHYS_MASK) >> PAGE_SHIFT)
 #define pfn_pte(pfn,prot)	__pte(__pfn_to_phys(pfn) | pgprot_val(prot))
-
+/*! 2016.10.29 study -ing */
 #define pte_page(pte)		pfn_to_page(pte_pfn(pte))
+	/*! 2016.10.29 study -ing */
 #define mk_pte(page,prot)	pfn_pte(page_to_pfn(page), prot)
 /*! 2016-04-02 study -ing */
 /*! cpu_v7_set_pte_ext(ptep, __pte(0), 0) 를 수행하게 된다. */

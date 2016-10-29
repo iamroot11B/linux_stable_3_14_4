@@ -59,6 +59,7 @@
  */
 /*! 2016.07.16 study -ing */
 #define raw_local_irq_disable()		arch_local_irq_disable()
+/*! 2016.10.29 study -ing */
 #define raw_local_irq_enable()		arch_local_irq_enable()
 #define raw_local_irq_save(flags)			\
 	do {						\
@@ -91,6 +92,7 @@
  * if !TRACE_IRQFLAGS.
  */
 #ifdef CONFIG_TRACE_IRQFLAGS_SUPPORT
+/*! 2016.10.29 study -ing */
 #define local_irq_enable() \
 	do { trace_hardirqs_on(); raw_local_irq_enable(); } while (0)
 /*! 2016.07.16 study -ing */

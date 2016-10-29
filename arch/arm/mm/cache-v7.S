@@ -224,6 +224,7 @@ ENDPROC(v7_flush_dcache_all)
  *  unification in a single instruction.
  *
  */
+/*! 2016.10.29 study -ing */	
 ENTRY(v7_flush_kern_cache_all)
  ARM(	stmfd	sp!, {r4-r5, r7, r9-r11, lr}	)
  THUMB(	stmfd	sp!, {r4-r7, r9-r11, lr}	)

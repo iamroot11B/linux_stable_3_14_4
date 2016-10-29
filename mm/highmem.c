@@ -83,6 +83,7 @@ static DECLARE_WAIT_QUEUE_HEAD(pkmap_map_wait);
 #ifdef ARCH_NEEDS_KMAP_HIGH_GET
 #define lock_kmap()             spin_lock_irq(&kmap_lock)
 #define unlock_kmap()           spin_unlock_irq(&kmap_lock)
+/*! 2016.10.29 study -ing */
 #define lock_kmap_any(flags)    spin_lock_irqsave(&kmap_lock, flags)
 #define unlock_kmap_any(flags)  spin_unlock_irqrestore(&kmap_lock, flags)
 #else
@@ -246,13 +247,16 @@ EXPORT_SYMBOL(kmap_high);
  *
  * This can be called from any context.
  */
+/*! 2016.10.29 study -ing */
 void *kmap_high_get(struct page *page)
 {
 	unsigned long vaddr, flags;
 
+	/*! spin lock으로 연결 됨  */
 	lock_kmap_any(flags);
 	vaddr = (unsigned long)page_address(page);
 	if (vaddr) {
+		/*! BUG_ON : 괄호안이 true 면 bug  */
 		BUG_ON(pkmap_count[PKMAP_NR(vaddr)] < 1);
 		pkmap_count[PKMAP_NR(vaddr)]++;
 	}
@@ -268,6 +272,7 @@ void *kmap_high_get(struct page *page)
  * If ARCH_NEEDS_KMAP_HIGH_GET is not defined then this may be called
  * only from user context.
  */
+/*! 2016.10.29 study -ing */
 void kunmap_high(struct page *page)
 {
 	unsigned long vaddr;
@@ -275,6 +280,7 @@ void kunmap_high(struct page *page)
 	unsigned long flags;
 	int need_wakeup;
 
+	/*! lock 걸고,  */
 	lock_kmap_any(flags);
 	vaddr = (unsigned long)page_address(page);
 	BUG_ON(!vaddr);
@@ -299,11 +305,14 @@ void kunmap_high(struct page *page)
 		 * no need for the wait-queue-head's lock.  Simply
 		 * test if the queue is empty.
 		 */
+		/*! 리스트가 empty가 아니면 waitqueue active 상태라고 판단  */
 		need_wakeup = waitqueue_active(&pkmap_map_wait);
 	}
+	/*! lock 해제 */
 	unlock_kmap_any(flags);
 
 	/* do wake-up, if needed, race-free outside of the spin lock */
+	/*! pkmap_map_wait->task_list 가 emptry 아니면(need_wakup) wake_up 수행  */
 	if (need_wakeup)
 		wake_up(&pkmap_map_wait);
 }

@@ -188,7 +188,8 @@ extern void __bad_size_call_parameter(void);
 	}								\
 	pscr_ret__;							\
 })
-
+/*! 2016.10.29 study -ing */
+/*! __this_cpu_read_1 */
 #define __pcpu_size_call_return2(stem, variable, ...)			\
 ({									\
 	typeof(variable) pscr2_ret__;					\
@@ -556,7 +557,7 @@ do {									\
  */
 # define __this_cpu_read(pcp)	__pcpu_size_call_return(__this_cpu_read_, (pcp))
 #endif
-
+/*! 2016.10.29 study -ing */
 #define __this_cpu_generic_to_op(pcp, val, op)				\
 do {									\
 	*__this_cpu_ptr(&(pcp)) op val;					\
@@ -610,7 +611,7 @@ do {									\
 # endif
 # define __this_cpu_add(pcp, val)	__pcpu_size_call(__this_cpu_add_, (pcp), (val))
 #endif
-
+/*! 2016.10.29 study -ing */
 #ifndef __this_cpu_sub
 # define __this_cpu_sub(pcp, val)	__this_cpu_add((pcp), -(typeof(pcp))(val))
 #endif
@@ -618,7 +619,7 @@ do {									\
 #ifndef __this_cpu_inc
 # define __this_cpu_inc(pcp)		__this_cpu_add((pcp), 1)
 #endif
-
+/*! 2016.10.29 study -ing */
 #ifndef __this_cpu_dec
 # define __this_cpu_dec(pcp)		__this_cpu_sub((pcp), 1)
 #endif
@@ -674,11 +675,13 @@ do {									\
 # ifndef __this_cpu_add_return_8
 #  define __this_cpu_add_return_8(pcp, val)	__this_cpu_generic_add_return(pcp, val)
 # endif
+/*! 2016.10.29 study -ing */
 # define __this_cpu_add_return(pcp, val)	\
 	__pcpu_size_call_return2(__this_cpu_add_return_, pcp, val)
 #endif
 
 #define __this_cpu_sub_return(pcp, val)	__this_cpu_add_return(pcp, -(typeof(pcp))(val))
+/*! 2016.10.29 study -ing */
 #define __this_cpu_inc_return(pcp)	__this_cpu_add_return(pcp, 1)
 #define __this_cpu_dec_return(pcp)	__this_cpu_add_return(pcp, -1)
 

@@ -130,6 +130,7 @@ extern struct memory_block *find_memory_block(struct mem_section *);
 #define register_hotmemory_notifier(nb)		register_memory_notifier(nb)
 #define unregister_hotmemory_notifier(nb) 	unregister_memory_notifier(nb)
 #else
+/*! 2016.10.29 study -ing */
 #define hotplug_memory_notifier(fn, pri)	({ 0; })
 /* These aren't inline functions due to a GCC bug. */
 #define register_hotmemory_notifier(nb)    ({ (void)(nb); 0; })

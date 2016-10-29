@@ -329,7 +329,7 @@ static inline void spin_lock_irq(spinlock_t *lock)
 {
 	raw_spin_lock_irq(&lock->rlock);
 }
-
+/*! 2016.10.29 study -ing */
 #define spin_lock_irqsave(lock, flags)				\
 do {								\
 	raw_spin_lock_irqsave(spinlock_check(lock), flags);	\

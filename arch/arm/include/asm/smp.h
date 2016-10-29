@@ -17,7 +17,7 @@
 #ifndef CONFIG_SMP
 # error "<asm/smp.h> included in non-SMP build"
 #endif
-
+/*! 2016.10.29 study -ing */
 #define raw_smp_processor_id() (current_thread_info()->cpu)
 
 struct seq_file;

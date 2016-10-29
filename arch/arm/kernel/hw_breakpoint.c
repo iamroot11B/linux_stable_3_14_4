@@ -135,6 +135,7 @@ static void write_wb_reg(int n, u32 val)
 }
 
 /* Determine debug architecture. */
+/*! 2016.10.29 study -ing */
 static u8 get_debug_arch(void)
 {
 	u32 didr;
@@ -154,7 +155,7 @@ u8 arch_get_debug_arch(void)
 {
 	return debug_arch;
 }
-
+/*! 2016.10.29 study -ing */
 static int debug_arch_supported(void)
 {
 	u8 arch = get_debug_arch();
@@ -179,6 +180,7 @@ static int get_num_wrp_resources(void)
 }
 
 /* Determine number of BRP registers available. */
+/*! 2016.10.29 study -ing */
 static int get_num_brp_resources(void)
 {
 	u32 didr;
@@ -187,6 +189,7 @@ static int get_num_brp_resources(void)
 }
 
 /* Does this core support mismatch breakpoints? */
+/*! 2016.10.29 study -ing */
 static int core_has_mismatch_brps(void)
 {
 	return (get_debug_arch() >= ARM_DEBUG_ARCH_V7_ECP14 &&
@@ -194,6 +197,7 @@ static int core_has_mismatch_brps(void)
 }
 
 /* Determine number of usable WRPs available. */
+/*! 2016.10.29 study -ing */
 static int get_num_wrps(void)
 {
 	/*
@@ -221,8 +225,10 @@ static int get_num_wrps(void)
 }
 
 /* Determine number of usable BRPs available. */
+/*! 2016.10.29 study -ing */
 static int get_num_brps(void)
 {
+	/*! ARM_DBG_READ 를 통해 읽은 register 값을 이용하여 정보 확인  */
 	int brps = get_num_brp_resources();
 	return core_has_mismatch_brps() ? brps - 1 : brps;
 }
@@ -275,9 +281,10 @@ static int enable_monitor_mode(void)
 out:
 	return 0;
 }
-
+/*! 2016.10.29 study -ing */
 int hw_breakpoint_slots(int type)
 {
+	/*! arch 정보 확인하여 debug support 여부 확인  */
 	if (!debug_arch_supported())
 		return 0;
 

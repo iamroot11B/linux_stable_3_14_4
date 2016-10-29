@@ -1360,8 +1360,12 @@ void __init memblock_enforce_memory_limit(phys_addr_t limit)
 	__memblock_remove(&memblock.reserved, max_addr, (phys_addr_t)ULLONG_MAX);
 }
 
+/*! 2016.10.29 study -ing */
 static int __init_memblock memblock_search(struct memblock_type *type, phys_addr_t addr)
 {
+	/*! 주어진 type의 memblock에서 주어진 주소로 2진 탐색 알고리즘을 사용하여 memblock을 찾고,
+	 *  해당 인덱스 값을 얻는다.  
+	 */
 	unsigned int left = 0, right = type->cnt;
 
 	do {
@@ -1382,7 +1386,7 @@ int __init memblock_is_reserved(phys_addr_t addr)
 {
 	return memblock_search(&memblock.reserved, addr) != -1;
 }
-
+/*! 2016.10.29 study -ing */
 int __init_memblock memblock_is_memory(phys_addr_t addr)
 {
 	return memblock_search(&memblock.memory, addr) != -1;

@@ -12,7 +12,7 @@
  * The cache flushing code in proc-xscale.S uses the virtual area between
  * 0xfffe0000 and 0xfffeffff.
  */
-
+/*! Fix map address space : himem 페이지를 cpu id 별로 할당된 fixmap 영역에 매핑하여 사용한다. */
 #define FIXADDR_START		0xfff00000UL
 #define FIXADDR_TOP		0xfffe0000UL
 #define FIXADDR_SIZE		(FIXADDR_TOP - FIXADDR_START)
@@ -20,6 +20,7 @@
 #define FIX_KMAP_BEGIN		0
 #define FIX_KMAP_END		(FIXADDR_SIZE >> PAGE_SHIFT)
 
+/*! 2016.10.29 study -ing */
 #define __fix_to_virt(x)	(FIXADDR_START + ((x) << PAGE_SHIFT))
 #define __virt_to_fix(x)	(((x) - FIXADDR_START) >> PAGE_SHIFT)
 

@@ -86,23 +86,24 @@ static inline void __kunmap_atomic(void *addr)
 #if defined(CONFIG_HIGHMEM) || defined(CONFIG_X86_32)
 
 DECLARE_PER_CPU(int, __kmap_atomic_idx);
-
+/*! 2016.10.29 study -ing */
 static inline int kmap_atomic_idx_push(void)
 {
 	int idx = __this_cpu_inc_return(__kmap_atomic_idx) - 1;
 
+	/*! CONFIG_DEBUG_HIGHMEM not defiend. */
 #ifdef CONFIG_DEBUG_HIGHMEM
 	WARN_ON_ONCE(in_irq() && !irqs_disabled());
 	BUG_ON(idx > KM_TYPE_NR);
 #endif
 	return idx;
 }
-
+/*! 2016.10.29 study -ing */
 static inline int kmap_atomic_idx(void)
 {
 	return __this_cpu_read(__kmap_atomic_idx) - 1;
 }
-
+/*! 2016.10.29 study -ing */
 static inline void kmap_atomic_idx_pop(void)
 {
 #ifdef CONFIG_DEBUG_HIGHMEM
@@ -120,6 +121,7 @@ static inline void kmap_atomic_idx_pop(void)
  * Prevent people trying to call kunmap_atomic() as if it were kunmap()
  * kunmap_atomic() should get the return value of kmap_atomic, not the page.
  */
+/*! 2016.10.29 study -ing */
 #define kunmap_atomic(addr)                                     \
 do {                                                            \
 	BUILD_BUG_ON(__same_type((addr), struct page *));       \

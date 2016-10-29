@@ -59,6 +59,7 @@ typedef pteval_t pgprot_t;
 #define pgd_val(x)	((x)[0])
 #define pgprot_val(x)   (x)
 
+/*! 2016.10.29 study -ing */
 #define __pte(x)        (x)
 #define __pmd(x)        (x)
 #define __pgprot(x)     (x)

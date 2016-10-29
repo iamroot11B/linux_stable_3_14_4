@@ -117,6 +117,7 @@ static int __kprobes notifier_call_chain(struct notifier_block **nl,
  *
  *	Currently always returns zero.
  */
+/*! 2016.10.29 study -ing */
 int atomic_notifier_chain_register(struct atomic_notifier_head *nh,
 		struct notifier_block *n)
 {
@@ -545,10 +546,12 @@ int notrace __kprobes notify_die(enum die_val val, const char *str,
 	};
 	return atomic_notifier_call_chain(&die_chain, val, &args);
 }
-
+/*! 2016.10.29 study -ing */
 int register_die_notifier(struct notifier_block *nb)
 {
+	/*! Do Nothing.  */
 	vmalloc_sync_all();
+	/*! 리턴 값은 0  */
 	return atomic_notifier_chain_register(&die_chain, nb);
 }
 EXPORT_SYMBOL_GPL(register_die_notifier);

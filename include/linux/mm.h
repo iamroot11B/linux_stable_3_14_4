@@ -714,6 +714,7 @@ static inline pte_t maybe_mkwrite(pte_t pte, struct vm_area_struct *vma)
 #define LAST_CPUPID_MASK	((1UL << LAST_CPUPID_WIDTH) - 1)
 #define ZONEID_MASK		((1UL << ZONEID_SHIFT) - 1)
 
+/*! 2016.10.29 study -ing */
 static inline enum zone_type page_zonenum(const struct page *page)
 {
 	return (page->flags >> ZONES_PGSHIFT) & ZONES_MASK;
@@ -748,6 +749,7 @@ static inline int zone_to_nid(struct zone *zone)
 #ifdef NODE_NOT_IN_PAGE_FLAGS
 extern int page_to_nid(const struct page *page);
 #else
+/*! 2016.10.29 study -ing */
 static inline int page_to_nid(const struct page *page)
 {
 	return (page->flags >> NODES_PGSHIFT) & NODES_MASK;
@@ -971,6 +973,7 @@ void page_address_init(void);
 #endif
 
 #if !defined(HASHED_PAGE_VIRTUAL) && !defined(WANT_PAGE_VIRTUAL)
+/*! 2016.10.29 study -ing */
 #define page_address(page) lowmem_page_address(page)
 #define set_page_address(page, address)  do { } while(0)
 #define page_address_init()  do { } while(0)

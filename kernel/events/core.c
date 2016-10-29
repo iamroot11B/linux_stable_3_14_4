@@ -7995,6 +7995,7 @@ void __init perf_event_init(void)
     /*! 2016.10.22 study start */
 	register_reboot_notifier(&perf_reboot_notifier);
 
+	/*! 2016.10.29 study -ing */
 	ret = init_hw_breakpoint();
 	WARN(ret, "hw_breakpoint initialization failed with: %d", ret);
 
@@ -8004,6 +8005,9 @@ void __init perf_event_init(void)
 	/*
 	 * Build time assertion that we keep the data_head at the intended
 	 * location.  IOW, validation we got the __reserved[] size right.
+	 */
+	/*! BUILD_BUG_ON : 옵션에 따라 enable 되어 있으면 build 시 조건보고 에러 발생
+	 *  disable 되어 있으면 Do Nothing.
 	 */
 	BUILD_BUG_ON((offsetof(struct perf_event_mmap_page, data_head))
 		     != 1024);
