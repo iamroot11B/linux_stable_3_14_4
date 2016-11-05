@@ -15,6 +15,8 @@
  * some arches have their own ways of determining the offset (x86_64, s390).
  */
 #ifndef __per_cpu_offset
+/*! 2016.11.05 study -ing  */
+/*! 오프셋 to 원하는 percpu variable  */
 extern unsigned long __per_cpu_offset[NR_CPUS];
 /*! 2016.07.09 study -ing */
 #define per_cpu_offset(x) (__per_cpu_offset[x])

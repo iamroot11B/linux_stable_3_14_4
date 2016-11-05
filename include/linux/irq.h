@@ -197,7 +197,7 @@ static inline bool irqd_is_per_cpu(struct irq_data *d)
 {
 	return d->state_use_accessors & IRQD_PER_CPU;
 }
-
+/*! 2016.11.05 study -ing  */
 static inline bool irqd_can_balance(struct irq_data *d)
 {
 	return !(d->state_use_accessors & (IRQD_PER_CPU | IRQD_NO_BALANCING));
@@ -550,7 +550,7 @@ static inline struct irq_chip *irq_get_chip(unsigned int irq)
 	struct irq_data *d = irq_get_irq_data(irq);
 	return d ? d->chip : NULL;
 }
-
+/*! 2016.11.05 study -ing  */
 static inline struct irq_chip *irq_data_get_irq_chip(struct irq_data *d)
 {
 	return d->chip;

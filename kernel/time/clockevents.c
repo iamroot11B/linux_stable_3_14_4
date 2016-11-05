@@ -101,10 +101,12 @@ EXPORT_SYMBOL_GPL(clockevent_delta2ns);
  *
  * Must be called with interrupts disabled !
  */
+/*! 2016.11.05 study -ing  */
 void clockevents_set_mode(struct clock_event_device *dev,
 				 enum clock_event_mode mode)
 {
 	if (dev->mode != mode) {
+		/*! dev->set_mode 수행하고, dev->mode 를 mode로 바꿔준다  */
 		dev->set_mode(mode, dev);
 		dev->mode = mode;
 
@@ -125,8 +127,10 @@ void clockevents_set_mode(struct clock_event_device *dev,
  * clockevents_shutdown - shutdown the device and clear next_event
  * @dev:	device to shutdown
  */
+/*! 2016.11.05 study -ing  */
 void clockevents_shutdown(struct clock_event_device *dev)
 {
+	/*! dev->mode에 CLOCK_EVT_MODE_SHUTDOWN 대입  */
 	clockevents_set_mode(dev, CLOCK_EVT_MODE_SHUTDOWN);
 	dev->next_event.tv64 = KTIME_MAX;
 }
@@ -210,12 +214,15 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
  *
  * Returns 0 on success, -ETIME when the retry loop failed.
  */
+/*! 2016.11.05 study -ing */
 static int clockevents_program_min_delta(struct clock_event_device *dev)
 {
 	unsigned long long clc;
 	int64_t delta;
 
+	/*! dev->min_delta_ns 를 읽어서,  */
 	delta = dev->min_delta_ns;
+	/*! ktime_get 으로 구한 ktime_t 에 읽은 ns 값을 더해서 next_event에 넣는다.  */
 	dev->next_event = ktime_add_ns(ktime_get(), delta);
 
 	if (dev->mode == CLOCK_EVT_MODE_SHUTDOWN)
@@ -236,6 +243,7 @@ static int clockevents_program_min_delta(struct clock_event_device *dev)
  *
  * Returns 0 on success, -ETIME when the event is in the past.
  */
+/*! 2016.11.05 study -ing */
 int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
 			      bool force)
 {
@@ -243,20 +251,31 @@ int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
 	int64_t delta;
 	int rc;
 
+	/*! clock_event_device인 dev를 reprogram 한다.  */
+
 	if (unlikely(expires.tv64 < 0)) {
 		WARN_ON_ONCE(1);
 		return -ETIME;
 	}
 
+	/*! dev의 next_event는 expires 시간 이후. */
 	dev->next_event = expires;
 
 	if (dev->mode == CLOCK_EVT_MODE_SHUTDOWN)
 		return 0;
 
 	/* Shortcut for clockevent devices that can deal with ktime. */
+	/*! features 의 CLOCK_EVT_FEAT_KTIME bit가 set 되어 있으면(ktime 다루는 dev라면)
+	 *  next_ktime을 수행하고 리턴
+	 */
 	if (dev->features & CLOCK_EVT_FEAT_KTIME)
 		return dev->set_next_ktime(expires, dev);
 
+	/*! features에 CLOCK_EVT_FEAT_KTIME이 not set 되어 있으면,
+	 *  clc 계산 후 set_next_event 수행
+	 */
+
+	/*! set_next_event에 전달할 clock 계산  */
 	delta = ktime_to_ns(ktime_sub(expires, ktime_get()));
 	if (delta <= 0)
 		return force ? clockevents_program_min_delta(dev) : -ETIME;
@@ -265,6 +284,7 @@ int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
 	delta = max(delta, (int64_t) dev->min_delta_ns);
 
 	clc = ((unsigned long long) delta * dev->mult) >> dev->shift;
+	
 	rc = dev->set_next_event((unsigned long) clc, dev);
 
 	return (rc && force) ? clockevents_program_min_delta(dev) : rc;
@@ -274,13 +294,17 @@ int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
  * Called after a notify add to make devices available which were
  * released from the notifier call.
  */
+/*! 2016.11.05 study -ing */
 static void clockevents_notify_released(void)
 {
 	struct clock_event_device *dev;
 
+	/*! clockevents_released 리스트를 모두 돌면서   */
 	while (!list_empty(&clockevents_released)) {
+		/*! clockevents_released 리스트의 각 entry를 가져와서  */
 		dev = list_entry(clockevents_released.next,
 				 struct clock_event_device, list);
+		/*! list 삭제 */
 		list_del(&dev->list);
 		list_add(&dev->list, &clockevent_devices);
 		tick_check_new_device(dev);
@@ -375,22 +399,27 @@ EXPORT_SYMBOL_GPL(clockevents_unbind);
  * clockevents_register_device - register a clock event device
  * @dev:	device to register
  */
+/*! 2016.11.05 study -ing  */
 void clockevents_register_device(struct clock_event_device *dev)
 {
 	unsigned long flags;
 
 	BUG_ON(dev->mode != CLOCK_EVT_MODE_UNUSED);
 	if (!dev->cpumask) {
+		/*! cpu_possible_mask의 1로 set된 bit 수가 1 이하면 warning */
 		WARN_ON(num_possible_cpus() > 1);
+		/*! cpu_bit_bitmap에서 cpu에 해당하는 배열 주소 리턴   */
 		dev->cpumask = cpumask_of(smp_processor_id());
 	}
-
+	/*! 락 걸고  */
 	raw_spin_lock_irqsave(&clockevents_lock, flags);
 
+	/*! dev-list에 리스트 추가 */
 	list_add(&dev->list, &clockevent_devices);
 	tick_check_new_device(dev);
 	clockevents_notify_released();
 
+	/*! 락 풀고,  */
 	raw_spin_unlock_irqrestore(&clockevents_lock, flags);
 }
 EXPORT_SYMBOL_GPL(clockevents_register_device);
@@ -462,6 +491,7 @@ int clockevents_update_freq(struct clock_event_device *dev, u32 freq)
 /*
  * Noop handler when we shut down an event device
  */
+/*! 2016.11.05 study -ing  */
 void clockevents_handle_noop(struct clock_event_device *dev)
 {
 }
@@ -473,6 +503,7 @@ void clockevents_handle_noop(struct clock_event_device *dev)
  *
  * Called from the notifier chain. clockevents_lock is held already
  */
+/*! 2016.11.05 study -ing  */
 void clockevents_exchange_device(struct clock_event_device *old,
 				 struct clock_event_device *new)
 {
@@ -485,6 +516,7 @@ void clockevents_exchange_device(struct clock_event_device *old,
 	 */
 	if (old) {
 		module_put(old->owner);
+		/*! old->mode를 CLOCK_EVT_MODE_UNUSED로 바꿔준다.  */
 		clockevents_set_mode(old, CLOCK_EVT_MODE_UNUSED);
 		list_del(&old->list);
 		list_add(&old->list, &clockevents_released);
@@ -492,6 +524,7 @@ void clockevents_exchange_device(struct clock_event_device *old,
 
 	if (new) {
 		BUG_ON(new->mode != CLOCK_EVT_MODE_UNUSED);
+		/*! new는 clockenents shutdown  */
 		clockevents_shutdown(new);
 	}
 	local_irq_restore(flags);

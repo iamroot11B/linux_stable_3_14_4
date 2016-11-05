@@ -8,9 +8,10 @@
 #include <linux/stddef.h>
 #include <linux/mm.h>
 #include <linux/mmzone.h>
-
+/*! 2016.11.05 study -ing  */
 struct pglist_data *first_online_pgdat(void)
 {
+	/*! (&contig_page_data)  */
 	return NODE_DATA(first_online_node);
 }
 
@@ -26,6 +27,7 @@ struct pglist_data *next_online_pgdat(struct pglist_data *pgdat)
 /*
  * next_zone - helper magic for for_each_zone()
  */
+/*! 2016.11.05 study -ing  */
 struct zone *next_zone(struct zone *zone)
 {
 	pg_data_t *pgdat = zone->zone_pgdat;

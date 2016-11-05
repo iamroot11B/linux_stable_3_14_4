@@ -267,22 +267,29 @@ static void twd_get_clock(struct device_node *np)
 /*
  * Setup the local clock events for a CPU.
  */
+/*! 2016.11.05 study -ing  */
 static void twd_timer_setup(void)
 {
 	struct clock_event_device *clk = __this_cpu_ptr(twd_evt);
+	/*! current_thread_info()->cpu 를 가져온다.  */
 	int cpu = smp_processor_id();
 
 	/*
 	 * If the basic setup for this CPU has been done before don't
 	 * bother with the below.
 	 */
+	/*! 현재 cpu의 percpu_setup_called가 값이 설정되어 있으면 리턴  */
 	if (per_cpu(percpu_setup_called, cpu)) {
+		/*! twd_base + TWD_TIMER_CONTROL 에 0을 쓴다  */
 		writel_relaxed(0, twd_base + TWD_TIMER_CONTROL);
+		/*! clk device 등록  */
 		clockevents_register_device(clk);
 		enable_percpu_irq(clk->irq, 0);
 		return;
 	}
 	per_cpu(percpu_setup_called, cpu) = true;
+
+	/*! 2016.11.05 study end */
 
 	twd_calibrate_rate();
 

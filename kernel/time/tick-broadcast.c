@@ -57,6 +57,7 @@ struct cpumask *tick_get_broadcast_mask(void)
 /*
  * Start the device in periodic mode
  */
+/*! 2016.11.05 study -ing */
 static void tick_broadcast_start_periodic(struct clock_event_device *bc)
 {
 	if (bc)
@@ -66,24 +67,29 @@ static void tick_broadcast_start_periodic(struct clock_event_device *bc)
 /*
  * Check, if the device can be utilized as broadcast device:
  */
+/*! 2016.11.05 study -ing */
 static bool tick_check_broadcast_device(struct clock_event_device *curdev,
 					struct clock_event_device *newdev)
 {
+	/*! newdev->features 를 보고 판단하거나,  */
 	if ((newdev->features & CLOCK_EVT_FEAT_DUMMY) ||
 	    (newdev->features & CLOCK_EVT_FEAT_PERCPU) ||
 	    (newdev->features & CLOCK_EVT_FEAT_C3STOP))
 		return false;
 
+	/*! mode를 보고 판단  */
 	if (tick_broadcast_device.mode == TICKDEV_MODE_ONESHOT &&
 	    !(newdev->features & CLOCK_EVT_FEAT_ONESHOT))
 		return false;
 
+	/*! 마지막으로 rating 을 보고 판단  */
 	return !curdev || newdev->rating > curdev->rating;
 }
 
 /*
  * Conditionally install/replace broadcast device
  */
+/*! 2016.11.05 study -ing */
 void tick_install_broadcast_device(struct clock_event_device *dev)
 {
 	struct clock_event_device *cur = tick_broadcast_device.evtdev;
@@ -91,13 +97,16 @@ void tick_install_broadcast_device(struct clock_event_device *dev)
 	if (!tick_check_broadcast_device(cur, dev))
 		return;
 
+	/*! dev->owner가 live 상태가 아니면 리턴 */
 	if (!try_module_get(dev->owner))
 		return;
 
 	clockevents_exchange_device(cur, dev);
+	/*! cur이 있으면 event_handler를 noop(do nothing) 으로 바ㅂ군다. */
 	if (cur)
 		cur->event_handler = clockevents_handle_noop;
 	tick_broadcast_device.evtdev = dev;
+	/*! tick_broadcast_mask 가 모두 비어있으면 */
 	if (!cpumask_empty(tick_broadcast_mask))
 		tick_broadcast_start_periodic(dev);
 	/*
@@ -108,6 +117,7 @@ void tick_install_broadcast_device(struct clock_event_device *dev)
 	 * notification the systems stays stuck in periodic mode
 	 * forever.
 	 */
+	/*! ONESHOT 모드면  */
 	if (dev->features & CLOCK_EVT_FEAT_ONESHOT)
 		tick_clock_notify();
 }
@@ -115,6 +125,7 @@ void tick_install_broadcast_device(struct clock_event_device *dev)
 /*
  * Check, if the device is the broadcast device
  */
+/*! 2016.11.05 study -ing  */
 int tick_is_broadcast_device(struct clock_event_device *dev)
 {
 	return (dev && tick_broadcast_device.evtdev == dev);
@@ -125,8 +136,12 @@ static void err_broadcast(const struct cpumask *mask)
 	pr_crit_once("Failed to broadcast timer tick. Some CPUs may be unresponsive.\n");
 }
 
+/*! 2016.11.05 study -ing */
 static void tick_device_setup_broadcast_func(struct clock_event_device *dev)
 {
+	/*! dev->broadcast가 NULL 이면 tick_brocast로,
+	 * tick_brocast도 NULL 이면 err_broadcast로 설정
+	 */
 	if (!dev->broadcast)
 		dev->broadcast = tick_broadcast;
 	if (!dev->broadcast) {
@@ -140,6 +155,7 @@ static void tick_device_setup_broadcast_func(struct clock_event_device *dev)
  * Check, if the device is disfunctional and a place holder, which
  * needs to be handled by the broadcast device.
  */
+/*! 2016.11.05 study -ing  */
 int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 {
 	struct clock_event_device *bc = tick_broadcast_device.evtdev;
@@ -154,7 +170,13 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 	 * operated from the broadcast device and is a placeholder for
 	 * the cpu local device.
 	 */
+	/*! dev->features의 CLOCK_EVT_FEAT_DUMMY bit가 set 안되어있으면,
+	 *  dev 는 functional 하다고 판단.
+	 */
 	if (!tick_device_is_functional(dev)) {
+		/*! functional 하지 않으면,  */
+		/*! 2016.11.05 study TBD  */
+		/*! event_handler가 콜 될때 tick_handle_periodic을 자세히 보도록 한다.  */
 		dev->event_handler = tick_handle_periodic;
 		tick_device_setup_broadcast_func(dev);
 		cpumask_set_cpu(cpu, tick_broadcast_mask);
@@ -180,6 +202,7 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 		if (!cpumask_test_cpu(cpu, tick_broadcast_on))
 			cpumask_clear_cpu(cpu, tick_broadcast_mask);
 
+		/*! tick_broadcast_device.mode 의 각 모드별로,  */
 		switch (tick_broadcast_device.mode) {
 		case TICKDEV_MODE_ONESHOT:
 			/*
@@ -190,6 +213,7 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 			 * state affected device to stop. Let the
 			 * caller initialize the device.
 			 */
+			/*! ONESHOT 모드면 clear onshot 수행  */
 			tick_broadcast_clear_oneshot(cpu);
 			ret = 0;
 			break;
@@ -200,6 +224,9 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 			 * whether the broadcast device can be
 			 * switched off now.
 			 */
+			/*! PERIODIC 모드이고 tick_broadcast_mask가 empty 이면,
+			 *  shutodwn.
+			 */
 			if (cpumask_empty(tick_broadcast_mask) && bc)
 				clockevents_shutdown(bc);
 			/*
@@ -208,6 +235,7 @@ int tick_device_uses_broadcast(struct clock_event_device *dev, int cpu)
 			 * in shutdown state. The periodic interrupt
 			 * is delivered by the broadcast device.
 			 */
+			/*! tick_broadcast_mask 에서 현재 cpu가 set 되어 있는지 확인   */
 			ret = cpumask_test_cpu(cpu, tick_broadcast_mask);
 			break;
 		default:
@@ -395,6 +423,7 @@ void tick_broadcast_on_off(unsigned long reason, int *oncpu)
 /*
  * Set the periodic handler depending on broadcast on/off
  */
+/*! 2016.11.05 study -ing */
 void tick_set_periodic_handler(struct clock_event_device *dev, int broadcast)
 {
 	if (!broadcast)
@@ -501,27 +530,34 @@ int tick_check_broadcast_expired(void)
 /*
  * Set broadcast interrupt affinity
  */
+/*! 2016.11.05 study -ing */
 static void tick_broadcast_set_affinity(struct clock_event_device *bc,
 					const struct cpumask *cpumask)
 {
+	/*! features를 보고 CLOCK_EVT_FEAT_DYNIRQ 가 아니면 리턴 */
 	if (!(bc->features & CLOCK_EVT_FEAT_DYNIRQ))
 		return;
 
+	/*! bc->cpumask와 cpumask가 동일하면 리턴  */
 	if (cpumask_equal(bc->cpumask, cpumask))
 		return;
 
+	/*! bc->cpumask 업데이트, irq affinity 업데이트 */
 	bc->cpumask = cpumask;
 	irq_set_affinity(bc->irq, bc->cpumask);
 }
-
+/*! 2016.11.05 study -ing */
 static int tick_broadcast_set_event(struct clock_event_device *bc, int cpu,
 				    ktime_t expires, int force)
 {
 	int ret;
 
+	/*! ONESHOT 모드가 아니면  */
 	if (bc->mode != CLOCK_EVT_MODE_ONESHOT)
+		/*! ONESHOT 모드로 설정  */
 		clockevents_set_mode(bc, CLOCK_EVT_MODE_ONESHOT);
 
+	/*! bc dev를 expires 시간을 이용해 업데이트  */
 	ret = clockevents_program_event(bc, expires, force);
 	if (!ret)
 		tick_broadcast_set_affinity(bc, cpumask_of(cpu));
@@ -753,19 +789,23 @@ out:
  *
  * Called with tick_broadcast_lock held
  */
+/*! 2016.11.05 study -ing */
 static void tick_broadcast_clear_oneshot(int cpu)
 {
+	/*! 각 cpumask 클리어  */
 	cpumask_clear_cpu(cpu, tick_broadcast_oneshot_mask);
 	cpumask_clear_cpu(cpu, tick_broadcast_pending_mask);
 }
-
+/*! 2016.11.05 study -ing */
 static void tick_broadcast_init_next_event(struct cpumask *mask,
 					   ktime_t expires)
 {
 	struct tick_device *td;
 	int cpu;
 
+	/*! 모든 cpu loop 돌면서, */
 	for_each_cpu(cpu, mask) {
+		/*! 각 cpud의 td->evtdev->next_event를 expires로 업데이트 */
 		td = &per_cpu(tick_cpu_device, cpu);
 		if (td->evtdev)
 			td->evtdev->next_event = expires;
@@ -775,11 +815,13 @@ static void tick_broadcast_init_next_event(struct cpumask *mask,
 /**
  * tick_broadcast_setup_oneshot - setup the broadcast device
  */
+/*! 2016.11.05 study -ing */
 void tick_broadcast_setup_oneshot(struct clock_event_device *bc)
 {
 	int cpu = smp_processor_id();
 
 	/* Set it up only once ! */
+	/*! bc->event_handler를 tick_handle_oneshot_broadcast로 설정.(한번만 수행) */
 	if (bc->event_handler != tick_handle_oneshot_broadcast) {
 		int was_periodic = bc->mode == CLOCK_EVT_MODE_PERIODIC;
 
@@ -793,6 +835,9 @@ void tick_broadcast_setup_oneshot(struct clock_event_device *bc)
 		 */
 		cpumask_copy(tmpmask, tick_broadcast_mask);
 		cpumask_clear_cpu(cpu, tmpmask);
+		/*! tick_broadcast_oneshot_mask와 tmpmask를 bit or 해서
+		 *  tick_broadcast_oneshot_mask에 저장
+		 */
 		cpumask_or(tick_broadcast_oneshot_mask,
 			   tick_broadcast_oneshot_mask, tmpmask);
 
@@ -858,6 +903,7 @@ void tick_shutdown_broadcast_oneshot(unsigned int *cpup)
 /*
  * Check, whether the broadcast device is in one shot mode
  */
+tick_handle_periodic
 int tick_broadcast_oneshot_active(void)
 {
 	return tick_broadcast_device.mode == TICKDEV_MODE_ONESHOT;

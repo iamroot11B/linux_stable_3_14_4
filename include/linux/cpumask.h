@@ -93,6 +93,7 @@ extern const struct cpumask *const cpu_active_mask;
 
 #if NR_CPUS > 1
 #define num_online_cpus()	cpumask_weight(cpu_online_mask)
+/*! 2016.11.05 study -ing  */
 #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
 #define num_present_cpus()	cpumask_weight(cpu_present_mask)
 #define num_active_cpus()	cpumask_weight(cpu_active_mask)
@@ -374,9 +375,11 @@ static inline int cpumask_and(struct cpumask *dstp,
  * @src1p: the first input
  * @src2p: the second input
  */
+/*! 2016.11.05 study -ing */
 static inline void cpumask_or(struct cpumask *dstp, const struct cpumask *src1p,
 			      const struct cpumask *src2p)
 {
+	/*! src1p 와 src2p 의 bit or 수행해서 dst에 대입  */
 	bitmap_or(cpumask_bits(dstp), cpumask_bits(src1p),
 				      cpumask_bits(src2p), nr_cpumask_bits);
 }
@@ -428,9 +431,11 @@ static inline void cpumask_complement(struct cpumask *dstp,
  * @src1p: the first input
  * @src2p: the second input
  */
+/*! 2016.11.05 study -ing  */
 static inline bool cpumask_equal(const struct cpumask *src1p,
 				const struct cpumask *src2p)
 {
+	/*! bitmap mask가 동일한지 확인  */
 	return bitmap_equal(cpumask_bits(src1p), cpumask_bits(src2p),
 						 nr_cpumask_bits);
 }
@@ -466,6 +471,7 @@ static inline int cpumask_subset(const struct cpumask *src1p,
  * cpumask_empty - *srcp == 0
  * @srcp: the cpumask to that all cpus < nr_cpu_ids are clear.
  */
+/*! 2016.11.05 study -ing */
 static inline bool cpumask_empty(const struct cpumask *srcp)
 {
 	return bitmap_empty(cpumask_bits(srcp), nr_cpumask_bits);
@@ -484,8 +490,10 @@ static inline bool cpumask_full(const struct cpumask *srcp)
  * cpumask_weight - Count of bits in *srcp
  * @srcp: the cpumask to count bits (< nr_cpu_ids) in.
  */
+/*! 2016.11.05 study -ing  */
 static inline unsigned int cpumask_weight(const struct cpumask *srcp)
 {
+	/*! nr_cpumask_bits 는 NR_CPUS  */
 	return bitmap_weight(cpumask_bits(srcp), nr_cpumask_bits);
 }
 
@@ -557,6 +565,7 @@ static inline void cpumask_copy(struct cpumask *dstp,
  * cpumask_of - the cpumask containing just a given cpu
  * @cpu: the cpu (<= nr_cpu_ids)
  */
+/*! 2016.11.05 study -ing  */
 #define cpumask_of(cpu) (get_cpu_mask(cpu))
 
 /**
@@ -780,6 +789,11 @@ void init_cpu_online(const struct cpumask *src);
  *
  * This does the conversion, and can be used as a constant initializer.
  */
+/*! 2016.11.05 study -ing  */
+/*! 3항연산문 조건이 1이므로 그냥 bitmap 리턴
+ *  무조건 bitmap 리턴인데 3항 연산자가 사용된 이유는,
+ *  bitmap 의 type을 체크하여 compile warnning을 발생시키는 용도라고 한다.
+ */
 #define to_cpumask(bitmap)						\
 	((struct cpumask *)(1 ? (bitmap)				\
 			    : (void *)sizeof(__check_is_bitmap(bitmap))))
@@ -796,11 +810,20 @@ static inline int __check_is_bitmap(const unsigned long *bitmap)
  * padding to the left and the right, and return the constant pointer
  * appropriately offset.
  */
+/*! 2016.11.05 study -ing  */
 extern const unsigned long
 	cpu_bit_bitmap[BITS_PER_LONG+1][BITS_TO_LONGS(NR_CPUS)];
-
+/*! 2016.11.05 study -ing  */
 static inline const struct cpumask *get_cpu_mask(unsigned int cpu)
 {
+	/*! ex)
+	 *  BITS_PER_LONG = 32, cpu = 35 인 경우,
+	 *  p = cpu_bit_bitmap[1 + 35 % 32] => p = cpu_bit_bitmap[4]
+	 *  p -= 35 / 32 => p -= 1
+	 *   => cpu_bit_bitmap[4] -= 1  => cpu_bit_bitmap[3][1] 이 되고,
+	 *   여기에 들어있는 값은 1 << 34 이다.
+	 *   to_cpumask은 그냥 그 bitmap 주소 리턴
+	 */
 	const unsigned long *p = cpu_bit_bitmap[1 + cpu % BITS_PER_LONG];
 	p -= cpu / BITS_PER_LONG;
 	return to_cpumask(p);

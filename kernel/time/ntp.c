@@ -361,7 +361,7 @@ void ntp_clear(void)
 	pps_clear();
 }
 
-
+/*! 2016.11.05 study -ing  */
 u64 ntp_tick_length(void)
 {
 	return tick_length;

@@ -260,13 +260,17 @@ void irq_disable(struct irq_desc *desc)
 		irq_state_set_masked(desc);
 	}
 }
-
+/*! 2016.11.05 study -ing */
 void irq_percpu_enable(struct irq_desc *desc, unsigned int cpu)
 {
+	/*! desc->irq_data.chip->irq_enable 함수가 설정되어 있으면 수행,
+	 *  설정되어 있지 않으면 desc->irq_data.chip->irq_unmask를 ㅅ행
+	 */
 	if (desc->irq_data.chip->irq_enable)
 		desc->irq_data.chip->irq_enable(&desc->irq_data);
 	else
 		desc->irq_data.chip->irq_unmask(&desc->irq_data);
+	/*! 현재 cpu의 desc->percpu_enabled 번째 bit 셋  */
 	cpumask_set_cpu(cpu, desc->percpu_enabled);
 }
 

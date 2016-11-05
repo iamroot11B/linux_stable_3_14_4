@@ -4477,9 +4477,14 @@ static int __meminit zone_batchsize(struct zone *zone)
  * outside of boot time (or some other assurance that no concurrent updaters
  * exist).
  */
+/*! 2016.11.05 study -ing  */
 static void pageset_update(struct per_cpu_pages *pcp, unsigned long high,
 		unsigned long batch)
 {
+	/*! pcp의 batch와 high는 dependant 한 관계인데,
+	 *  batch가 high보다 크면 안된다.
+	 *  그래서 batch를 1로 만들고 high를 업데이트 후 batch를 최종 업데이트
+	 */
        /* start with a fail safe value for batch */
 	pcp->batch = 1;
 	smp_wmb();
@@ -4523,16 +4528,22 @@ static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch)
  * pageset_set_high() sets the high water mark for hot per_cpu_pagelist
  * to the value high for the pageset p.
  */
+/*! 2016.11.05 study -ing  */
 static void pageset_set_high(struct per_cpu_pageset *p,
 				unsigned long high)
 {
+	/*! batch 는 1 혹은 high / 4,  */
 	unsigned long batch = max(1UL, high / 4);
+	/*! batch 가 PAGE_SHIFT * 8보다 크면 PAGE_SHIFT * 8으로 수정
+	 *  (우리는 12 * 8 = 96)
+	 */
 	if ((high / 4) > (PAGE_SHIFT * 8))
 		batch = PAGE_SHIFT * 8;
 
+	/*! 전달받은 high를 이용해 batch값을 계산한 후 pageset update  */
 	pageset_update(&p->pcp, high, batch);
 }
-
+/*! 2016.11.05 study -ing  */
 static void __meminit pageset_set_high_and_batch(struct zone *zone,
 		struct per_cpu_pageset *pcp)
 {
@@ -4543,7 +4554,7 @@ static void __meminit pageset_set_high_and_batch(struct zone *zone,
 	else
 		pageset_set_batch(pcp, zone_batchsize(zone));
 }
-
+/*! 2016.11.05 study -ing  */
 static void __meminit zone_pageset_init(struct zone *zone, int cpu)
 {
 	struct per_cpu_pageset *pcp = per_cpu_ptr(zone->pageset, cpu);
@@ -4551,11 +4562,13 @@ static void __meminit zone_pageset_init(struct zone *zone, int cpu)
 	pageset_init(pcp);
 	pageset_set_high_and_batch(zone, pcp);
 }
-
+/*! 2016.11.05 study -ing  */
 static void __meminit setup_zone_pageset(struct zone *zone)
 {
 	int cpu;
+	/*! zone->pageset 에 percpu allog 하고,  */
 	zone->pageset = alloc_percpu(struct per_cpu_pageset);
+	/*! cpu_possible_mask에 있는 cpu들을 loop 돌면서 zone_pageset_init 수행 */
 	for_each_possible_cpu(cpu)
 		zone_pageset_init(zone, cpu);
 }
@@ -4564,10 +4577,14 @@ static void __meminit setup_zone_pageset(struct zone *zone)
  * Allocate per cpu pagesets and initialize them.
  * Before this call only boot pagesets were available.
  */
+/*! 2016.11.05 study -ing  */
 void __init setup_per_cpu_pageset(void)
 {
 	struct zone *zone;
 
+	/*! zone->present_pages 상태를 보고 populated zone에 대해서만
+	 * for 문 바디 내용 수행
+	 */
 	for_each_populated_zone(zone)
 		setup_zone_pageset(zone);
 }

@@ -71,6 +71,7 @@ typedef union ktime ktime_t;		/* Kill this */
  *
  * Return: The ktime_t representation of the value.
  */
+/*! 2016.11.05 study -ing  */
 static inline ktime_t ktime_set(const long secs, const unsigned long nsecs)
 {
 #if (BITS_PER_LONG == 64)
@@ -122,6 +123,7 @@ static inline ktime_t timeval_to_ktime(struct timeval tv)
 #define ktime_to_timeval(kt)		ns_to_timeval((kt).tv64)
 
 /* Convert ktime_t to nanoseconds - NOP in the scalar storage format: */
+/*! 2016.11.05 study -ing */
 #define ktime_to_ns(kt)			((kt).tv64)
 
 #else	/* !((BITS_PER_LONG == 64) || defined(CONFIG_KTIME_SCALAR)) */

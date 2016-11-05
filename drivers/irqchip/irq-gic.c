@@ -675,6 +675,7 @@ static void __init gic_pm_init(struct gic_chip_data *gic)
 #endif
 
 #ifdef CONFIG_SMP
+/*! 2016.11.05 study -ing */
 void gic_raise_softirq(const struct cpumask *mask, unsigned int irq)
 {
 	int cpu;

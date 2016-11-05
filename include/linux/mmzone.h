@@ -846,7 +846,7 @@ unsigned long __init node_memmap_size_bytes(int, unsigned long, unsigned long);
  * zone_idx() returns 0 for the ZONE_DMA zone, 1 for the ZONE_NORMAL zone, etc.
  */
 #define zone_idx(zone)		((zone) - (zone)->zone_pgdat->node_zones)
-
+/*! 2016.11.05 study -ing  */
 static inline int populated_zone(struct zone *zone)
 {
 	return (!!zone->present_pages);
@@ -951,7 +951,7 @@ extern struct zone *next_zone(struct zone *zone);
 	for (zone = (first_online_pgdat())->node_zones; \
 	     zone;					\
 	     zone = next_zone(zone))
-
+/*! 2016.11.05 study -ing  */
 #define for_each_populated_zone(zone)		        \
 	for (zone = (first_online_pgdat())->node_zones; \
 	     zone;					\

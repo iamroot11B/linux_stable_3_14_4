@@ -1156,10 +1156,12 @@ void tick_cancel_sched_timer(int cpu)
 /**
  * Async notification about clocksource changes
  */
+/*! 2016.11.05 study -ing */
 void tick_clock_notify(void)
 {
 	int cpu;
 
+	/*! 전체 cpu의 pcpu의 tick_cpu_sched의 check_clocks의 첫번째 bit를 1로 set */
 	for_each_possible_cpu(cpu)
 		set_bit(0, &per_cpu(tick_cpu_sched, cpu).check_clocks);
 }
@@ -1167,10 +1169,13 @@ void tick_clock_notify(void)
 /*
  * Async notification about clock event changes
  */
+/*! 2016.11.05 study -ing */
 void tick_oneshot_notify(void)
 {
+	/*! 현재 cpu의 pcpu에서 tick_cpu_sched variable을 찾아온다.  */
 	struct tick_sched *ts = &__get_cpu_var(tick_cpu_sched);
 
+	/*! ts->check_clocks 의 0번째 bit를 1로 set  */
 	set_bit(0, &ts->check_clocks);
 }
 

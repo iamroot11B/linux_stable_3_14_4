@@ -945,15 +945,18 @@ void __module_get(struct module *module)
 	}
 }
 EXPORT_SYMBOL(__module_get);
-
+/*! 2016.11.05 study -ing  */
 bool try_module_get(struct module *module)
 {
+	/*! module 이 live 상태면 true, 아니면 false  */
 	bool ret = true;
 
 	if (module) {
 		preempt_disable();
 
+		/*! module->state 이 MODULE_STATE_GOING 이 아니면 module is live */
 		if (likely(module_is_live(module))) {
+			/*! module is live 상태면 module->refptr->incs 에 +1을 한다  */
 			__this_cpu_inc(module->refptr->incs);
 			trace_module_get(module, _RET_IP_);
 		} else
@@ -964,9 +967,10 @@ bool try_module_get(struct module *module)
 	return ret;
 }
 EXPORT_SYMBOL(try_module_get);
-
+/*! 2016.11.05 study -ing  */
 void module_put(struct module *module)
 {
+	/*! 선점 disable 하고 module->refptr->decs +1 하고 선점 enable  */
 	if (module) {
 		preempt_disable();
 		smp_wmb(); /* see comment in module_refcount */

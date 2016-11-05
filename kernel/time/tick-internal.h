@@ -147,6 +147,7 @@ static inline void tick_set_periodic_handler(struct clock_event_device *dev,
 /*
  * Check, if the device is functional or a dummy for broadcast
  */
+/*! 2016.11.05 study -ing  */
 static inline int tick_device_is_functional(struct clock_event_device *dev)
 {
 	return !(dev->features & CLOCK_EVT_FEAT_DUMMY);

@@ -449,6 +449,7 @@ static void (*smp_cross_call)(const struct cpumask *, unsigned int);
 /*! 2016.10.15 study -ing */
 void __init set_smp_cross_call(void (*fn)(const struct cpumask *, unsigned int))
 {
+	/*! gic_init_base 함수에서 gic_raise_softirq 으로 set 한다. */
 	if (!smp_cross_call)
 		smp_cross_call = fn;
 }
@@ -515,8 +516,10 @@ u64 smp_irq_stat_cpu(unsigned int cpu)
 }
 
 #ifdef CONFIG_GENERIC_CLOCKEVENTS_BROADCAST
+/*! 2016.11.05 study -ing */
 void tick_broadcast(const struct cpumask *mask)
 {
+	/*! gic_raise_softirq  */
 	smp_cross_call(mask, IPI_TIMER);
 }
 #endif

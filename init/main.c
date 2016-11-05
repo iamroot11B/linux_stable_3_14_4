@@ -755,11 +755,23 @@ asmlinkage void __init start_kernel(void)
 #endif
 	page_cgroup_init();
 	/*! 2016.10.29 study end */
+	/*! 2016.11.05 study start */
 
+	/*! Do nothing */
 	debug_objects_mem_init();
+	/*! Do nothing */
 	kmemleak_init();
 	setup_per_cpu_pageset();
+	/*! Do nothing */
 	numa_policy_init();
+	/*! late_time_init 은 ct-ca9x4.c의 ct_ca9x4_init_irq 에서
+	 *  값이 설정 될 수 있음.
+	 *  설정 시 twd_timer_setup() 함수가 설정 된다.
+	 *  결국 twd_timer_setup 함수가
+	 *  twd_local_timer_common_register 에서 수행되거나, 여기서 수행됨
+	 */
+	/*! 2016.11.05 study -ing */
+	/*! late_time_init => twd_timer_setup  */
 	if (late_time_init)
 		late_time_init();
 	sched_clock_init();

@@ -57,7 +57,7 @@ static inline void kmemleak_erase(void **ptr)
 }
 
 #else
-
+/*! 2016.11.05 study -ing  */
 static inline void kmemleak_init(void)
 {
 }

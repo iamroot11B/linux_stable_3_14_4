@@ -59,7 +59,7 @@ enum {
 
 #include "debug.h"
 #include "settings.h"
-
+/*! 2016.11.05 study -ing  */
 #define irq_data_to_desc(data)	container_of(data, struct irq_desc, irq_data)
 
 extern int __irq_set_trigger(struct irq_desc *desc, unsigned int irq,
@@ -158,8 +158,10 @@ irq_put_desc_unlock(struct irq_desc *desc, unsigned long flags)
 /*
  * Manipulation functions for irq_data.state
  */
+/*! 2016.11.05 study -ing  */
 static inline void irqd_set_move_pending(struct irq_data *d)
 {
+	/*! IRQD_SETAFFINITY_PENDING bit set 해준다.  */
 	d->state_use_accessors |= IRQD_SETAFFINITY_PENDING;
 }
 

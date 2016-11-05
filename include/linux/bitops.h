@@ -78,7 +78,7 @@ static __inline__ int get_count_order(unsigned int count)
 		order++;
 	return order;
 }
-
+/*! 2016.11.05 study -ing  */
 static inline unsigned long hweight_long(unsigned long w)
 {
 	return sizeof(w) == 4 ? hweight32(w) : hweight64(w);

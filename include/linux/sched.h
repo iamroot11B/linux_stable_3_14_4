@@ -149,6 +149,8 @@ struct filename;
 extern unsigned long avenrun[];		/* Load averages */
 extern void get_avenrun(unsigned long *loads, unsigned long offset, int shift);
 
+/*! 2016.11.05 study -ing  */
+/*! 관련 범위 내에서 1 << 11 을 1.0 으로 씀  */
 #define FSHIFT		11		/* nr of bits of precision */
 #define FIXED_1		(1<<FSHIFT)	/* 1.0 as fixed-point */
 #define LOAD_FREQ	(5*HZ+1)	/* 5 sec intervals */

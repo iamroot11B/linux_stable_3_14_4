@@ -201,10 +201,11 @@ static inline int bitmap_and(unsigned long *dst, const unsigned long *src1,
     /*! src1 과 src2의 모든 bit들의 and 연산을 dst에 저장 */
 	return __bitmap_and(dst, src1, src2, nbits);
 }
-
+/*! 2016.11.05 study -ing */
 static inline void bitmap_or(unsigned long *dst, const unsigned long *src1,
 			const unsigned long *src2, int nbits)
 {
+	/*! src1 과 src2 의 bit or 수행해서 dst에 대입  */
 	if (small_const_nbits(nbits))
 		*dst = *src1 | *src2;
 	else
@@ -236,10 +237,11 @@ static inline void bitmap_complement(unsigned long *dst, const unsigned long *sr
 	else
 		__bitmap_complement(dst, src, nbits);
 }
-
+/*! 2016.11.05 study -ing  */
 static inline int bitmap_equal(const unsigned long *src1,
 			const unsigned long *src2, int nbits)
 {
+	/*! bitmap mask가 동일한지 확인  */
 	if (small_const_nbits(nbits))
 		return ! ((*src1 ^ *src2) & BITMAP_LAST_WORD_MASK(nbits));
 	else
@@ -267,9 +269,10 @@ static inline int bitmap_subset(const unsigned long *src1,
 	else
 		return __bitmap_subset(src1, src2, nbits);
 }
-
+/*! 2016.11.05 study -ing */
 static inline int bitmap_empty(const unsigned long *src, int nbits)
 {
+	/*! src 비트맵의 nbits가 모두 0이면 true 리턴  */
 	if (small_const_nbits(nbits))
 		return ! (*src & BITMAP_LAST_WORD_MASK(nbits));
 	else
@@ -283,11 +286,14 @@ static inline int bitmap_full(const unsigned long *src, int nbits)
 	else
 		return __bitmap_full(src, nbits);
 }
-
+/*! 2016.11.05 study -ing  */
 static inline int bitmap_weight(const unsigned long *src, int nbits)
 {
+	/*! src 비트맵의 nbits 이내에서 1로 설정되어 있는 bit 수를 리턴한다. */
+	/*! nbits 가 32bit보다 작으면 아래에서 바로 구하고, */
 	if (small_const_nbits(nbits))
 		return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits));
+	/*! nbits 가 32bit보다 크면 __bitmap_weight을 이용해 구한다.  */
 	return __bitmap_weight(src, nbits);
 }
 

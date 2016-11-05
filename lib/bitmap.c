@@ -39,9 +39,10 @@
  * include/asm-ppc64/bitops.h and include/asm-s390/bitops.h
  * for the best explanations of this ordering.
  */
-
+/*! 2016.11.05 study -ing */
 int __bitmap_empty(const unsigned long *bitmap, int bits)
 {
+	/*! bitmap의 0부터 bits 만큼의 bit가 모두 0이면 true 리턴  */
 	int k, lim = bits/BITS_PER_LONG;
 	for (k = 0; k < lim; ++k)
 		if (bitmap[k])
@@ -69,10 +70,11 @@ int __bitmap_full(const unsigned long *bitmap, int bits)
 	return 1;
 }
 EXPORT_SYMBOL(__bitmap_full);
-
+/*! 2016.11.05 study -ing  */
 int __bitmap_equal(const unsigned long *bitmap1,
 		const unsigned long *bitmap2, int bits)
 {
+	/*! bitmap mask가 동일한지 확인  */
 	int k, lim = bits/BITS_PER_LONG;
 	for (k = 0; k < lim; ++k)
 		if (bitmap1[k] != bitmap2[k])
@@ -193,10 +195,11 @@ int __bitmap_and(unsigned long *dst, const unsigned long *bitmap1,
 	return result != 0;
 }
 EXPORT_SYMBOL(__bitmap_and);
-
+/*! 2016.11.05 study -ing */
 void __bitmap_or(unsigned long *dst, const unsigned long *bitmap1,
 				const unsigned long *bitmap2, int bits)
 {
+	/*! bitmap1 과 bitmap2 의 bit or 수행해서 dst에 대입  */
 	int k;
 	int nr = BITS_TO_LONGS(bits);
 
@@ -259,8 +262,10 @@ int __bitmap_subset(const unsigned long *bitmap1,
 }
 EXPORT_SYMBOL(__bitmap_subset);
 
+/*! 2016.11.05 study -ing  */
 int __bitmap_weight(const unsigned long *bitmap, int bits)
 {
+	/*! src 비트맵의 nbits 이내에서 1로 설정되어 있는 bit 수를 리턴한다. */
 	int k, w = 0, lim = bits/BITS_PER_LONG;
 
 	for (k = 0; k < lim; k++)

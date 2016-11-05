@@ -122,6 +122,7 @@ static inline void tick_cancel_sched_timer(int cpu) { }
 static inline void tick_clock_notify(void) { }
 static inline int tick_check_oneshot_change(int allow_nohz) { return 0; }
 static inline void tick_irq_enter(void) { }
+/*! 2016.11.05 study -ing  */
 static inline int tick_oneshot_mode_active(void) { return 0; }
 #endif /* !CONFIG_GENERIC_CLOCKEVENTS */
 
@@ -188,6 +189,7 @@ extern void __tick_nohz_task_switch(struct task_struct *tsk);
 /*! 2016.07.23 study -ing */
 static inline void tick_nohz_init(void) { }
 static inline bool tick_nohz_full_enabled(void) { return false; }
+/*! 2016.11.05 study -ing  */
 static inline bool tick_nohz_full_cpu(int cpu) { return false; }
 static inline void __tick_nohz_full_check(void) { }
 static inline void tick_nohz_full_kick(void) { }

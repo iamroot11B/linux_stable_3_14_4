@@ -154,7 +154,7 @@ static void tk_setup_internals(struct timekeeper *tk, struct clocksource *clock)
 
 #ifdef CONFIG_ARCH_USES_GETTIMEOFFSET
 u32 (*arch_gettimeoffset)(void);
-
+/*! 2016.11.05 study -ing  */
 u32 get_arch_timeoffset(void)
 {
 	if (likely(arch_gettimeoffset))
@@ -164,9 +164,10 @@ u32 get_arch_timeoffset(void)
 #else
 static inline u32 get_arch_timeoffset(void) { return 0; }
 #endif
-
+/*! 2016.11.05 study -ing  */
 static inline s64 timekeeping_get_ns(struct timekeeper *tk)
 {
+	/*! clock source 를 읽어서 nsec을 구해서 리턴한다.  */
 	cycle_t cycle_now, cycle_delta;
 	struct clocksource *clock;
 	s64 nsec;
@@ -182,6 +183,7 @@ static inline s64 timekeeping_get_ns(struct timekeeper *tk)
 	nsec >>= tk->shift;
 
 	/* If arch requires, add in get_arch_timeoffset() */
+	/*! get_arch_timeoffset 리턴 0*/
 	return nsec + get_arch_timeoffset();
 }
 
@@ -335,7 +337,7 @@ void getnstimeofday(struct timespec *ts)
 	WARN_ON(__getnstimeofday(ts));
 }
 EXPORT_SYMBOL(getnstimeofday);
-
+/*! 2016.11.05 study -ing  */
 ktime_t ktime_get(void)
 {
 	struct timekeeper *tk = &timekeeper;
@@ -353,6 +355,9 @@ ktime_t ktime_get(void)
 	/*
 	 * Use ktime_set/ktime_add_ns to create a proper ktime on
 	 * 32-bit architectures without CONFIG_KTIME_SCALAR.
+	 */
+	/*! 구한 secs로 ktime을 만들고, 여기에 nsecs 더해서 만든
+	 *  ktime_t 구조체를 리턴하다.
 	 */
 	return ktime_add_ns(ktime_set(secs, 0), nsecs);
 }
@@ -1126,6 +1131,7 @@ static __always_inline int timekeeping_bigadjust(struct timekeeper *tk,
  * this is optimized for the most common adjustments of -1,0,1,
  * for other values we can do a bit more work.
  */
+/*! 2016.11.05 study -ing  */
 static void timekeeping_adjust(struct timekeeper *tk, s64 offset)
 {
 	s64 error, interval = tk->cycle_interval;
@@ -1305,10 +1311,12 @@ static inline unsigned int accumulate_nsecs_to_secs(struct timekeeper *tk)
  *
  * Returns the unconsumed cycles.
  */
+/*! 2016.11.05 study -ing  */
 static cycle_t logarithmic_accumulation(struct timekeeper *tk, cycle_t offset,
 						u32 shift,
 						unsigned int *clock_set)
 {
+	/*! clock 사이의 간격(interval)을 누적하여 오차 계산에 사용한다.  */
 	cycle_t interval = tk->cycle_interval << shift;
 	u64 raw_nsecs;
 
@@ -1334,6 +1342,7 @@ static cycle_t logarithmic_accumulation(struct timekeeper *tk, cycle_t offset,
 	tk->raw_time.tv_nsec = raw_nsecs;
 
 	/* Accumulate error between NTP and clock interval */
+	/*! NTP 와 clock interval 사이의 차이(error)를 누적   */
 	tk->ntp_error += ntp_tick_length() << shift;
 	tk->ntp_error -= (tk->xtime_interval + tk->xtime_remainder) <<
 						(tk->ntp_error_shift + shift);
@@ -1372,8 +1381,13 @@ static inline void old_vsyscall_fixup(struct timekeeper *tk)
  * update_wall_time - Uses the current clocksource to increment the wall time
  *
  */
+/*! 2016.11.05 study -ing  */
 void update_wall_time(void)
 {
+	/*! 실제 쓰이는 시간을 업데이트한다.
+	 *  네트워크 타임 프로토콜에서 얻어온 시간과,
+	 *  클럭 간격(clock interval)사이의 오차까지 계산한다.
+	 */
 	struct clocksource *clock;
 	struct timekeeper *real_tk = &timekeeper;
 	struct timekeeper *tk = &shadow_timekeeper;
@@ -1382,12 +1396,14 @@ void update_wall_time(void)
 	unsigned int clock_set = 0;
 	unsigned long flags;
 
+	/*! 락 걸고,  */
 	raw_spin_lock_irqsave(&timekeeper_lock, flags);
 
 	/* Make sure we're fully resumed: */
 	if (unlikely(timekeeping_suspended))
 		goto out;
 
+	/*! clock, offset 구하고,  */
 	clock = real_tk->clock;
 
 #ifdef CONFIG_ARCH_USES_GETTIMEOFFSET
@@ -1397,6 +1413,7 @@ void update_wall_time(void)
 #endif
 
 	/* Check if there's really nothing to do */
+	/*! offset 이 real_tk 의 cycle_interval 보다 작으면 할 일 없음.  */
 	if (offset < real_tk->cycle_interval)
 		goto out;
 
@@ -1597,9 +1614,12 @@ struct timespec get_monotonic_coarse(void)
 /*
  * Must hold jiffies_lock
  */
+/*! 2016.11.05 study -ing  */
 void do_timer(unsigned long ticks)
 {
+	/*! ticks 플러스  */
 	jiffies_64 += ticks;
+	/*! 10 ticks 마다 시스템 통계 업데이트  */
 	calc_global_load(ticks);
 }
 

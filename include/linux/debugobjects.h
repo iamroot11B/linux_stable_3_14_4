@@ -98,6 +98,7 @@ static inline void
 debug_object_assert_init(void *addr, struct debug_obj_descr *descr) { }
 
 static inline void debug_objects_early_init(void) { }
+/*! 2016.11.05 study -ing  */
 static inline void debug_objects_mem_init(void) { }
 #endif
 

@@ -231,7 +231,7 @@ extern void __bad_size_call_parameter(void);
 	}								\
 	pdcrb_ret__;							\
 })
-
+/*! 2016.11.05 study -ing  */
 #define __pcpu_size_call(stem, variable, ...)				\
 do {									\
 	__verify_pcpu_ptr(&(variable));					\
@@ -609,6 +609,7 @@ do {									\
 # ifndef __this_cpu_add_8
 #  define __this_cpu_add_8(pcp, val)	__this_cpu_generic_to_op((pcp), (val), +=)
 # endif
+/*! 2016.11.05 study -ing  */
 # define __this_cpu_add(pcp, val)	__pcpu_size_call(__this_cpu_add_, (pcp), (val))
 #endif
 /*! 2016.10.29 study -ing */
@@ -616,6 +617,7 @@ do {									\
 # define __this_cpu_sub(pcp, val)	__this_cpu_add((pcp), -(typeof(pcp))(val))
 #endif
 
+/*! 2016.11.05 study -ing  */
 #ifndef __this_cpu_inc
 # define __this_cpu_inc(pcp)		__this_cpu_add((pcp), 1)
 #endif

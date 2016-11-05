@@ -84,10 +84,12 @@ cpumask_var_t irq_default_affinity;
  *	@irq:		Interrupt to check
  *
  */
+/*! 2016.11.05 study -ing  */
 int irq_can_set_affinity(unsigned int irq)
 {
 	struct irq_desc *desc = irq_to_desc(irq);
 
+	/*! desc->irq_data의 state_use_accessors 상태를 보고 balance 가능한 상태인지 파악 */
 	if (!desc || !irqd_can_balance(&desc->irq_data) ||
 	    !desc->irq_data.chip || !desc->irq_data.chip->irq_set_affinity)
 		return 0;
@@ -104,10 +106,14 @@ int irq_can_set_affinity(unsigned int irq)
  *	set_cpus_allowed_ptr() here as we hold desc->lock and this
  *	code can be called from hard interrupt context.
  */
+/*! 2016.11.05 study -ing  */
 void irq_set_thread_affinity(struct irq_desc *desc)
 {
 	struct irqaction *action = desc->action;
 
+	/*! action 리스트 끝까지 돌면서 action->thread가 있는 경우,
+	 *  action->thread_flags의 IRQTF_AFFINITY(2) 번째 bit set
+	 */
 	while (action) {
 		if (action->thread)
 			set_bit(IRQTF_AFFINITY, &action->thread_flags);
@@ -135,18 +141,22 @@ irq_get_pending(struct cpumask *mask, struct irq_desc *desc)
 	cpumask_copy(mask, desc->pending_mask);
 }
 #else
+/*! 2016.11.05 study -ing  */
 static inline bool irq_can_move_pcntxt(struct irq_data *data) { return true; }
 static inline bool irq_move_pending(struct irq_data *data) { return false; }
+/*! 2016.11.05 study -ing  */
 static inline void
 irq_copy_pending(struct irq_desc *desc, const struct cpumask *mask) { }
 static inline void
 irq_get_pending(struct cpumask *mask, struct irq_desc *desc) { }
 #endif
-
+/*! 2016.11.05 study -ing  */
 int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
 			bool force)
-{
+{	
+	/*! data를 포함하는 desc 구조체의 시작주소를 찾아온다.   */
 	struct irq_desc *desc = irq_data_to_desc(data);
+	/*! chip = data->chip  */
 	struct irq_chip *chip = irq_data_get_irq_chip(data);
 	int ret;
 
@@ -162,19 +172,25 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
 	return ret;
 }
 
+/*! 2016.11.05 study -ing  */
 int __irq_set_affinity_locked(struct irq_data *data, const struct cpumask *mask)
 {
+	/*! chip = data->chip  */
 	struct irq_chip *chip = irq_data_get_irq_chip(data);
+	/*! data를 포함하는 desc 구조체의 시작주소를 찾아온다.   */
 	struct irq_desc *desc = irq_data_to_desc(data);
 	int ret = 0;
 
+	/*! chip 이 NULL 이거나 chip->irq_set_affinity가 set 안돼 있으면 에러 리턴 */
 	if (!chip || !chip->irq_set_affinity)
 		return -EINVAL;
 
+	/*! irq_can_move_pcntxt => 무조건 true 리턴  */
 	if (irq_can_move_pcntxt(data)) {
 		ret = irq_do_set_affinity(data, mask, false);
 	} else {
 		irqd_set_move_pending(data);
+		/*! Do Nothing  */
 		irq_copy_pending(desc, mask);
 	}
 
@@ -193,12 +209,15 @@ int __irq_set_affinity_locked(struct irq_data *data, const struct cpumask *mask)
  *	@mask:		cpumask
  *
  */
+/*! 2016.11.05 study -ing  */
 int irq_set_affinity(unsigned int irq, const struct cpumask *mask)
 {
+	/*! irq 번호로 해당하는 irq_desc를 찾고,  */
 	struct irq_desc *desc = irq_to_desc(irq);
 	unsigned long flags;
 	int ret;
 
+	/*! 해당하는 desc 못 찾으면 에러 리턴  */
 	if (!desc)
 		return -EINVAL;
 
@@ -1499,13 +1518,15 @@ int request_any_context_irq(unsigned int irq, irq_handler_t handler,
 	return !ret ? IRQC_IS_HARDIRQ : ret;
 }
 EXPORT_SYMBOL_GPL(request_any_context_irq);
-
+/*! 2016.11.05 study -ing */
 void enable_percpu_irq(unsigned int irq, unsigned int type)
 {
 	unsigned int cpu = smp_processor_id();
 	unsigned long flags;
+	/*! irq 번호에 해당하는 desc를 가져온다.  */
 	struct irq_desc *desc = irq_get_desc_lock(irq, &flags, IRQ_GET_DESC_CHECK_PERCPU);
 
+	/*! 못 가져오면 리턴  */
 	if (!desc)
 		return;
 
@@ -1513,6 +1534,9 @@ void enable_percpu_irq(unsigned int irq, unsigned int type)
 	if (type != IRQ_TYPE_NONE) {
 		int ret;
 
+		/*! desc->status_use_accessors 와,
+		 *  desc->irq_data->state_use_accessors 값들을 업데이트 하는게 주요 내용
+		 */
 		ret = __irq_set_trigger(desc, irq, type);
 
 		if (ret) {

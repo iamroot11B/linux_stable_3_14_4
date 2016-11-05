@@ -101,6 +101,7 @@ long calc_load_fold_active(struct rq *this_rq)
 /*
  * a1 = a0 * e + a * (1 - e)
  */
+/*! 2016.11.05 study -ing  */
 static unsigned long
 calc_load(unsigned long load, unsigned long exp, unsigned long active)
 {
@@ -337,7 +338,7 @@ static void calc_global_nohz(void)
 	calc_load_idx++;
 }
 #else /* !CONFIG_NO_HZ_COMMON */
-
+/*! 2016.11.05 study -ing  */
 static inline long calc_load_fold_idle(void) { return 0; }
 static inline void calc_global_nohz(void) { }
 
@@ -347,16 +348,20 @@ static inline void calc_global_nohz(void) { }
  * calc_load - update the avenrun load estimates 10 ticks after the
  * CPUs have updated calc_load_tasks.
  */
+/*! 2016.11.05 study -ing  */
 void calc_global_load(unsigned long ticks)
 {
+	/*! 시스템의 평균 로드 통계를 갱신. */
 	long active, delta;
 
+	/*! 10 ticks 이 안 지났으면 리턴.(10 tick 마다 업데이트)  */
 	if (time_before(jiffies, calc_load_update + 10))
 		return;
 
 	/*
 	 * Fold the 'old' idle-delta to include all NO_HZ cpus.
 	 */
+	/*! calc_load_fold_idle => 리턴 0  */
 	delta = calc_load_fold_idle();
 	if (delta)
 		atomic_long_add(delta, &calc_load_tasks);
@@ -373,6 +378,7 @@ void calc_global_load(unsigned long ticks)
 	/*
 	 * In case we idled for multiple LOAD_FREQ intervals, catch up in bulk.
 	 */
+	/*! Do Nothing  */
 	calc_global_nohz();
 }
 

@@ -653,6 +653,22 @@ void notify_cpu_starting(unsigned int cpu)
 #define MASK_DECLARE_4(x)	MASK_DECLARE_2(x), MASK_DECLARE_2(x+2)
 #define MASK_DECLARE_8(x)	MASK_DECLARE_4(x), MASK_DECLARE_4(x+4)
 
+/*! 2016.11.05 study -ing  */
+/*! cpu_bit_bitmap[33][1]
+ *  const unsigned long cpu_bit_bitmap[BITS_PER_LONG+1][BITS_TO_LONGS(NR_CPUS)] = {
+ *	  MASK_DECLARE_8(0) ~ MASK_DECLARE_8(24) 가 아래와 같이 확장된다.
+ *	  [1][0] = (1UL << 0), 
+ *	  [2][0] = (1UL << 1), 
+ *	  [3][0] = (1UL << 2), 
+ *	  [4][0] = (1UL << 3), 
+ *	  [5][0] = (1UL << 4), 
+ *	  [6][0] = (1UL << 5), 
+ *	  [7][0] = (1UL << 6), 
+ *	  [8][0] = (1UL << 7),
+ *	  ...
+ *	  [32][0] = (1UL << 31), 
+ */
+
 const unsigned long cpu_bit_bitmap[BITS_PER_LONG+1][BITS_TO_LONGS(NR_CPUS)] = {
 
 	MASK_DECLARE_8(0),	MASK_DECLARE_8(8),

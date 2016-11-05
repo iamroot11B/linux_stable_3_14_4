@@ -84,6 +84,7 @@ static inline void seqcount_lockdep_reader_access(const seqcount_t *s)
 #else
 # define SEQCOUNT_DEP_MAP_INIT(lockname)
 # define seqcount_init(s) __seqcount_init(s, NULL, NULL)
+/*! 2016.11.05 study -ing  */
 # define seqcount_lockdep_reader_access(x)
 #endif
 
@@ -103,6 +104,7 @@ static inline void seqcount_lockdep_reader_access(const seqcount_t *s)
  * Use carefully, only in critical code, and comment how the barrier is
  * provided.
  */
+/*! 2016.11.05 study -ing  */
 static inline unsigned __read_seqcount_begin(const seqcount_t *s)
 {
 	unsigned ret;
@@ -110,6 +112,8 @@ static inline unsigned __read_seqcount_begin(const seqcount_t *s)
 repeat:
 	ret = ACCESS_ONCE(s->sequence);
 	if (unlikely(ret & 1)) {
+		/*! s->sequence의 첫번째 bit가 1로 set 되어 있으면, cpu_relax 후 다시 읽어본다.  */
+		/*! cpu_relax = barrier  */
 		cpu_relax();
 		goto repeat;
 	}
@@ -125,9 +129,11 @@ repeat:
  * seqcount, but without any lockdep checking. Validity of the critical
  * section is tested by checking read_seqcount_retry function.
  */
+/*! 2016.11.05 study -ing  */
 static inline unsigned raw_read_seqcount_begin(const seqcount_t *s)
 {
 	unsigned ret = __read_seqcount_begin(s);
+	/*! barrier 후 ret 리턴  */
 	smp_rmb();
 	return ret;
 }
@@ -141,8 +147,10 @@ static inline unsigned raw_read_seqcount_begin(const seqcount_t *s)
  * Validity of the critical section is tested by checking read_seqcount_retry
  * function.
  */
+/*! 2016.11.05 study -ing  */
 static inline unsigned read_seqcount_begin(const seqcount_t *s)
 {
+	/*! Do Nothing */
 	seqcount_lockdep_reader_access(s);
 	return raw_read_seqcount_begin(s);
 }
@@ -184,8 +192,10 @@ static inline unsigned raw_seqcount_begin(const seqcount_t *s)
  * Use carefully, only in critical code, and comment how the barrier is
  * provided.
  */
+/*! 2016.11.05 study -ing  */
 static inline int __read_seqcount_retry(const seqcount_t *s, unsigned start)
 {
+	/*! s->sequence 가 start와 같은지 확인 */
 	return unlikely(s->sequence != start);
 }
 
@@ -199,6 +209,7 @@ static inline int __read_seqcount_retry(const seqcount_t *s, unsigned start)
  * If the critical section was invalid, it must be ignored (and typically
  * retried).
  */
+/*! 2016.11.05 study -ing  */
 static inline int read_seqcount_retry(const seqcount_t *s, unsigned start)
 {
 	smp_rmb();
@@ -285,13 +296,17 @@ typedef struct {
 /*
  * Read side functions for starting and finalizing a read side section.
  */
+/*! 2016.11.05 study -ing */
 static inline unsigned read_seqbegin(const seqlock_t *sl)
 {
+	/*! sl->seqcount를 읽어서 리턴.  */
 	return read_seqcount_begin(&sl->seqcount);
 }
 
+/*! 2016.11.05 study -ing */
 static inline unsigned read_seqretry(const seqlock_t *sl, unsigned start)
 {
+	/*! sl->seqcount->sequence 와 start가 같은지 확인  */
 	return read_seqcount_retry(&sl->seqcount, start);
 }
 
@@ -300,15 +315,18 @@ static inline unsigned read_seqretry(const seqlock_t *sl, unsigned start)
  * Acts like a normal spin_lock/unlock.
  * Don't need preempt_disable() because that is in the spin_lock already.
  */
+/*! 2016.11.05 study -ing  */
 static inline void write_seqlock(seqlock_t *sl)
 {
+	/*! 락 걸고,  */
 	spin_lock(&sl->lock);
 	write_seqcount_begin(&sl->seqcount);
 }
-
+/*! 2016.11.05 study -ing  */
 static inline void write_sequnlock(seqlock_t *sl)
 {
 	write_seqcount_end(&sl->seqcount);
+	/*! 락 풀고,  */
 	spin_unlock(&sl->lock);
 }
 
