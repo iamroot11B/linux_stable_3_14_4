@@ -15,7 +15,12 @@ static struct signal_struct init_signals = INIT_SIGNALS(init_signals);
 static struct sighand_struct init_sighand = INIT_SIGHAND(init_sighand);
 
 /* Initial task structure */
-/*! */
+/*! fork_init 에서	
+ * init_task.signal->rlim[RLIMIT_NPROC].rlim_cur = max_threads/2;
+ * init_task.signal->rlim[RLIMIT_NPROC].rlim_max = max_threads/2;
+ * init_task.signal->rlim[RLIMIT_SIGPPENDING] =
+		init_task.signal->rlim[RLIMIT_NPROC];
+ * */
 struct task_struct init_task = INIT_TASK(init_task);
 EXPORT_SYMBOL(init_task);
 

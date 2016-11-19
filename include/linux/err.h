@@ -17,6 +17,7 @@
 
 #ifndef __ASSEMBLY__
 
+/*! 2016.11.19 study -ing */
 #define IS_ERR_VALUE(x) unlikely((x) >= (unsigned long)-MAX_ERRNO)
 
 static inline void * __must_check ERR_PTR(long error)
@@ -34,6 +35,8 @@ static inline long __must_check IS_ERR(__force const void *ptr)
 	return IS_ERR_VALUE((unsigned long)ptr);
 }
 
+/*! 2016.11.19 study -ing */
+/*! 에러에 포함되는 값이 거나 NULL 이면 트루 */
 static inline long __must_check IS_ERR_OR_NULL(__force const void *ptr)
 {
 	return !ptr || IS_ERR_VALUE((unsigned long)ptr);

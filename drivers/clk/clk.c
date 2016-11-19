@@ -37,6 +37,7 @@ static HLIST_HEAD(clk_orphan_list);
 static LIST_HEAD(clk_notifier_list);
 
 /***           locking             ***/
+/*! 2016.11.19 study -ing */
 static void clk_prepare_lock(void)
 {
 	if (!mutex_trylock(&prepare_lock)) {
@@ -52,6 +53,7 @@ static void clk_prepare_lock(void)
 	prepare_refcnt = 1;
 }
 
+/*! 2016.11.19 study -ing */
 static void clk_prepare_unlock(void)
 {
 	WARN_ON_ONCE(prepare_owner != current);
@@ -288,6 +290,7 @@ out:
 }
 
 /* caller must hold prepare_lock */
+/*! 2016.11.19 study -ing */
 static int clk_debug_create_subtree(struct clk *clk, struct dentry *pdentry)
 {
 	struct clk *child;
@@ -320,6 +323,7 @@ out:
  * Caller must hold prepare_lock.  Only clk_init calls this function (so
  * far) so this is taken care.
  */
+/*! 2016.11.19 study -ing */
 static int clk_debug_register(struct clk *clk)
 {
 	struct clk *parent;
@@ -589,6 +593,7 @@ struct clk *__clk_get_parent(struct clk *clk)
 }
 EXPORT_SYMBOL_GPL(__clk_get_parent);
 
+/*! 2016.11.19 study -ing */
 struct clk *clk_get_parent_by_index(struct clk *clk, u8 index)
 {
 	if (!clk || index >= clk->num_parents)
@@ -692,6 +697,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(__clk_is_enabled);
 
+/*! 2016.11.19 study -ing */
 static struct clk *__clk_lookup_subtree(const char *name, struct clk *clk)
 {
 	struct clk *child;
@@ -709,6 +715,7 @@ static struct clk *__clk_lookup_subtree(const char *name, struct clk *clk)
 	return NULL;
 }
 
+/*! 2016.11.19 study -ing */
 struct clk *__clk_lookup(const char *name)
 {
 	struct clk *root_clk;
@@ -1036,6 +1043,7 @@ EXPORT_SYMBOL_GPL(clk_round_rate);
  * called if all went well, or NOTIFY_STOP or NOTIFY_BAD immediately if
  * a driver returns that.
  */
+/*! 2016.11.19 study -ing */
 static int __clk_notify(struct clk *clk, unsigned long msg,
 		unsigned long old_rate, unsigned long new_rate)
 {
@@ -1069,6 +1077,7 @@ static int __clk_notify(struct clk *clk, unsigned long msg,
  *
  * Caller must hold prepare_lock.
  */
+/*! 2016.11.19 study -ing */
 static void __clk_recalc_accuracies(struct clk *clk)
 {
 	unsigned long parent_accuracy = 0;
@@ -1125,6 +1134,7 @@ EXPORT_SYMBOL_GPL(clk_get_accuracy);
  *
  * Caller must hold prepare_lock.
  */
+/*! 2016.11.19 study -ing */
 static void __clk_recalc_rates(struct clk *clk, unsigned long msg)
 {
 	unsigned long old_rate;
@@ -1208,6 +1218,7 @@ static int clk_fetch_parent_index(struct clk *clk, struct clk *parent)
 	return -EINVAL;
 }
 
+/*! 2016.11.19 study -ing */
 static void clk_reparent(struct clk *clk, struct clk *new_parent)
 {
 	hlist_del(&clk->child_node);
@@ -1632,6 +1643,7 @@ EXPORT_SYMBOL_GPL(clk_get_parent);
  * .parents array exists, and if so use it to avoid an expensive tree
  * traversal.  If .parents does not exist then walk the tree with __clk_lookup.
  */
+/*! 2016.11.19 study -ing */
 static struct clk *__clk_init_parent(struct clk *clk)
 {
 	struct clk *ret = NULL;
@@ -1675,6 +1687,7 @@ out:
 	return ret;
 }
 
+/*! 2016.11.19 study -ing */
 void __clk_reparent(struct clk *clk, struct clk *new_parent)
 {
 	clk_reparent(clk, new_parent);
@@ -1773,6 +1786,7 @@ EXPORT_SYMBOL_GPL(clk_set_parent);
  * Initializes the lists in struct clk, queries the hardware for the
  * parent and rate and sets them both.
  */
+/*! 2016.11.19 study -ing */
 int __clk_init(struct device *dev, struct clk *clk)
 {
 	int i, ret = 0;
@@ -1977,6 +1991,7 @@ struct clk *__clk_register(struct device *dev, struct clk_hw *hw)
 }
 EXPORT_SYMBOL_GPL(__clk_register);
 
+/*! 2016.11.19 study -ing */
 static int _clk_register(struct device *dev, struct clk_hw *hw, struct clk *clk)
 {
 	int i, ret;
@@ -2042,6 +2057,7 @@ fail_name:
  * rest of the clock API.  In the event of an error clk_register will return an
  * error code; drivers must test for an error code after calling clk_register.
  */
+/*! 2016.11.19 study -ing */
 struct clk *clk_register(struct device *dev, struct clk_hw *hw)
 {
 	int ret;
@@ -2425,6 +2441,7 @@ EXPORT_SYMBOL_GPL(of_clk_src_onecell_get);
  * @clk_src_get: callback for decoding clock
  * @data: context pointer for @clk_src_get callback.
  */
+/*! 2016.11.19 study -ing */
 int of_clk_add_provider(struct device_node *np,
 			struct clk *(*clk_src_get)(struct of_phandle_args *clkspec,
 						   void *data),
@@ -2542,7 +2559,10 @@ void __init of_clk_init(const struct of_device_id *matches)
 
 	if (!matches)
 		matches = &__clk_of_table;
-
+	/*! CLK_OF_DECLARE 를 통해 생성한 것들이 __clk_of_table에 위치 */
+	/*! vexpress_osc_of_setup and clk_sp810_of_setup 이므로, 
+	 *  vexpress_osc_of_setup 만 실행 할 듯
+	 * */
 	/*! __of_match_node를 통해 matches에서 가장 호환성이 좋은 node를 찾아서 *match에 대입  */
 	for_each_matching_node_and_match(np, matches, &match) {
 		/*! 찾은 match의 match->data를 통해 clk_init_cb 수행  */

@@ -92,6 +92,7 @@ struct vexpress_config_func {
 	void *func;
 };
 
+/*! 2016.11.19 study -ing */
 struct vexpress_config_func *__vexpress_config_func_get(struct device *dev,
 		struct device_node *node)
 {
@@ -122,6 +123,7 @@ struct vexpress_config_func *__vexpress_config_func_get(struct device *dev,
 		bridge_node = of_get_next_parent(bridge_node);
 	}
 
+	/*!rough 브릿지가 같다면, 설정 */
 	mutex_lock(&vexpress_config_bridges_mutex);
 	for (i = 0; i < ARRAY_SIZE(vexpress_config_bridges); i++) {
 		struct vexpress_config_bridge *bridge =
@@ -136,6 +138,7 @@ struct vexpress_config_func *__vexpress_config_func_get(struct device *dev,
 	}
 	mutex_unlock(&vexpress_config_bridges_mutex);
 
+	/*! if func is null, return error */
 	if (!func->func) {
 		of_node_put(node);
 		kfree(func);
@@ -146,6 +149,7 @@ struct vexpress_config_func *__vexpress_config_func_get(struct device *dev,
 }
 EXPORT_SYMBOL(__vexpress_config_func_get);
 
+/*! 2016.11.19 study -ing */
 void vexpress_config_func_put(struct vexpress_config_func *func)
 {
 	func->bridge->info->func_put(func->func);

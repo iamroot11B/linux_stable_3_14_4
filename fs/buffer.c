@@ -3308,7 +3308,8 @@ static struct kmem_cache *bh_cachep __read_mostly;
  * stripping them in writeback.
  */
 static unsigned long max_buffer_heads;
-
+/*! buffer_init 에서 설정, max_buffer 갯수와 동일 */
+ 
 int buffer_heads_over_limit;
 
 struct bh_accounting {
@@ -3421,6 +3422,7 @@ int bh_submit_read(struct buffer_head *bh)
 }
 EXPORT_SYMBOL(bh_submit_read);
 
+/*! 2016.11.19 study -ing */
 void __init buffer_init(void)
 {
 	unsigned long nrpages;
@@ -3434,7 +3436,9 @@ void __init buffer_init(void)
 	/*
 	 * Limit the bh occupancy to 10% of ZONE_NORMAL
 	 */
+	/*! nr_free_buffer_pages =  calc (GFP_USER) page 갯 수 */
 	nrpages = (nr_free_buffer_pages() * 10) / 100;
 	max_buffer_heads = nrpages * (PAGE_SIZE / sizeof(struct buffer_head));
+	/* 노티파이어 생성 */
 	hotcpu_notifier(buffer_cpu_notify, 0);
 }

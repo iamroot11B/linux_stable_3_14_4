@@ -37,11 +37,14 @@ struct arm_delay_ops arm_delay_ops = {
 static const struct delay_timer *delay_timer;
 static bool delay_calibrated;
 
+/*! 2016.11.19 study -ing  */
 int read_current_timer(unsigned long *timer_val)
 {
 	if (!delay_timer)
 		return -ENXIO;
-
+	/*! delay_timer 는 arch_timer_delay_timer_register -> resgister_current_timer_delay 에서
+	 * arch_delay_timer 로 설정
+	 * read_current_timer 는 arch_timer_read_counter_long */
 	*timer_val = delay_timer->read_current_timer();
 	return 0;
 }

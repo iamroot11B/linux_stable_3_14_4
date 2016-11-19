@@ -47,9 +47,11 @@ static inline int __init verify(struct security_operations *ops)
 	return 0;
 }
 
+/*! 2016.11.19 study -ing */
 static void __init do_security_initcalls(void)
 {
 	initcall_t *call;
+	/*! include/asm-generic/vmliux.lds.h */
 	call = __security_initcall_start;
 	while (call < __security_initcall_end) {
 		(*call) ();
@@ -62,6 +64,7 @@ static void __init do_security_initcalls(void)
  *
  * This should be called early in the kernel initialization sequence.
  */
+/*! 2016.11.19 study -ing */
 int __init security_init(void)
 {
 	printk(KERN_INFO "Security Framework initialized\n");

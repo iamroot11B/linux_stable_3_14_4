@@ -160,6 +160,8 @@ extern int clockevents_program_event(struct clock_event_device *dev,
 
 extern void clockevents_handle_noop(struct clock_event_device *dev);
 
+/*! 2016.11.19 study -ing  */
+/*! from(sec) 을 to(hz)에 근접 시키는 multi 와 shift 값을 정한다. */
 static inline void
 clockevents_calc_mult_shift(struct clock_event_device *ce, u32 freq, u32 minsec)
 {

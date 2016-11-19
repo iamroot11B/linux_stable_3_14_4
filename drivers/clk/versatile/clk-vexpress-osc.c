@@ -30,6 +30,7 @@ struct vexpress_osc {
 
 #define to_vexpress_osc(osc) container_of(osc, struct vexpress_osc, hw)
 
+/*! 2016.11.19 study -ing */
 static unsigned long vexpress_osc_recalc_rate(struct clk_hw *hw,
 		unsigned long parent_rate)
 {
@@ -41,6 +42,7 @@ static unsigned long vexpress_osc_recalc_rate(struct clk_hw *hw,
 	return rate;
 }
 
+/*! 2016.11.19 study -ing */
 static long vexpress_osc_round_rate(struct clk_hw *hw, unsigned long rate,
 		unsigned long *parent_rate)
 {
@@ -55,6 +57,7 @@ static long vexpress_osc_round_rate(struct clk_hw *hw, unsigned long rate,
 	return rate;
 }
 
+/*! 2016.11.19 study -ing */
 static int vexpress_osc_set_rate(struct clk_hw *hw, unsigned long rate,
 		unsigned long parent_rate)
 {
@@ -63,6 +66,7 @@ static int vexpress_osc_set_rate(struct clk_hw *hw, unsigned long rate,
 	return vexpress_config_write(osc->func, 0, rate);
 }
 
+/*! 2016.11.19 study -ing */
 static struct clk_ops vexpress_osc_ops = {
 	.recalc_rate = vexpress_osc_recalc_rate,
 	.round_rate = vexpress_osc_round_rate,
@@ -93,6 +97,7 @@ struct clk * __init vexpress_osc_setup(struct device *dev)
 	return clk_register(NULL, &osc->hw);
 }
 
+/*! 2016.11.19 study -ing */
 void __init vexpress_osc_of_setup(struct device_node *node)
 {
 	struct clk_init_data init;

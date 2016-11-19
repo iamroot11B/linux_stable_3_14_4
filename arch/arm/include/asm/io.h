@@ -93,6 +93,11 @@ static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
 		     : "r" (val));
 }
 /*! 2016.10.15 study -ing */
+/*! 
+ *  addr 에 r을 써준다. 
+ *  Qo 는 메모리 엑세스를 해주는 클로버이다.
+ *  상세 : http://jake.dothome.co.kr/inline-assembly/ 
+ */
 static inline void __raw_writel(u32 val, volatile void __iomem *addr)
 {
 	asm volatile("str %1, %0"
@@ -304,6 +309,7 @@ extern void _memset_io(volatile void __iomem *, int, size_t);
 #define writeb_relaxed(v,c)	__raw_writeb(v,c)
 #define writew_relaxed(v,c)	__raw_writew((__force u16) cpu_to_le16(v),c)
 /*! 2016.10.15 study -ing */
+/*! *(c) = v */
 #define writel_relaxed(v,c)	__raw_writel((__force u32) cpu_to_le32(v),c)
 
 #define readb(c)		({ u8  __v = readb_relaxed(c); __iormb(); __v; })

@@ -3123,6 +3123,7 @@ void mm_drop_all_locks(struct mm_struct *mm)
 /*
  * initialise the VMA slab
  */
+/*! 2016.11.19 study -ing */
 void __init mmap_init(void)
 {
 	int ret;

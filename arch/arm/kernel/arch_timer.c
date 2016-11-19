@@ -16,6 +16,7 @@
 
 #include <clocksource/arm_arch_timer.h>
 
+/*! 2016.11.19 study -ing */
 static unsigned long arch_timer_read_counter_long(void)
 {
 	return arch_timer_read_counter();

@@ -1081,6 +1081,7 @@ EXPORT_SYMBOL(unregister_key_type);
 /*
  * Initialise the key management state.
  */
+/*! 2016.11.19 study -ing */
 void __init key_init(void)
 {
 	/* allocate a slab in which we can store keys */

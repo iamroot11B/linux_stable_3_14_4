@@ -75,6 +75,7 @@ static struct clocksource clocksource_jiffies = {
 
 __cacheline_aligned_in_smp DEFINE_SEQLOCK(jiffies_lock);
 
+/*! 2016.11.19 study -ing */
 #if (BITS_PER_LONG < 64)
 u64 get_jiffies_64(void)
 {
@@ -83,6 +84,8 @@ u64 get_jiffies_64(void)
 
 	do {
 		seq = read_seqbegin(&jiffies_lock);
+		/*! do_timer 에서 jiffies_64 에 1씩 늘려준다. 
+		 *  do_timer 를 실행하는 곳 에서 jiffies_lock을 건다.*/
 		ret = jiffies_64;
 	} while (read_seqretry(&jiffies_lock, seq));
 	return ret;

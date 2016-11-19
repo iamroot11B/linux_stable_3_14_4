@@ -36,6 +36,8 @@ static DEFINE_PER_CPU(bool, percpu_setup_called);
 static struct clock_event_device __percpu *twd_evt;
 static int twd_ppi;
 
+/*! 2016.11.05 study -ing  */
+/*! 입력받은 모드에 따른, control 레지스터와 load 레지스터 설정 */
 static void twd_set_mode(enum clock_event_mode mode,
 			struct clock_event_device *clk)
 {
@@ -61,6 +63,8 @@ static void twd_set_mode(enum clock_event_mode mode,
 	writel_relaxed(ctrl, twd_base + TWD_TIMER_CONTROL);
 }
 
+/*! 2016.11.05 study -ing  */
+/*! timer 를 키고, 입력받은 evt 값으로, counter 레지스터를 바꾼다. */
 static int twd_set_next_event(unsigned long evt,
 			struct clock_event_device *unused)
 {
@@ -189,6 +193,7 @@ core_initcall(twd_cpufreq_init);
 
 #endif
 
+/*! 2016.11.19 study -ing */
 static void twd_calibrate_rate(void)
 {
 	unsigned long count;
@@ -201,9 +206,11 @@ static void twd_calibrate_rate(void)
 	if (twd_timer_rate == 0) {
 		printk(KERN_INFO "Calibrating local timer... ");
 
-		/* Wait for a tick to start */
+		/*  Wait for a tick to start */
+		/*! lock을 확인하며, jiffies 를 가져온다. */
 		waitjiffies = get_jiffies_64() + 1;
 
+		/*! jiffie 가 켜지는걸 10ms 씩 기다림 */
 		while (get_jiffies_64() < waitjiffies)
 			udelay(10);
 
@@ -211,9 +218,14 @@ static void twd_calibrate_rate(void)
 		waitjiffies += 5;
 
 				 /* enable, no interrupt or reload */
+		/*! 
+		 * TIMER control regsiter degin 은 
+		 * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0434c/JHBDIBGA.html 참고
+		 */                 
 		writel_relaxed(0x1, twd_base + TWD_TIMER_CONTROL);
 
 				 /* maximum value */
+		/*! 타이머는 설정된 값(0xFFFFFFFFU) 한 틱 마다 1씩 줄여준다. */
 		writel_relaxed(0xFFFFFFFFU, twd_base + TWD_TIMER_COUNTER);
 
 		while (get_jiffies_64() < waitjiffies)
@@ -222,6 +234,8 @@ static void twd_calibrate_rate(void)
 		count = readl_relaxed(twd_base + TWD_TIMER_COUNTER);
 
 		twd_timer_rate = (0xFFFFFFFFU - count) * (HZ / 5);
+		/*! 수행에 걸린 시간을 계산해준 후 HZ/5 로 곱해줘서
+		 *  한 틱당 걸린 시간을 계산해준다. */
 
 		printk("%lu.%02luMHz.\n", twd_timer_rate / 1000000,
 			(twd_timer_rate / 10000) % 100);
@@ -290,21 +304,27 @@ static void twd_timer_setup(void)
 	per_cpu(percpu_setup_called, cpu) = true;
 
 	/*! 2016.11.05 study end */
+	/*! 2016.11.19 study start */
 
+	/*! twd의 rate 를 계산 및 출력 */
 	twd_calibrate_rate();
 
 	/*
 	 * The following is done once per CPU the first time .setup() is
 	 * called.
 	 */
+	/*! timer disable */
 	writel_relaxed(0, twd_base + TWD_TIMER_CONTROL);
 
 	clk->name = "local_timer";
 	clk->features = CLOCK_EVT_FEAT_PERIODIC | CLOCK_EVT_FEAT_ONESHOT |
 			CLOCK_EVT_FEAT_C3STOP;
 	clk->rating = 350;
+	/*! set_mode 를 위한 함수 등록 */	
 	clk->set_mode = twd_set_mode;
+	/*! set_next_event 를 위한 함수 등록*/
 	clk->set_next_event = twd_set_next_event;
+	/*! twd_ppi 는 twd_local_timer_register 에서 IRQ_LOCAL_TIMER(29)로 저장 */
 	clk->irq = twd_ppi;
 	clk->cpumask = cpumask_of(cpu);
 

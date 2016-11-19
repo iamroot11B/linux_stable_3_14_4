@@ -775,6 +775,7 @@ asmlinkage void __init start_kernel(void)
 	if (late_time_init)
 		late_time_init();
 	sched_clock_init();
+	/*!lpj 를 설정해 준다 */
 	calibrate_delay();
 	pidmap_init();
 	anon_vma_init();
@@ -791,6 +792,7 @@ asmlinkage void __init start_kernel(void)
 	key_init();
 	security_init();
 	dbg_late_init();
+	/*! 2016.11.19 study end */
 	vfs_caches_init(totalram_pages);
 	signals_init();
 	/* rootfs populating might need page-writeback */

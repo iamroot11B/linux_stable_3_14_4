@@ -922,7 +922,9 @@ static void cap_audit_rule_free(void *lsmrule)
 				 " security operation with the default.\n");\
 			}						\
 	} while (0)
-
+//cap_syslog : 대부분 빈 함수
+//cap_ptrace_access_check : 일부 경우 내용이 있음
+/*! 2016.11.19 study -ing */
 void __init security_fixup_ops(struct security_operations *ops)
 {
 	set_to_cap_if_null(ops, ptrace_access_check);

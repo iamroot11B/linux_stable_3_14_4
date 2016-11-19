@@ -71,6 +71,7 @@ static int notifier_chain_unregister(struct notifier_block **nl,
  *	@returns:	notifier_call_chain returns the value returned by the
  *			last notifier function called.
  */
+/*! 2016.11.19 study -ing */
 static int __kprobes notifier_call_chain(struct notifier_block **nl,
 					unsigned long val, void *v,
 					int nr_to_call,	int *nr_calls)
@@ -489,6 +490,7 @@ EXPORT_SYMBOL_GPL(srcu_notifier_chain_unregister);
  *	Otherwise the return value is the return value
  *	of the last notifier function called.
  */
+/*! 2016.11.19 study -ing */
 int __srcu_notifier_call_chain(struct srcu_notifier_head *nh,
 			       unsigned long val, void *v,
 			       int nr_to_call, int *nr_calls)
@@ -503,6 +505,7 @@ int __srcu_notifier_call_chain(struct srcu_notifier_head *nh,
 }
 EXPORT_SYMBOL_GPL(__srcu_notifier_call_chain);
 
+/*! 2016.11.19 study -ing */
 int srcu_notifier_call_chain(struct srcu_notifier_head *nh,
 		unsigned long val, void *v)
 {

@@ -393,6 +393,7 @@ u64 local_clock(void)
 
 #else /* CONFIG_HAVE_UNSTABLE_SCHED_CLOCK */
 
+/*! 2016.11.19 study -ing  */
 void sched_clock_init(void)
 {
 	sched_clock_running = 1;

@@ -828,6 +828,7 @@ void __weak kgdb_arch_late(void)
 {
 }
 
+/*! 2016.11.19 study -ing */
 void __init dbg_late_init(void)
 {
 	dbg_is_early = false;

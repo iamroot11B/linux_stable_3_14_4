@@ -151,6 +151,7 @@ extern int kdb_register_repeat(char *, kdb_func_t, char *, char *,
 extern int kdb_unregister(char *);
 #else /* ! CONFIG_KGDB_KDB */
 static inline __printf(1, 2) int kdb_printf(const char *fmt, ...) { return 0; }
+/*! 2016.11.19 study -ing */
 static inline void kdb_init(int level) {}
 static inline int kdb_register(char *cmd, kdb_func_t func, char *usage,
 			       char *help, short minlen) { return 0; }

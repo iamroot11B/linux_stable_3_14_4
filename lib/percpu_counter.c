@@ -51,8 +51,10 @@ static inline void debug_percpu_counter_deactivate(struct percpu_counter *fbc)
 }
 
 #else	/* CONFIG_DEBUG_OBJECTS_PERCPU_COUNTER */
+/*! 2016.11.19 study -ing */
 static inline void debug_percpu_counter_activate(struct percpu_counter *fbc)
 { }
+/*! 2016.11.19 study -ing */
 static inline void debug_percpu_counter_deactivate(struct percpu_counter *fbc)
 { }
 #endif	/* CONFIG_DEBUG_OBJECTS_PERCPU_COUNTER */
@@ -112,6 +114,7 @@ s64 __percpu_counter_sum(struct percpu_counter *fbc)
 }
 EXPORT_SYMBOL(__percpu_counter_sum);
 
+/*! 2016.11.19 study -ing */
 int __percpu_counter_init(struct percpu_counter *fbc, s64 amount,
 			  struct lock_class_key *key)
 {

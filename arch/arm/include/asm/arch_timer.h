@@ -78,6 +78,8 @@ static inline u32 arch_timer_get_cntfrq(void)
 	return val;
 }
 
+/*! 2016.11.19 study -ing */
+/* counter virtual count register */
 static inline u64 arch_counter_get_cntvct(void)
 {
 	u64 cval;

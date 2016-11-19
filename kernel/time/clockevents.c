@@ -33,6 +33,7 @@ struct ce_unbind {
 	int res;
 };
 
+/*! 2016.11.19 study -ing  */
 static u64 cev_delta2ns(unsigned long latch, struct clock_event_device *evt,
 			bool ismax)
 {
@@ -424,6 +425,7 @@ void clockevents_register_device(struct clock_event_device *dev)
 }
 EXPORT_SYMBOL_GPL(clockevents_register_device);
 
+/*! 2016.11.19 study -ing  */
 void clockevents_config(struct clock_event_device *dev, u32 freq)
 {
 	u64 sec;
@@ -437,6 +439,7 @@ void clockevents_config(struct clock_event_device *dev, u32 freq)
 	 * 32bit ticks so we still get reasonable conversion values.
 	 */
 	sec = dev->max_delta_ticks;
+	/*! sec = sec/freq */
 	do_div(sec, freq);
 	if (!sec)
 		sec = 1;
@@ -444,7 +447,9 @@ void clockevents_config(struct clock_event_device *dev, u32 freq)
 		sec = 600;
 
 	clockevents_calc_mult_shift(dev, freq, sec);
+	/*! min_delta_ticks to nanoseconds */
 	dev->min_delta_ns = cev_delta2ns(dev->min_delta_ticks, dev, false);
+	/*! max_delta_ticks to nanoseconds */
 	dev->max_delta_ns = cev_delta2ns(dev->max_delta_ticks, dev, true);
 }
 
@@ -457,6 +462,7 @@ void clockevents_config(struct clock_event_device *dev, u32 freq)
  *
  * min/max_delta can be 0 for devices which do not support oneshot mode.
  */
+/*! 2016.11.19 study -ing */
 void clockevents_config_and_register(struct clock_event_device *dev,
 				     u32 freq, unsigned long min_delta,
 				     unsigned long max_delta)

@@ -171,6 +171,7 @@ static void free_thread_info(struct thread_info *ti)
 	kmem_cache_free(thread_info_cache, ti);
 }
 
+/*! 2016.11.19 study -ing */
 void thread_info_cache_init(void)
 {
 	thread_info_cache = kmem_cache_create("thread_info", THREAD_SIZE,
@@ -249,6 +250,7 @@ EXPORT_SYMBOL_GPL(__put_task_struct);
 
 void __init __weak arch_task_cache_init(void) { }
 
+/*! 2016.11.19 study -ing */
 void __init fork_init(unsigned long mempages)
 {
 #ifndef CONFIG_ARCH_TASK_STRUCT_ALLOCATOR

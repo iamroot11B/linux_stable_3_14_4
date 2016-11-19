@@ -591,17 +591,26 @@ void __init pidmap_init(void)
 	BUILD_BUG_ON(PID_MAX_LIMIT >= PIDNS_HASH_ADDING);
 
 	/* bump default and minimum pid_max based on number of cpus */
+	/*! pid_max_max = PID_MAX_DEFAULT(0x8000) = 32768
+	 *  pid_max = PID_MAX_DEFAULT (0x8000) = 32768
+	 *  pid_max_min = 301
+	 *  PIDS_PER_CPU_DEFAULT = 1024
+	 *  PIDS_PER_CPU_MIN = 8  
+	 */
+
 	pid_max = min(pid_max_max, max_t(int, pid_max,
 				PIDS_PER_CPU_DEFAULT * num_possible_cpus()));
 	pid_max_min = max_t(int, pid_max_min,
 				PIDS_PER_CPU_MIN * num_possible_cpus());
 	pr_info("pid_max: default: %u minimum: %u\n", pid_max, pid_max_min);
 
+	/*! pidmap 에 page init */
 	init_pid_ns.pidmap[0].page = kzalloc(PAGE_SIZE, GFP_KERNEL);
 	/* Reserve PID 0. We never call free_pidmap(0) */
 	set_bit(0, init_pid_ns.pidmap[0].page);
 	atomic_dec(&init_pid_ns.pidmap[0].nr_free);
 
+	/*! kmem_cache 하나 할당 */
 	init_pid_ns.pid_cachep = KMEM_CACHE(pid,
 			SLAB_HWCACHE_ALIGN | SLAB_PANIC);
 }

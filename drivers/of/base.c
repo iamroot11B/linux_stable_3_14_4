@@ -172,6 +172,7 @@ static void of_node_release(struct kref *kref)
  *		simplify writing of callers
  *
  */
+/*! 2016.11.19 study -ing */
 void of_node_put(struct device_node *node)
 {
 	if (node)
@@ -568,6 +569,7 @@ EXPORT_SYMBOL(of_get_parent);
  *	Returns a node pointer with refcount incremented, use
  *	of_node_put() on it when done.
  */
+/*! 2016.11.19 study -ing */
 struct device_node *of_get_next_parent(struct device_node *node)
 {
 	struct device_node *parent;

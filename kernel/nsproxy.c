@@ -261,6 +261,7 @@ out:
 	return err;
 }
 
+/*! 2016.11.19 study -ing */
 int __init nsproxy_cache_init(void)
 {
 	nsproxy_cachep = KMEM_CACHE(nsproxy, SLAB_PANIC);

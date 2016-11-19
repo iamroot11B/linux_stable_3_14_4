@@ -31,6 +31,7 @@ __setup("lpj=", lpj_setup);
 #define DELAY_CALIBRATION_TICKS			((HZ < 100) ? 1 : (HZ/100))
 #define MAX_DIRECT_CALIBRATION_RETRIES		5
 
+/*! 2016.11.19 study -ing  */
 static unsigned long calibrate_delay_direct(void)
 {
 	unsigned long pre_start, start, post_start;
@@ -70,6 +71,7 @@ static unsigned long calibrate_delay_direct(void)
 		pre_start = 0;
 		read_current_timer(&start);
 		start_jiffies = jiffies;
+		/*! timer 흐를때 까지 대기 */
 		while (time_before_eq(jiffies, start_jiffies + 1)) {
 			pre_start = start;
 			read_current_timer(&start);
@@ -101,6 +103,10 @@ static unsigned long calibrate_delay_direct(void)
 				start, post_end);
 		if (start < post_end && pre_start != 0 && pre_end != 0 &&
 		    (timer_rate_max - timer_rate_min) < (timer_rate_max >> 3)) {
+			/*! 정상적인 카운터일 경우, 
+			 *  good_timer_count 를 1 늘려주고, good_timer_sum 에 추가
+			 *  measured_times 의 각 항에 timer_rate_max를 저장
+			 */
 			good_timer_count++;
 			good_timer_sum += timer_rate_max;
 			measured_times[i] = timer_rate_max;
@@ -147,6 +153,7 @@ static unsigned long calibrate_delay_direct(void)
 			max = min;
 		}
 
+		/*! re do */
 		for (i = 0; i < MAX_DIRECT_CALIBRATION_RETRIES; i++) {
 			if (measured_times[i] == 0)
 				continue;
@@ -183,6 +190,7 @@ static unsigned long calibrate_delay_direct(void)
  */
 #define LPS_PREC 8
 
+/*! 2016.11.19 study -ing */
 static unsigned long calibrate_delay_converge(void)
 {
 	/* First stage - slowly accelerate to find initial bounds */
@@ -221,17 +229,23 @@ recalibrate:
 	 * Do a binary approximation to get lpj set to
 	 * equal one clock (up to LPS_PREC bits)
 	 */
+	/*!
+	 * 한 직피에 러프하게 근접한 다음 자세하게 다가감
+	 */
 	chop_limit = lpj >> LPS_PREC;
 	while (loopadd > chop_limit) {
 		lpj += loopadd;
+		/*! lpj_base 는 러프하게 다가간 위치 여기에 loopadd 만큼 더함 */
 		ticks = jiffies;
 		while (ticks == jiffies)
 			; /* nothing */
 		ticks = jiffies;
 		__delay(lpj);
 		if (jiffies != ticks)	/* longer than 1 tick */
+			/*! 더한 결과가, 1직피 보다 크다면, 다시 빼줌 */
 			lpj -= loopadd;
 		loopadd >>= 1;
+		/*! 더할 크기는 1/2 씩 줄여줌 */
 	}
 	/*
 	 * If we incremented every single time possible, presume we've
@@ -268,23 +282,29 @@ void calibrate_delay(void)
 	static bool printed;
 	int this_cpu = smp_processor_id();
 
+	/*! cpu_loops_per_jiffy 값을 per_cpu 에서 읽어옴 및 lpj에 저장 */
 	if (per_cpu(cpu_loops_per_jiffy, this_cpu)) {
 		lpj = per_cpu(cpu_loops_per_jiffy, this_cpu);
 		if (!printed)
 			pr_info("Calibrating delay loop (skipped) "
 				"already calibrated this CPU");
 	} else if (preset_lpj) {
+		/*! preset_lpj 는 lpj_setup 에서 설정 (boot script) */
 		lpj = preset_lpj;
 		if (!printed)
 			pr_info("Calibrating delay loop (skipped) "
 				"preset value.. ");
 	} else if ((!printed) && lpj_fine) {
+		/*! lpj_fine 은 arch_timer_init -> register_current_timer_delay
+		 * 에서 설정 (timer_frequncy / HZ ) */
 		lpj = lpj_fine;
 		pr_info("Calibrating delay loop (skipped), "
 			"value calculated using timer frequency.. ");
 	} else if ((lpj = calibrate_delay_is_known())) {
+		/*! return lpj_fine */
 		;
 	} else if ((lpj = calibrate_delay_direct()) != 0) {
+		/*! 평균적인 loop per jiffies 를 계산해서 리턴 */
 		if (!printed)
 			pr_info("Calibrating delay using timer "
 				"specific routine.. ");
@@ -292,6 +312,7 @@ void calibrate_delay(void)
 		if (!printed)
 			pr_info("Calibrating delay loop... ");
 		lpj = calibrate_delay_converge();
+		/*! 정밀한 lps 를 계산해서 출력 */
 	}
 	per_cpu(cpu_loops_per_jiffy, this_cpu) = lpj;
 	if (!printed)

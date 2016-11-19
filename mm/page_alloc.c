@@ -3155,6 +3155,7 @@ static unsigned long nr_free_zone_pages(int offset)
  * nr_free_buffer_pages() counts the number of pages which are beyond the high
  * watermark within ZONE_DMA and ZONE_NORMAL.
  */
+/*! 2016.11.19 study -ing */
 unsigned long nr_free_buffer_pages(void)
 {
 	return nr_free_zone_pages(gfp_zone(GFP_USER));
