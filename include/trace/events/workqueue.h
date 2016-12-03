@@ -34,6 +34,7 @@ DECLARE_EVENT_CLASS(workqueue_work,
  * delayed work is actually queued on a workqueue (ie: once the delay
  * has been reached).
  */
+/*! 2016.12.03 study */
 TRACE_EVENT(workqueue_queue_work,
 
 	TP_PROTO(unsigned int req_cpu, struct pool_workqueue *pwq,

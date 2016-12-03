@@ -429,8 +429,16 @@ void exit_files(struct task_struct *tsk)
 	}
 }
 
+/*! 2016.12.03 study */
 void __init files_defer_init(void)
 {
+    /*!
+     * min 결과를 BITS_PER_LONG으로 align
+     *
+     * size_t        : unsigned int
+     * INT_MAX	     : ((int)(~0U>>1))
+     * BITS_PER_LONG : 32
+     */
 	sysctl_nr_open_max = min((size_t)INT_MAX, ~(size_t)0/sizeof(void *)) &
 			     -BITS_PER_LONG;
 }

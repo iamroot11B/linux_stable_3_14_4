@@ -122,8 +122,11 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
 		init_timer_on_stack_key((_timer), (_flags), #_timer, &__key); \
 	} while (0)
 #else
+
+/*! 2016.12.03 study */
 #define __init_timer(_timer, _flags)					\
 	init_timer_key((_timer), (_flags), NULL, NULL)
+
 #define __init_timer_on_stack(_timer, _flags)				\
 	init_timer_on_stack_key((_timer), (_flags), NULL, NULL)
 #endif
@@ -135,6 +138,7 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
 #define init_timer_on_stack(timer)					\
 	__init_timer_on_stack((timer), 0)
 
+/*! 2016.12.03 study */
 #define __setup_timer(_timer, _fn, _data, _flags)			\
 	do {								\
 		__init_timer((_timer), (_flags));			\

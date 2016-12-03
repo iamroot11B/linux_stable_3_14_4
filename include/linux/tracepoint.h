@@ -216,6 +216,8 @@ static inline void tracepoint_synchronize_unregister(void)
 	EXPORT_SYMBOL(__tracepoint_##name)
 
 #else /* !CONFIG_TRACEPOINTS */
+
+/*! 2016.12.03 study */
 #define __DECLARE_TRACE(name, proto, args, cond, data_proto, data_args) \
 	static inline void trace_##name(proto)				\
 	{ }								\
@@ -261,10 +263,13 @@ static inline void tracepoint_synchronize_unregister(void)
 #define DECLARE_TRACE_NOARGS(name)					\
 		__DECLARE_TRACE(name, void, , 1, void *__data, __data)
 
+
+/*! 2016.12.03 study */
 #define DECLARE_TRACE(name, proto, args)				\
 		__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args), 1,	\
 				PARAMS(void *__data, proto),		\
 				PARAMS(__data, args))
+
 
 #define DECLARE_TRACE_CONDITION(name, proto, args, cond)		\
 	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args), PARAMS(cond), \
@@ -395,8 +400,10 @@ static inline void tracepoint_synchronize_unregister(void)
 	DECLARE_TRACE_CONDITION(name, PARAMS(proto),		\
 				PARAMS(args), PARAMS(cond))
 
+/*! 2016.12.03 study */
 #define TRACE_EVENT(name, proto, args, struct, assign, print)	\
 	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
+
 #define TRACE_EVENT_FN(name, proto, args, struct,		\
 		assign, print, reg, unreg)			\
 	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))

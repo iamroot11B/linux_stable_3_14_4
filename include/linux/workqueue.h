@@ -111,6 +111,7 @@ struct work_struct {
 #define WORK_DATA_STATIC_INIT()	\
 	ATOMIC_LONG_INIT(WORK_STRUCT_NO_POOL | WORK_STRUCT_STATIC)
 
+/*! 2016.12.03 study */
 struct delayed_work {
 	struct work_struct work;
 	struct timer_list timer;

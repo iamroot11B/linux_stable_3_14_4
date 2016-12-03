@@ -2821,6 +2821,7 @@ static void __init init_mount_tree(void)
 	set_fs_root(current->fs, &root);
 }
 
+/*! 2016.12.03 study */
 void __init mnt_init(void)
 {
 	unsigned u;

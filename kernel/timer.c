@@ -620,6 +620,7 @@ static inline void debug_assert_init(struct timer_list *timer)
 	debug_timer_assert_init(timer);
 }
 
+/*! 2016.12.03 study */
 static void do_init_timer(struct timer_list *timer, unsigned int flags,
 			  const char *name, struct lock_class_key *key)
 {
@@ -647,6 +648,7 @@ static void do_init_timer(struct timer_list *timer, unsigned int flags,
  * init_timer_key() must be done to a timer prior calling *any* of the
  * other timer functions.
  */
+/*! 2016.12.03 study */
 void init_timer_key(struct timer_list *timer, unsigned int flags,
 		    const char *name, struct lock_class_key *key)
 {

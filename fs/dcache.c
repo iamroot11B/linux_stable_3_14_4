@@ -3377,6 +3377,9 @@ static void __init dcache_init_early(void)
 		INIT_HLIST_BL_HEAD(dentry_hashtable + loop);
 }
 
+/*! 2016.12.03 study 
+ * 디렉터리 엔트리 (directory entry)에 대한 캐싱 init
+ */
 static void __init dcache_init(void)
 {
 	unsigned int loop;
@@ -3390,6 +3393,12 @@ static void __init dcache_init(void)
 		SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|SLAB_MEM_SPREAD);
 
 	/* Hash may have been set up in dcache_init_early */
+    /*!
+     * hashdist가 bootparam에 명시되지 않아 hashdist는 zero
+     * hashdist의 설정여부에 따라 "Dentry cache" alloc 시점이 달라진다
+     * hashdist == 1, dcache_init()에서 생성
+     * hashdist == 0, dcache_init_early()에서 생성
+     */
 	if (!hashdist)
 		return;
 

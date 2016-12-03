@@ -187,6 +187,8 @@ struct list_head {
 	struct list_head *next, *prev;
 };
 
+
+/*! 2016.12.03 study */
 struct hlist_head {
 	struct hlist_node *first;
 };

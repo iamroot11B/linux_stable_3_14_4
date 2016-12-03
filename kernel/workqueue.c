@@ -24,6 +24,10 @@
  * Please read Documentation/workqueue.txt for details.
  */
 
+/*! 2016.12.03 study 
+ * 참고: http://egloos.zum.com/studyfoss/v/5626173
+ */
+
 #include <linux/export.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
@@ -662,6 +666,7 @@ static struct pool_workqueue *get_work_pwq(struct work_struct *work)
  *
  * Return: The worker_pool @work was last associated with.  %NULL if none.
  */
+/*! 2016.12.03 study */
 static struct worker_pool *get_work_pool(struct work_struct *work)
 {
 	unsigned long data = atomic_long_read(&work->data);
@@ -982,6 +987,7 @@ static inline void worker_clr_flags(struct worker *worker, unsigned int flags)
  * Pointer to worker which is executing @work if found, %NULL
  * otherwise.
  */
+/*! 2016.12.03 study */
 static struct worker *find_worker_executing_work(struct worker_pool *pool,
 						 struct work_struct *work)
 {
@@ -1311,6 +1317,7 @@ static bool is_chained_work(struct workqueue_struct *wq)
 	return worker && worker->current_pwq->wq == wq;
 }
 
+/*! 2016.12.03 study */
 static void __queue_work(int cpu, struct workqueue_struct *wq,
 			 struct work_struct *work)
 {
@@ -1335,10 +1342,16 @@ static void __queue_work(int cpu, struct workqueue_struct *wq,
 	    WARN_ON_ONCE(!is_chained_work(wq)))
 		return;
 retry:
+    /*! WORK_CPU_UNBOUND == NR_CPU == 8
+     * raw_smp_processor_id() =  (current_thread_info()->cpu)
+     */
 	if (req_cpu == WORK_CPU_UNBOUND)
 		cpu = raw_smp_processor_id();
 
 	/* pwq which will be used unless @work is executing elsewhere */
+    /*!
+     * unbound된 pool workqueue 할당
+     */
 	if (!(wq->flags & WQ_UNBOUND))
 		pwq = per_cpu_ptr(wq->cpu_pwqs, cpu);
 	else
@@ -1351,6 +1364,10 @@ retry:
 	 */
 	last_pool = get_work_pool(work);
 	if (last_pool && last_pool != pwq->pool) {
+       /*!
+        * 위에서 unbound된 pwq 와 last_pool이 다르면
+        * 실행중인 worker의 pwq로 바꿔준다.
+        */
 		struct worker *worker;
 
 		spin_lock(&last_pool->lock);
@@ -1379,7 +1396,10 @@ retry:
 	if (unlikely(!pwq->refcnt)) {
 		if (wq->flags & WQ_UNBOUND) {
 			spin_unlock(&pwq->pool->lock);
-			cpu_relax();
+            /*!
+             * cpu_relax() = barrier()
+             */
+            cpu_relax();
 			goto retry;
 		}
 		/* oops */
@@ -1398,6 +1418,9 @@ retry:
 	pwq->nr_in_flight[pwq->work_color]++;
 	work_flags = work_color_to_flags(pwq->work_color);
 
+    /*!
+     * max_active보다 클 경우 delay ????
+     */
 	if (likely(pwq->nr_active < pwq->max_active)) {
 		trace_workqueue_activate_work(work);
 		pwq->nr_active++;
@@ -1406,6 +1429,7 @@ retry:
 		work_flags |= WORK_STRUCT_DELAYED;
 		worklist = &pwq->delayed_works;
 	}
+/*! 2016.12.03 study - end */
 
 	insert_work(pwq, work, worklist, work_flags);
 
@@ -1441,6 +1465,7 @@ bool queue_work_on(int cpu, struct workqueue_struct *wq,
 }
 EXPORT_SYMBOL(queue_work_on);
 
+/*! 2016.12.03 study */
 void delayed_work_timer_fn(unsigned long __data)
 {
 	struct delayed_work *dwork = (struct delayed_work *)__data;

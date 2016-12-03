@@ -1765,6 +1765,8 @@ void __init inode_init_early(void)
 		INIT_HLIST_HEAD(&inode_hashtable[loop]);
 }
 
+/*! 2016.12.03 study 
+ */
 void __init inode_init(void)
 {
 	unsigned int loop;

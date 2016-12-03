@@ -793,6 +793,8 @@ asmlinkage void __init start_kernel(void)
 	security_init();
 	dbg_late_init();
 	/*! 2016.11.19 study end */
+
+	/*! 2016.12.03 study start */
 	vfs_caches_init(totalram_pages);
 	signals_init();
 	/* rootfs populating might need page-writeback */

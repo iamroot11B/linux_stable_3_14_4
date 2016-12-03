@@ -421,6 +421,7 @@ void bdi_unregister(struct backing_dev_info *bdi)
 }
 EXPORT_SYMBOL(bdi_unregister);
 
+/*! 2016.12.03 study */
 static void bdi_wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi)
 {
 	memset(wb, 0, sizeof(*wb));
@@ -431,6 +432,10 @@ static void bdi_wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi)
 	INIT_LIST_HEAD(&wb->b_io);
 	INIT_LIST_HEAD(&wb->b_more_io);
 	spin_lock_init(&wb->list_lock);
+
+    /*!
+     * setup timer 
+     */
 	INIT_DELAYED_WORK(&wb->dwork, bdi_writeback_workfn);
 }
 

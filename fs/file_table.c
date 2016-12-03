@@ -345,6 +345,9 @@ void put_filp(struct file *file)
 	}
 }
 
+/*! 2016.12.03 study 
+ * 참고 : http://onestep.tistory.com/65
+ */
 void __init files_init(unsigned long mempages)
 { 
 	unsigned long n;
@@ -358,7 +361,14 @@ void __init files_init(unsigned long mempages)
 	 */ 
 
 	n = (mempages * (PAGE_SIZE / 1024)) / 10;
+    /*!
+     * n과 NR_FILE중 큰 값 선택 ( 값 처리시 unsigned long 타입으로 처리 )
+     * NR_FILE = 8192
+     */
 	files_stat.max_files = max_t(unsigned long, n, NR_FILE);
 	files_defer_init();
+    /*!
+     * nr_files 에 percpu count 설정
+     */
 	percpu_counter_init(&nr_files, 0);
 } 

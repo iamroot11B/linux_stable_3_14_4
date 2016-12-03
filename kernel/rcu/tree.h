@@ -37,10 +37,10 @@
  * Of course, your mileage may vary.
  */
 #define MAX_RCU_LVLS 4
-#define RCU_FANOUT_1	      (CONFIG_RCU_FANOUT_LEAF)
-#define RCU_FANOUT_2	      (RCU_FANOUT_1 * CONFIG_RCU_FANOUT)
-#define RCU_FANOUT_3	      (RCU_FANOUT_2 * CONFIG_RCU_FANOUT)
-#define RCU_FANOUT_4	      (RCU_FANOUT_3 * CONFIG_RCU_FANOUT)
+#define RCU_FANOUT_1	      (CONFIG_RCU_FANOUT_LEAF)              // 16
+#define RCU_FANOUT_2	      (RCU_FANOUT_1 * CONFIG_RCU_FANOUT)    // 16 * 32
+#define RCU_FANOUT_3	      (RCU_FANOUT_2 * CONFIG_RCU_FANOUT)    // 16 * 32 * 32
+#define RCU_FANOUT_4	      (RCU_FANOUT_3 * CONFIG_RCU_FANOUT)    // 16 * 32 * 32 * 32
 
 #if NR_CPUS <= RCU_FANOUT_1
 #  define RCU_NUM_LVLS	      1
