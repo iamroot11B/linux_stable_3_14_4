@@ -60,7 +60,7 @@ struct mount {
 };
 
 #define MNT_NS_INTERNAL ERR_PTR(-EINVAL) /* distinct from any mnt_namespace */
-
+/*! 2017. 1.07 study -ing */
 static inline struct mount *real_mount(struct vfsmount *mnt)
 {
 	return container_of(mnt, struct mount, mnt);
@@ -88,12 +88,12 @@ static inline void get_mnt_ns(struct mnt_namespace *ns)
 }
 
 extern seqlock_t mount_lock;
-
+/*! 2017. 1.07 study -ing */
 static inline void lock_mount_hash(void)
 {
 	write_seqlock(&mount_lock);
 }
-
+/*! 2017. 1.07 study -ing */
 static inline void unlock_mount_hash(void)
 {
 	write_sequnlock(&mount_lock);

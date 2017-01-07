@@ -459,7 +459,7 @@ retry:
 			return ERR_PTR(-ENOMEM);
 		goto retry;
 	}
-		
+
 	err = set(s, data);
 	if (err) {
 		spin_unlock(&sb_lock);
@@ -560,7 +560,7 @@ EXPORT_SYMBOL(iterate_supers_type);
 /**
  *	get_super - get the superblock of a device
  *	@bdev: device to get the superblock for
- *	
+ *
  *	Scans the superblock list and finds the superblock of the file system
  *	mounted on the device given. %NULL is returned if no match is found.
  */
@@ -650,7 +650,7 @@ restart:
 	spin_unlock(&sb_lock);
 	return NULL;
 }
- 
+
 struct super_block *user_get_super(dev_t dev)
 {
 	struct super_block *sb;
@@ -1021,7 +1021,7 @@ void kill_block_super(struct super_block *sb)
 
 EXPORT_SYMBOL(kill_block_super);
 #endif
-
+/*! 2017. 1.07 study -ing */
 struct dentry *mount_nodev(struct file_system_type *fs_type,
 	int flags, void *data,
 	int (*fill_super)(struct super_block *, void *, int))
@@ -1070,7 +1070,7 @@ struct dentry *mount_single(struct file_system_type *fs_type,
 	return dget(s->s_root);
 }
 EXPORT_SYMBOL(mount_single);
-
+/*! 2017. 1.07 study -ing */
 struct dentry *
 mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
 {
@@ -1084,22 +1084,25 @@ mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
 		if (!secdata)
 			goto out;
 
+		/*! CONFIG_SECURITY not define -> Do Nothing */
 		error = security_sb_copy_data(data, secdata);
 		if (error)
 			goto out_free_secdata;
 	}
-
+	/*! 해당 file_system_type의 mount 함수를 수행 후 root를 리턴 받는다.  */
 	root = type->mount(type, flags, name, data);
 	if (IS_ERR(root)) {
 		error = PTR_ERR(root);
 		goto out_free_secdata;
 	}
+	/*! super block 설정  */
 	sb = root->d_sb;
 	BUG_ON(!sb);
 	WARN_ON(!sb->s_bdi);
 	WARN_ON(sb->s_bdi == &default_backing_dev_info);
 	sb->s_flags |= MS_BORN;
 
+	/*! Do Nothing  */
 	error = security_sb_kern_mount(sb, flags, secdata);
 	if (error)
 		goto out_sb;
@@ -1114,6 +1117,7 @@ mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
 		"negative value (%lld)\n", type->name, sb->s_maxbytes);
 
 	up_write(&sb->s_umount);
+	/*! Do Nothing  */
 	free_secdata(secdata);
 	return root;
 out_sb:

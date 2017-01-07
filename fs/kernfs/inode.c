@@ -39,7 +39,7 @@ static const struct inode_operations kernfs_iops = {
 	.getxattr	= kernfs_iop_getxattr,
 	.listxattr	= kernfs_iop_listxattr,
 };
-
+/*! 2017. 1.07 study -ing */
 void __init kernfs_inode_init(void)
 {
 	if (bdi_init(&kernfs_bdi))

@@ -134,7 +134,7 @@ static struct idr_layer *idr_layer_alloc(gfp_t gfp_mask, struct idr *layer_idr)
 		/*! 현재 내 cpu의 idr_preload_head 주소를 리턴  */
 		new = __this_cpu_read(idr_preload_head);
 		if (new) {
-			/*! 현재 내 cpu의 idr_preload_head 주소에 new->ary[0] 값 write  
+			/*! 현재 내 cpu의 idr_preload_head 주소에 new->ary[0] 값 write
 			 *  -> 매크로 통해 idr_preload_head = new->ary[0] 으로 치환 됨
 			 */
 			__this_cpu_write(idr_preload_head, new->ary[0]);
@@ -162,7 +162,7 @@ static void idr_layer_rcu_free(struct rcu_head *head)
 	layer = container_of(head, struct idr_layer, rcu_head);
 	kmem_cache_free(idr_layer_cache, layer);
 }
-
+/*! 2017. 1.07 study -ing */
 static inline void free_layer(struct idr *idr, struct idr_layer *p)
 {
 	if (idr->hint && idr->hint == p)
@@ -178,7 +178,7 @@ static void __move_to_free_list(struct idr *idp, struct idr_layer *p)
 	idp->id_free = p;
 	idp->id_free_cnt++;
 }
-
+/*! 2017. 1.07 study -ing */
 static void move_to_free_list(struct idr *idp, struct idr_layer *p)
 {
 	unsigned long flags;
@@ -212,7 +212,7 @@ static void idr_mark_full(struct idr_layer **pa, int id)
 		__set_bit((id & IDR_MASK), p->bitmap);
 	}
 }
-
+/*! 2017. 1.07 study -ing */
 int __idr_pre_get(struct idr *idp, gfp_t gfp_mask)
 {
 	while (idp->id_free_cnt < MAX_IDR_FREE) {
@@ -554,12 +554,12 @@ int idr_alloc_cyclic(struct idr *idr, void *ptr, int start, int end,
 	return id;
 }
 EXPORT_SYMBOL(idr_alloc_cyclic);
-
+/*! 2017. 1.07 study -ing */
 static void idr_remove_warning(int id)
 {
 	WARN(1, "idr_remove called for id=%d which is not allocated.\n", id);
 }
-
+/*! 2017. 1.07 study -ing */
 static void sub_remove(struct idr *idp, int shift, int id)
 {
 	struct idr_layer *p = idp->top;
@@ -571,6 +571,9 @@ static void sub_remove(struct idr *idp, int shift, int id)
 	*paa = NULL;
 	*++paa = &idp->top;
 
+	/*! p->bitmap clear bit 및 free_layer를 통한 idp free  */
+	/*! pa 에 tree를 타고 내려가면서 경로 저장  */
+
 	while ((shift > 0) && p) {
 		n = (id >> shift) & IDR_MASK;
 		__clear_bit(n, p->bitmap);
@@ -579,10 +582,15 @@ static void sub_remove(struct idr *idp, int shift, int id)
 		shift -= IDR_BITS;
 	}
 	n = id & IDR_MASK;
+	/*! pa에 저장된 경로들을 거슬러 올라가면 free 수행  */
 	if (likely(p != NULL && test_bit(n, p->bitmap))) {
 		__clear_bit(n, p->bitmap);
 		rcu_assign_pointer(p->ary[n], NULL);
 		to_free = NULL;
+		/*!
+		 * --count해서 0이면 계속 거슬러 올라가면 free,
+		 * 0이 아니면 종료
+		 */
 		while(*paa && ! --((**paa)->count)){
 			if (to_free)
 				free_layer(idp, to_free);
@@ -602,6 +610,7 @@ static void sub_remove(struct idr *idp, int shift, int id)
  * @idp: idr handle
  * @id: unique key
  */
+/*! 2017. 1.07 study -ing */
 void idr_remove(struct idr *idp, int id)
 {
 	struct idr_layer *p;
@@ -611,6 +620,9 @@ void idr_remove(struct idr *idp, int id)
 		return;
 
 	sub_remove(idp, (idp->layers - 1) * IDR_BITS, id);
+	/*! tree를 축소시킬 수 있는지 확인하고 가능하면 축소
+	 *  -> top의 count가 1인 경우
+	 */
 	if (idp->top && idp->top->count == 1 && (idp->layers > 1) &&
 	    idp->top->ary[0]) {
 		/*
@@ -619,6 +631,7 @@ void idr_remove(struct idr *idp, int id)
 		 * inserted, they are inserted at the top of the existing
 		 * tree.
 		 */
+		/*! idp->top->ary[0]을 top으로 바꾸고 layers 갯수 줄이고, bitmap clear */
 		to_free = idp->top;
 		p = idp->top->ary[0];
 		rcu_assign_pointer(idp->top, p);
@@ -639,7 +652,7 @@ void idr_remove(struct idr *idp, int id)
 	return;
 }
 EXPORT_SYMBOL(idr_remove);
-
+/*! 2017. 1.07 study -ing */
 void __idr_remove_all(struct idr *idp)
 {
 	int n, id, max;
@@ -688,6 +701,7 @@ EXPORT_SYMBOL(__idr_remove_all);
  * idr_for_each() to free all objects, if necessay, then idr_destroy() to
  * free up the id mappings and cached idr_layers.
  */
+/*! 2017. 1.07 study -ing */
 void idr_destroy(struct idr *idp)
 {
 	__idr_remove_all(idp);
@@ -916,11 +930,12 @@ EXPORT_SYMBOL(idr_init);
  *
  * 2007-04-25  written by Tejun Heo <htejun@gmail.com>
  */
-
+/*! 2017. 1.07 study -ing */
 static void free_bitmap(struct ida *ida, struct ida_bitmap *bitmap)
 {
 	unsigned long flags;
 
+	/*! 일반적인 free가 아니라 free_bitmap을 전달받은 bitmap으로 갱신  */
 	if (!ida->free_bitmap) {
 		spin_lock_irqsave(&ida->idr.lock, flags);
 		if (!ida->free_bitmap) {
@@ -945,6 +960,7 @@ static void free_bitmap(struct ida *ida, struct ida_bitmap *bitmap)
  * If the system is REALLY out of memory this function returns %0,
  * otherwise %1.
  */
+/*! 2017. 1.07 study -ing */
 int ida_pre_get(struct ida *ida, gfp_t gfp_mask)
 {
 	/* allocate idr_layers */
@@ -959,6 +975,7 @@ int ida_pre_get(struct ida *ida, gfp_t gfp_mask)
 		if (!bitmap)
 			return 0;
 
+		/*! ida->free_bimap에 alloc한 bitmap을 넣어주는 작업  */
 		free_bitmap(ida, bitmap);
 	}
 
@@ -981,6 +998,7 @@ EXPORT_SYMBOL(ida_pre_get);
  *
  * @p_id returns a value in the range @starting_id ... %0x7fffffff.
  */
+/*! 2017. 1.07 study -ing */
 int ida_get_new_above(struct ida *ida, int starting_id, int *p_id)
 {
 	struct idr_layer *pa[MAX_IDR_LEVEL + 1];
@@ -999,13 +1017,18 @@ int ida_get_new_above(struct ida *ida, int starting_id, int *p_id)
 	if (t * IDA_BITMAP_BITS >= MAX_IDR_BIT)
 		return -ENOSPC;
 
+	/*! offset 는 idr_get_empty_slot을 통해 empty slot을 가져오면 0,
+	 *  아니면 위에서 계산한 값
+	 */
 	if (t != idr_id)
 		offset = 0;
 	idr_id = t;
 
 	/* if bitmap isn't there, create a new one */
+	/*! idr_id에 해당하는 bitmap을 가져온다  */
 	bitmap = (void *)pa[0]->ary[idr_id & IDR_MASK];
 	if (!bitmap) {
+		/*! 해당하는 bitmap이 없으면 ida->free_bitmap에서 가져온다. */
 		spin_lock_irqsave(&ida->idr.lock, flags);
 		bitmap = ida->free_bitmap;
 		ida->free_bitmap = NULL;
@@ -1034,6 +1057,7 @@ int ida_get_new_above(struct ida *ida, int starting_id, int *p_id)
 		return -ENOSPC;
 
 	__set_bit(t, bitmap->bitmap);
+	/*! 만들때 마다 nr_busy는 ++, 꽉차면 full mark  */
 	if (++bitmap->nr_busy == IDA_BITMAP_BITS)
 		idr_mark_full(pa, idr_id);
 
@@ -1059,6 +1083,7 @@ EXPORT_SYMBOL(ida_get_new_above);
  * @ida:	ida handle
  * @id:		ID to free
  */
+/*! 2017. 1.07 study -ing */
 void ida_remove(struct ida *ida, int id)
 {
 	struct idr_layer *p = ida->idr.top;
@@ -1068,6 +1093,7 @@ void ida_remove(struct ida *ida, int id)
 	int n;
 	struct ida_bitmap *bitmap;
 
+	/*! p->bitmap 을 clear */
 	/* clear full bits while looking up the leaf idr_layer */
 	while ((shift > 0) && p) {
 		n = (idr_id >> shift) & IDR_MASK;
@@ -1083,9 +1109,11 @@ void ida_remove(struct ida *ida, int id)
 	__clear_bit(n, p->bitmap);
 
 	bitmap = (void *)p->ary[n];
+	/*! bitmap->bitmap의 offset번째 bit가 set 되어 있지 않으면 에러  */
 	if (!test_bit(offset, bitmap->bitmap))
 		goto err;
 
+	/*! bitmap->bitmap의 offset번째 bit가 set 되어있으면 bitmap->nr_busy 업데이트 */
 	/* update bitmap and remove it if empty */
 	__clear_bit(offset, bitmap->bitmap);
 	if (--bitmap->nr_busy == 0) {
@@ -1105,6 +1133,7 @@ EXPORT_SYMBOL(ida_remove);
  * ida_destroy - release all cached layers within an ida tree
  * @ida:		ida handle
  */
+/*! 2017. 1.07 study -ing */
 void ida_destroy(struct ida *ida)
 {
 	idr_destroy(&ida->idr);
@@ -1124,6 +1153,7 @@ EXPORT_SYMBOL(ida_destroy);
  *
  * Use ida_simple_remove() to get rid of an id.
  */
+/*! 2017. 1.07 study -ing */
 int ida_simple_get(struct ida *ida, unsigned int start, unsigned int end,
 		   gfp_t gfp_mask)
 {
@@ -1149,6 +1179,7 @@ again:
 	ret = ida_get_new_above(ida, start, &id);
 	if (!ret) {
 		if (id > max) {
+			/*! id가 max를 넘어가면 가져온 id 삭제, return 에러  */
 			ida_remove(ida, id);
 			ret = -ENOSPC;
 		} else {
@@ -1187,6 +1218,7 @@ EXPORT_SYMBOL(ida_simple_remove);
  * This function is use to set up the handle (@ida) that you will pass
  * to the rest of the functions.
  */
+/*! 2017. 1.07 study -ing */
 void ida_init(struct ida *ida)
 {
 	memset(ida, 0, sizeof(struct ida));

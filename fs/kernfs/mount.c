@@ -161,7 +161,7 @@ void kernfs_kill_sb(struct super_block *sb)
 	kfree(info);
 	kernfs_put(root_kn);
 }
-
+/*! 2017. 1.07 study -ing */
 void __init kernfs_init(void)
 {
 	kernfs_node_cache = kmem_cache_create("kernfs_node_cache",

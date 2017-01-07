@@ -58,7 +58,7 @@ static struct file_system_type sysfs_fs_type = {
 	.kill_sb	= sysfs_kill_sb,
 	.fs_flags	= FS_USERNS_MOUNT,
 };
-
+/*! 2017. 1.07 study -ing */
 int __init sysfs_init(void)
 {
 	int err;

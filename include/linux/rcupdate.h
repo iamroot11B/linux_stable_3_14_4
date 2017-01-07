@@ -515,9 +515,9 @@ static inline void rcu_preempt_sleep_check(void)
 		rcu_dereference_sparse(p, space); \
 		((typeof(*p) __force __kernel *)(_________p1)); \
 	})
-/*! 
- * 참고1: http://studyfoss.egloos.com/viewer/5375570 
- * 참고2:http://www.quora.com/What-is-the-significance-of-__user-__kernel-__force-macros-for-ARM-platform 
+/*!
+ * 참고1: http://studyfoss.egloos.com/viewer/5375570
+ * 참고2:http://www.quora.com/What-is-the-significance-of-__user-__kernel-__force-macros-for-ARM-platform
  */
 /*! typeof(*p) = 역참조 *
  */
@@ -974,6 +974,7 @@ static inline notrace void rcu_read_unlock_sched_notrace(void)
  * external-to-structure pointer -after- you have completely initialized
  * the reader-accessible portions of the linked structure.
  */
+/*! 2017. 1.07 study -ing */
 #define RCU_INIT_POINTER(p, v) \
 	do { \
 		p = RCU_INITIALIZER(v); \

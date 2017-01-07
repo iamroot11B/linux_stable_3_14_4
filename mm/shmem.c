@@ -2679,7 +2679,7 @@ static void shmem_init_inode(void *foo)
 	struct shmem_inode_info *info = foo;
 	inode_init_once(&info->vfs_inode);
 }
-
+/*! 2017. 1.07 study -ing */
 static int shmem_init_inodecache(void)
 {
 	shmem_inode_cachep = kmem_cache_create("shmem_inode_cache",
@@ -2803,7 +2803,7 @@ static struct file_system_type shmem_fs_type = {
 	.kill_sb	= kill_litter_super,
 	.fs_flags	= FS_USERNS_MOUNT,
 };
-
+/*! 2017. 1.07 study -ing */
 int __init shmem_init(void)
 {
 	int error;
@@ -2820,12 +2820,13 @@ int __init shmem_init(void)
 	if (error)
 		goto out3;
 
+	/*! shmem_fs_type 파일시스템 등록  */
 	error = register_filesystem(&shmem_fs_type);
 	if (error) {
 		printk(KERN_ERR "Could not register tmpfs\n");
 		goto out2;
 	}
-
+	/*! 설정한 mnt를 shm_mnt에 대입 해 준다.  */
 	shm_mnt = kern_mount(&shmem_fs_type);
 	if (IS_ERR(shm_mnt)) {
 		error = PTR_ERR(shm_mnt);

@@ -42,10 +42,11 @@ void put_filesystem(struct file_system_type *fs)
 {
 	module_put(fs->owner);
 }
-
+/*! 2017. 1.07 study -ing */
 static struct file_system_type **find_filesystem(const char *name, unsigned len)
 {
 	struct file_system_type **p;
+	/*! 이름으로 해당 파일 시스템을 검색  */
 	for (p=&file_systems; *p; p=&(*p)->next)
 		if (strlen((*p)->name) == len &&
 		    strncmp((*p)->name, name, len) == 0)
@@ -61,11 +62,11 @@ static struct file_system_type **find_filesystem(const char *name, unsigned len)
  *	is aware of for mount and other syscalls. Returns 0 on success,
  *	or a negative errno code on an error.
  *
- *	The &struct file_system_type that is passed is linked into the kernel 
+ *	The &struct file_system_type that is passed is linked into the kernel
  *	structures and must not be freed until the file system has been
  *	unregistered.
  */
- 
+ /*! 2017. 1.07 study -ing */
 int register_filesystem(struct file_system_type * fs)
 {
 	int res = 0;
@@ -76,6 +77,10 @@ int register_filesystem(struct file_system_type * fs)
 		return -EBUSY;
 	write_lock(&file_systems_lock);
 	p = find_filesystem(fs->name, strlen(fs->name));
+	/*!
+	 * 이미 해당 이름의 해당 파일 시스템이 있으면 에러, 없으면 p에 대입.
+	 * p는 file_systems의 NULL인 마지막 next.
+	 */
 	if (*p)
 		res = -EBUSY;
 	else
@@ -93,11 +98,11 @@ EXPORT_SYMBOL(register_filesystem);
  *	Remove a file system that was previously successfully registered
  *	with the kernel. An error is returned if the file system is not found.
  *	Zero is returned on a success.
- *	
+ *
  *	Once this function has returned the &struct file_system_type structure
  *	may be freed or reused.
  */
- 
+
 int unregister_filesystem(struct file_system_type * fs)
 {
 	struct file_system_type ** tmp;
@@ -178,7 +183,7 @@ static int fs_maxindex(void)
 }
 
 /*
- * Whee.. Weird sysv syscall. 
+ * Whee.. Weird sysv syscall.
  */
 SYSCALL_DEFINE3(sysfs, int, option, unsigned long, arg1, unsigned long, arg2)
 {

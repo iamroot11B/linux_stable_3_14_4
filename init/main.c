@@ -6,7 +6,7 @@
  *  GK 2/5/95  -  Changed to support mounting root fs via NFS
  *  Added initrd & change_root: Werner Almesberger & Hans Lermen, Feb '96
  *  Moan early if gcc is old, avoiding bogus kernels - Paul Gortmaker, May '96
- *  Simplified starting of init:  Michael A. Griffith <grif@acm.org> 
+ *  Simplified starting of init:  Michael A. Griffith <grif@acm.org>
  */
 
 #define DEBUG		/* Enable initcall_debug */
@@ -538,9 +538,9 @@ static void __init mm_init(void)
 	vmalloc_init();
 }
 
-/*! __init : 초기화 과정에서 사용 
+/*! __init : 초기화 과정에서 사용
  * __cold : 잘 불리는 함수나 잘 안불리 함수의 구분
- * notrace : no_instrument_function 속성을 지정해주는 매크로입니다. 
+ * notrace : no_instrument_function 속성을 지정해주는 매크로입니다.
  * http://www.iamroot.org/xe/index.php?mid=FreeBoard&document_srl=218773&act=dispBoardReplyComment&comment_srl=219033 */
 asmlinkage void __init start_kernel(void)
 {
@@ -551,7 +551,7 @@ asmlinkage void __init start_kernel(void)
 	 * Need to run as early as possible, to initialize the
 	 * lockdep hash:
 	 */
-	/*! http://studyfoss.egloos.com/5342153 
+	/*! http://studyfoss.egloos.com/5342153
 	 * CONFIG_LOCKDEP 는 현재 셋팅 안되있음 */
 	/*!do while(0) 의 이유
 	 * http://kernelnewbies.org/FAQ/DoWhile0
@@ -583,9 +583,9 @@ asmlinkage void __init start_kernel(void)
 	cgroup_init_early();
 
 	/*!
-	 * 이전 상태플래그 저장하고 irq disable 
+	 * 이전 상태플래그 저장하고 irq disable
 	 */
-	/*! 
+	/*!
 	 * early = 순서 상 init 보다 앞설 경우
 	 */
 	local_irq_disable();
@@ -639,7 +639,7 @@ asmlinkage void __init start_kernel(void)
 		   -1, -1, &unknown_bootoption);
 	/*! 2015.08.22 study end */
 	/*! 2015.08.29 study start */
-	
+
 	/*! HAVE_JUMP_LABEL define 안 돼있음.
 	 * Optimize very unlikely/likely branches (from Kconfig)
 	 */
@@ -697,17 +697,17 @@ asmlinkage void __init start_kernel(void)
 	/*! 2016.10.15 study -ing */
 	tick_init();
 	init_timers();
-	hrtimers_init();	
-	softirq_init();	
-	timekeeping_init();	
-	time_init();	
+	hrtimers_init();
+	softirq_init();
+	timekeeping_init();
+	time_init();
 	sched_clock_postinit();
 	/*! 2016.10.15 study -ing */
-	perf_event_init();	
-	profile_init();	
+	perf_event_init();
+	profile_init();
 	call_function_init();
 	WARN(!irqs_disabled(), "Interrupts were enabled early\n");
-	early_boot_irqs_disabled = false;	
+	early_boot_irqs_disabled = false;
 	/*! arch_local_irq_enable 를 통해 irq enable 수행  */
 	local_irq_enable();
 

@@ -432,7 +432,7 @@ retry:
 out:
 	put_page(page);
 }
- 
+
 #ifdef CONFIG_ROOT_NFS
 
 #define NFSROOT_TIMEOUT_MIN	5
@@ -614,9 +614,10 @@ static struct file_system_type rootfs_fs_type = {
 	.mount		= rootfs_mount,
 	.kill_sb	= kill_litter_super,
 };
-
+/*! 2017. 1.07 study -ing */
 int __init init_rootfs(void)
 {
+	/*! rootfs_fs_type을 파일시스템에 등록  */
 	int err = register_filesystem(&rootfs_fs_type);
 
 	if (err)
@@ -624,12 +625,15 @@ int __init init_rootfs(void)
 
 	if (IS_ENABLED(CONFIG_TMPFS) && !saved_root_name[0] &&
 		(!root_fs_names || strstr(root_fs_names, "tmpfs"))) {
+		/*! tmpfs init 상황이면 shmem_int을,  */
 		err = shmem_init();
 		is_tmpfs = true;
 	} else {
+		/*! 일반적인 init 상황이면 init_ramfs_fs를 수행  */
 		err = init_ramfs_fs();
 	}
 
+	/*! 에러 시 등록 해제  */
 	if (err)
 		unregister_filesystem(&rootfs_fs_type);
 

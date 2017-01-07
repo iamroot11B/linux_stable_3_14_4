@@ -332,7 +332,7 @@ const struct dentry_operations kernfs_dops = {
 	.d_revalidate	= kernfs_dop_revalidate,
 	.d_release	= kernfs_dop_release,
 };
-
+/*! 2017. 1.07 study -ing */
 static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
 					     const char *name, umode_t mode,
 					     unsigned flags)
@@ -350,10 +350,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
 	kn = kmem_cache_zalloc(kernfs_node_cache, GFP_KERNEL);
 	if (!kn)
 		goto err_out1;
-
+	/*! root->ino_ida에서 ida id를 하나 가져온다. */
 	ret = ida_simple_get(&root->ino_ida, 1, 0, GFP_KERNEL);
 	if (ret < 0)
 		goto err_out2;
+	/*! 가져온 ida id 대입  */
 	kn->ino = ret;
 
 	atomic_set(&kn->count, 1);
@@ -619,6 +620,7 @@ EXPORT_SYMBOL_GPL(kernfs_find_and_get_ns);
  * Returns the root of the new hierarchy on success, ERR_PTR() value on
  * failure.
  */
+/*! 2017. 1.07 study -ing */
 struct kernfs_root *kernfs_create_root(struct kernfs_dir_ops *kdops, void *priv)
 {
 	struct kernfs_root *root;
@@ -638,6 +640,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_dir_ops *kdops, void *priv)
 		return ERR_PTR(-ENOMEM);
 	}
 
+	/*! 초기값 대입  */
 	kn->flags &= ~KERNFS_REMOVED;
 	kn->priv = priv;
 	kn->dir.root = root;
@@ -655,6 +658,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_dir_ops *kdops, void *priv)
  * Destroy the hierarchy anchored at @root by removing all existing
  * directories and destroying @root.
  */
+/*! 2017. 1.07 study -ing */
 void kernfs_destroy_root(struct kernfs_root *root)
 {
 	kernfs_remove(root->kn);	/* will also free @root */
@@ -873,6 +877,7 @@ static void __kernfs_remove(struct kernfs_addrm_cxt *acxt,
  *
  * Remove @kn along with all its subdirectories and files.
  */
+/*! 2017. 1.07 study -ing */
 void kernfs_remove(struct kernfs_node *kn)
 {
 	struct kernfs_addrm_cxt acxt;

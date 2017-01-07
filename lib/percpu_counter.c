@@ -136,7 +136,7 @@ int __percpu_counter_init(struct percpu_counter *fbc, s64 amount,
 	return 0;
 }
 EXPORT_SYMBOL(__percpu_counter_init);
-
+/*! 2017. 1.07 study -ing */
 void percpu_counter_destroy(struct percpu_counter *fbc)
 {
 	if (!fbc->counters)

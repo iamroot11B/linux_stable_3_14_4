@@ -97,6 +97,7 @@ static inline struct hlist_head *mp_hash(struct dentry *dentry)
  * allocation is serialized by namespace_sem, but we need the spinlock to
  * serialize with freeing.
  */
+/*! 2017. 1.07 study -ing */
 static int mnt_alloc_id(struct mount *mnt)
 {
 	int res;
@@ -189,17 +190,19 @@ unsigned int mnt_get_count(struct mount *mnt)
 	return mnt->mnt_count;
 #endif
 }
-
+/*! 2017. 1.07 study -ing */
 static struct mount *alloc_vfsmnt(const char *name)
 {
 	struct mount *mnt = kmem_cache_zalloc(mnt_cache, GFP_KERNEL);
 	if (mnt) {
 		int err;
 
+		/*! ida id를 가져온다.  */
 		err = mnt_alloc_id(mnt);
 		if (err)
 			goto out_free_cache;
 
+		/*! 이름 설정  */
 		if (name) {
 			mnt->mnt_devname = kstrdup(name, GFP_KERNEL);
 			if (!mnt->mnt_devname)
@@ -217,6 +220,7 @@ static struct mount *alloc_vfsmnt(const char *name)
 		mnt->mnt_writers = 0;
 #endif
 
+		/*! 리스트들 초기화  */
 		INIT_HLIST_NODE(&mnt->mnt_hash);
 		INIT_LIST_HEAD(&mnt->mnt_child);
 		INIT_LIST_HEAD(&mnt->mnt_mounts);
@@ -829,7 +833,7 @@ static struct mount *skip_mnt_tree(struct mount *p)
 	}
 	return p;
 }
-
+/*! 2017. 1.07 study -ing */
 struct vfsmount *
 vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void *data)
 {
@@ -848,6 +852,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 
 	root = mount_fs(type, flags, name, data);
 	if (IS_ERR(root)) {
+		/*! 에러면 free  */
 		free_vfsmnt(mnt);
 		return ERR_CAST(root);
 	}
@@ -857,6 +862,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 	mnt->mnt_mountpoint = mnt->mnt.mnt_root;
 	mnt->mnt_parent = mnt;
 	lock_mount_hash();
+	/*! mnt->mnt_instance 리스트에 root->d_sb->s_mounts넣어준다.  */
 	list_add_tail(&mnt->mnt_instance, &root->d_sb->s_mounts);
 	unlock_mount_hash();
 	return &mnt->mnt;
@@ -1364,7 +1370,7 @@ static int do_umount(struct mount *mnt, int flags)
 	return retval;
 }
 
-/* 
+/*
  * Is the caller allowed to modify his namespace?
  */
 static inline bool may_mount(void)
@@ -1832,7 +1838,7 @@ static int do_loopback(struct path *path, const char *old_name,
 
 	err = -EINVAL;
 	if (mnt_ns_loop(old_path.dentry))
-		goto out; 
+		goto out;
 
 	mp = lock_mount(path);
 	err = PTR_ERR(mp);
@@ -2849,6 +2855,7 @@ void __init mnt_init(void)
 	for (u = 0; u <= mp_hash_mask; u++)
 		INIT_HLIST_HEAD(&mountpoint_hashtable[u]);
 
+	/*! 2017. 1.07 study start */
 	kernfs_init();
 
 	err = sysfs_init();
@@ -2859,6 +2866,7 @@ void __init mnt_init(void)
 	if (!fs_kobj)
 		printk(KERN_WARNING "%s: kobj create error\n", __func__);
 	init_rootfs();
+	/*! 2017. 1.07 study end */
 	init_mount_tree();
 }
 
@@ -2869,7 +2877,7 @@ void put_mnt_ns(struct mnt_namespace *ns)
 	drop_collected_mounts(&ns->root->mnt);
 	free_mnt_ns(ns);
 }
-
+/*! 2017. 1.07 study -ing */
 struct vfsmount *kern_mount_data(struct file_system_type *type, void *data)
 {
 	struct vfsmount *mnt;

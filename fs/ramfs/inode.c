@@ -263,7 +263,7 @@ static struct file_system_type ramfs_fs_type = {
 	.kill_sb	= ramfs_kill_sb,
 	.fs_flags	= FS_USERNS_MOUNT,
 };
-
+/*! 2017. 1.07 study -ing */
 int __init init_ramfs_fs(void)
 {
 	static unsigned long once;
@@ -272,10 +272,12 @@ int __init init_ramfs_fs(void)
 	if (test_and_set_bit(0, &once))
 		return 0;
 
+	/*! bdi 초기화  */
 	err = bdi_init(&ramfs_backing_dev_info);
 	if (err)
 		return err;
 
+	/*! ramfs_fs_type 값을 이용하여 파일시스템 등록, 실패 시 bdi_destroy  */
 	err = register_filesystem(&ramfs_fs_type);
 	if (err)
 		bdi_destroy(&ramfs_backing_dev_info);

@@ -609,6 +609,7 @@ static inline void *kcalloc(size_t n, size_t size, gfp_t flags)
 	(defined(CONFIG_SLAB) && defined(CONFIG_TRACING)) || \
 	(defined(CONFIG_SLOB) && defined(CONFIG_TRACING))
 extern void *__kmalloc_track_caller(size_t, gfp_t, unsigned long);
+/*! 2017. 1.07 study -ing */
 #define kmalloc_track_caller(size, flags) \
 	__kmalloc_track_caller(size, flags, _RET_IP_)
 #else

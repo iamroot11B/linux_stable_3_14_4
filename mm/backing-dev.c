@@ -434,7 +434,7 @@ static void bdi_wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi)
 	spin_lock_init(&wb->list_lock);
 
     /*!
-     * setup timer 
+     * setup timer
      */
 	INIT_DELAYED_WORK(&wb->dwork, bdi_writeback_workfn);
 }
@@ -443,7 +443,7 @@ static void bdi_wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi)
  * Initial write bandwidth: 100 MB/s
  */
 #define INIT_BW		(100 << (20 - PAGE_SHIFT))
-
+/*! 2017. 1.07 study -ing */
 int bdi_init(struct backing_dev_info *bdi)
 {
 	int i, err;

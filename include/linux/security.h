@@ -2011,7 +2011,7 @@ static inline int security_sb_alloc(struct super_block *sb)
 
 static inline void security_sb_free(struct super_block *sb)
 { }
-
+/*! 2017. 1.07 study -ing */
 static inline int security_sb_copy_data(char *orig, char *copy)
 {
 	return 0;
@@ -2021,7 +2021,7 @@ static inline int security_sb_remount(struct super_block *sb, void *data)
 {
 	return 0;
 }
-
+/*! 2017. 1.07 study -ing */
 static inline int security_sb_kern_mount(struct super_block *sb, int flags, void *data)
 {
 	return 0;
@@ -3138,12 +3138,12 @@ static inline void free_secdata(void *secdata)
 }
 
 #else
-
+/*! 2017. 1.07 study -ing */
 static inline char *alloc_secdata(void)
 {
         return (char *)1;
 }
-
+/*! 2017. 1.07 study -ing */
 static inline void free_secdata(void *secdata)
 { }
 #endif /* CONFIG_SECURITY */
@@ -3180,4 +3180,3 @@ static inline int yama_task_prctl(int option, unsigned long arg2,
 #endif /* CONFIG_SECURITY_YAMA */
 
 #endif /* ! __LINUX_SECURITY_H */
-
