@@ -37,6 +37,7 @@ void __fsnotify_inode_delete(struct inode *inode)
 }
 EXPORT_SYMBOL_GPL(__fsnotify_inode_delete);
 
+/*! 2017. 2.04 study start */
 void __fsnotify_vfsmount_delete(struct vfsmount *mnt)
 {
 	fsnotify_clear_marks_by_mount(mnt);

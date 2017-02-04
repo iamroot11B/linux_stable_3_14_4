@@ -396,6 +396,8 @@ static inline int spin_can_lock(spinlock_t *lock)
 	return raw_spin_can_lock(&lock->rlock);
 }
 
+/*! 2017. 2.04 study start */
+/*! 락이걸려있는지 확인, 안걸려있으면 죽음 */
 #define assert_spin_locked(lock)	assert_raw_spin_locked(&(lock)->rlock)
 
 /*
@@ -411,6 +413,8 @@ static inline int spin_can_lock(spinlock_t *lock)
  * Decrements @atomic by 1.  If the result is 0, returns true and locks
  * @lock.  Returns false for all other cases.
  */
+/*! 2017. 2.04 study start */
+/*! atomic 하게 빼주고, 성공하면, 락 걸로 리턴 트루 */
 extern int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock);
 #define atomic_dec_and_lock(atomic, lock) \
 		__cond_lock(lock, _atomic_dec_and_lock(atomic, lock))

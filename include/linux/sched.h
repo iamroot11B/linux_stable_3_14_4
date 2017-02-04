@@ -2622,6 +2622,7 @@ static inline int signal_pending_state(long state, struct task_struct *p)
  */
 extern int _cond_resched(void);
 
+/*! 2017. 2.04 study start */
 #define cond_resched() ({			\
 	__might_sleep(__FILE__, __LINE__, 0);	\
 	_cond_resched();			\

@@ -1382,6 +1382,7 @@ EXPORT_SYMBOL(generic_delete_inode);
  * in cache if fs is alive, sync and evict if fs is
  * shutting down.
  */
+/*! 2017. 2.04 study start */
 static void iput_final(struct inode *inode)
 {
 	struct super_block *sb = inode->i_sb;
@@ -1428,6 +1429,7 @@ static void iput_final(struct inode *inode)
  *
  *	Consequently, iput() can sleep.
  */
+/*! 2017. 2.04 study start */
 void iput(struct inode *inode)
 {
 	if (inode) {

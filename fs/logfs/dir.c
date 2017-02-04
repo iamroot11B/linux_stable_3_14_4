@@ -95,6 +95,7 @@ static int beyond_eof(struct inode *inode, loff_t bix)
  * of each character and pick a prime nearby, preferably a bit-sparse
  * one.
  */
+/*! 2017. 2.04 study start */
 static u32 hash_32(const char *s, int len, u32 seed)
 {
 	u32 hash = seed;

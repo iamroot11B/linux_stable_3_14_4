@@ -236,6 +236,7 @@ void ida_simple_remove(struct ida *ida, unsigned int id);
  *
  * Simple wrapper around ida_get_new_above() w/ @starting_id of zero.
  */
+/*! 2017. 2.04 study start */
 static inline int ida_get_new(struct ida *ida, int *p_id)
 {
 	return ida_get_new_above(ida, 0, p_id);

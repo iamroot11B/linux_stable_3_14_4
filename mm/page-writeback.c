@@ -1818,6 +1818,7 @@ void __init page_writeback_init(void)
 /*
  * We tag pages in batches of WRITEBACK_TAG_BATCH to reduce tree_lock latency.
  */
+/*! 2017. 2.04 study start */
 void tag_pages_for_writeback(struct address_space *mapping,
 			     pgoff_t start, pgoff_t end)
 {
@@ -1859,6 +1860,7 @@ EXPORT_SYMBOL(tag_pages_for_writeback);
  * tag we set). The rule we follow is that TOWRITE tag can be cleared only
  * by the process clearing the DIRTY tag (and submitting the page for IO).
  */
+/*! 2017. 2.04 study start */
 int write_cache_pages(struct address_space *mapping,
 		      struct writeback_control *wbc, writepage_t writepage,
 		      void *data)
@@ -1898,6 +1900,8 @@ int write_cache_pages(struct address_space *mapping,
 retry:
 	if (wbc->sync_mode == WB_SYNC_ALL || wbc->tagged_writepages)
 		tag_pages_for_writeback(mapping, index, end);
+
+	/*! 2017. 2.04 study end */
 	done_index = index;
 	while (!done && (index <= end)) {
 		int i;
@@ -2036,6 +2040,7 @@ static int __writepage(struct page *page, struct writeback_control *wbc,
  * This is a library function, which implements the writepages()
  * address_space_operation.
  */
+/*! 2017. 2.04 study start */
 int generic_writepages(struct address_space *mapping,
 		       struct writeback_control *wbc)
 {
@@ -2054,6 +2059,7 @@ int generic_writepages(struct address_space *mapping,
 
 EXPORT_SYMBOL(generic_writepages);
 
+/*! 2017. 2.04 study start */
 int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
 {
 	int ret;
@@ -2442,6 +2448,7 @@ EXPORT_SYMBOL(test_set_page_writeback);
  * Return true if any of the pages in the mapping are marked with the
  * passed tag.
  */
+/*! 2017. 2.04 study start */
 int mapping_tagged(struct address_space *mapping, int tag)
 {
 	return radix_tree_tagged(&mapping->page_tree, tag);

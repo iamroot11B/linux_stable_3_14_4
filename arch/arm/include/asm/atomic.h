@@ -295,6 +295,7 @@ static inline void atomic64_add(long long i, atomic64_t *v)
 	: "cc");
 }
 
+/*! 2017. 2.04 study start */
 static inline long long atomic64_add_return(long long i, atomic64_t *v)
 {
 	long long result;

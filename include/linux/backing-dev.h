@@ -316,6 +316,7 @@ static inline bool bdi_cap_stable_pages_required(struct backing_dev_info *bdi)
 	return bdi->capabilities & BDI_CAP_STABLE_WRITES;
 }
 
+/*! 2017. 2.04 study start */
 static inline bool bdi_cap_writeback_dirty(struct backing_dev_info *bdi)
 {
 	return !(bdi->capabilities & BDI_CAP_NO_WRITEBACK);
@@ -338,6 +339,7 @@ static inline bool bdi_cap_swap_backed(struct backing_dev_info *bdi)
 	return bdi->capabilities & BDI_CAP_SWAP_BACKED;
 }
 
+/*! 2017. 2.04 study start */
 static inline bool mapping_cap_writeback_dirty(struct address_space *mapping)
 {
 	return bdi_cap_writeback_dirty(mapping->backing_dev_info);

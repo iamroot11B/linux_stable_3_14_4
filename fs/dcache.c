@@ -575,6 +575,7 @@ relock:
  * releasing its resources. If the parent dentries were scheduled for release
  * they too may now get deleted.
  */
+/*! 2017. 2.04 study start */
 void dput(struct dentry *dentry)
 {
 	if (unlikely(!dentry))
@@ -3434,6 +3435,7 @@ void __init vfs_caches_init_early(void)
 	inode_init_early();
 }
 
+/*! 2016. 12.03 study start */
 void __init vfs_caches_init(unsigned long mempages)
 {
 	unsigned long reserve;

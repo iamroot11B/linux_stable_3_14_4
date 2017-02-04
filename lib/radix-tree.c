@@ -100,6 +100,7 @@ static inline void *ptr_to_indirect(void *ptr)
 	return (void *)((unsigned long)ptr | RADIX_TREE_INDIRECT_PTR);
 }
 
+/*! 2017. 2.04 study start */
 static inline void *indirect_to_ptr(void *ptr)
 {
 	return (void *)((unsigned long)ptr & ~RADIX_TREE_INDIRECT_PTR);
@@ -110,6 +111,7 @@ static inline gfp_t root_gfp_mask(struct radix_tree_root *root)
 	return root->gfp_mask & __GFP_BITS_MASK;
 }
 
+/*! 2017. 2.04 study start */
 static inline void tag_set(struct radix_tree_node *node, unsigned int tag,
 		int offset)
 {
@@ -122,12 +124,14 @@ static inline void tag_clear(struct radix_tree_node *node, unsigned int tag,
 	__clear_bit(offset, node->tags[tag]);
 }
 
+/*! 2017. 2.04 study start */
 static inline int tag_get(struct radix_tree_node *node, unsigned int tag,
 		int offset)
 {
 	return test_bit(offset, node->tags[tag]);
 }
 
+/*! 2017. 2.04 study start */
 static inline void root_tag_set(struct radix_tree_root *root, unsigned int tag)
 {
 	root->gfp_mask |= (__force gfp_t)(1 << (tag + __GFP_BITS_SHIFT));
@@ -143,6 +147,7 @@ static inline void root_tag_clear_all(struct radix_tree_root *root)
 	root->gfp_mask &= __GFP_BITS_MASK;
 }
 
+/*! 2017. 2.04 study start */
 static inline int root_tag_get(struct radix_tree_root *root, unsigned int tag)
 {
 	return (__force unsigned)root->gfp_mask & (1 << (tag + __GFP_BITS_SHIFT));
@@ -846,6 +851,7 @@ EXPORT_SYMBOL(radix_tree_next_chunk);
  * WARNING! *first_indexp can wrap if last_index is ULONG_MAX. Caller must
  * be prepared to handle that.
  */
+/*! 2017. 2.04 study start */
 unsigned long radix_tree_range_tag_if_tagged(struct radix_tree_root *root,
 		unsigned long *first_indexp, unsigned long last_index,
 		unsigned long nr_to_tag,
@@ -1435,6 +1441,7 @@ EXPORT_SYMBOL(radix_tree_delete);
  *	@root:		radix tree root
  *	@tag:		tag to test
  */
+/*! 2017. 2.04 study start */
 int radix_tree_tagged(struct radix_tree_root *root, unsigned int tag)
 {
 	return root_tag_get(root, tag);

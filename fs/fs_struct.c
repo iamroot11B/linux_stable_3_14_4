@@ -29,6 +29,8 @@ void set_fs_root(struct fs_struct *fs, const struct path *path)
  * Replace the fs->{pwdmnt,pwd} with {mnt,dentry}. Put the old values.
  * It can block.
  */
+/*! 2017. 2.04 study start */
+/*! 읽을 위치에 카운터를 올려주고, pwd	변경 */
 void set_fs_pwd(struct fs_struct *fs, const struct path *path)
 {
 	struct path old_pwd;

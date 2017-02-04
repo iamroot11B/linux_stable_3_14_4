@@ -127,6 +127,7 @@ static DEFINE_SPINLOCK(proc_inum_lock); /* protects the above */
  * Return an inode number between PROC_DYNAMIC_FIRST and
  * 0xffffffff, or zero on failure.
  */
+/*! 2017. 2.04 study start */
 int proc_alloc_inum(unsigned int *inum)
 {
 	unsigned int i;

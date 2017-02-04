@@ -38,6 +38,7 @@ void get_filesystem(struct file_system_type *fs)
 	__module_get(fs->owner);
 }
 
+/*! 2017. 2.04 study start */
 void put_filesystem(struct file_system_type *fs)
 {
 	module_put(fs->owner);
@@ -259,25 +260,39 @@ static int __init proc_filesystems_init(void)
 module_init(proc_filesystems_init);
 #endif
 
+/*! 2017. 2.04 study start */
 static struct file_system_type *__get_fs_type(const char *name, int len)
 {
 	struct file_system_type *fs;
-
+	/*!
+	 * if fs is null or fs is live and it's module is live too, return fs, else return NULLi
+	 */
 	read_lock(&file_systems_lock);
 	fs = *(find_filesystem(name, len));
+
+	/*!
+	 * if fs is not null, must need living module
+	 */
 	if (fs && !try_module_get(fs->owner))
 		fs = NULL;
 	read_unlock(&file_systems_lock);
 	return fs;
 }
 
+/*! 2017. 2.04 study start */
 struct file_system_type *get_fs_type(const char *name)
 {
 	struct file_system_type *fs;
 	const char *dot = strchr(name, '.');
 	int len = dot ? dot - name : strlen(name);
-
+	/*!
+	 * len은dot까지의 길이
+	 */
 	fs = __get_fs_type(name, len);
+	
+	/*!
+	 * request_module 은 우리는 무조건 에러 출력
+	 */
 	if (!fs && (request_module("fs-%.*s", len, name) == 0))
 		fs = __get_fs_type(name, len);
 

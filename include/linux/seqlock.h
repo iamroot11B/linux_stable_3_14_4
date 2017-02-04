@@ -243,6 +243,7 @@ static inline void write_seqcount_begin_nested(seqcount_t *s, int subclass)
 	seqcount_acquire(&s->dep_map, subclass, 0, _RET_IP_);
 }
 /*! 2016.10.15 study -ing */
+/*! s의 sequence를 1 늘려준다  */
 static inline void write_seqcount_begin(seqcount_t *s)
 {
 	write_seqcount_begin_nested(s, 0);

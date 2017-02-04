@@ -163,12 +163,14 @@ out:
  *
  * NOTE: acct_lock MUST be held on entry and exit.
  */
+/*! 2017. 2.04 study start */
 static void acct_file_reopen(struct bsd_acct_struct *acct, struct file *file,
 		struct pid_namespace *ns)
 {
 	struct file *old_acct = NULL;
 	struct pid_namespace *old_ns = NULL;
 
+	/*! Old_acct를 저장 */
 	if (acct->file) {
 		old_acct = acct->file;
 		old_ns = acct->ns;
@@ -177,6 +179,7 @@ static void acct_file_reopen(struct bsd_acct_struct *acct, struct file *file,
 		acct->ns = NULL;
 		list_del(&acct->list);
 	}
+	/*! 받아온 file 정보로 설정 */
 	if (file) {
 		acct->file = file;
 		acct->ns = ns;
@@ -184,6 +187,7 @@ static void acct_file_reopen(struct bsd_acct_struct *acct, struct file *file,
 		acct->active = 1;
 		list_add(&acct->list, &acct_list);
 	}
+	/*! old_acct unlock */
 	if (old_acct) {
 		mnt_unpin(old_acct->f_path.mnt);
 		spin_unlock(&acct_lock);
@@ -287,6 +291,7 @@ SYSCALL_DEFINE1(acct, const char __user *, name)
  * If the accounting is turned on for a file in the subtree pointed to
  * to by m, turn accounting off.  Done when m is about to die.
  */
+/*! 2017. 2.04 study start */
 void acct_auto_close_mnt(struct vfsmount *m)
 {
 	struct bsd_acct_struct *acct;

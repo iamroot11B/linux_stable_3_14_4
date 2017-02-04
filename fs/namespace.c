@@ -161,6 +161,7 @@ void mnt_release_group_id(struct mount *mnt)
 /*
  * vfsmount lock must be held for read
  */
+/*! 2017. 2.04 study start */
 static inline void mnt_add_count(struct mount *mnt, int n)
 {
 #ifdef CONFIG_SMP
@@ -175,6 +176,7 @@ static inline void mnt_add_count(struct mount *mnt, int n)
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 2.04 study start */
 unsigned int mnt_get_count(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
@@ -948,6 +950,7 @@ static void delayed_free(struct rcu_head *head)
 	kmem_cache_free(mnt_cache, mnt);
 }
 
+/*! 2017. 2.04 study start */
 static void mntput_no_expire(struct mount *mnt)
 {
 put_again:
@@ -1000,6 +1003,7 @@ put_again:
 	call_rcu(&mnt->mnt_rcu, delayed_free);
 }
 
+/*! 2017. 2.04 study start */
 void mntput(struct vfsmount *mnt)
 {
 	if (mnt) {
@@ -1012,6 +1016,7 @@ void mntput(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(mntput);
 
+/*! 2017. 2.04 study start */
 struct vfsmount *mntget(struct vfsmount *mnt)
 {
 	if (mnt)
@@ -2470,6 +2475,8 @@ static void free_mnt_ns(struct mnt_namespace *ns)
  */
 static atomic64_t mnt_ns_seq = ATOMIC64_INIT(1);
 
+/*! 2017. 2.04 study start */
+/*! 새로운 mnt_namespace 를 만들어서 인자로 받은 user_ns 앞에 붙여준다. */
 static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns)
 {
 	struct mnt_namespace *new_ns;
@@ -2479,6 +2486,7 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns)
 	if (!new_ns)
 		return ERR_PTR(-ENOMEM);
 	ret = proc_alloc_inum(&new_ns->proc_inum);
+	/*! inode 의 넘버를 ida를 통해 얻어온다. */
 	if (ret) {
 		kfree(new_ns);
 		return ERR_PTR(ret);
@@ -2489,6 +2497,9 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns)
 	INIT_LIST_HEAD(&new_ns->list);
 	init_waitqueue_head(&new_ns->poll);
 	new_ns->event = 0;
+	/*! CONFIG_USER_NS 의존재에 따라, init_user_ns 또는 자기 자신을 출력,
+	 * 우리는 없음
+	 * */
 	new_ns->user_ns = get_user_ns(user_ns);
 	return new_ns;
 }
@@ -2570,6 +2581,8 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  * create_mnt_ns - creates a private namespace and adds a root filesystem
  * @mnt: pointer to the new root filesystem mountpoint
  */
+/*! 2017. 2.04 study start */
+/*! 마운팅된 vfs에namespace 추가 */
 static struct mnt_namespace *create_mnt_ns(struct vfsmount *m)
 {
 	struct mnt_namespace *new_ns = alloc_mnt_ns(&init_user_ns);
@@ -2798,6 +2811,7 @@ out0:
 	return error;
 }
 
+/*! 2017. 2.04 study start */
 static void __init init_mount_tree(void)
 {
 	struct vfsmount *mnt;
@@ -2806,14 +2820,17 @@ static void __init init_mount_tree(void)
 	struct file_system_type *type;
 
 	type = get_fs_type("rootfs");
+	/*! rootfs 를 가져온다.*/
 	if (!type)
 		panic("Can't find rootfs type");
 	mnt = vfs_kern_mount(type, 0, "rootfs", NULL);
 	put_filesystem(type);
+	/*! rootfs 를 마운팅 시킨다 */
 	if (IS_ERR(mnt))
 		panic("Can't create rootfs");
 
 	ns = create_mnt_ns(mnt);
+	/*! namespace 리턴 */
 	if (IS_ERR(ns))
 		panic("Can't allocate initial namespace");
 
@@ -2867,6 +2884,7 @@ void __init mnt_init(void)
 		printk(KERN_WARNING "%s: kobj create error\n", __func__);
 	init_rootfs();
 	/*! 2017. 1.07 study end */
+	/*! 2017. 2.04 study start */
 	init_mount_tree();
 }
 
