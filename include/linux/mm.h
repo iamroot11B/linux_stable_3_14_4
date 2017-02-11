@@ -215,7 +215,7 @@ struct vm_fault {
 /*
  * These are the virtual MM functions - opening of an area, closing and
  * unmapping it (needed to keep files on disk up-to-date etc), pointer
- * to the functions called when a no-page or a wp-page exception occurs. 
+ * to the functions called when a no-page or a wp-page exception occurs.
  */
 struct vm_operations_struct {
 	void (*open)(struct vm_area_struct * area);
@@ -264,10 +264,12 @@ struct vm_operations_struct {
 struct mmu_gather;
 struct inode;
 
+/*! 2017. 2.11 study -ing */
 #define page_private(page)		((page)->private)
 #define set_page_private(page, v)	((page)->private = (v))
 
 /* It's valid only if the page is free path or free_list */
+/*! 2017. 2.11 study -ing */
 static inline void set_freepage_migratetype(struct page *page, int migratetype)
 {
 	page->index = migratetype;
@@ -302,6 +304,7 @@ static inline int get_freepage_migratetype(struct page *page)
 /*
  * Drop a ref, return true if the refcount fell to zero (the page has no users)
  */
+/*! 2017. 2.11 study -ing */
 static inline int put_page_testzero(struct page *page)
 {
 	VM_BUG_ON_PAGE(atomic_read(&page->_count) == 0, page);
@@ -314,8 +317,10 @@ static inline int put_page_testzero(struct page *page)
  * This can be called when MMU is off so it must not access
  * any of the virtual mappings.
  */
+/*! 2017. 2.11 study -ing */
 static inline int get_page_unless_zero(struct page *page)
 {
+	/*! page->_count 를 atomic inc 하고 그 값이 0이면 false  */
 	return atomic_inc_not_zero(&page->_count);
 }
 
@@ -361,7 +366,7 @@ static inline int is_vmalloc_or_module_addr(const void *x)
 	return 0;
 }
 #endif
-
+/*! 2017. 2.11 study -ing */
 static inline void compound_lock(struct page *page)
 {
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
@@ -369,7 +374,7 @@ static inline void compound_lock(struct page *page)
 	bit_spin_lock(PG_compound_lock, &page->flags);
 #endif
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void compound_unlock(struct page *page)
 {
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
@@ -377,7 +382,7 @@ static inline void compound_unlock(struct page *page)
 	bit_spin_unlock(PG_compound_lock, &page->flags);
 #endif
 }
-
+/*! 2017. 2.11 study -ing */
 static inline unsigned long compound_lock_irqsave(struct page *page)
 {
 	unsigned long uninitialized_var(flags);
@@ -387,7 +392,7 @@ static inline unsigned long compound_lock_irqsave(struct page *page)
 #endif
 	return flags;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void compound_unlock_irqrestore(struct page *page,
 					      unsigned long flags)
 {
@@ -444,14 +449,16 @@ static inline int page_count(struct page *page)
 #ifdef CONFIG_HUGETLB_PAGE
 extern int PageHeadHuge(struct page *page_head);
 #else /* CONFIG_HUGETLB_PAGE */
+/*! 2017. 2.11 study -ing */
 static inline int PageHeadHuge(struct page *page_head)
 {
 	return 0;
 }
 #endif /* CONFIG_HUGETLB_PAGE */
-
+/*! 2017. 2.11 study -ing */
 static inline bool __compound_tail_refcounted(struct page *page)
 {
+	/*! PageHeadHuge == 0  */
 	return !PageSlab(page) && !PageHeadHuge(page);
 }
 
@@ -563,7 +570,7 @@ static inline void set_compound_page_dtor(struct page *page,
 {
 	page[1].lru.next = (void *)dtor;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline compound_page_dtor *get_compound_page_dtor(struct page *page)
 {
 	return (compound_page_dtor *)page[1].lru.next;
@@ -817,7 +824,7 @@ extern int page_cpupid_xchg_last(struct page *page, int cpupid);
 
 static inline void page_cpupid_reset_last(struct page *page)
 {
-    /*! 
+    /*!
      * LAST_CPUPID_SHIFT = 0
      * cpupid = 0
      */
@@ -896,9 +903,9 @@ static inline unsigned long page_to_section(const struct page *page)
 
 static inline void set_page_zone(struct page *page, enum zone_type zone)
 {
-    
-    /*! Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS | 
-     *              |  31 ~ 28  |    x   |  27,26 |        
+
+    /*! Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS |
+     *              |  31 ~ 28  |    x   |  27,26 |
      *                    4          0        2
      */
     /*!
@@ -909,7 +916,7 @@ static inline void set_page_zone(struct page *page, enum zone_type zone)
      */
 	page->flags &= ~(ZONES_MASK << ZONES_PGSHIFT);
     /*!
-     * ZONES_MASK = 3 = 0b11 
+     * ZONES_MASK = 3 = 0b11
      * ZONES_PGSHIFT = 26
      */
 	page->flags |= (zone & ZONES_MASK) << ZONES_PGSHIFT;
@@ -924,8 +931,8 @@ static inline void set_page_node(struct page *page, unsigned long node)
 /*!
  * set_page_links
  * - page->flags의 section, node, zone 영역을 셋팅한다.
- * Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS | 
- *             |  31 ~ 28  |    x   |  27,26 |        
+ * Page flags: | [SECTION] | [NODE] | [ZONE] | [LAST_CPUPID] | ... | FLAGS |
+ *             |  31 ~ 28  |    x   |  27,26 |
  *                   4          0        2
  */
 static inline void set_page_links(struct page *page, enum zone_type zone,

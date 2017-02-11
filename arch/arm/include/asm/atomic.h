@@ -27,6 +27,7 @@
  * strex/ldrex monitor on some implementations. The reason we can use it for
  * atomic_set() is the clrex or dummy strex done on every exception return.
  */
+/*! 2017. 2.11 study -ing */
 #define atomic_read(v)	(*(volatile int *)&(v)->counter)
 #define atomic_set(v,i)	(((v)->counter) = (i))
 
@@ -189,7 +190,7 @@ static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
 #endif /* __LINUX_ARM_ARCH__ */
 
 #define atomic_xchg(v, new) (xchg(&((v)->counter), new))
-
+/*! 2017. 2.11 study -ing */
 static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 {
 	int c, old;

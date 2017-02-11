@@ -272,7 +272,7 @@ static inline int page_referenced(struct page *page, int is_locked,
 }
 
 #define try_to_unmap(page, refs) SWAP_FAIL
-
+/*! 2017. 2.11 study -ing */
 static inline int page_mkclean(struct page *page)
 {
 	return 0;

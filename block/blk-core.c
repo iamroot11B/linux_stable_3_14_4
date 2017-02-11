@@ -3099,7 +3099,7 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
 
 	local_irq_restore(flags);
 }
-
+/*! 2017. 2.11 study -ing */
 void blk_finish_plug(struct blk_plug *plug)
 {
 	blk_flush_plug_list(plug, false);

@@ -178,13 +178,16 @@ static inline int any_tag_set(struct radix_tree_node *node, unsigned int tag)
  * Tail bits starting from size to roundup(size, BITS_PER_LONG) must be zero.
  * Returns next bit offset, or size if nothing found.
  */
+/*! 2017. 2.11 study -ing */
 static __always_inline unsigned long
 radix_tree_find_next_bit(const unsigned long *addr,
 			 unsigned long size, unsigned long offset)
 {
+	/*! 컴파일타임에 상수로 정해질 수 있으면 1 아니면 0  */
 	if (!__builtin_constant_p(size))
 		return find_next_bit(addr, size, offset);
 
+	/*! next bit를 찾으면서 addr를 ++ 시켜준다.  */
 	if (offset < size) {
 		unsigned long tmp;
 
@@ -716,6 +719,7 @@ EXPORT_SYMBOL(radix_tree_tag_get);
  * @flags:	RADIX_TREE_ITER_* flags and tag index
  * Returns:	pointer to chunk first slot, or NULL if iteration is over
  */
+/*! 2017. 2.11 study -ing */
 void **radix_tree_next_chunk(struct radix_tree_root *root,
 			     struct radix_tree_iter *iter, unsigned flags)
 {
@@ -740,9 +744,12 @@ void **radix_tree_next_chunk(struct radix_tree_root *root,
 		return NULL;
 
 	rnode = rcu_dereference_raw(root->rnode);
+	/*! rnode가 홀수 주소인지 확인하고,  */
 	if (radix_tree_is_indirect_ptr(rnode)) {
+		/*! 홀수 주소면 짝수 주소로 변경(1을 지워준다)  */
 		rnode = indirect_to_ptr(rnode);
 	} else if (rnode && !index) {
+		/*! 홀수 주소가 아니고 index가 없으면 single slot tree이다. */
 		/* Single-slot tree */
 		iter->index = 0;
 		iter->next_index = 1;
@@ -791,9 +798,12 @@ restart:
 		if (!shift)
 			break;
 
+		/*! node를 찾고, 못 찾으면 goto restart. */
 		node = rcu_dereference_raw(node->slots[offset]);
 		if (node == NULL)
 			goto restart;
+
+		/*! node를 찾았으면 shift, offset 조정 해 준후, */
 		shift -= RADIX_TREE_MAP_SHIFT;
 		offset = (index >> shift) & RADIX_TREE_MAP_MASK;
 	}
@@ -820,6 +830,7 @@ restart:
 		}
 	}
 
+	/*! 찾은 chunk 리턴  */
 	return node->slots + offset;
 }
 EXPORT_SYMBOL(radix_tree_next_chunk);

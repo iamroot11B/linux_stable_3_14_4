@@ -9,6 +9,7 @@
  *
  * Undefined if no bit exists, so code should check against 0 first.
  */
+/*! 2017. 2.11 study -ing */
 static __always_inline unsigned long __ffs(unsigned long word)
 {
 	int num = 0;

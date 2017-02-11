@@ -234,7 +234,7 @@ int page_group_by_mobility_disabled __read_mostly;
 
 /*!
  * set_pageblock_migratetype()
- *  - page_group_by_mobility_disabled에 따라 page의 migratetype을 셋 
+ *  - page_group_by_mobility_disabled에 따라 page의 migratetype을 셋
  *
  */
 void set_pageblock_migratetype(struct page *page, int migratetype)
@@ -742,7 +742,7 @@ static void free_pcppages_bulk(struct zone *zone, int count,
 	}
 	spin_unlock(&zone->lock);
 }
-
+/*! 2017. 2.11 study -ing */
 static void free_one_page(struct zone *zone, struct page *page, int order,
 				int migratetype)
 {
@@ -1447,6 +1447,7 @@ void mark_free_pages(struct zone *zone)
  * Free a 0-order page
  * cold == 1 ? free a cold page : free a hot page
  */
+/*! 2017. 2.11 study -ing */
 void free_hot_cold_page(struct page *page, int cold)
 {
 	struct zone *zone = page_zone(page);
@@ -1470,7 +1471,9 @@ void free_hot_cold_page(struct page *page, int cold)
 	 * excessively into the page allocator
 	 */
 	if (migratetype >= MIGRATE_PCPTYPES) {
+		/*! migrateisolate == MIGRATE_ISOLATE 인지 확인 */
 		if (unlikely(is_migrate_isolate(migratetype))) {
+			/*! __free_one_page() 이용해서 page free  */
 			free_one_page(zone, page, 0, migratetype);
 			goto out;
 		}
@@ -1501,6 +1504,7 @@ out:
 /*
  * Free a list of 0-order pages
  */
+/*! 2017. 2.11 study -ing */
 void free_hot_cold_page_list(struct list_head *list, int cold)
 {
 	struct page *page, *next;
@@ -1786,7 +1790,7 @@ static bool __zone_watermark_ok(struct zone *z, int order, unsigned long mark,
 {
 	/*! 2015.11.28 study end */
 	/*! 2015.12.12 study start */
-	/* free_pages my go negative - that's OK */	
+	/* free_pages my go negative - that's OK */
 	long min = mark;
 	long lowmem_reserve = z->lowmem_reserve[classzone_idx];
 	int o;
@@ -2020,7 +2024,7 @@ static inline void init_zone_allows_reclaim(int nid)
  * a page.
  */
 /*! From __alloc_pages_nodemask().
- * alloc_flags = ALLOC_WMARK_LOW|ALLOC_CPUSET|ALLOC_FAIR  
+ * alloc_flags = ALLOC_WMARK_LOW|ALLOC_CPUSET|ALLOC_FAIR
  */
 static struct page *
 get_page_from_freelist(gfp_t gfp_mask, nodemask_t *nodemask, unsigned int order,
@@ -2827,9 +2831,9 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 			struct zonelist *zonelist, nodemask_t *nodemask)
 {
 	/*! From 'alloc_large_system_hash'
-	 *  gfp_mask = GFP_ATOMIC = __GFP_HIGH 
+	 *  gfp_mask = GFP_ATOMIC = __GFP_HIGH
 	 *  gfp_zone(gfp_mask) = 0 (우리는 ZONE_NORMAL)
-	 */ 
+	 */
 	enum zone_type high_zoneidx = gfp_zone(gfp_mask);
 	struct zone *preferred_zone;
 	struct page *page = NULL;
@@ -2849,7 +2853,7 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 	might_sleep_if(gfp_mask & __GFP_WAIT);
 
 	/*! should_fail_alloc_page()
-	 * CONFIG_FAIL_PAGE_ALLOC define 안 돼 있어서 우리는 무조건 false  
+	 * CONFIG_FAIL_PAGE_ALLOC define 안 돼 있어서 우리는 무조건 false
 	 */
 	if (should_fail_alloc_page(gfp_mask, order))
 		return NULL;
@@ -2923,7 +2927,7 @@ retry:
 				zonelist, high_zoneidx, nodemask,
 				preferred_zone, migratetype);
 	}
-	/*! trace_mm_page_alloc() 
+	/*! trace_mm_page_alloc()
 	 * include/trace/events/kmem.h L194 에서 매크로로 만들어 줌.  */
 	trace_mm_page_alloc(page, order, gfp_mask, migratetype);
 
@@ -2935,7 +2939,7 @@ out:
 	 * check if the cpuset changed during allocation and if so, retry.
 	 */
 	/*! CONFIG_CPUSETS not defined. -> Do nothing
-	 *  151128. VEXPRESS에서는 CONFIG_CPUSETS set 됨 
+	 *  151128. VEXPRESS에서는 CONFIG_CPUSETS set 됨
 	 */
 	if (unlikely(!put_mems_allowed(cpuset_mems_cookie) && !page))
 		goto retry_cpuset;
@@ -3872,7 +3876,7 @@ static void set_zonelist_order(void)
 	current_zonelist_order = ZONELIST_ORDER_ZONE;
 }
 
-/*! build_zonelists 
+/*! build_zonelists
  */
 static void build_zonelists(pg_data_t *pgdat)
 {
@@ -3944,7 +3948,7 @@ DEFINE_MUTEX(zonelists_mutex);
 
 /* return values int ....just for stop_machine() */
 /*! build_zonelists()
- * 
+ *
  */
 static int __build_all_zonelists(void *data)
 {
@@ -4036,7 +4040,7 @@ void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 	/*! system_state */
 	if (system_state == SYSTEM_BOOTING) {
 		__build_all_zonelists(NULL);
-		
+
 		/*! 2015.08.22 study start */
 		mminit_verify_zonelist();
 		cpuset_init_current_mems_allowed();
@@ -4324,7 +4328,7 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		/*! page->_mapcount = -1*/
 		page_mapcount_reset(page);
 		page_cpupid_reset_last(page);
-		/*! 
+		/*!
 		 * PAGEFLAG 매크로 이용해서 SetPageReserved 함수가 만들어짐
 		 * PAGEFLAG(Reserved, reserved) __CLEARPAGEFLAG(Reserved, reserved)
 		 * #define PAGEFLAG(uname, lname) TESTPAGEFLAG(uname, lname)		\
@@ -4336,7 +4340,7 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		 * -> SetPageReserved(struct page *page)
 		 *    { set_bit(PG_rserved, &page->flags); }
 		 **********
-		 * page->flags PG_reserved번째 비트를 셋한다. 
+		 * page->flags PG_reserved번째 비트를 셋한다.
 		 */
 		SetPageReserved(page);
 		/*
@@ -4353,8 +4357,8 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		 * check here not to call set_pageblock_migratetype() against
 		 * pfn out of zone.
 		 */
-		/*! 
-		 * pfn이 zone영역 사이에 있으면서 1024의 배수일때 MIGRATE_MOVABLE로 셋팅 
+		/*!
+		 * pfn이 zone영역 사이에 있으면서 1024의 배수일때 MIGRATE_MOVABLE로 셋팅
 		 * !(pfn & (pageblock_nr_pages - 1)) -> pfn의 하위 10개 비트가 0일때 1(true) -> 1024 단위
 		 */
 		/*! 2015.05.09 study end */
@@ -4401,9 +4405,9 @@ static void __meminit zone_init_free_lists(struct zone *zone)
 
 /*!
  * zone_batchsize()
- * @zone : noral or high zone 구조체 
- * - 
- * batch? : 
+ * @zone : noral or high zone 구조체
+ * -
+ * batch? :
  */
 static int __meminit zone_batchsize(struct zone *zone)
 {
@@ -4593,7 +4597,7 @@ void __init setup_per_cpu_pageset(void)
 static noinline __init_refok
 /*!
  * zone_wait_table_init()
- * @zone: zone 구조체 
+ * @zone: zone 구조체
  * @zone_size_pages: 존의 사이즈(페이지단위)
  * - zone->wait_table 생성
  *   zone->wait_table_hash_nr_entries: zone_size_pages를 이용해(웨이트큐의 갯수를 구함)
@@ -4608,7 +4612,7 @@ int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
 	 * The per-page waitqueue mechanism uses hashed waitqueues
 	 * per zone.
 	 */
-	/*! 
+	/*!
 	 * wait_queue당 page 개수 = 256
 	 * zone->wait_table_hash_nr_entries = wait_queue의 개수
 	 */
@@ -4683,7 +4687,7 @@ static __meminit void zone_pcp_init(struct zone *zone)
 
 /*!
  * init_currently_empty_zone()
- * -wait_table, free_area 초기화 
+ * -wait_table, free_area 초기화
  */
 int __meminit init_currently_empty_zone(struct zone *zone,
 					unsigned long zone_start_pfn,
@@ -4692,7 +4696,7 @@ int __meminit init_currently_empty_zone(struct zone *zone,
 {
 	struct pglist_data *pgdat = zone->zone_pgdat;
 	int ret;
-	/*! 
+	/*!
 	 * parameters : 현재 zone과 홀이 포함된 존의 size
 	 * wait_table 초기화
 	 */
@@ -5126,7 +5130,7 @@ void __paginginit set_pageblock_order(void)
 
 /*!
  * calc_memmap_size
- * - memmap의 크기를 계산해서 반환 
+ * - memmap의 크기를 계산해서 반환
  */
 static unsigned long __paginginit calc_memmap_size(unsigned long spanned_pages,
 						   unsigned long present_pages)
@@ -5148,7 +5152,7 @@ static unsigned long __paginginit calc_memmap_size(unsigned long spanned_pages,
 	/*!
 	 * pages(zone의 페이지 갯수) * page를 관리하는 구조체의 크기
 	 * PAGE_ALIGN() -> PAGE_SIZE(4096)단위 얼라인
-	 * PAGE_SHIFT = 12 
+	 * PAGE_SHIFT = 12
 	 */
 	return PAGE_ALIGN(pages * sizeof(struct page)) >> PAGE_SHIFT;
 }
@@ -5270,8 +5274,8 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		/*! 2015/05/02 study start */
 		/* For bootup, initialized properly in watermark setup */
 		/*!
-		 * zone->vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset) 
-		 * vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset) 
+		 * zone->vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset)
+		 * vmstat[NR_ALLOC_BATCH] = zone->managed_pages + __this_cpu_read(zone->pageset)
 		 */
 		mod_zone_page_state(zone, NR_ALLOC_BATCH, zone->managed_pages);
 
@@ -5284,7 +5288,7 @@ static void __paginginit free_area_init_core(struct pglist_data *pgdat,
 		/*! not config */
 		setup_usemap(pgdat, zone, zone_start_pfn, size);
 		/*!
-		 * -wait_table, free_area 초기화 
+		 * -wait_table, free_area 초기화
 		 */
 		ret = init_currently_empty_zone(zone, zone_start_pfn,
 						size, MEMMAP_EARLY);
@@ -5347,7 +5351,7 @@ static void __init_refok alloc_node_mem_map(struct pglist_data *pgdat)
 }
 /*!
  * free_area_init_node
- * 
+ *
  *
  */
 void __paginginit free_area_init_node(int nid, unsigned long *zones_size,
@@ -6351,7 +6355,7 @@ __setup("hashdist=", set_hashdist);
  * HASH_EARLY | HASH_SMALL,	=> HASH_EARLY 0x00000001, HASH_SMALL 0x00000002
  * &pidhash_shift,			=> pidhash_shift = 4
  * NULL,
- * 0, 4096)  
+ * 0, 4096)
  */
 void *__init alloc_large_system_hash(const char *tablename,
 				     unsigned long bucketsize,
@@ -6404,7 +6408,7 @@ void *__init alloc_large_system_hash(const char *tablename,
 		else if (unlikely((numentries * bucketsize) < PAGE_SIZE))
 			numentries = PAGE_SIZE / bucketsize;
 	}
-	
+
 	/*! 위 과정을 통해 구한 numentries을 2의 승수배로 round up 해준다. */
 	numentries = roundup_pow_of_two(numentries);
 
@@ -6429,13 +6433,13 @@ void *__init alloc_large_system_hash(const char *tablename,
 	/*! log 2-numentris 값을 구한다(numentries가 2의 몇 승수인지) */
 	log2qty = ilog2(numentries);
 	/*! 2015-08-29 study end */
-	
+
 	/*! 2015-09-12 study start */
 
 	do {
 		size = bucketsize << log2qty;
 		/*! 메모리 관리자가 bootmem일 경우 - flags & HASH_EARLY    */
-		if (flags & HASH_EARLY)	
+		if (flags & HASH_EARLY)
 			table = memblock_virt_alloc_nopanic(size, 0);
 		/*! hashdist = default 0.
 		 *  CONFIG_NUMA와 CONFIG_64BIT 가 define 돼 있으면 default 값 1을 가지고,
@@ -6481,6 +6485,7 @@ void *__init alloc_large_system_hash(const char *tablename,
 }
 
 /* Return a pointer to the bitmap storing bits affecting a block of pages */
+/*! 2017. 2.11 study -ing */
 static inline unsigned long *get_pageblock_bitmap(struct zone *zone,
 							unsigned long pfn)
 {
@@ -6510,6 +6515,7 @@ static inline int pfn_to_bitidx(struct zone *zone, unsigned long pfn)
  * @end_bitidx: The last bit of interest
  * returns pageblock_bits flags
  */
+/*! 2017. 2.11 study -ing */
 unsigned long get_pageblock_flags_group(struct page *page,
 					int start_bitidx, int end_bitidx)
 {

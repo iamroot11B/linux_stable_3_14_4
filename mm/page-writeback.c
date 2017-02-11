@@ -1902,16 +1902,20 @@ retry:
 		tag_pages_for_writeback(mapping, index, end);
 
 	/*! 2017. 2.04 study end */
+	/*! 2017. 2.11 study start */
 	done_index = index;
 	while (!done && (index <= end)) {
 		int i;
 
+		/*! pvec->nr 을 가져온다.  */
 		nr_pages = pagevec_lookup_tag(&pvec, mapping, &index, tag,
 			      min(end - index, (pgoff_t)PAGEVEC_SIZE-1) + 1);
 		if (nr_pages == 0)
 			break;
 
+		/*! nr_pages 갯수만큼 loop 돌면서, */
 		for (i = 0; i < nr_pages; i++) {
+			/*! pvec.pages[] 에는 pagevec_lookup_tag에서 넣어준 page들이 존재  */
 			struct page *page = pvec.pages[i];
 
 			/*
@@ -1948,13 +1952,16 @@ continue_unlock:
 				continue;
 			}
 
+			/*! PG_dirty flag set 여부 확인  */
 			if (!PageDirty(page)) {
 				/* someone wrote it for us */
 				goto continue_unlock;
 			}
 
+			/*! PG_writeback flag set 여부 확인  */
 			if (PageWriteback(page)) {
 				if (wbc->sync_mode != WB_SYNC_NONE)
+					/*! __wait_on_bit 수행  */
 					wait_on_page_writeback(page);
 				else
 					goto continue_unlock;
@@ -1992,6 +1999,7 @@ continue_unlock:
 			 * keep going until we have written all the pages
 			 * we tagged for writeback prior to entering this loop.
 			 */
+			/*! wbc->sync_mode 가 SYNC_MODE 일때도 종료한다.  */
 			if (--wbc->nr_to_write <= 0 &&
 			    wbc->sync_mode == WB_SYNC_NONE) {
 				done = 1;
@@ -2001,6 +2009,8 @@ continue_unlock:
 		pagevec_release(&pvec);
 		cond_resched();
 	}
+
+	/*! 안 돈게 남아있으면서, 찾지 못한 경우(done == 0) goto retry.  */
 	if (!cycled && !done) {
 		/*
 		 * range_cyclic:
@@ -2012,6 +2022,7 @@ continue_unlock:
 		end = writeback_index - 1;
 		goto retry;
 	}
+	/*! 필요시 마지막 index 기록  */
 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
 		mapping->writeback_index = done_index;
 
@@ -2312,8 +2323,10 @@ EXPORT_SYMBOL(set_page_dirty_lock);
  * This incoherency between the page's dirty flag and radix-tree tag is
  * unfortunate, but it only exists while the page is locked.
  */
+/*! 2017. 2.11 study -ing */
 int clear_page_dirty_for_io(struct page *page)
 {
+	/*! page->mapping을 리턴 */
 	struct address_space *mapping = page_mapping(page);
 
 	BUG_ON(!PageLocked(page));
@@ -2344,6 +2357,7 @@ int clear_page_dirty_for_io(struct page *page)
 		 * as a serialization point for all the different
 		 * threads doing their things.
 		 */
+		/* 0 리턴(Do Nothing)  */
 		if (page_mkclean(page))
 			set_page_dirty(page);
 		/*
@@ -2356,7 +2370,11 @@ int clear_page_dirty_for_io(struct page *page)
 		 * the desired exclusion. See mm/memory.c:do_wp_page()
 		 * for more comments.
 		 */
+		/*! PG_dirty flag을 확인  */
 		if (TestClearPageDirty(page)) {
+			/*! page->node_zones[]->vm_stat[NR_FILE_DIRTY] 을 atomic 하게 감소,
+			 *  vm_stat[NR_FILE_DIRTY] atomic 하게 감소
+			 */
 			dec_zone_page_state(page, NR_FILE_DIRTY);
 			dec_bdi_stat(mapping->backing_dev_info,
 					BDI_RECLAIMABLE);

@@ -12,6 +12,7 @@
  * Atomically adds @a to @v, so long as @v was not already @u.
  * Returns non-zero if @v was not @u, and zero otherwise.
  */
+/*! 2017. 2.11 study -ing */
 static inline int atomic_add_unless(atomic_t *v, int a, int u)
 {
 	return __atomic_add_unless(v, a, u) != u;
@@ -24,6 +25,7 @@ static inline int atomic_add_unless(atomic_t *v, int a, int u)
  * Atomically increments @v by 1, so long as @v is non-zero.
  * Returns non-zero if @v was non-zero, and zero otherwise.
  */
+/*! 2017. 2.11 study -ing */
 #ifndef atomic_inc_not_zero
 #define atomic_inc_not_zero(v)		atomic_add_unless((v), 1, 0)
 #endif

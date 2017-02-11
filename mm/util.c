@@ -387,15 +387,17 @@ unsigned long vm_mmap(struct file *file, unsigned long addr,
 	return vm_mmap_pgoff(file, addr, len, prot, flag, offset >> PAGE_SHIFT);
 }
 EXPORT_SYMBOL(vm_mmap);
-
+/*! 2017. 2.11 study -ing */
 struct address_space *page_mapping(struct page *page)
 {
 	struct address_space *mapping = page->mapping;
 
 	/* This happens if someone calls flush_dcache_page on slab page */
+	/*! PG_slab flag set 여부 확인  */
 	if (unlikely(PageSlab(page)))
 		return NULL;
 
+	/*! PG_swapcache flag set 여부 확인  */
 	if (unlikely(PageSwapCache(page))) {
 		swp_entry_t entry;
 

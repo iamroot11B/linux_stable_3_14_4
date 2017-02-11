@@ -26,7 +26,7 @@ struct vm_event_state {
 };
 
 DECLARE_PER_CPU(struct vm_event_state, vm_event_states);
-
+/*! 2017. 2.11 study -ing */
 static inline void __count_vm_event(enum vm_event_item item)
 {
 	__this_cpu_inc(vm_event_states.event[item]);
@@ -238,13 +238,13 @@ static inline void __inc_zone_page_state(struct page *page,
 {
 	__inc_zone_state(page_zone(page), item);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void __dec_zone_state(struct zone *zone, enum zone_stat_item item)
 {
 	atomic_long_dec(&zone->vm_stat[item]);
 	atomic_long_dec(&vm_stat[item]);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void __dec_zone_page_state(struct page *page,
 			enum zone_stat_item item)
 {
@@ -256,6 +256,7 @@ static inline void __dec_zone_page_state(struct page *page,
  * disable interrupts.
  */
 #define inc_zone_page_state __inc_zone_page_state
+/*! 2017. 2.11 study -ing */
 #define dec_zone_page_state __dec_zone_page_state
 #define mod_zone_page_state __mod_zone_page_state
 

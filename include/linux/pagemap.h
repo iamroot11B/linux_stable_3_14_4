@@ -98,6 +98,7 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
 #define PAGE_CACHE_ALIGN(addr)	(((addr)+PAGE_CACHE_SIZE-1)&PAGE_CACHE_MASK)
 
 #define page_cache_get(page)		get_page(page)
+/*! 2017. 2.11 study -ing */
 #define page_cache_release(page)	put_page(page)
 void release_pages(struct page **pages, int nr, int cold);
 
@@ -145,8 +146,10 @@ void release_pages(struct page **pages, int nr, int cold);
  * will find the page or it will not. Likewise, the old find_get_page could run
  * either before the insertion or afterwards, depending on timing.
  */
+/*! 2017. 2.11 study -ing */
 static inline int page_cache_get_speculative(struct page *page)
 {
+	/*! Do Nothing */
 	VM_BUG_ON(in_interrupt());
 
 #ifdef CONFIG_TINY_RCU
@@ -162,10 +165,12 @@ static inline int page_cache_get_speculative(struct page *page)
 	 * disabling preempt, and hence no need for the "speculative get" that
 	 * SMP requires.
 	 */
+	/*! Do Nothing */
 	VM_BUG_ON_PAGE(page_count(page) == 0, page);
 	atomic_inc(&page->_count);
 
 #else
+	/*! page->_count 값을 atomic하게 증가시키고 그 값이 0인지 확인.(0이면 false)  */
 	if (unlikely(!get_page_unless_zero(page))) {
 		/*
 		 * Either the page has been freed, or will be freed.
@@ -336,17 +341,20 @@ static inline void __clear_page_locked(struct page *page)
 {
 	__clear_bit(PG_locked, &page->flags);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline int trylock_page(struct page *page)
 {
+	/*! page->flags에 PG_locked flag을 set 한다. */
 	return (likely(!test_and_set_bit_lock(PG_locked, &page->flags)));
 }
 
 /*
  * lock_page may only be called if we have the page's inode pinned.
  */
+/*! 2017. 2.11 study -ing */
 static inline void lock_page(struct page *page)
 {
+	/*! Do Nothing */
 	might_sleep();
 	if (!trylock_page(page))
 		__lock_page(page);
@@ -391,7 +399,7 @@ static inline int wait_on_page_locked_killable(struct page *page)
 	return 0;
 }
 
-/* 
+/*
  * Wait for a page to be unlocked.
  *
  * This must be called with the caller "holding" the page,
@@ -404,9 +412,10 @@ static inline void wait_on_page_locked(struct page *page)
 		wait_on_page_bit(page, PG_locked);
 }
 
-/* 
+/*
  * Wait for a page to complete writeback
  */
+/*! 2017. 2.11 study -ing */
 static inline void wait_on_page_writeback(struct page *page)
 {
 	if (PageWriteback(page))

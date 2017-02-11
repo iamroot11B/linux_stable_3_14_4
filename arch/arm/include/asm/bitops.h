@@ -26,6 +26,7 @@
 #include <linux/compiler.h>
 #include <linux/irqflags.h>
 
+/*! 2017. 2.11 study -ing */
 #define smp_mb__before_clear_bit()	smp_mb()
 #define smp_mb__after_clear_bit()	smp_mb()
 
@@ -186,7 +187,7 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
 /*! from test_and_set_bit -> __builtin_constant_p(nr) ? ->
  * 1. ____atomic_test_and_set_bit(nr,p)
  * 2. _test_and_set_bit(nr,p)
- * 
+ *
  * __builtin_constant_p(exp)
  *  -> 컴파일 타임에 상수로 정해질 수 있는 경우에 1, 아닌 경우에는 0을 리턴
  */

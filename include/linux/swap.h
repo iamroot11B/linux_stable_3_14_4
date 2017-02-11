@@ -384,6 +384,7 @@ int generic_swapfile_activate(struct swap_info_struct *, struct file *,
 
 /* linux/mm/swap_state.c */
 extern struct address_space swapper_spaces[];
+/*! 2017. 2.11 study -ing */
 #define swap_address_space(entry) (&swapper_spaces[swp_type(entry)])
 extern unsigned long total_swapcache_pages(void);
 extern void show_swap_cache_info(void);

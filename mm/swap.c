@@ -48,42 +48,48 @@ static DEFINE_PER_CPU(struct pagevec, lru_deactivate_pvecs);
  * This path almost never happens for VM activity - pages are normally
  * freed via pagevecs.  But it gets used by networking.
  */
+/*! 2017. 2.11 study -ing */
 static void __page_cache_release(struct page *page)
 {
+	/*! page가 LRU flag이 set 되어 있으면,  */
 	if (PageLRU(page)) {
 		struct zone *zone = page_zone(page);
 		struct lruvec *lruvec;
 		unsigned long flags;
 
 		spin_lock_irqsave(&zone->lru_lock, flags);
+		/*! &zone->lruvec  */
 		lruvec = mem_cgroup_page_lruvec(page, zone);
 		VM_BUG_ON_PAGE(!PageLRU(page), page);
 		__ClearPageLRU(page);
+		/*! page 를 lru 리스트에서 삭제  */
 		del_page_from_lru_list(page, lruvec, page_off_lru(page));
 		spin_unlock_irqrestore(&zone->lru_lock, flags);
 	}
 }
-
+/*! 2017. 2.11 study -ing */
 static void __put_single_page(struct page *page)
 {
 	__page_cache_release(page);
 	free_hot_cold_page(page, 0);
 }
-
+/*! 2017. 2.11 study -ing */
 static void __put_compound_page(struct page *page)
 {
 	compound_page_dtor *dtor;
 
 	__page_cache_release(page);
 	dtor = get_compound_page_dtor(page);
+	/*! 가져온 함수 포인터로 함수 수행 */
 	(*dtor)(page);
 }
-
+/*! 2017. 2.11 study -ing */
 static void put_compound_page(struct page *page)
 {
 	struct page *page_head;
 
 	if (likely(!PageTail(page))) {
+		/*! page->_count 를 atomic하게 줄이고 test  */
 		if (put_page_testzero(page)) {
 			/*
 			 * By the time all refcounts have been released
@@ -227,9 +233,10 @@ out_put_single:
 		goto out_put_single;
 	}
 }
-
+/*! 2017. 2.11 study -ing */
 void put_page(struct page *page)
 {
+	/*! PG_head, PG_tail 중 하나의 flag이 켜져 있으면 true.  */
 	if (unlikely(PageCompound(page)))
 		put_compound_page(page);
 	else if (put_page_testzero(page))
@@ -373,7 +380,7 @@ int get_kernel_page(unsigned long start, int write, struct page **pages)
 	return get_kernel_pages(&kiov, 1, write, pages);
 }
 EXPORT_SYMBOL_GPL(get_kernel_page);
-
+/*! 2017. 2.11 study -ing */
 static void pagevec_lru_move_fn(struct pagevec *pvec,
 	void (*move_fn)(struct page *page, struct lruvec *lruvec, void *arg),
 	void *arg)
@@ -383,6 +390,7 @@ static void pagevec_lru_move_fn(struct pagevec *pvec,
 	struct lruvec *lruvec;
 	unsigned long flags = 0;
 
+	/*! pvec->nr 만큼 loop  */
 	for (i = 0; i < pagevec_count(pvec); i++) {
 		struct page *page = pvec->pages[i];
 		struct zone *pagezone = page_zone(page);
@@ -394,15 +402,18 @@ static void pagevec_lru_move_fn(struct pagevec *pvec,
 			spin_lock_irqsave(&zone->lru_lock, flags);
 		}
 
+		/*! lruvec = zone->lruvec  */
 		lruvec = mem_cgroup_page_lruvec(page, zone);
 		(*move_fn)(page, lruvec, arg);
 	}
 	if (zone)
 		spin_unlock_irqrestore(&zone->lru_lock, flags);
 	release_pages(pvec->pages, pvec->nr, pvec->cold);
+	/*! pvec->nr 만 0으로 재 설정  */
 	pagevec_reinit(pvec);
 }
 
+/*! 2017. 2.11 study -ing */
 static void pagevec_move_tail_fn(struct page *page, struct lruvec *lruvec,
 				 void *arg)
 {
@@ -410,6 +421,7 @@ static void pagevec_move_tail_fn(struct page *page, struct lruvec *lruvec,
 
 	if (PageLRU(page) && !PageActive(page) && !PageUnevictable(page)) {
 		enum lru_list lru = page_lru_base_type(page);
+		/*! page->lru을 lruvec->lists[lru]의 tail로 옮긴다. */
 		list_move_tail(&page->lru, &lruvec->lists[lru]);
 		(*pgmoved)++;
 	}
@@ -419,6 +431,7 @@ static void pagevec_move_tail_fn(struct page *page, struct lruvec *lruvec,
  * pagevec_move_tail() must be called with IRQ disabled.
  * Otherwise this may cause nasty races.
  */
+/*! 2017. 2.11 study -ing */
 static void pagevec_move_tail(struct pagevec *pvec)
 {
 	int pgmoved = 0;
@@ -705,6 +718,7 @@ static void lru_deactivate_fn(struct page *page, struct lruvec *lruvec,
  * Either "cpu" is the current CPU, and preemption has already been
  * disabled; or "cpu" is being hot-unplugged, and is already dead.
  */
+/*! 2017. 2.11 study -ing */
 void lru_add_drain_cpu(int cpu)
 {
 	struct pagevec *pvec = &per_cpu(lru_add_pvec, cpu);
@@ -754,7 +768,7 @@ void deactivate_page(struct page *page)
 		put_cpu_var(lru_deactivate_pvecs);
 	}
 }
-
+/*! 2017. 2.11 study -ing */
 void lru_add_drain(void)
 {
 	lru_add_drain_cpu(get_cpu());
@@ -811,6 +825,7 @@ void lru_add_drain_all(void)
  * grabbed the page via the LRU.  If it did, give up: shrink_inactive_list()
  * will free it.
  */
+/*! 2017. 2.11 study -ing */
 void release_pages(struct page **pages, int nr, int cold)
 {
 	int i;
@@ -822,6 +837,7 @@ void release_pages(struct page **pages, int nr, int cold)
 	for (i = 0; i < nr; i++) {
 		struct page *page = pages[i];
 
+		/*! PG_compound flag set 여부 확인  */
 		if (unlikely(PageCompound(page))) {
 			if (zone) {
 				spin_unlock_irqrestore(&zone->lru_lock, flags);
@@ -834,6 +850,7 @@ void release_pages(struct page **pages, int nr, int cold)
 		if (!put_page_testzero(page))
 			continue;
 
+		/*! PG_lru flag set 여부 확인  */
 		if (PageLRU(page)) {
 			struct zone *pagezone = page_zone(page);
 
@@ -847,13 +864,16 @@ void release_pages(struct page **pages, int nr, int cold)
 
 			lruvec = mem_cgroup_page_lruvec(page, zone);
 			VM_BUG_ON_PAGE(!PageLRU(page), page);
+			/*! PG_lru flag clear  */
 			__ClearPageLRU(page);
 			del_page_from_lru_list(page, lruvec, page_off_lru(page));
 		}
 
 		/* Clear Active bit in case of parallel mark_page_accessed */
+		/*! PG_active 비트를 clear  */
 		ClearPageActive(page);
 
+		/*! pages_to_free 리스트에 추가 */
 		list_add(&page->lru, &pages_to_free);
 	}
 	if (zone)
@@ -873,6 +893,7 @@ EXPORT_SYMBOL(release_pages);
  * and __pagevec_lru_add_active() call release_pages() directly to avoid
  * mutual recursion.
  */
+/*! 2017. 2.11 study -ing */
 void __pagevec_release(struct pagevec *pvec)
 {
 	lru_add_drain();
@@ -941,6 +962,7 @@ static void __pagevec_lru_add_fn(struct page *page, struct lruvec *lruvec,
  * Add the passed pages to the LRU, then drop the caller's refcount
  * on them.  Reinitialises the caller's pagevec.
  */
+/*! 2017. 2.11 study -ing */
 void __pagevec_lru_add(struct pagevec *pvec)
 {
 	pagevec_lru_move_fn(pvec, __pagevec_lru_add_fn, NULL);
@@ -970,12 +992,13 @@ unsigned pagevec_lookup(struct pagevec *pvec, struct address_space *mapping,
 	return pagevec_count(pvec);
 }
 EXPORT_SYMBOL(pagevec_lookup);
-
+/*! 2017. 2.11 study -ing */
 unsigned pagevec_lookup_tag(struct pagevec *pvec, struct address_space *mapping,
 		pgoff_t *index, int tag, unsigned nr_pages)
 {
 	pvec->nr = find_get_pages_tag(mapping, index, tag,
 					nr_pages, pvec->pages);
+	/*! pvec->nr 리턴  */
 	return pagevec_count(pvec);
 }
 EXPORT_SYMBOL(pagevec_lookup_tag);

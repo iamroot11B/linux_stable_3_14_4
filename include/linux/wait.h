@@ -58,7 +58,7 @@ struct task_struct;
 
 #define DECLARE_WAIT_QUEUE_HEAD(name) \
 	wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)
-
+/*! 2017. 2.11 study -ing */
 #define __WAIT_BIT_KEY_INITIALIZER(word, bit)				\
 	{ .flags = word, .bit_nr = bit, }
 
@@ -125,7 +125,7 @@ __add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t *wait)
 	wait->flags |= WQ_FLAG_EXCLUSIVE;
 	__add_wait_queue(q, wait);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void __add_wait_queue_tail(wait_queue_head_t *head,
 					 wait_queue_t *new)
 {

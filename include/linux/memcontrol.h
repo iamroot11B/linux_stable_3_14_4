@@ -282,7 +282,7 @@ static inline struct lruvec *mem_cgroup_zone_lruvec(struct zone *zone,
 {
 	return &zone->lruvec;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline struct lruvec *mem_cgroup_page_lruvec(struct page *page,
 						    struct zone *zone)
 {
@@ -357,7 +357,7 @@ mem_cgroup_get_lru_size(struct lruvec *lruvec, enum lru_list lru)
 {
 	return 0;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void
 mem_cgroup_update_lru_size(struct lruvec *lruvec, enum lru_list lru,
 			      int increment)
@@ -671,4 +671,3 @@ static inline void kmem_cache_destroy_memcg_children(struct kmem_cache *s)
 }
 #endif /* CONFIG_MEMCG_KMEM */
 #endif /* _LINUX_MEMCONTROL_H */
-

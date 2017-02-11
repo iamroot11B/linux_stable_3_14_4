@@ -54,6 +54,7 @@
 #define smp_rmb()	barrier()
 #define smp_wmb()	barrier()
 #else
+/*! 2017. 2.11 study -ing */
 #define smp_mb()	dmb(ish)
 #define smp_rmb()	smp_mb()
 /*! 2016.07.09 study -ing */

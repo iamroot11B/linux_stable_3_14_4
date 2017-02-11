@@ -339,7 +339,7 @@ static inline void set_page_writeback(struct page *page)
  */
 __PAGEFLAG(Head, head) CLEARPAGEFLAG(Head, head)
 __PAGEFLAG(Tail, tail)
-
+/*! 2017. 2.11 study -ing */
 static inline int PageCompound(struct page *page)
 {
 	return page->flags & ((1L << PG_head) | (1L << PG_tail));
@@ -378,7 +378,7 @@ __SETPAGEFLAG(Head, compound)  __CLEARPAGEFLAG(Head, compound)
 /*!
  * PageHead()
  * - page의 flags중 PG_compound, PG_reclaim 비트 중
- *   PG_compound만 셋팅되어있을 경우 true 
+ *   PG_compound만 셋팅되어있을 경우 true
  */
 static inline int PageHead(struct page *page)
 {

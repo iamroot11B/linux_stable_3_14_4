@@ -11,7 +11,7 @@
  */
 /*! 2015.01.30 study -ing */
 /*! addr의 nr 비트를 set 하고, 해당 bit의 기존값이 1 이었으면 1을 리턴,
- *  해당 비트가 0 이었으면 0 리턴  
+ *  해당 비트가 0 이었으면 0 리턴
  */
 #define test_and_set_bit_lock(nr, addr)	test_and_set_bit(nr, addr)
 
@@ -22,6 +22,7 @@
  *
  * This operation is atomic and provides release barrier semantics.
  */
+/*! 2017. 2.11 study -ing */
 #define clear_bit_unlock(nr, addr)	\
 do {					\
 	smp_mb__before_clear_bit();	\
@@ -46,4 +47,3 @@ do {					\
 } while (0)
 
 #endif /* _ASM_GENERIC_BITOPS_LOCK_H_ */
-

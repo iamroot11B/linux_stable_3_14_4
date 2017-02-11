@@ -30,11 +30,13 @@ static __always_inline void add_page_to_lru_list(struct page *page,
 	list_add(&page->lru, &lruvec->lists[lru]);
 	__mod_zone_page_state(lruvec_zone(lruvec), NR_LRU_BASE + lru, nr_pages);
 }
-
+/*! 2017. 2.11 study -ing */
 static __always_inline void del_page_from_lru_list(struct page *page,
 				struct lruvec *lruvec, enum lru_list lru)
 {
+	/*! hpage_nr_pages == 1  */
 	int nr_pages = hpage_nr_pages(page);
+	/*! Do Nothing */
 	mem_cgroup_update_lru_size(lruvec, lru, -nr_pages);
 	list_del(&page->lru);
 	__mod_zone_page_state(lruvec_zone(lruvec), NR_LRU_BASE + lru, -nr_pages);
@@ -48,6 +50,7 @@ static __always_inline void del_page_from_lru_list(struct page *page,
  *
  * Returns the base LRU type - file or anon - @page should be on.
  */
+/*! 2017. 2.11 study -ing */
 static inline enum lru_list page_lru_base_type(struct page *page)
 {
 	if (page_is_file_cache(page))

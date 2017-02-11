@@ -459,7 +459,7 @@ __writeback_single_inode(struct inode *inode, struct writeback_control *wbc)
 	trace_writeback_single_inode_start(inode, wbc, nr_to_write);
 
 	ret = do_writepages(mapping, wbc);
-
+	/*! 2017. 2.11 study end */
 	/*
 	 * Make sure to wait on the data before writing out the metadata.
 	 * This is important for filesystems that modify metadata on data

@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2, or (at
  * your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -50,9 +50,10 @@
  */
 #define RADIX_TREE_EXCEPTIONAL_ENTRY	2
 #define RADIX_TREE_EXCEPTIONAL_SHIFT	2
-
+/*! 2017. 2.11 study -ing */
 static inline int radix_tree_is_indirect_ptr(void *ptr)
 {
+	/*! indirect ptr 인지(홀수 주소인지) 확인 */
 	return (int)((unsigned long)ptr & RADIX_TREE_INDIRECT_PTR);
 }
 
@@ -147,6 +148,7 @@ do {									\
  * radix_tree_deref_retry must be used to confirm validity of the pointer if
  * only the read lock is held.
  */
+/*! 2017. 2.11 study -ing */
 static inline void *radix_tree_deref_slot(void **pslot)
 {
 	return rcu_dereference(*pslot);
@@ -175,6 +177,7 @@ static inline void *radix_tree_deref_slot_protected(void **pslot,
  *
  * radix_tree_deref_retry must be used with radix_tree_deref_slot.
  */
+/*! 2017. 2.11 study -ing */
 static inline int radix_tree_deref_retry(void *arg)
 {
 	return unlikely((unsigned long)arg & RADIX_TREE_INDIRECT_PTR);
@@ -196,6 +199,7 @@ static inline int radix_tree_exceptional_entry(void *arg)
  * @arg:	value returned by radix_tree_deref_slot
  * Returns:	0 if well-aligned pointer, non-0 if either kind of exception.
  */
+/*! 2017. 2.11 study -ing */
 static inline int radix_tree_exception(void *arg)
 {
 	return unlikely((unsigned long)arg &
@@ -290,6 +294,7 @@ struct radix_tree_iter {
  * @start:	iteration starting index
  * Returns:	NULL
  */
+/*! 2017. 2.11 study -ing */
 static __always_inline void **
 radix_tree_iter_init(struct radix_tree_iter *iter, unsigned long start)
 {
@@ -450,6 +455,8 @@ radix_tree_next_slot(void **slot, struct radix_tree_iter *iter, unsigned flags)
  *
  * @slot points to radix tree slot, @iter->index contains its index.
  */
+/*! 2017. 2.11 study -ing */
+/*! root 부터 tree를 돌면서 for 문 수행. */
 #define radix_tree_for_each_tagged(slot, root, iter, start, tag)	\
 	for (slot = radix_tree_iter_init(iter, start) ;			\
 	     slot || (slot = radix_tree_next_chunk(root, iter,		\

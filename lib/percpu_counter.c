@@ -73,11 +73,11 @@ void percpu_counter_set(struct percpu_counter *fbc, s64 amount)
 	raw_spin_unlock_irqrestore(&fbc->lock, flags);
 }
 EXPORT_SYMBOL(percpu_counter_set);
-
+/*! 2017. 2.11 study -ing */
 void __percpu_counter_add(struct percpu_counter *fbc, s64 amount, s32 batch)
 {
 	s64 count;
-
+	/*! 선점 disable 후에 fbc->counters 에 amount를 더한다. */
 	preempt_disable();
 	count = __this_cpu_read(*fbc->counters) + amount;
 	if (count >= batch || count <= -batch) {

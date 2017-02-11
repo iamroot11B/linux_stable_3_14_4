@@ -33,12 +33,12 @@ static inline void pagevec_init(struct pagevec *pvec, int cold)
 	pvec->nr = 0;
 	pvec->cold = cold;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void pagevec_reinit(struct pagevec *pvec)
 {
 	pvec->nr = 0;
 }
-
+/*! 2017. 2.11 study -ing */
 static inline unsigned pagevec_count(struct pagevec *pvec)
 {
 	return pvec->nr;
@@ -57,7 +57,7 @@ static inline unsigned pagevec_add(struct pagevec *pvec, struct page *page)
 	pvec->pages[pvec->nr++] = page;
 	return pagevec_space(pvec);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void pagevec_release(struct pagevec *pvec)
 {
 	if (pagevec_count(pvec))

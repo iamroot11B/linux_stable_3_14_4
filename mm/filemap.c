@@ -542,6 +542,7 @@ EXPORT_SYMBOL(__page_cache_alloc);
  * at a cost of "thundering herd" phenomena during rare hash
  * collisions.
  */
+/*! 2017. 2.11 study -ing */
 static wait_queue_head_t *page_waitqueue(struct page *page)
 {
 	const struct zone *zone = page_zone(page);
@@ -549,11 +550,13 @@ static wait_queue_head_t *page_waitqueue(struct page *page)
 	return &zone->wait_table[hash_ptr(page, zone->wait_table_bits)];
 }
 
+/*! 2017. 2.11 study -ing */
 static inline void wake_up_page(struct page *page, int bit)
 {
+	/*! __wake_up 수행  */
 	__wake_up_bit(page_waitqueue(page), &page->flags, bit);
 }
-
+/*! 2017. 2.11 study -ing */
 void wait_on_page_bit(struct page *page, int bit_nr)
 {
 	DEFINE_WAIT_BIT(wait, &page->flags, bit_nr);
@@ -605,10 +608,13 @@ EXPORT_SYMBOL_GPL(add_page_wait_queue);
  * The mb is necessary to enforce ordering between the clear_bit and the read
  * of the waitqueue (to avoid SMP races with a parallel wait_on_page_locked()).
  */
+/*! 2017. 2.11 study -ing */
 void unlock_page(struct page *page)
 {
 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+	/*! barrier 치고 clear bit 수행  */
 	clear_bit_unlock(PG_locked, &page->flags);
+	/*! barrier */
 	smp_mb__after_clear_bit();
 	wake_up_page(page, PG_locked);
 }
@@ -635,6 +641,7 @@ EXPORT_SYMBOL(end_page_writeback);
  * __lock_page - get a lock on the page, assuming we need to sleep to get it
  * @page: the page to lock
  */
+/*! 2017. 2.11 study -ing */
 void __lock_page(struct page *page)
 {
 	DEFINE_WAIT_BIT(wait, &page->flags, PG_locked);
@@ -972,6 +979,7 @@ EXPORT_SYMBOL(find_get_pages_contig);
  * Like find_get_pages, except we only return pages which are tagged with
  * @tag.   We update @index to index the next page for the traversal.
  */
+/*! 2017. 2.11 study -ing */
 unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *index,
 			int tag, unsigned int nr_pages, struct page **pages)
 {
@@ -984,15 +992,18 @@ unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *index,
 
 	rcu_read_lock();
 restart:
+	/*! mapping->page_tree 트리를 돌면서 각 node 들을 slot에 넣어서 for 문 수행  */
 	radix_tree_for_each_tagged(slot, &mapping->page_tree,
 				   &iter, *index, tag) {
 		struct page *page;
 repeat:
+		/*! slot을 포함하는 struct 역참조로 가져온다.  */
 		page = radix_tree_deref_slot(slot);
 		if (unlikely(!page))
 			continue;
-
+		/*! 예외 확인  */
 		if (radix_tree_exception(page)) {
+			/*! page가 indirect ptr 이면 restart로, */
 			if (radix_tree_deref_retry(page)) {
 				/*
 				 * Transient condition which can only trigger
@@ -1005,9 +1016,11 @@ repeat:
 			 * This function is never used on a shmem/tmpfs
 			 * mapping, so a swap entry won't be found here.
 			 */
+			/*! 주소가 & RADIX_TREE_EXCEPTIONAL_ENTRY(2) 인 경우  */
 			BUG();
 		}
 
+		/*! page->_count를 atomic 증가 하고, 그 값이 0이면 goto repeat */
 		if (!page_cache_get_speculative(page))
 			goto repeat;
 
@@ -1017,6 +1030,7 @@ repeat:
 			goto repeat;
 		}
 
+		/*! 정상적으로 찾은 page를 pages[ret]에 넣어준다.  */
 		pages[ret] = page;
 		if (++ret == nr_pages)
 			break;
@@ -1503,7 +1517,7 @@ EXPORT_SYMBOL(generic_file_aio_read);
 static int page_cache_read(struct file *file, pgoff_t offset)
 {
 	struct address_space *mapping = file->f_mapping;
-	struct page *page; 
+	struct page *page;
 	int ret;
 
 	do {
@@ -1520,7 +1534,7 @@ static int page_cache_read(struct file *file, pgoff_t offset)
 		page_cache_release(page);
 
 	} while (ret == AOP_TRUNCATED_PAGE);
-		
+
 	return ret;
 }
 
@@ -2405,7 +2419,7 @@ generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
 		written += status;
 		*ppos = pos + status;
   	}
-	
+
 	return written ? written : status;
 }
 EXPORT_SYMBOL(generic_file_buffered_write);

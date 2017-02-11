@@ -137,10 +137,11 @@ static inline int wb_has_dirty_io(struct bdi_writeback *wb)
 	       !list_empty(&wb->b_io) ||
 	       !list_empty(&wb->b_more_io);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void __add_bdi_stat(struct backing_dev_info *bdi,
 		enum bdi_stat_item item, s64 amount)
 {
+	/*! bdi->bdi_stat[item] 에 amount를 더한다.  */
 	__percpu_counter_add(&bdi->bdi_stat[item], amount, BDI_STAT_BATCH);
 }
 
@@ -159,13 +160,14 @@ static inline void inc_bdi_stat(struct backing_dev_info *bdi,
 	__inc_bdi_stat(bdi, item);
 	local_irq_restore(flags);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void __dec_bdi_stat(struct backing_dev_info *bdi,
 		enum bdi_stat_item item)
 {
+	/*! bdi->bdi_stat[item] 에서 1을 빼준다.  */
 	__add_bdi_stat(bdi, item, -1);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline void dec_bdi_stat(struct backing_dev_info *bdi,
 		enum bdi_stat_item item)
 {
@@ -321,7 +323,7 @@ static inline bool bdi_cap_writeback_dirty(struct backing_dev_info *bdi)
 {
 	return !(bdi->capabilities & BDI_CAP_NO_WRITEBACK);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline bool bdi_cap_account_dirty(struct backing_dev_info *bdi)
 {
 	return !(bdi->capabilities & BDI_CAP_NO_ACCT_DIRTY);
@@ -344,7 +346,7 @@ static inline bool mapping_cap_writeback_dirty(struct address_space *mapping)
 {
 	return bdi_cap_writeback_dirty(mapping->backing_dev_info);
 }
-
+/*! 2017. 2.11 study -ing */
 static inline bool mapping_cap_account_dirty(struct address_space *mapping)
 {
 	return bdi_cap_account_dirty(mapping->backing_dev_info);

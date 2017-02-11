@@ -110,7 +110,7 @@ void __wake_up_locked(wait_queue_head_t *q, unsigned int mode, int nr)
 	__wake_up_common(q, mode, nr, 0, NULL);
 }
 EXPORT_SYMBOL_GPL(__wake_up_locked);
-
+/*! 2017. 2.11 study -ing */
 void __wake_up_locked_key(wait_queue_head_t *q, unsigned int mode, void *key)
 {
 	__wake_up_common(q, mode, 1, 0, key);
@@ -187,16 +187,20 @@ prepare_to_wait(wait_queue_head_t *q, wait_queue_t *wait, int state)
 	spin_unlock_irqrestore(&q->lock, flags);
 }
 EXPORT_SYMBOL(prepare_to_wait);
-
+/*! 2017. 2.11 study -ing */
 void
 prepare_to_wait_exclusive(wait_queue_head_t *q, wait_queue_t *wait, int state)
 {
 	unsigned long flags;
 
+	/*! WQ_FLAG_EXCLUSIVE flag을 set 한다.  */
 	wait->flags |= WQ_FLAG_EXCLUSIVE;
 	spin_lock_irqsave(&q->lock, flags);
+	/*! head->next == head 이면 list는 비어있다.  */
 	if (list_empty(&wait->task_list))
+		/*! 비어있으면 tail에 삽입  */
 		__add_wait_queue_tail(q, wait);
+	/*! current->state에 state 대입  */
 	set_current_state(state);
 	spin_unlock_irqrestore(&q->lock, flags);
 }
@@ -280,14 +284,17 @@ EXPORT_SYMBOL(finish_wait);
  * aborts and is woken up concurrently and no one wakes up
  * the next waiter.
  */
+/*! 2017. 2.11 study -ing */
 void abort_exclusive_wait(wait_queue_head_t *q, wait_queue_t *wait,
 			unsigned int mode, void *key)
 {
 	unsigned long flags;
-
+	/*! current->state 에 TASK_RUNNING 대입  */
 	__set_current_state(TASK_RUNNING);
 	spin_lock_irqsave(&q->lock, flags);
+	/*! list가 비어있으면,  */
 	if (!list_empty(&wait->task_list))
+		/*! entry 지우고 list init */
 		list_del_init(&wait->task_list);
 	else if (waitqueue_active(q))
 		__wake_up_locked_key(q, mode, key);
@@ -351,7 +358,7 @@ int __sched out_of_line_wait_on_bit(void *word, int bit,
 	return __wait_on_bit(wq, &wait, action, mode);
 }
 EXPORT_SYMBOL(out_of_line_wait_on_bit);
-
+/*! 2017. 2.11 study -ing */
 int __sched
 __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
 			int (*action)(void *), unsigned mode)
@@ -362,6 +369,7 @@ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
 		prepare_to_wait_exclusive(wq, &q->wait, mode);
 		if (!test_bit(q->key.bit_nr, q->key.flags))
 			continue;
+		/*! 가져온 함수 action을 수행  */
 		ret = action(q->key.flags);
 		if (!ret)
 			continue;
@@ -382,7 +390,7 @@ int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
 	return __wait_on_bit_lock(wq, &wait, action, mode);
 }
 EXPORT_SYMBOL(out_of_line_wait_on_bit_lock);
-
+/*! 2017. 2.11 study -ing */
 void __wake_up_bit(wait_queue_head_t *wq, void *word, int bit)
 {
 	struct wait_bit_key key = __WAIT_BIT_KEY_INITIALIZER(word, bit);

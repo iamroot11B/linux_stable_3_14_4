@@ -173,7 +173,7 @@ static inline void kick_all_cpus_sync(void) {  }
  * the warning message, as your code might not work under PREEMPT.
  */
 /*!
- * 
+ *
  */
 #ifdef CONFIG_DEBUG_PREEMPT
   extern unsigned int debug_smp_processor_id(void);
@@ -184,6 +184,7 @@ static inline void kick_all_cpus_sync(void) {  }
 #endif
 
 #define get_cpu()		({ preempt_disable(); smp_processor_id(); })
+/*! 2017. 2.11 study -ing */
 #define put_cpu()		preempt_enable()
 
 /*

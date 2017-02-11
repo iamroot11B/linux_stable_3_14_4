@@ -74,7 +74,7 @@ enum {
 		for (type = 0; type < MIGRATE_TYPES; type++)
 
 extern int page_group_by_mobility_disabled;
-
+/*! 2017. 2.11 study -ing */
 static inline int get_pageblock_migratetype(struct page *page)
 {
 	return get_pageblock_flags_group(page, PB_migrate, PB_migrate_end);
@@ -816,7 +816,7 @@ extern int init_currently_empty_zone(struct zone *zone, unsigned long start_pfn,
 				     enum memmap_context context);
 
 extern void lruvec_init(struct lruvec *lruvec);
-
+/*! 2017. 2.11 study -ing */
 static inline struct zone *lruvec_zone(struct lruvec *lruvec)
 {
 #ifdef CONFIG_MEMCG
@@ -875,7 +875,7 @@ static inline int is_highmem_idx(enum zone_type idx)
 }
 
 /**
- * is_highmem - helper function to quickly check if a struct zone is a 
+ * is_highmem - helper function to quickly check if a struct zone is a
  *              highmem zone or not.  This is an attempt to keep references
  *              to ZONE_{DMA/NORMAL/HIGHMEM/etc} in general code to a minimum.
  * @zone - pointer to struct zone variable
@@ -886,7 +886,7 @@ static inline int is_highmem(struct zone *zone)
 #ifdef CONFIG_HIGHMEM
 	int zone_off = (char *)zone - (char *)zone->zone_pgdat->node_zones;
 	/*! zone_off 가 ZONE_HIGMEM 이거나,
-	 * zone_off가 ZONE_MOVABLE 이면서, ZONE_MOVABLE이 HIGME이면 1 리턴 
+	 * zone_off가 ZONE_MOVABLE 이면서, ZONE_MOVABLE이 HIGME이면 1 리턴
 	 */
 	return zone_off == ZONE_HIGHMEM * sizeof(*zone) ||
 	       (zone_off == ZONE_MOVABLE * sizeof(*zone) &&
@@ -1079,7 +1079,7 @@ static inline unsigned long early_pfn_to_nid(unsigned long pfn)
  */
 #define PA_SECTION_SHIFT	(SECTION_SIZE_BITS)
 /*!
- * PFN : 몇번째 page인지 나타냄 
+ * PFN : 몇번째 page인지 나타냄
  * PFN_SECTION_SHIFT = 28 - 12 = 16
  * PFN에서 섹션번호로 바꿈
  * */
@@ -1157,16 +1157,16 @@ extern struct mem_section mem_section[NR_SECTION_ROOTS][SECTIONS_PER_ROOT];
 
 /*!
  * __nr_to_section()
- * - __nr: 몇번째 섹션인지 의미 
+ * - __nr: 몇번째 섹션인지 의미
  *   nr번째 섹션의 주소를 반환
  */
 static inline struct mem_section *__nr_to_section(unsigned long nr)
 {
     /*!
-     * ROOT의 의미 : mem_section단위(4096/sizeof(struct mem_section)) 
+     * ROOT의 의미 : mem_section단위(4096/sizeof(struct mem_section))
      * PAGE_SIZE 4096
      * #define SECTIONS_PER_ROOT       (PAGE_SIZE / sizeof (struct mem_section))
-     * -> 
+     * ->
      * #define SECTION_NR_TO_ROOT(sec)	((sec) / SECTIONS_PER_ROOT)
      */
 	if (!mem_section[SECTION_NR_TO_ROOT(nr)])

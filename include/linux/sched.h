@@ -260,8 +260,12 @@ extern char ___assert_task_state[1 - 2*!!(
  *
  * If the caller does not need such serialisation then use __set_current_state()
  */
+/*! 2017. 2.11 study -ing */
+/*! current->state에 state_value 대입  */
 #define __set_current_state(state_value)			\
 	do { current->state = (state_value); } while (0)
+/*! 2017. 2.11 study -ing */
+/*! current->state에 state_value 대입  */
 #define set_current_state(state_value)		\
 	set_mb(current->state, (state_value))
 
