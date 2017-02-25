@@ -163,7 +163,7 @@ static inline void list_replace_init(struct list_head *old,
  * list_del_init - deletes entry from list and reinitialize it.
  * @entry: the element to delete from the list.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline void list_del_init(struct list_head *entry)
 {
 	__list_del(entry->prev, entry->next);
@@ -226,7 +226,7 @@ static inline int list_empty(const struct list_head *head)
  * to the list entry is list_del_init(). Eg. it cannot be used
  * if another CPU could re-list_add() it.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline int list_empty_careful(const struct list_head *head)
 {
 	struct list_head *next = head->next;

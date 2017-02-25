@@ -33,7 +33,7 @@
 /*
  * Recalculate the mask of events relevant to a given inode locked.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static void fsnotify_recalc_inode_mask_locked(struct inode *inode)
 {
 	struct fsnotify_mark *mark;
@@ -59,7 +59,7 @@ void fsnotify_recalc_inode_mask(struct inode *inode)
 	__fsnotify_update_child_dentry_flags(inode);
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void fsnotify_destroy_inode_mark(struct fsnotify_mark *mark)
 {
 	struct inode *inode = mark->i.inode;

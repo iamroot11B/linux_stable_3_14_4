@@ -103,7 +103,7 @@ void *memchr(const void *s, int c, size_t count)
 	return NULL;
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 char *strchr(const char *s, int c)
 {
 	while (*s != (char)c)

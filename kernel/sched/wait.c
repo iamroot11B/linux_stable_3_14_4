@@ -173,7 +173,7 @@ EXPORT_SYMBOL_GPL(__wake_up_sync);	/* For internal use only */
  * stops them from bleeding out - it would still allow subsequent
  * loads to move into the critical region).
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void
 prepare_to_wait(wait_queue_head_t *q, wait_queue_t *wait, int state)
 {
@@ -239,7 +239,7 @@ EXPORT_SYMBOL(prepare_to_wait_event);
  * the wait descriptor from the given waitqueue if still
  * queued.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void finish_wait(wait_queue_head_t *q, wait_queue_t *wait)
 {
 	unsigned long flags;
@@ -332,7 +332,7 @@ EXPORT_SYMBOL(wake_bit_function);
  * waiting, the actions of __wait_on_bit() and __wait_on_bit_lock() are
  * permitted return codes. Nonzero return codes halt waiting and return.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 int __sched
 __wait_on_bit(wait_queue_head_t *wq, struct wait_bit_queue *q,
 			int (*action)(void *), unsigned mode)
@@ -422,7 +422,7 @@ void wake_up_bit(void *word, int bit)
 }
 EXPORT_SYMBOL(wake_up_bit);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 wait_queue_head_t *bit_waitqueue(void *word, int bit)
 {
 	const int shift = BITS_PER_LONG == 32 ? 5 : 6;

@@ -46,7 +46,7 @@
  * This operation is only valid if you already hold a reference
  * to the object, so you know the count cannot be zero.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void lockref_get(struct lockref *lockref)
 {
 	CMPXCHG_LOOP(

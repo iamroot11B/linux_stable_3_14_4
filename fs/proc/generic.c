@@ -3,7 +3,7 @@
  *
  * This file contains generic proc-fs routines for handling
  * directories and files.
- * 
+ *
  * Copyright (C) 1991, 1992 Linus Torvalds.
  * Copyright (C) 1997 Theodore Ts'o
  */
@@ -127,7 +127,7 @@ static DEFINE_SPINLOCK(proc_inum_lock); /* protects the above */
  * Return an inode number between PROC_DYNAMIC_FIRST and
  * 0xffffffff, or zero on failure.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 int proc_alloc_inum(unsigned int *inum)
 {
 	unsigned int i;
@@ -289,7 +289,7 @@ static int proc_register(struct proc_dir_entry * dir, struct proc_dir_entry * dp
 {
 	struct proc_dir_entry *tmp;
 	int ret;
-	
+
 	ret = proc_alloc_inum(&dp->low_ino);
 	if (ret)
 		return ret;
@@ -452,7 +452,7 @@ out:
 	return NULL;
 }
 EXPORT_SYMBOL(proc_create_data);
- 
+
 void proc_set_size(struct proc_dir_entry *de, loff_t size)
 {
 	de->size = size;

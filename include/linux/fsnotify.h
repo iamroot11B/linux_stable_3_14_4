@@ -123,7 +123,7 @@ static inline void fsnotify_inode_delete(struct inode *inode)
 /*
  * fsnotify_vfsmount_delete - a vfsmount is being destroyed, clean up is needed
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline void fsnotify_vfsmount_delete(struct vfsmount *mnt)
 {
 	__fsnotify_vfsmount_delete(mnt);

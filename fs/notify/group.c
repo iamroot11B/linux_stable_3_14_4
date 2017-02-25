@@ -68,7 +68,7 @@ void fsnotify_destroy_group(struct fsnotify_group *group)
 /*
  * Get reference to a group.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void fsnotify_get_group(struct fsnotify_group *group)
 {
 	atomic_inc(&group->refcnt);

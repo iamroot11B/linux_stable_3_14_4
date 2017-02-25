@@ -161,7 +161,7 @@ void mnt_release_group_id(struct mount *mnt)
 /*
  * vfsmount lock must be held for read
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline void mnt_add_count(struct mount *mnt, int n)
 {
 #ifdef CONFIG_SMP
@@ -176,7 +176,7 @@ static inline void mnt_add_count(struct mount *mnt, int n)
 /*
  * vfsmount lock must be held for write
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 unsigned int mnt_get_count(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
@@ -950,7 +950,7 @@ static void delayed_free(struct rcu_head *head)
 	kmem_cache_free(mnt_cache, mnt);
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static void mntput_no_expire(struct mount *mnt)
 {
 put_again:
@@ -1003,7 +1003,7 @@ put_again:
 	call_rcu(&mnt->mnt_rcu, delayed_free);
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void mntput(struct vfsmount *mnt)
 {
 	if (mnt) {
@@ -1016,7 +1016,7 @@ void mntput(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(mntput);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 struct vfsmount *mntget(struct vfsmount *mnt)
 {
 	if (mnt)
@@ -2475,7 +2475,7 @@ static void free_mnt_ns(struct mnt_namespace *ns)
  */
 static atomic64_t mnt_ns_seq = ATOMIC64_INIT(1);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 /*! 새로운 mnt_namespace 를 만들어서 인자로 받은 user_ns 앞에 붙여준다. */
 static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns)
 {
@@ -2581,7 +2581,7 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  * create_mnt_ns - creates a private namespace and adds a root filesystem
  * @mnt: pointer to the new root filesystem mountpoint
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 /*! 마운팅된 vfs에namespace 추가 */
 static struct mnt_namespace *create_mnt_ns(struct vfsmount *m)
 {
@@ -2811,7 +2811,7 @@ out0:
 	return error;
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static void __init init_mount_tree(void)
 {
 	struct vfsmount *mnt;

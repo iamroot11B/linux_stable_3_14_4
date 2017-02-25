@@ -81,7 +81,7 @@ void atomic64_add(long long a, atomic64_t *v)
 }
 EXPORT_SYMBOL(atomic64_add);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 long long atomic64_add_return(long long a, atomic64_t *v)
 {
 	unsigned long flags;

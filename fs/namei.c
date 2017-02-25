@@ -48,8 +48,8 @@
  * The new code replaces the old recursive symlink resolution with
  * an iterative one (in case of non-nested symlink chains).  It does
  * this with calls to <fs>_follow_link().
- * As a side effect, dir_namei(), _namei() and follow_link() are now 
- * replaced with a single function lookup_dentry() that can handle all 
+ * As a side effect, dir_namei(), _namei() and follow_link() are now
+ * replaced with a single function lookup_dentry() that can handle all
  * the special cases of the former code.
  *
  * With the new dcache, the pathname is stored at each inode, at least as
@@ -462,7 +462,7 @@ int inode_permission(struct inode *inode, int mask)
  *
  * Given a path increment the reference count to the dentry and the vfsmount.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void path_get(const struct path *path)
 {
 	mntget(path->mnt);
@@ -476,7 +476,7 @@ EXPORT_SYMBOL(path_get);
  *
  * Given a path decrement the reference count to the dentry and the vfsmount.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 /*! 경로의 레퍼런스 카운터 1 감소 */
 void path_put(const struct path *path)
 {
@@ -526,7 +526,7 @@ static int unlazy_walk(struct nameidata *nd, struct dentry *dentry)
 	nd->flags &= ~LOOKUP_RCU;
 
 	if (!lockref_get_not_dead(&parent->d_lockref)) {
-		nd->path.dentry = NULL;	
+		nd->path.dentry = NULL;
 		goto out;
 	}
 
@@ -1732,7 +1732,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 {
 	struct path next;
 	int err;
-	
+
 	while (*name=='/')
 		name++;
 	if (!*name)
@@ -1800,7 +1800,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 				return err;
 		}
 		if (!d_is_directory(nd->path.dentry)) {
-			err = -ENOTDIR; 
+			err = -ENOTDIR;
 			break;
 		}
 	}
@@ -4131,7 +4131,7 @@ int vfs_rename(struct inode *old_dir, struct dentry *old_dentry,
 
 	if (old_dentry->d_inode == new_dentry->d_inode)
  		return 0;
- 
+
 	error = may_delete(old_dir, old_dentry, is_dir);
 	if (error)
 		return error;

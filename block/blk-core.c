@@ -2933,7 +2933,7 @@ EXPORT_SYMBOL(kblockd_schedule_delayed_work);
  *   plug. By flushing the pending I/O when the process goes to sleep, we avoid
  *   this kind of deadlock.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void blk_start_plug(struct blk_plug *plug)
 {
 	struct task_struct *tsk = current;

@@ -110,7 +110,7 @@ extern void add_wait_queue(wait_queue_head_t *q, wait_queue_t *wait);
 extern void add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t *wait);
 extern void remove_wait_queue(wait_queue_head_t *q, wait_queue_t *wait);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline void __add_wait_queue(wait_queue_head_t *head, wait_queue_t *new)
 {
 	list_add(&new->task_list, &head->task_list);
@@ -838,7 +838,7 @@ int wake_bit_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
 
 #define DEFINE_WAIT(name) DEFINE_WAIT_FUNC(name, autoremove_wake_function)
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 #define DEFINE_WAIT_BIT(name, word, bit)				\
 	struct wait_bit_queue name = {					\
 		.key = __WAIT_BIT_KEY_INITIALIZER(word, bit),		\

@@ -17,7 +17,7 @@
  * because the spin-lock and the decrement must be
  * "atomic".
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
 {
 	/* Subtract 1 from counter unless that drops it to 0 (ie. it was 1) */

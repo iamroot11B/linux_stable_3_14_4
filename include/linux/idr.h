@@ -1,6 +1,6 @@
 /*
  * include/linux/idr.h
- * 
+ *
  * 2002-10-18  written by Jim Houston jim.houston@ccur.com
  *	Copyright (C) 2002 by Concurrent Computer Corporation
  *	Distributed under the GNU GPL license version 2.
@@ -236,7 +236,7 @@ void ida_simple_remove(struct ida *ida, unsigned int id);
  *
  * Simple wrapper around ida_get_new_above() w/ @starting_id of zero.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline int ida_get_new(struct ida *ida, int *p_id)
 {
 	return ida_get_new_above(ida, 0, p_id);

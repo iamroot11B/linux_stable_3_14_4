@@ -330,7 +330,7 @@ static int write_inode(struct inode *inode, struct writeback_control *wbc)
  * Wait for writeback on an inode to complete. Called with i_lock held.
  * Caller must make sure inode cannot go away when we drop i_lock.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static void __inode_wait_for_writeback(struct inode *inode)
 	__releases(inode->i_lock)
 	__acquires(inode->i_lock)
@@ -444,7 +444,7 @@ static void requeue_inode(struct inode *inode, struct bdi_writeback *wb,
  * linkage. That is left to the caller. The caller is also responsible for
  * setting I_SYNC flag and calling inode_sync_complete() to clear it.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static int
 __writeback_single_inode(struct inode *inode, struct writeback_control *wbc)
 {
@@ -503,7 +503,7 @@ __writeback_single_inode(struct inode *inode, struct writeback_control *wbc)
  * we go e.g. from filesystem. Flusher thread uses __writeback_single_inode()
  * and does more profound writeback list handling in writeback_sb_inodes().
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static int
 writeback_single_inode(struct inode *inode, struct bdi_writeback *wb,
 		       struct writeback_control *wbc)
@@ -1406,7 +1406,7 @@ EXPORT_SYMBOL(sync_inodes_sb);
  *
  * The caller must either have a ref on the inode or must have set I_WILL_FREE.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 int write_inode_now(struct inode *inode, int sync)
 {
 	struct bdi_writeback *wb = &inode_to_bdi(inode)->wb;

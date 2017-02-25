@@ -96,7 +96,7 @@ static DEFINE_SPINLOCK(destroy_lock);
 static LIST_HEAD(destroy_list);
 static DECLARE_WAIT_QUEUE_HEAD(destroy_waitq);
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void fsnotify_get_mark(struct fsnotify_mark *mark)
 {
 	atomic_inc(&mark->refcnt);
@@ -116,7 +116,7 @@ void fsnotify_put_mark(struct fsnotify_mark *mark)
  * The caller had better be holding a reference to this mark so we don't actually
  * do the final put under the mark->lock
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void fsnotify_destroy_mark_locked(struct fsnotify_mark *mark,
 				  struct fsnotify_group *group)
 {
@@ -186,7 +186,7 @@ void fsnotify_destroy_mark_locked(struct fsnotify_mark *mark,
 	mutex_lock_nested(&group->mark_mutex, SINGLE_DEPTH_NESTING);
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void fsnotify_destroy_mark(struct fsnotify_mark *mark,
 			   struct fsnotify_group *group)
 {

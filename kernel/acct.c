@@ -163,7 +163,7 @@ out:
  *
  * NOTE: acct_lock MUST be held on entry and exit.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static void acct_file_reopen(struct bsd_acct_struct *acct, struct file *file,
 		struct pid_namespace *ns)
 {
@@ -291,7 +291,7 @@ SYSCALL_DEFINE1(acct, const char __user *, name)
  * If the accounting is turned on for a file in the subtree pointed to
  * to by m, turn accounting off.  Done when m is about to die.
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void acct_auto_close_mnt(struct vfsmount *m)
 {
 	struct bsd_acct_struct *acct;

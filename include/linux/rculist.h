@@ -153,7 +153,7 @@ static inline void list_del_rcu(struct list_head *entry)
  * perfectly legal to run concurrently with the _rcu list-traversal
  * primitives, such as hlist_for_each_entry_rcu().
  */
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static inline void hlist_del_init_rcu(struct hlist_node *n)
 {
 	if (!hlist_unhashed(n)) {

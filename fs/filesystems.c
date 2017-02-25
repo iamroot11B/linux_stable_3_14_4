@@ -38,7 +38,7 @@ void get_filesystem(struct file_system_type *fs)
 	__module_get(fs->owner);
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 void put_filesystem(struct file_system_type *fs)
 {
 	module_put(fs->owner);
@@ -260,7 +260,7 @@ static int __init proc_filesystems_init(void)
 module_init(proc_filesystems_init);
 #endif
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 static struct file_system_type *__get_fs_type(const char *name, int len)
 {
 	struct file_system_type *fs;
@@ -279,7 +279,7 @@ static struct file_system_type *__get_fs_type(const char *name, int len)
 	return fs;
 }
 
-/*! 2017. 2.04 study start */
+/*! 2017. 2.04 study -ing */
 struct file_system_type *get_fs_type(const char *name)
 {
 	struct file_system_type *fs;
@@ -289,7 +289,7 @@ struct file_system_type *get_fs_type(const char *name)
 	 * len은dot까지의 길이
 	 */
 	fs = __get_fs_type(name, len);
-	
+
 	/*!
 	 * request_module 은 우리는 무조건 에러 출력
 	 */
