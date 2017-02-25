@@ -260,7 +260,7 @@ static inline void mem_cgroup_commit_charge_swapin(struct page *page,
 static inline void mem_cgroup_cancel_charge_swapin(struct mem_cgroup *memcg)
 {
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void mem_cgroup_uncharge_start(void)
 {
 }

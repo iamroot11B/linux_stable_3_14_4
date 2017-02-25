@@ -27,7 +27,7 @@ unsigned pagevec_lookup(struct pagevec *pvec, struct address_space *mapping,
 unsigned pagevec_lookup_tag(struct pagevec *pvec,
 		struct address_space *mapping, pgoff_t *index, int tag,
 		unsigned nr_pages);
-
+/*! 2017. 2.25 study -ing */
 static inline void pagevec_init(struct pagevec *pvec, int cold)
 {
 	pvec->nr = 0;

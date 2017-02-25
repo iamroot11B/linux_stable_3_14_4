@@ -204,6 +204,7 @@ static int cleancache_get_key(struct inode *inode,
 /*
  * Returns a pool_id that is associated with a given fake poolid.
  */
+/*! 2017. 2.25 study -ing */
 static int get_poolid_from_fake(int fake_pool_id)
 {
 	if (fake_pool_id >= FAKE_SHARED_FS_POOLID_OFFSET)
@@ -337,6 +338,7 @@ EXPORT_SYMBOL(__cleancache_invalidate_page);
  * a backend is registered and whether the sb->cleancache_poolid
  * is correct.
  */
+/*! 2017. 2.25 study -ing */
 void __cleancache_invalidate_inode(struct address_space *mapping)
 {
 	int pool_id;

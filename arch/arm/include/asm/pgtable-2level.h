@@ -78,7 +78,7 @@
 
 /*!
  *  PTE_HWTABLE_OFF  = 512 EA * 4 Byte = 2048 (2KB)
- *  PTE_HWTABLE_SIZE = 512 EA * 4 Byte = 2048 (2KB)	
+ *  PTE_HWTABLE_SIZE = 512 EA * 4 Byte = 2048 (2KB)
  */
 
 /*
@@ -92,7 +92,7 @@
  * 1 << 20 == 1M
  * 1 << 21 == 2M
  */
-#define PMD_SIZE		(1UL << PMD_SHIFT)  
+#define PMD_SIZE		(1UL << PMD_SHIFT)
 #define PMD_MASK		(~(PMD_SIZE-1))
 #define PGDIR_SIZE		(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK		(~(PGDIR_SIZE-1))
@@ -162,6 +162,7 @@
  */
 /*! 2016-04-02 study -ing */
 #define pud_none(pud)		(0)
+/*! 2017. 2.25 study -ing */
 #define pud_bad(pud)		(0)
 #define pud_present(pud)	(1)
 #define pud_clear(pudp)		do { } while (0)
@@ -181,7 +182,7 @@ static inline pmd_t *pmd_offset(pud_t *pud, unsigned long addr)
 		pmdpd[1] = pmdps[1];	\
 		flush_pmd_entry(pmdpd);	\
 	} while (0)
-
+/*! 2017. 2.25 study -ing */
 #define pmd_clear(pmdp)			\
 	do {				\
 		pmdp[0] = __pmd(0);	\

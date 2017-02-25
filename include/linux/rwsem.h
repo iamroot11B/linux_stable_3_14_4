@@ -40,6 +40,7 @@ extern struct rw_semaphore *rwsem_downgrade_wake(struct rw_semaphore *sem);
 #include <asm/rwsem.h>
 
 /* In all implementations count != 0 means locked */
+/*! 2017. 2.25 study -ing */
 static inline int rwsem_is_locked(struct rw_semaphore *sem)
 {
 	return sem->count != 0;

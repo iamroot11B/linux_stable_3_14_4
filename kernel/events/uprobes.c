@@ -127,6 +127,7 @@ struct xol_area {
  *	- Return 1 if the specified virtual address is in an
  *	  executable vma.
  */
+/*! 2017. 2.25 study -ing */
 static bool valid_vma(struct vm_area_struct *vma, bool is_register)
 {
 	vm_flags_t flags = VM_HUGETLB | VM_MAYEXEC | VM_SHARED;

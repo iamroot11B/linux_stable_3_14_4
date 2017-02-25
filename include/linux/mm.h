@@ -1058,6 +1058,7 @@ static inline pgoff_t page_file_index(struct page *page)
 /*
  * Return true if this page is mapped into pagetables.
  */
+/*! 2017. 2.25 study -ing */
 static inline int page_mapped(struct page *page)
 {
 	return atomic_read(&(page)->_mapcount) >= 0;
@@ -1304,6 +1305,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
 /*
  * per-process(per-mm_struct) statistics.
  */
+/*! 2017. 2.25 study -ing */
 static inline unsigned long get_mm_counter(struct mm_struct *mm, int member)
 {
 	long val = atomic_long_read(&mm->rss_stat.count[member]);
@@ -1333,7 +1335,7 @@ static inline void dec_mm_counter(struct mm_struct *mm, int member)
 {
 	atomic_long_dec(&mm->rss_stat.count[member]);
 }
-
+/*! 2017. 2.25 study -ing */
 static inline unsigned long get_mm_rss(struct mm_struct *mm)
 {
 	return get_mm_counter(mm, MM_FILEPAGES) +
@@ -1349,7 +1351,7 @@ static inline unsigned long get_mm_hiwater_vm(struct mm_struct *mm)
 {
 	return max(mm->hiwater_vm, mm->total_vm);
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void update_hiwater_rss(struct mm_struct *mm)
 {
 	unsigned long _rss = get_mm_rss(mm);
@@ -1505,6 +1507,7 @@ static inline void pte_lock_deinit(struct page *page)
 /*
  * We use mm->page_table_lock to guard all pagetable pages of the mm.
  */
+/*! 2017. 2.25 study -ing */
 static inline spinlock_t *pte_lockptr(struct mm_struct *mm, pmd_t *pmd)
 {
 	return &mm->page_table_lock;
@@ -1778,7 +1781,12 @@ struct vm_area_struct *vma_interval_tree_iter_first(struct rb_root *root,
 				unsigned long start, unsigned long last);
 struct vm_area_struct *vma_interval_tree_iter_next(struct vm_area_struct *node,
 				unsigned long start, unsigned long last);
-
+/*! 2017. 2.25 study -ing */
+/*! vma_interval_tree_iter_first
+ *   -> interval_tree_generic.h 의 142 line
+ *  vma_interval_tree_iter_next
+ *   -> interval_tree_generic.h 의 155 line
+ */
 #define vma_interval_tree_foreach(vma, root, start, last)		\
 	for (vma = vma_interval_tree_iter_first(root, start, last);	\
 	     vma; vma = vma_interval_tree_iter_next(vma, start, last))

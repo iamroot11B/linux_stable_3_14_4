@@ -338,11 +338,11 @@ do {									\
 #ifndef this_cpu_sub
 # define this_cpu_sub(pcp, val)		this_cpu_add((pcp), -(typeof(pcp))(val))
 #endif
-
+/*! 2017. 2.25 study -ing */
 #ifndef this_cpu_inc
 # define this_cpu_inc(pcp)		this_cpu_add((pcp), 1)
 #endif
-
+/*! 2017. 2.25 study -ing */
 #ifndef this_cpu_dec
 # define this_cpu_dec(pcp)		this_cpu_sub((pcp), 1)
 #endif
@@ -552,7 +552,7 @@ do {									\
  *  ({ unsigned long __ptr;					\
  *     __ptr = (unsigned long) (ptr);				\
  *    (typeof(ptr)) (__ptr + (off)); })
- ****************************************************** 
+ ******************************************************
  * - this_cpu_read(pcp) = *(&pcp + __my_cpu_offset)
  */
 # define __this_cpu_read(pcp)	__pcpu_size_call_return(__this_cpu_read_, (pcp))
@@ -590,7 +590,7 @@ do {									\
  *  ({ unsigned long __ptr;					\
  *     __ptr = (unsigned long) (ptr);				\
  *    (typeof(ptr)) (__ptr + (off)); })
- ****************************************************** 
+ ******************************************************
  * *(&pcp + _my_cpu_offset) = val
  */
 # define __this_cpu_write(pcp, val)	__pcpu_size_call(__this_cpu_write_, (pcp), (val))

@@ -130,7 +130,7 @@ invalidate_complete_page(struct address_space *mapping, struct page *page)
 
 	return ret;
 }
-
+/*! 2017. 2.25 study -ing */
 int truncate_inode_page(struct address_space *mapping, struct page *page)
 {
 	if (page_mapped(page)) {
@@ -200,6 +200,7 @@ int invalidate_inode_page(struct page *page)
  * truncate_inode_pages_range is able to handle cases where lend + 1 is not
  * page aligned properly.
  */
+
 void truncate_inode_pages_range(struct address_space *mapping,
 				loff_t lstart, loff_t lend)
 {
@@ -240,6 +241,7 @@ void truncate_inode_pages_range(struct address_space *mapping,
 	index = start;
 	while (index < end && pagevec_lookup(&pvec, mapping, index,
 			min(end - index, (pgoff_t)PAGEVEC_SIZE))) {
+		/*! Do Nothing */
 		mem_cgroup_uncharge_start();
 		for (i = 0; i < pagevec_count(&pvec); i++) {
 			struct page *page = pvec.pages[i];
@@ -353,6 +355,7 @@ EXPORT_SYMBOL(truncate_inode_pages_range);
  * mapping->nrpages can be non-zero when this function returns even after
  * truncation of the whole mapping.
  */
+/*! 2017. 2.25 study -ing */
 void truncate_inode_pages(struct address_space *mapping, loff_t lstart)
 {
 	truncate_inode_pages_range(mapping, lstart, (loff_t)-1);

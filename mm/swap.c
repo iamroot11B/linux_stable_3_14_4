@@ -985,9 +985,11 @@ EXPORT_SYMBOL(__pagevec_lru_add);
  *
  * pagevec_lookup() returns the number of pages which were found.
  */
+/*! 2017. 2.25 study -ing */
 unsigned pagevec_lookup(struct pagevec *pvec, struct address_space *mapping,
 		pgoff_t start, unsigned nr_pages)
 {
+	/*! pvec->nr 이게 리턴된다.  */
 	pvec->nr = find_get_pages(mapping, start, nr_pages, pvec->pages);
 	return pagevec_count(pvec);
 }

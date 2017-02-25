@@ -44,7 +44,7 @@
  *
  * int first_node(mask)			Number lowest set bit, or MAX_NUMNODES
  * int next_node(node, mask)		Next node past 'node', or MAX_NUMNODES
- * int first_unset_node(mask)		First node not set in mask, or 
+ * int first_unset_node(mask)		First node not set in mask, or
  *					MAX_NUMNODES.
  *
  * nodemask_t nodemask_of_node(node)	Return nodemask with bit 'node' set
@@ -107,12 +107,13 @@ extern nodemask_t _unused_nodemask_arg_;
  * to fix the problem.  If other functions in the future also end up in
  * this situation they will also need to be annotated as __always_inline
  */
+/*! 2017. 2.25 study -ing */
 #define node_set(node, dst) __node_set((node), &(dst))
 static __always_inline void __node_set(int node, volatile nodemask_t *dstp)
 {
 	set_bit(node, dstp->bits);
 }
-
+/*! 2017. 2.25 study -ing */
 #define node_clear(node, dst) __node_clear((node), &(dst))
 static inline void __node_clear(int node, volatile nodemask_t *dstp)
 {

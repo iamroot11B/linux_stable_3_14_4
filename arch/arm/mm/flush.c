@@ -63,7 +63,7 @@ void flush_cache_mm(struct mm_struct *mm)
 		    : "cc");
 	}
 }
-
+/*! 2017. 2.25 study -ing */
 void flush_cache_range(struct vm_area_struct *vma, unsigned long start, unsigned long end)
 {
 	if (cache_is_vivt()) {
@@ -163,7 +163,7 @@ void copy_to_user_page(struct vm_area_struct *vma, struct page *page,
 
 /*!
  * __flush_dcache_page()
- * -  
+ * -
  *
  */
 void __flush_dcache_page(struct address_space *mapping, struct page *page)
@@ -178,7 +178,7 @@ void __flush_dcache_page(struct address_space *mapping, struct page *page)
 	if (!PageHighMem(page)) {
 		size_t page_size = PAGE_SIZE << compound_order(page);
 		__cpuc_flush_dcache_area(page_address(page), page_size);
-	} 
+	}
 	/*! highmem일 경우 */
 	else {
 		unsigned long i;

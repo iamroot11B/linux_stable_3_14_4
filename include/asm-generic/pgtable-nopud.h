@@ -24,6 +24,7 @@ typedef struct { pgd_t pgd; } pud_t;
  */
 /*! 2016.10.22 study -ing */
 static inline int pgd_none(pgd_t pgd)		{ return 0; }
+/*! 2017. 2.25 study -ing */
 static inline int pgd_bad(pgd_t pgd)		{ return 0; }
 static inline int pgd_present(pgd_t pgd)	{ return 1; }
 static inline void pgd_clear(pgd_t *pgd)	{ }

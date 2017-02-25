@@ -51,12 +51,12 @@ static __always_inline bool test_preempt_need_resched(void)
 /*
  * The various preempt_count add/sub methods
  */
-
+/*! 2017. 2.25 study -ing */
 static __always_inline void __preempt_count_add(int val)
 {
 	*preempt_count_ptr() += val;
 }
-
+/*! 2017. 2.25 study -ing */
 static __always_inline void __preempt_count_sub(int val)
 {
 	*preempt_count_ptr() -= val;
@@ -75,6 +75,7 @@ static __always_inline bool __preempt_count_dec_and_test(void)
 /*
  * Returns true when we need to resched and can (barring IRQ state).
  */
+/*! 2017. 2.25 study -ing */
 static __always_inline bool should_resched(void)
 {
 	return unlikely(!preempt_count() && tif_need_resched());

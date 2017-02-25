@@ -180,6 +180,7 @@ static inline int split_huge_page(struct page *page)
 {
 	return 0;
 }
+/*! 2017. 2.25 study -ing */
 #define split_huge_page_pmd(__vma, __address, __pmd)	\
 	do { } while (0)
 #define wait_split_huge_page(__anon_vma, __pmd)	\

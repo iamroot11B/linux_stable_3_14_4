@@ -422,6 +422,7 @@ radix_tree_next_slot(void **slot, struct radix_tree_iter *iter, unsigned flags)
  *
  * @slot points to radix tree slot, @iter->index contains its index.
  */
+/*! 2017. 2.25 study -ing */
 #define radix_tree_for_each_slot(slot, root, iter, start)		\
 	for (slot = radix_tree_iter_init(iter, start) ;			\
 	     slot || (slot = radix_tree_next_chunk(root, iter, 0)) ;	\

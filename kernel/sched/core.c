@@ -2765,7 +2765,7 @@ asmlinkage void __sched schedule(void)
 {
 	struct task_struct *tsk = current;
 
-	sched_submit_work(tsk);	
+	sched_submit_work(tsk);
 	__schedule();
 }
 EXPORT_SYMBOL(schedule);
@@ -4085,14 +4085,14 @@ SYSCALL_DEFINE0(sched_yield)
 
 	return 0;
 }
-
+/*! 2017. 2.25 study -ing */
 static void __cond_resched(void)
 {
 	__preempt_count_add(PREEMPT_ACTIVE);
 	__schedule();
 	__preempt_count_sub(PREEMPT_ACTIVE);
 }
-
+/*! 2017. 2.25 study -ing */
 int __sched _cond_resched(void)
 {
 	if (should_resched()) {

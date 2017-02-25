@@ -9,7 +9,7 @@
 #include <linux/mm.h>
 #include <linux/list_lru.h>
 #include <linux/slab.h>
-
+/*! 2017. 2.25 study -ing */
 bool list_lru_add(struct list_lru *lru, struct list_head *item)
 {
 	int nid = page_to_nid(virt_to_page(item));
@@ -28,7 +28,7 @@ bool list_lru_add(struct list_lru *lru, struct list_head *item)
 	return false;
 }
 EXPORT_SYMBOL_GPL(list_lru_add);
-
+/*! 2017. 2.25 study -ing */
 bool list_lru_del(struct list_lru *lru, struct list_head *item)
 {
 	int nid = page_to_nid(virt_to_page(item));

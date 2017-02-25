@@ -147,6 +147,7 @@ static inline int uprobe_mmap(struct vm_area_struct *vma)
 {
 	return 0;
 }
+/*! 2017. 2.25 study -ing */
 static inline void
 uprobe_munmap(struct vm_area_struct *vma, unsigned long start, unsigned long end)
 {

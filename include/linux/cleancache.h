@@ -56,6 +56,7 @@ static inline bool cleancache_fs_enabled_mapping(struct address_space *mapping)
 #else
 #define cleancache_enabled (0)
 #define cleancache_fs_enabled(_page) (0)
+/*! 2017. 2.25 study -ing */
 #define cleancache_fs_enabled_mapping(_page) (0)
 #endif
 
@@ -106,9 +107,12 @@ static inline void cleancache_invalidate_page(struct address_space *mapping,
 	if (cleancache_enabled && cleancache_fs_enabled_mapping(mapping))
 		__cleancache_invalidate_page(mapping, page);
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void cleancache_invalidate_inode(struct address_space *mapping)
 {
+	/*!
+	 * cleancache_fs_enabled_mapping -> CONFIG_CLEANCACHE not defined. 그냥 0 리턴
+	 */
 	if (cleancache_enabled && cleancache_fs_enabled_mapping(mapping))
 		__cleancache_invalidate_inode(mapping);
 }

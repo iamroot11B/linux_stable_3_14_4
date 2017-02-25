@@ -239,7 +239,7 @@ static inline int pmd_same(pmd_t pmd_a, pmd_t pmd_b)
  * or the end address of the range if that comes earlier.  Although no
  * vma end wraps to 0, rounded up __boundary may wrap to 0 throughout.
  */
-
+/*! 2017. 2.25 study -ing */
 #define pgd_addr_end(addr, end)						\
 ({	unsigned long __boundary = ((addr) + PGDIR_SIZE) & PGDIR_MASK;	\
 	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
@@ -251,7 +251,7 @@ static inline int pmd_same(pmd_t pmd_a, pmd_t pmd_b)
 	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
 })
 #endif
-
+/*! 2017. 2.25 study -ing */
 #ifndef pmd_addr_end
 #define pmd_addr_end(addr, end)						\
 ({	unsigned long __boundary = ((addr) + PMD_SIZE) & PMD_MASK;	\
@@ -267,22 +267,26 @@ static inline int pmd_same(pmd_t pmd_a, pmd_t pmd_b)
 void pgd_clear_bad(pgd_t *);
 void pud_clear_bad(pud_t *);
 void pmd_clear_bad(pmd_t *);
-
+/*! 2017. 2.25 study -ing */
 static inline int pgd_none_or_clear_bad(pgd_t *pgd)
 {
+	/*! pgd_none : 리턴 0  */
 	if (pgd_none(*pgd))
 		return 1;
+	/*! pgd_bad : 리턴 0  */
 	if (unlikely(pgd_bad(*pgd))) {
 		pgd_clear_bad(pgd);
 		return 1;
 	}
 	return 0;
 }
-
+/*! 2017. 2.25 study -ing */
 static inline int pud_none_or_clear_bad(pud_t *pud)
 {
+	/*! pud_none : 리턴 0  */
 	if (pud_none(*pud))
 		return 1;
+	/*! pud_bad : 리턴 0  */
 	if (unlikely(pud_bad(*pud))) {
 		pud_clear_bad(pud);
 		return 1;
@@ -489,6 +493,7 @@ static inline int track_pfn_copy(struct vm_area_struct *vma)
  * untrack can be called for a specific region indicated by pfn and size or
  * can be for the entire vma (in which case pfn, size are zero).
  */
+/*! 2017. 2.25 study -ing */
 static inline void untrack_pfn(struct vm_area_struct *vma,
 			       unsigned long pfn, unsigned long size)
 {
@@ -531,6 +536,7 @@ static inline unsigned long my_zero_pfn(unsigned long addr)
 #ifdef CONFIG_MMU
 
 #ifndef CONFIG_TRANSPARENT_HUGEPAGE
+/*! 2017. 2.25 study -ing */
 static inline int pmd_trans_huge(pmd_t pmd)
 {
 	return 0;
@@ -549,6 +555,7 @@ static inline int pmd_write(pmd_t pmd)
 #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
 
 #ifndef pmd_read_atomic
+/*! 2017. 2.25 study -ing */
 static inline pmd_t pmd_read_atomic(pmd_t *pmdp)
 {
 	/*
@@ -593,6 +600,7 @@ static inline int pmd_move_must_withdraw(spinlock_t *new_pmd_ptl,
  * version above, is also needed when THP is disabled because the page
  * fault can populate the pmd from under us).
  */
+/*! 2017. 2.25 study -ing */
 static inline int pmd_none_or_trans_huge_or_clear_bad(pmd_t *pmd)
 {
 	pmd_t pmdval = pmd_read_atomic(pmd);
@@ -613,6 +621,10 @@ static inline int pmd_none_or_trans_huge_or_clear_bad(pmd_t *pmd)
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 	barrier();
 #endif
+	/*!
+	 *  pmd_none : !(pmdval.pmd),
+	 *  pmd_trans_huge : 0
+	 */
 	if (pmd_none(pmdval) || pmd_trans_huge(pmdval))
 		return 1;
 	if (unlikely(pmd_bad(pmdval))) {

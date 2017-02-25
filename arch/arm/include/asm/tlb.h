@@ -87,7 +87,7 @@ static inline void tlb_add_flush(struct mmu_gather *tlb, unsigned long addr)
 			tlb->range_end = addr + PAGE_SIZE;
 	}
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void __tlb_alloc_page(struct mmu_gather *tlb)
 {
 	unsigned long addr = __get_free_pages(GFP_NOWAIT | __GFP_NOWARN, 0);
@@ -106,7 +106,7 @@ static inline void tlb_flush_mmu(struct mmu_gather *tlb)
 	if (tlb->pages == tlb->local)
 		__tlb_alloc_page(tlb);
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void
 tlb_gather_mmu(struct mmu_gather *tlb, struct mm_struct *mm, unsigned long start, unsigned long end)
 {
@@ -147,10 +147,12 @@ tlb_remove_tlb_entry(struct mmu_gather *tlb, pte_t *ptep, unsigned long addr)
  * case where we're doing a full MM flush.  When we're doing a munmap,
  * the vmas are adjusted to only cover the region to be torn down.
  */
+/*! 2017. 2.25 study -ing */
 static inline void
 tlb_start_vma(struct mmu_gather *tlb, struct vm_area_struct *vma)
 {
 	if (!tlb->fullmm) {
+		/*! flush cache 후 tlb 업데이트  */
 		flush_cache_range(vma, vma->vm_start, vma->vm_end);
 		tlb->vma = vma;
 		tlb->range_start = TASK_SIZE;

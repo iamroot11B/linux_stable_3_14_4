@@ -36,7 +36,7 @@
  * Note - before using this, please consider if non-generic version
  * (interval_tree.h) would work for you...
  */
-
+/*! 2017. 2.25 study -ing */
 #define INTERVAL_TREE_DEFINE(ITSTRUCT, ITRB, ITTYPE, ITSUBTREE,		      \
 			     ITSTART, ITLAST, ITSTATIC, ITPREFIX)	      \
 									      \

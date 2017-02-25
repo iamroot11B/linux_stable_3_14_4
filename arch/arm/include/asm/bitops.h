@@ -35,6 +35,7 @@
  *
  * First, the atomic bitops. These use native endian.
  */
+/*! 2017. 2.25 study -ing */
 static inline void ____atomic_set_bit(unsigned int bit, volatile unsigned long *p)
 {
 	unsigned long flags;
@@ -91,7 +92,7 @@ ____atomic_test_and_set_bit(unsigned int bit, volatile unsigned long *p)
 
 	return (res & mask) != 0;
 }
-
+/*! 2017. 2.25 study -ing */
 static inline int
 ____atomic_test_and_clear_bit(unsigned int bit, volatile unsigned long *p)
 {
@@ -202,11 +203,14 @@ extern int _find_next_bit_be(const unsigned long *p, int size, int offset);
  * Native endian atomic definitions.
  */
 /*! 2016.11.05 study -ing  */
+/*! ____atomic_set_bit  */
 #define set_bit(nr,p)			ATOMIC_BITOP(set_bit,nr,p)
 #define clear_bit(nr,p)			ATOMIC_BITOP(clear_bit,nr,p)
 #define change_bit(nr,p)		ATOMIC_BITOP(change_bit,nr,p)
 /*! 2015.01.30 study -ing */
 #define test_and_set_bit(nr,p)		ATOMIC_BITOP(test_and_set_bit,nr,p)
+/*! 2017. 2.25 study -ing */
+/*! ____atomic_test_and_clear_bit  */
 #define test_and_clear_bit(nr,p)	ATOMIC_BITOP(test_and_clear_bit,nr,p)
 #define test_and_change_bit(nr,p)	ATOMIC_BITOP(test_and_change_bit,nr,p)
 

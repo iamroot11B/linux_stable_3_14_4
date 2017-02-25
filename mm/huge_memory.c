@@ -1414,7 +1414,7 @@ out:
 
 	return 0;
 }
-
+/*! 2017. 2.25 study -ing */
 int zap_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 		 pmd_t *pmd, unsigned long addr)
 {

@@ -88,7 +88,7 @@ void kill_bdev(struct block_device *bdev)
 
 	invalidate_bh_lrus();
 	truncate_inode_pages(mapping, 0);
-}	
+}
 EXPORT_SYMBOL(kill_bdev);
 
 /* Invalidate clean unused buffers and pagecache. */
@@ -339,13 +339,13 @@ static loff_t block_llseek(struct file *file, loff_t offset, int whence)
 	mutex_unlock(&bd_inode->i_mutex);
 	return retval;
 }
-	
+
 int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
 {
 	struct inode *bd_inode = filp->f_mapping->host;
 	struct block_device *bdev = I_BDEV(bd_inode);
 	int error;
-	
+
 	error = filemap_write_and_wait_range(filp->f_mapping, start, end);
 	if (error)
 		return error;
@@ -558,7 +558,7 @@ void bdput(struct block_device *bdev)
 }
 
 EXPORT_SYMBOL(bdput);
- 
+
 static struct block_device *bd_acquire(struct inode *inode)
 {
 	struct block_device *bdev;
@@ -591,7 +591,7 @@ static struct block_device *bd_acquire(struct inode *inode)
 	}
 	return bdev;
 }
-
+/*! 2017. 2.25 study -ing */
 int sb_is_blkdev_sb(struct super_block *sb)
 {
 	return sb == blockdev_superblock;

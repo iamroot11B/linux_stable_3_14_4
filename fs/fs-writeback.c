@@ -65,7 +65,7 @@ int writeback_in_progress(struct backing_dev_info *bdi)
 	return test_bit(BDI_writeback_running, &bdi->state);
 }
 EXPORT_SYMBOL(writeback_in_progress);
-
+/*! 2017. 2.25 study -ing */
 static inline struct backing_dev_info *inode_to_bdi(struct inode *inode)
 {
 	struct super_block *sb = inode->i_sb;
@@ -180,6 +180,7 @@ void bdi_start_background_writeback(struct backing_dev_info *bdi)
 /*
  * Remove the inode from the writeback list it is on.
  */
+/*! 2017. 2.25 study -ing */
 void inode_wb_list_del(struct inode *inode)
 {
 	struct backing_dev_info *bdi = inode_to_bdi(inode);
@@ -219,7 +220,7 @@ static void requeue_io(struct inode *inode, struct bdi_writeback *wb)
 	assert_spin_locked(&wb->list_lock);
 	list_move(&inode->i_wb_list, &wb->b_more_io);
 }
-
+/*! 2017. 2.25 study -ing */
 static void inode_sync_complete(struct inode *inode)
 {
 	inode->i_state &= ~I_SYNC;
@@ -312,13 +313,14 @@ static void queue_io(struct bdi_writeback *wb, struct wb_writeback_work *work)
 	moved = move_expired_inodes(&wb->b_dirty, &wb->b_io, work);
 	trace_writeback_queue_io(wb, work, moved);
 }
-
+/*! 2017. 2.25 study -ing */
 static int write_inode(struct inode *inode, struct writeback_control *wbc)
 {
 	int ret;
 
 	if (inode->i_sb->s_op->write_inode && !is_bad_inode(inode)) {
 		trace_writeback_write_inode_start(inode, wbc);
+		/*! super_operations 멤버인 write_inode 함수가 포인터를 가지면 수행.  */
 		ret = inode->i_sb->s_op->write_inode(inode, wbc);
 		trace_writeback_write_inode(inode, wbc);
 		return ret;
@@ -349,6 +351,7 @@ static void __inode_wait_for_writeback(struct inode *inode)
 /*
  * Wait for writeback on an inode to complete. Caller must have inode pinned.
  */
+/*! 2017. 2.25 study -ing */
 void inode_wait_for_writeback(struct inode *inode)
 {
 	spin_lock(&inode->i_lock);
@@ -455,11 +458,12 @@ __writeback_single_inode(struct inode *inode, struct writeback_control *wbc)
 
 	WARN_ON(!(inode->i_state & I_SYNC));
 
-	/*! do Nothing */
+	/*! Do Nothing */
 	trace_writeback_single_inode_start(inode, wbc, nr_to_write);
 
 	ret = do_writepages(mapping, wbc);
 	/*! 2017. 2.11 study end */
+	/*! 2017. 2.25 study start */
 	/*
 	 * Make sure to wait on the data before writing out the metadata.
 	 * This is important for filesystems that modify metadata on data
@@ -482,7 +486,9 @@ __writeback_single_inode(struct inode *inode, struct writeback_control *wbc)
 	/* Clear I_DIRTY_PAGES if we've written out all dirty pages */
 	if (!mapping_tagged(mapping, PAGECACHE_TAG_DIRTY))
 		inode->i_state &= ~I_DIRTY_PAGES;
+	/*! i_state 의 I_DIRTY 비트를 확인  */
 	dirty = inode->i_state & I_DIRTY;
+	/*! I_DIRTY_SYNC, I_DIRTY_DATASYNC 비트 클리어  */
 	inode->i_state &= ~(I_DIRTY_SYNC | I_DIRTY_DATASYNC);
 	spin_unlock(&inode->i_lock);
 	/* Don't write the inode if only I_DIRTY_PAGES was set */

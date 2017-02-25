@@ -27,7 +27,7 @@ void pud_clear_bad(pud_t *pud)
 	pud_ERROR(*pud);
 	pud_clear(pud);
 }
-
+/*! 2017. 2.25 study -ing */
 void pmd_clear_bad(pmd_t *pmd)
 {
 	pmd_ERROR(*pmd);
@@ -36,7 +36,7 @@ void pmd_clear_bad(pmd_t *pmd)
 
 #ifndef __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
 /*
- * Only sets the access flags (dirty, accessed), as well as write 
+ * Only sets the access flags (dirty, accessed), as well as write
  * permission. Furthermore, we know it always gets set to a "more
  * permissive" setting, which allows most architectures to optimize
  * this. We return whether the PTE actually changed, which in turn

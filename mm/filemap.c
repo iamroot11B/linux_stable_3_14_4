@@ -187,7 +187,7 @@ static int sleep_on_page_killable(void *word)
 	sleep_on_page(word);
 	return fatal_signal_pending(current) ? -EINTR : 0;
 }
-
+/*! 2017. 2.25 study -ing */
 static int filemap_check_errors(struct address_space *mapping)
 {
 	int ret = 0;
@@ -273,6 +273,7 @@ EXPORT_SYMBOL(filemap_flush);
  * Walk the list of under-writeback pages of the given address space
  * in the given range and wait for all of them.
  */
+/*! 2017. 2.25 study -ing */
 int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
 			    loff_t end_byte)
 {
@@ -322,6 +323,7 @@ EXPORT_SYMBOL(filemap_fdatawait_range);
  * Walk the list of under-writeback pages of the given address space
  * and wait for all of them.
  */
+/*! 2017. 2.25 study -ing */
 int filemap_fdatawait(struct address_space *mapping)
 {
 	loff_t i_size = i_size_read(mapping->host);
@@ -836,6 +838,7 @@ EXPORT_SYMBOL(find_or_create_page);
  *
  * find_get_pages() returns the number of pages which were found.
  */
+/*! 2017. 2.25 study -ing */
 unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
 			    unsigned int nr_pages, struct page **pages)
 {
@@ -851,10 +854,15 @@ restart:
 	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, start) {
 		struct page *page;
 repeat:
+		/*! slot을 역참조해서 page를 찾아온다.  */
 		page = radix_tree_deref_slot(slot);
 		if (unlikely(!page))
 			continue;
 
+		/*! radix_tree_exception 이고,
+		 *  1) RADIX_TREE_INDIRECT_PTR 이면 restart,
+		 *  2) RADIX_TREE_INDIRECT_PTR 아니면 continue
+		 */
 		if (radix_tree_exception(page)) {
 			if (radix_tree_deref_retry(page)) {
 				/*

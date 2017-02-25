@@ -149,7 +149,7 @@ static inline unsigned long hugetlb_change_protection(struct vm_area_struct *vma
 {
 	return 0;
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void __unmap_hugepage_range_final(struct mmu_gather *tlb,
 			struct vm_area_struct *vma, unsigned long start,
 			unsigned long end, struct page *ref_page)

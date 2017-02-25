@@ -399,7 +399,7 @@ void ihold(struct inode *inode)
 	WARN_ON(atomic_inc_return(&inode->i_count) < 2);
 }
 EXPORT_SYMBOL(ihold);
-
+/*! 2017. 2.25 study -ing */
 static void inode_lru_list_add(struct inode *inode)
 {
 	if (list_lru_add(&inode->i_sb->s_inode_lru, &inode->i_lru))
@@ -411,6 +411,7 @@ static void inode_lru_list_add(struct inode *inode)
  *
  * Needs inode->i_lock held.
  */
+/*! 2017. 2.25 study -ing */
 void inode_add_lru(struct inode *inode)
 {
 	if (!(inode->i_state & (I_DIRTY | I_SYNC | I_FREEING | I_WILL_FREE)) &&
@@ -418,7 +419,7 @@ void inode_add_lru(struct inode *inode)
 		inode_lru_list_add(inode);
 }
 
-
+/*! 2017. 2.25 study -ing */
 static void inode_lru_list_del(struct inode *inode)
 {
 
@@ -437,7 +438,7 @@ void inode_sb_list_add(struct inode *inode)
 	spin_unlock(&inode_sb_list_lock);
 }
 EXPORT_SYMBOL_GPL(inode_sb_list_add);
-
+/*! 2017. 2.25 study -ing */
 static inline void inode_sb_list_del(struct inode *inode)
 {
 	if (!list_empty(&inode->i_sb_list)) {
@@ -525,6 +526,7 @@ EXPORT_SYMBOL(clear_inode);
  * the cache. This should occur atomically with setting the I_FREEING state
  * flag, so no inodes here should ever be on the LRU when being evicted.
  */
+/*! 2017. 2.25 study -ing */
 static void evict(struct inode *inode)
 {
 	const struct super_operations *op = inode->i_sb->s_op;
@@ -1404,14 +1406,17 @@ static void iput_final(struct inode *inode)
 	}
 
 	if (!drop) {
+		/*! state에 I_WILL_FREE bit set 후 write_inode_now 수행 */
 		inode->i_state |= I_WILL_FREE;
 		spin_unlock(&inode->i_lock);
 		write_inode_now(inode, 1);
 		spin_lock(&inode->i_lock);
 		WARN_ON(inode->i_state & I_NEW);
+		/*! write_inode_now 수행 후 I_WILL_FREE bit clear  */
 		inode->i_state &= ~I_WILL_FREE;
 	}
 
+	/*! I_FREEING bit set  */
 	inode->i_state |= I_FREEING;
 	if (!list_empty(&inode->i_lru))
 		inode_lru_list_del(inode);

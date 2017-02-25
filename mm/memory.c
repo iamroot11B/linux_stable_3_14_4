@@ -1210,7 +1210,7 @@ again:
 
 	return addr;
 }
-
+/*! 2017. 2.25 study -ing */
 static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 				struct vm_area_struct *vma, pud_t *pud,
 				unsigned long addr, unsigned long end,
@@ -1222,8 +1222,10 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 	pmd = pmd_offset(pud, addr);
 	do {
 		next = pmd_addr_end(addr, end);
+		/*! pmd_trans_huge : 리턴 0 */
 		if (pmd_trans_huge(*pmd)) {
 			if (next - addr != HPAGE_PMD_SIZE) {
+				/*! CONFIG_DEBUG_VM : Not defined  */
 #ifdef CONFIG_DEBUG_VM
 				if (!rwsem_is_locked(&tlb->mm->mmap_sem)) {
 					pr_err("%s: mmap_sem is unlocked! addr=0x%lx end=0x%lx vma->vm_start=0x%lx vma->vm_end=0x%lx\n",
@@ -1233,6 +1235,7 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 					BUG();
 				}
 #endif
+				/*! split_huge_page_pmd : Do Nothing.  */
 				split_huge_page_pmd(vma, addr, pmd);
 			} else if (zap_huge_pmd(tlb, vma, pmd, addr))
 				goto next;
@@ -1247,6 +1250,7 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 		 */
 		if (pmd_none_or_trans_huge_or_clear_bad(pmd))
 			goto next;
+		/*! 2017. 2.25 study end */
 		next = zap_pte_range(tlb, vma, pmd, addr, next, details);
 next:
 		cond_resched();
@@ -1254,7 +1258,7 @@ next:
 
 	return addr;
 }
-
+/*! 2017. 2.25 study -ing */
 static inline unsigned long zap_pud_range(struct mmu_gather *tlb,
 				struct vm_area_struct *vma, pgd_t *pgd,
 				unsigned long addr, unsigned long end,
@@ -1266,6 +1270,7 @@ static inline unsigned long zap_pud_range(struct mmu_gather *tlb,
 	pud = pud_offset(pgd, addr);
 	do {
 		next = pud_addr_end(addr, end);
+		/*! 우리는 무조건 리턴 0  */
 		if (pud_none_or_clear_bad(pud))
 			continue;
 		next = zap_pmd_range(tlb, vma, pud, addr, next, details);
@@ -1273,7 +1278,7 @@ static inline unsigned long zap_pud_range(struct mmu_gather *tlb,
 
 	return addr;
 }
-
+/*! 2017. 2.25 study -ing */
 static void unmap_page_range(struct mmu_gather *tlb,
 			     struct vm_area_struct *vma,
 			     unsigned long addr, unsigned long end,
@@ -1291,6 +1296,7 @@ static void unmap_page_range(struct mmu_gather *tlb,
 	pgd = pgd_offset(vma->vm_mm, addr);
 	do {
 		next = pgd_addr_end(addr, end);
+		/*! 우리는 무조건 리턴 0  */
 		if (pgd_none_or_clear_bad(pgd))
 			continue;
 		next = zap_pud_range(tlb, vma, pgd, addr, next, details);
@@ -1299,7 +1305,7 @@ static void unmap_page_range(struct mmu_gather *tlb,
 	mem_cgroup_uncharge_end();
 }
 
-
+/*! 2017. 2.25 study -ing */
 static void unmap_single_vma(struct mmu_gather *tlb,
 		struct vm_area_struct *vma, unsigned long start_addr,
 		unsigned long end_addr,
@@ -1314,12 +1320,15 @@ static void unmap_single_vma(struct mmu_gather *tlb,
 	if (end <= vma->vm_start)
 		return;
 
+	/*! uprobe_munmap : Do Nothing  */
 	if (vma->vm_file)
 		uprobe_munmap(vma, start, end);
 
+	/*! untrack_pfn : Do Nothing */
 	if (unlikely(vma->vm_flags & VM_PFNMAP))
 		untrack_pfn(vma, 0, 0);
 
+	/*! is_vm_hugetlb_page : 리턴 0  */
 	if (start != end) {
 		if (unlikely(is_vm_hugetlb_page(vma))) {
 			/*
@@ -1408,6 +1417,7 @@ void zap_page_range(struct vm_area_struct *vma, unsigned long start,
  *
  * The range must fit into one VMA.
  */
+/*! 2017. 2.25 study -ing */
 static void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
 		unsigned long size, struct zap_details *details)
 {
@@ -1418,6 +1428,7 @@ static void zap_page_range_single(struct vm_area_struct *vma, unsigned long addr
 	lru_add_drain();
 	tlb_gather_mmu(&tlb, mm, address, end);
 	update_hiwater_rss(mm);
+	/*! Do Nothing */
 	mmu_notifier_invalidate_range_start(mm, address, end);
 	unmap_single_vma(&tlb, vma, address, end, details);
 	mmu_notifier_invalidate_range_end(mm, address, end);
@@ -1711,7 +1722,7 @@ long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
 
 	VM_BUG_ON(!!pages != !!(gup_flags & FOLL_GET));
 
-	/* 
+	/*
 	 * Require read or write permissions.
 	 * If FOLL_FORCE is set, we only require the "MAY" flags.
 	 */
@@ -2903,20 +2914,20 @@ unwritable_page:
 	page_cache_release(old_page);
 	return ret;
 }
-
+/*! 2017. 2.25 study -ing */
 static void unmap_mapping_range_vma(struct vm_area_struct *vma,
 		unsigned long start_addr, unsigned long end_addr,
 		struct zap_details *details)
 {
 	zap_page_range_single(vma, start_addr, end_addr - start_addr, details);
 }
-
+/*! 2017. 2.25 study -ing */
 static inline void unmap_mapping_range_tree(struct rb_root *root,
 					    struct zap_details *details)
 {
 	struct vm_area_struct *vma;
 	pgoff_t vba, vea, zba, zea;
-
+	/*! rb tree 루프 돌면서,  */
 	vma_interval_tree_foreach(vma, root,
 			details->first_index, details->last_index) {
 
@@ -2968,6 +2979,7 @@ static inline void unmap_mapping_range_list(struct list_head *head,
  * @even_cows: 1 when truncating a file, unmap even private COWed pages;
  * but 0 when invalidating pagecache, don't throw away private data.
  */
+/*! 2017. 2.25 study -ing */
 void unmap_mapping_range(struct address_space *mapping,
 		loff_t const holebegin, loff_t const holelen, int even_cows)
 {
@@ -2983,6 +2995,7 @@ void unmap_mapping_range(struct address_space *mapping,
 			hlen = ULONG_MAX - hba + 1;
 	}
 
+	/*! datails 값 설정  */
 	details.check_mapping = even_cows? NULL: mapping;
 	details.nonlinear_vma = NULL;
 	details.first_index = hba;
