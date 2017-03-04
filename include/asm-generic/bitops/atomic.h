@@ -151,6 +151,7 @@ static inline int test_and_set_bit(int nr, volatile unsigned long *addr)
  * It can be reorderdered on other architectures other than x86.
  * It also implies a memory barrier.
  */
+/*! 2017. 3.04 study -ing */
 static inline int test_and_clear_bit(int nr, volatile unsigned long *addr)
 {
 	unsigned long mask = BIT_MASK(nr);

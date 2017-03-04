@@ -1389,6 +1389,7 @@ int __init memblock_is_reserved(phys_addr_t addr)
 /*! 2016.10.29 study -ing */
 int __init_memblock memblock_is_memory(phys_addr_t addr)
 {
+	/*! 성공 시 해당 index 값, 실패 시 -1 리턴  */
 	return memblock_search(&memblock.memory, addr) != -1;
 }
 

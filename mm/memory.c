@@ -614,6 +614,7 @@ int __pte_alloc_kernel(pmd_t *pmd, unsigned long address)
 	return 0;
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void init_rss_vec(int *rss)
 {
 	memset(rss, 0, sizeof(int) * NR_MM_COUNTERS);
@@ -637,6 +638,7 @@ static inline void add_mm_rss_vec(struct mm_struct *mm, int *rss)
  *
  * The calling function must still handle the error.
  */
+/*! 2017. 3.04 study -ing */
 static void print_bad_pte(struct vm_area_struct *vma, unsigned long addr,
 			  pte_t pte, struct page *page)
 {
@@ -694,8 +696,10 @@ static void print_bad_pte(struct vm_area_struct *vma, unsigned long addr,
 	add_taint(TAINT_BAD_PAGE, LOCKDEP_NOW_UNRELIABLE);
 }
 
+/*! 2017. 3.04 study -ing */
 static inline bool is_cow_mapping(vm_flags_t flags)
 {
+	/*! flag에 VM_SHARED 는 없으면서, VM_MAYWRITE는 있는 경우 */
 	return (flags & (VM_SHARED | VM_MAYWRITE)) == VM_MAYWRITE;
 }
 
@@ -746,6 +750,7 @@ static inline bool is_cow_mapping(vm_flags_t flags)
 #else
 # define HAVE_PTE_SPECIAL 0
 #endif
+/*! 2017. 3.04 study -ing */
 struct page *vm_normal_page(struct vm_area_struct *vma, unsigned long addr,
 				pte_t pte)
 {
@@ -1071,6 +1076,7 @@ int copy_page_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 	return ret;
 }
 
+/*! 2017. 3.04 study -ing */
 static unsigned long zap_pte_range(struct mmu_gather *tlb,
 				struct vm_area_struct *vma, pmd_t *pmd,
 				unsigned long addr, unsigned long end,
@@ -1094,6 +1100,9 @@ again:
 			continue;
 		}
 
+		/*!
+		 * 첫번째 비트가 켜져 있으면
+		 */
 		if (pte_present(ptent)) {
 			struct page *page;
 
@@ -1251,6 +1260,7 @@ static inline unsigned long zap_pmd_range(struct mmu_gather *tlb,
 		if (pmd_none_or_trans_huge_or_clear_bad(pmd))
 			goto next;
 		/*! 2017. 2.25 study end */
+		/*! 2017. 3.04 study start */
 		next = zap_pte_range(tlb, vma, pmd, addr, next, details);
 next:
 		cond_resched();

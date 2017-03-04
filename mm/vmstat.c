@@ -217,6 +217,7 @@ void set_pgdat_percpu_threshold(pg_data_t *pgdat,
  * - zone->vmstat[item] += delta + __this_cpu_read(zone->pageset)
  * - vmstat[item] += delta + __this_cpu_read(zone->pageset)
  */
+/*! 2017. 3.04 study -ing */
 void __mod_zone_page_state(struct zone *zone, enum zone_stat_item item,
 				int delta)
 {
@@ -273,6 +274,7 @@ EXPORT_SYMBOL(__mod_zone_page_state);
  * in between and therefore the atomicity vs. interrupt cannot be exploited
  * in a useful way here.
  */
+/*! 2017. 3.04 study -ing */
 void __inc_zone_state(struct zone *zone, enum zone_stat_item item)
 {
 	struct per_cpu_pageset __percpu *pcp = zone->pageset;
@@ -289,6 +291,7 @@ void __inc_zone_state(struct zone *zone, enum zone_stat_item item)
 	}
 }
 
+/*! 2017. 3.04 study -ing */
 void __inc_zone_page_state(struct page *page, enum zone_stat_item item)
 {
 	__inc_zone_state(page_zone(page), item);

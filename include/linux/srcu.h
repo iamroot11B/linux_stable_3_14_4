@@ -196,6 +196,7 @@ static inline int srcu_read_lock_held(struct srcu_struct *sp)
  * is enabled, invoking this outside of an RCU read-side critical
  * section will result in an RCU-lockdep splat.
  */
+/*! 2017. 3.04 study -ing */
 #define srcu_dereference(p, sp) srcu_dereference_check((p), (sp), 0)
 
 /**
@@ -215,6 +216,7 @@ static inline int srcu_read_lock_held(struct srcu_struct *sp)
  * srcu_read_unlock() in an irq handler if the matching srcu_read_lock()
  * was invoked in process context.
  */
+/*! 2017. 3.04 study -ing */
 static inline int srcu_read_lock(struct srcu_struct *sp) __acquires(sp)
 {
 	int retval = __srcu_read_lock(sp);
@@ -230,6 +232,7 @@ static inline int srcu_read_lock(struct srcu_struct *sp) __acquires(sp)
  *
  * Exit an SRCU read-side critical section.
  */
+/*! 2017. 3.04 study -ing */
 static inline void srcu_read_unlock(struct srcu_struct *sp, int idx)
 	__releases(sp)
 {

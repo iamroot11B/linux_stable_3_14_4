@@ -315,6 +315,7 @@ static inline loff_t page_file_offset(struct page *page)
 extern pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
 				     unsigned long address);
 
+/*! 2017. 3.04 study -ing */
 static inline pgoff_t linear_page_index(struct vm_area_struct *vma,
 					unsigned long address)
 {
@@ -323,6 +324,7 @@ static inline pgoff_t linear_page_index(struct vm_area_struct *vma,
 		return linear_hugepage_index(vma, address);
 	pgoff = (address - vma->vm_start) >> PAGE_SHIFT;
 	pgoff += vma->vm_pgoff;
+    /*! PAGE_CACHE_SHIFT == PAGE_SHIFT */
 	return pgoff >> (PAGE_CACHE_SHIFT - PAGE_SHIFT);
 }
 

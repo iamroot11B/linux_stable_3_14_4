@@ -1090,6 +1090,7 @@ void wakeup_flusher_threads(long nr_pages, enum wb_reason reason)
 	rcu_read_unlock();
 }
 
+/*! 2017. 3.04 study -ing */
 static noinline void block_dump___mark_inode_dirty(struct inode *inode)
 {
 	if (inode->i_ino || strcmp(inode->i_sb->s_id, "bdev")) {
@@ -1136,6 +1137,7 @@ static noinline void block_dump___mark_inode_dirty(struct inode *inode)
  * page->mapping->host, so the page-dirtying time is recorded in the internal
  * blockdev inode.
  */
+/*! 2017. 3.04 study -ing */
 void __mark_inode_dirty(struct inode *inode, int flags)
 {
 	struct super_block *sb = inode->i_sb;

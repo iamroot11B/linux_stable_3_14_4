@@ -64,6 +64,7 @@ static inline unsigned long task_io_get_inblock(const struct task_struct *p)
 	return 0;
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void task_io_account_write(size_t bytes)
 {
 }

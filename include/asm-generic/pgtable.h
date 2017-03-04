@@ -106,6 +106,7 @@ static inline pmd_t pmdp_get_and_clear(struct mm_struct *mm,
 #endif
 
 #ifndef __HAVE_ARCH_PTEP_GET_AND_CLEAR_FULL
+/*! 2017. 3.04 study -ing */
 static inline pte_t ptep_get_and_clear_full(struct mm_struct *mm,
 					    unsigned long address, pte_t *ptep,
 					    int full)
@@ -400,6 +401,7 @@ static inline void ptep_modify_prot_commit(struct mm_struct *mm,
 #endif
 
 #ifndef CONFIG_HAVE_ARCH_SOFT_DIRTY
+/*! 2017. 3.04 study -ing */
 static inline int pte_soft_dirty(pte_t pte)
 {
 	return 0;
@@ -520,6 +522,7 @@ static inline int is_zero_pfn(unsigned long pfn)
 #define my_zero_pfn(addr)	page_to_pfn(ZERO_PAGE(addr))
 
 #else
+/*! 2017. 3.04 study -ing */
 static inline int is_zero_pfn(unsigned long pfn)
 {
 	extern unsigned long zero_pfn;

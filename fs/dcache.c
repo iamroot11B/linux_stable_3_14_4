@@ -102,6 +102,7 @@ static unsigned int d_hash_shift __read_mostly;
 
 static struct hlist_bl_head *dentry_hashtable __read_mostly;
 
+/*! 2017. 3.04 study -ing */
 static inline struct hlist_bl_head *d_hash(const struct dentry *parent,
 					unsigned int hash)
 {
@@ -270,6 +271,7 @@ static void d_free(struct dentry *dentry)
  * should be called after unhashing, and after changing d_inode (if
  * the dentry has not already been unhashed).
  */
+/*! 2017. 3.04 study -ing */
 static inline void dentry_rcuwalk_barrier(struct dentry *dentry)
 {
 	assert_spin_locked(&dentry->d_lock);
@@ -282,6 +284,7 @@ static inline void dentry_rcuwalk_barrier(struct dentry *dentry)
  * d_iput() operation if defined. Dentry has no refcount
  * and is unhashed.
  */
+/*! 2017. 3.04 study -ing */
 static void dentry_iput(struct dentry * dentry)
 	__releases(dentry->d_lock)
 	__releases(dentry->d_inode->i_lock)
@@ -341,6 +344,7 @@ static void dentry_unlink_inode(struct dentry * dentry)
  * rules. d_lock must be held by the caller.
  */
 #define D_FLAG_VERIFY(dentry,x) WARN_ON_ONCE(((dentry)->d_flags & (DCACHE_LRU_LIST | DCACHE_SHRINK_LIST)) != (x))
+/*! 2017. 3.04 study -ing */
 static void d_lru_add(struct dentry *dentry)
 {
 	D_FLAG_VERIFY(dentry, 0);
@@ -349,6 +353,7 @@ static void d_lru_add(struct dentry *dentry)
 	WARN_ON_ONCE(!list_lru_add(&dentry->d_sb->s_dentry_lru, &dentry->d_lru));
 }
 
+/*! 2017. 3.04 study -ing */
 static void d_lru_del(struct dentry *dentry)
 {
 	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
@@ -357,6 +362,7 @@ static void d_lru_del(struct dentry *dentry)
 	WARN_ON_ONCE(!list_lru_del(&dentry->d_sb->s_dentry_lru, &dentry->d_lru));
 }
 
+/*! 2017. 3.04 study -ing */
 static void d_shrink_del(struct dentry *dentry)
 {
 	D_FLAG_VERIFY(dentry, DCACHE_SHRINK_LIST | DCACHE_LRU_LIST);
@@ -397,6 +403,7 @@ static void d_lru_shrink_move(struct dentry *dentry, struct list_head *list)
 /*
  * dentry_lru_(add|del)_list) must be called with d_lock held.
  */
+/*! 2017. 3.04 study -ing */
 static void dentry_lru_add(struct dentry *dentry)
 {
 	if (unlikely(!(dentry->d_flags & DCACHE_LRU_LIST)))
@@ -410,6 +417,7 @@ static void dentry_lru_add(struct dentry *dentry)
  * lose our last reference through the parent walk. In this case, we need to
  * remove ourselves from the shrink list, not the LRU.
  */
+/*! 2017. 3.04 study -ing */
 static void dentry_lru_del(struct dentry *dentry)
 {
 	if (dentry->d_flags & DCACHE_LRU_LIST) {
@@ -431,6 +439,7 @@ static void dentry_lru_del(struct dentry *dentry)
  * dentry->d_lock and parent->d_lock must be held by caller, and are dropped by
  * d_kill.
  */
+/*! 2017. 3.04 study -ing */
 static struct dentry *d_kill(struct dentry *dentry, struct dentry *parent)
 	__releases(dentry->d_lock)
 	__releases(parent->d_lock)
@@ -468,6 +477,7 @@ static struct dentry *d_kill(struct dentry *dentry, struct dentry *parent)
  *
  * __d_drop requires dentry->d_lock.
  */
+/*! 2017. 3.04 study -ing */
 void __d_drop(struct dentry *dentry)
 {
 	if (!d_unhashed(dentry)) {
@@ -505,6 +515,7 @@ EXPORT_SYMBOL(d_drop);
  * If ref is non-zero, then decrement the refcount too.
  * Returns dentry requiring refcount drop, or NULL if we're done.
  */
+/*! 2017. 3.04 study -ing */
 static struct dentry *
 dentry_kill(struct dentry *dentry, int unlock_on_failure)
 	__releases(dentry->d_lock)
@@ -576,6 +587,7 @@ relock:
  * they too may now get deleted.
  */
 /*! 2017. 2.04 study -ing */
+/*! 2017. 3.04 study -ing */
 void dput(struct dentry *dentry)
 {
 	if (unlikely(!dentry))
@@ -667,6 +679,7 @@ int d_invalidate(struct dentry * dentry)
 EXPORT_SYMBOL(d_invalidate);
 
 /* This must be called with d_lock held */
+/*! 2017. 3.04 study -ing */
 static inline void __dget_dlock(struct dentry *dentry)
 {
 	dentry->d_lockref.count++;
@@ -733,6 +746,7 @@ EXPORT_SYMBOL(dget_parent);
  * any other hashed alias over that one unless @want_discon is set,
  * in which case only return an IS_ROOT, DCACHE_DISCONNECTED alias.
  */
+/*! 2017. 3.04 study -ing */
 static struct dentry *__d_find_alias(struct inode *inode, int want_discon)
 {
 	struct dentry *alias, *discon_alias;
@@ -770,6 +784,7 @@ again:
 	return NULL;
 }
 
+/*! 2017. 3.04 study -ing */
 struct dentry *d_find_alias(struct inode *inode)
 {
 	struct dentry *de = NULL;

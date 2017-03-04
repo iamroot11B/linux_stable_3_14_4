@@ -651,6 +651,7 @@ EXPORT_SYMBOL(mark_buffer_dirty_inode);
  * If warn is true, then emit a warning if the page is not uptodate and has
  * not been truncated.
  */
+/*! 2017. 3.04 study -ing */
 static void __set_page_dirty(struct page *page,
 		struct address_space *mapping, int warn)
 {
@@ -692,6 +693,7 @@ static void __set_page_dirty(struct page *page,
  * FIXME: may need to call ->reservepage here as well.  That's rather up to the
  * address_space though.
  */
+/*! 2017. 3.04 study -ing */
 int __set_page_dirty_buffers(struct page *page)
 {
 	int newly_dirty;
@@ -707,6 +709,7 @@ int __set_page_dirty_buffers(struct page *page)
 
 		do {
 			set_buffer_dirty(bh);
+			/*!  #define BUFFER_FNS(bit, name) 에서 만들어줌.*/
 			bh = bh->b_this_page;
 		} while (bh != head);
 	}

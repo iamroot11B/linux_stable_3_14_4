@@ -119,6 +119,7 @@ EXPORT_SYMBOL(lockref_get_or_lock);
  * @lockref: pointer to lockref structure
  * Return: 1 if count updated successfully or 0 if count <= 1 and lock taken
  */
+/*! 2017. 3.04 study -ing */
 int lockref_put_or_lock(struct lockref *lockref)
 {
 	CMPXCHG_LOOP(
@@ -142,6 +143,7 @@ EXPORT_SYMBOL(lockref_put_or_lock);
  * lockref_mark_dead - mark lockref dead
  * @lockref: pointer to lockref structure
  */
+/*! 2017. 3.04 study -ing */
 void lockref_mark_dead(struct lockref *lockref)
 {
 	assert_spin_locked(&lockref->lock);

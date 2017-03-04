@@ -145,6 +145,7 @@ static inline void __add_bdi_stat(struct backing_dev_info *bdi,
 	__percpu_counter_add(&bdi->bdi_stat[item], amount, BDI_STAT_BATCH);
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void __inc_bdi_stat(struct backing_dev_info *bdi,
 		enum bdi_stat_item item)
 {

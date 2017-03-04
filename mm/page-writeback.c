@@ -2137,13 +2137,16 @@ int __set_page_dirty_no_writeback(struct page *page)
  * Helper function for set_page_dirty family.
  * NOTE: This relies on being atomic wrt interrupts.
  */
+/*! 2017. 3.04 study -ing */
 void account_page_dirtied(struct page *page, struct address_space *mapping)
 {
 	trace_writeback_dirty_page(page, mapping);
 
 	if (mapping_cap_account_dirty(mapping)) {
+		/*! page의 NR_FILE_DIRTY/NR_DIRTIED 에 1을 더해준다*/
 		__inc_zone_page_state(page, NR_FILE_DIRTY);
 		__inc_zone_page_state(page, NR_DIRTIED);
+		/*! bdi의 BDI_RECLAIMABLE/BDI_DIRTIED 에 1을 더해준다 */
 		__inc_bdi_stat(mapping->backing_dev_info, BDI_RECLAIMABLE);
 		__inc_bdi_stat(mapping->backing_dev_info, BDI_DIRTIED);
 		task_io_account_write(PAGE_CACHE_SIZE);
@@ -2257,6 +2260,7 @@ EXPORT_SYMBOL(redirty_page_for_writepage);
  * If the mapping doesn't provide a set_page_dirty a_op, then
  * just fall through and assume that it wants buffer_heads.
  */
+/*! 2017. 3.04 study -ing */
 int set_page_dirty(struct page *page)
 {
 	struct address_space *mapping = page_mapping(page);

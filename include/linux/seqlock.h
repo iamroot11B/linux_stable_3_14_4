@@ -264,6 +264,7 @@ static inline void write_seqcount_end(seqcount_t *s)
  * After write_seqcount_barrier, no read-side seq operations will complete
  * successfully and see data older than this.
  */
+/*! 2017. 3.04 study -ing */
 static inline void write_seqcount_barrier(seqcount_t *s)
 {
 	smp_wmb();

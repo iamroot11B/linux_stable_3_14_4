@@ -50,6 +50,7 @@ static inline void INIT_HLIST_BL_NODE(struct hlist_bl_node *h)
 
 #define hlist_bl_entry(ptr, type, member) container_of(ptr,type,member)
 
+/*! 2017. 3.04 study -ing */
 static inline int hlist_bl_unhashed(const struct hlist_bl_node *h)
 {
 	return !h->pprev;
@@ -87,6 +88,7 @@ static inline void hlist_bl_add_head(struct hlist_bl_node *n,
 	hlist_bl_set_first(h, n);
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void __hlist_bl_del(struct hlist_bl_node *n)
 {
 	struct hlist_bl_node *next = n->next;
@@ -117,11 +119,13 @@ static inline void hlist_bl_del_init(struct hlist_bl_node *n)
 	}
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void hlist_bl_lock(struct hlist_bl_head *b)
 {
 	bit_spin_lock(0, (unsigned long *)b);
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void hlist_bl_unlock(struct hlist_bl_head *b)
 {
 	__bit_spin_unlock(0, (unsigned long *)b);

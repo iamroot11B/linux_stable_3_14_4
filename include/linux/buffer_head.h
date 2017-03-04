@@ -134,11 +134,13 @@ BUFFER_FNS(Defer_Completion, defer_completion)
 #define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
 
 /* If we *know* page->private refers to buffer_heads */
+/*! 2017. 3.04 study -ing */
 #define page_buffers(page)					\
 	({							\
 		BUG_ON(!PagePrivate(page));			\
 		((struct buffer_head *)page_private(page));	\
 	})
+/*! 2017. 3.04 study -ing */
 #define page_has_buffers(page)	PagePrivate(page)
 
 void buffer_check_dirty_writeback(struct page *page,

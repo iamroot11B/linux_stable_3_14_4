@@ -298,6 +298,7 @@ EXPORT_SYMBOL_GPL(cleanup_srcu_struct);
  * srcu_struct.  Must be called from process context.
  * Returns an index that must be passed to the matching srcu_read_unlock().
  */
+/*! 2017. 3.04 study -ing */
 int __srcu_read_lock(struct srcu_struct *sp)
 {
 	int idx;
@@ -318,6 +319,7 @@ EXPORT_SYMBOL_GPL(__srcu_read_lock);
  * CPU than that which was incremented by the corresponding srcu_read_lock().
  * Must be called from process context.
  */
+/*! 2017. 3.04 study -ing */
 void __srcu_read_unlock(struct srcu_struct *sp, int idx)
 {
 	smp_mb(); /* C */  /* Avoid leaking the critical section. */

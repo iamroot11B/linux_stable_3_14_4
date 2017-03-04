@@ -232,6 +232,7 @@ TESTPAGEFLAG(Writeback, writeback) TESTSCFLAG(Writeback, writeback)
 PAGEFLAG(MappedToDisk, mappedtodisk)
 
 /* PG_readahead is only used for reads; PG_reclaim is only for writes */
+/*! 2017. 3.04 study -ing */
 PAGEFLAG(Reclaim, reclaim) TESTCLEARFLAG(Reclaim, reclaim)
 PAGEFLAG(Readahead, reclaim) TESTCLEARFLAG(Readahead, reclaim)
 

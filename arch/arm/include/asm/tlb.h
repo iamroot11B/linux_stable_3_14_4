@@ -78,6 +78,7 @@ static inline void tlb_flush(struct mmu_gather *tlb)
 	}
 }
 
+/*! 2017. 3.04 study -ing */
 static inline void tlb_add_flush(struct mmu_gather *tlb, unsigned long addr)
 {
 	if (!tlb->fullmm) {
@@ -136,6 +137,7 @@ tlb_finish_mmu(struct mmu_gather *tlb, unsigned long start, unsigned long end)
 /*
  * Memorize the range for the TLB flush.
  */
+/*! 2017. 3.04 study -ing */
 static inline void
 tlb_remove_tlb_entry(struct mmu_gather *tlb, pte_t *ptep, unsigned long addr)
 {

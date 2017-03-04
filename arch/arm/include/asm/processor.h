@@ -77,6 +77,7 @@ extern void release_thread(struct task_struct *);
 unsigned long get_wchan(struct task_struct *p);
 
 #if __LINUX_ARM_ARCH__ == 6 || defined(CONFIG_ARM_ERRATA_754327)
+/*! 2017. 3.04 study -ing */
 #define cpu_relax()			smp_mb()
 #else
 /*! 2016.11.05 study -ing  */

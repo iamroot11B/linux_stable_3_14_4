@@ -521,6 +521,7 @@ static inline void rcu_preempt_sleep_check(void)
  */
 /*! typeof(*p) = 역참조 *
  */
+/*! 2017. 3.04 study -ing */
 #define __rcu_dereference_check(p, c, space) \
 	({ \
 		typeof(*p) *_________p1 = (typeof(*p)*__force )ACCESS_ONCE(p); \

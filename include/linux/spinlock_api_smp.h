@@ -84,6 +84,7 @@ _raw_spin_unlock_irqrestore(raw_spinlock_t *lock, unsigned long flags)
 #define _raw_spin_unlock_irqrestore(lock, flags) __raw_spin_unlock_irqrestore(lock, flags)
 #endif
 
+/*! 2017. 3.04 study -ing */
 static inline int __raw_spin_trylock(raw_spinlock_t *lock)
 {
 	preempt_disable();

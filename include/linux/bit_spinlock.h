@@ -12,6 +12,7 @@
  * Don't use this unless you really need to: spin_lock() and spin_unlock()
  * are significantly faster.
  */
+/*! 2017. 1.30 study -ing */
 static inline void bit_spin_lock(int bitnum, unsigned long *addr)
 {
 	/*
@@ -77,6 +78,7 @@ static inline void bit_spin_unlock(int bitnum, unsigned long *addr)
  *  non-atomic version, which can be used eg. if the bit lock itself is
  *  protecting the rest of the flags in the word.
  */
+/*! 2016. 1.30 study -ing */
 static inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
 {
 #ifdef CONFIG_DEBUG_SPINLOCK
