@@ -236,7 +236,7 @@ static inline int dentry_cmp(const struct dentry *dentry, const unsigned char *c
 	smp_read_barrier_depends();
 	return dentry_string_cmp(cs, ct, tcount);
 }
-
+/*! 2017. 3.11 study -ing */
 static void __d_free(struct rcu_head *head)
 {
 	struct dentry *dentry = container_of(head, struct dentry, d_u.d_rcu);
@@ -250,6 +250,7 @@ static void __d_free(struct rcu_head *head)
 /*
  * no locks, please.
  */
+/*! 2017. 3.11 study -ing */
 static void d_free(struct dentry *dentry)
 {
 	BUG_ON((int)dentry->d_lockref.count > 0);
@@ -297,6 +298,7 @@ static void dentry_iput(struct dentry * dentry)
 		spin_unlock(&inode->i_lock);
 		if (!inode->i_nlink)
 			fsnotify_inoderemove(inode);
+		/*! configfs_d_iput -> configfs_d_iput */
 		if (dentry->d_op && dentry->d_op->d_iput)
 			dentry->d_op->d_iput(dentry, inode);
 		else
@@ -615,6 +617,7 @@ repeat:
 	return;
 
 kill_it:
+	/*! return값인 parent가 있으면 goto repeat */
 	dentry = dentry_kill(dentry, 1);
 	if (dentry)
 		goto repeat;

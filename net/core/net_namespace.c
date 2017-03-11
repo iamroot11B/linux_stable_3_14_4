@@ -37,7 +37,7 @@ EXPORT_SYMBOL(init_net);
 #define INITIAL_NET_GEN_PTRS	13 /* +1 for len +2 for rcu_head */
 
 static unsigned int max_gen_ptrs = INITIAL_NET_GEN_PTRS;
-
+/*! 2017. 3.11 study -ing */
 static struct net_generic *net_alloc_generic(void)
 {
 	struct net_generic *ng;
@@ -49,7 +49,7 @@ static struct net_generic *net_alloc_generic(void)
 
 	return ng;
 }
-
+/*! 2017. 3.11 study -ing */
 static int net_assign_generic(struct net *net, int id, void *data)
 {
 	struct net_generic *ng, *old_ng;
@@ -86,7 +86,7 @@ assign:
 	ng->ptr[id - 1] = data;
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 static int ops_init(const struct pernet_operations *ops, struct net *net)
 {
 	int err = -ENOMEM;
@@ -475,7 +475,7 @@ static void __unregister_pernet_operations(struct pernet_operations *ops)
 }
 
 #else
-
+/*! 2017. 3.11 study -ing */
 static int __register_pernet_operations(struct list_head *list,
 					struct pernet_operations *ops)
 {
@@ -493,7 +493,7 @@ static void __unregister_pernet_operations(struct pernet_operations *ops)
 #endif /* CONFIG_NET_NS */
 
 static DEFINE_IDA(net_generic_ids);
-
+/*! 2017. 3.11 study -ing */
 static int register_pernet_operations(struct list_head *list,
 				      struct pernet_operations *ops)
 {
@@ -513,6 +513,7 @@ again:
 	}
 	error = __register_pernet_operations(list, ops);
 	if (error) {
+		/*! 에러 면,  */
 		rcu_barrier();
 		if (ops->id)
 			ida_remove(&net_generic_ids, *ops->id);
@@ -523,7 +524,7 @@ again:
 
 static void unregister_pernet_operations(struct pernet_operations *ops)
 {
-	
+
 	__unregister_pernet_operations(ops);
 	rcu_barrier();
 	if (ops->id)
@@ -549,6 +550,7 @@ static void unregister_pernet_operations(struct pernet_operations *ops)
  *	are called in the reverse of the order with which they were
  *	registered.
  */
+/*! 2017. 3.11 study -ing */
 int register_pernet_subsys(struct pernet_operations *ops)
 {
 	int error;

@@ -540,6 +540,7 @@ EXPORT_SYMBOL_GPL(idr_alloc);
  * higher ids if it can. If the "cur" counter wraps, then it will start again
  * at the "start" end of the range and allocate one that has already been used.
  */
+/*! 2017. 2.04 study -ing */
 int idr_alloc_cyclic(struct idr *idr, void *ptr, int start, int end,
 			gfp_t gfp_mask)
 {
@@ -757,9 +758,11 @@ EXPORT_SYMBOL(idr_find_slowpath);
  *
  * The caller must serialize idr_for_each() vs idr_get_new() and idr_remove().
  */
+/*! 2017. 3.11 study -ing */
 int idr_for_each(struct idr *idp,
 		 int (*fn)(int id, void *p, void *data), void *data)
 {
+	/*! idp->top(tree top)부터 트리를 loop 돌면서 콜백 fn 수행 */
 	int n, id, max, error = 0;
 	struct idr_layer *p;
 	struct idr_layer *pa[MAX_IDR_LEVEL + 1];

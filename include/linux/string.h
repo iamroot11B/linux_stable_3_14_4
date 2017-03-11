@@ -148,6 +148,7 @@ extern size_t memweight(const void *ptr, size_t bytes);
  *
  * @path: path to extract the filename from.
  */
+/*! 2017. 3.11 study -ing */
 static inline const char *kbasename(const char *path)
 {
 	const char *tail = strrchr(path, '/');

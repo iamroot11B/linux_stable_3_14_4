@@ -87,7 +87,7 @@
 #ifdef CONFIG_PROVE_RCU
 /*! mutex 구조체 생성과 동시에 초기화 */
 DEFINE_MUTEX(cgroup_mutex);
-/*! gpl 섹션에 mutex 구조체 변수 추가 
+/*! gpl 섹션에 mutex 구조체 변수 추가
  * http://blog.naver.com/dregon1312/40089773529
  * extern 쉬운 설명: http://sfixer.tistory.com/entry/extern-%EC%84%A0%EC%96%B8%EC%97%90-%EB%8C%80%ED%95%9C-%EC%89%AC%EC%9A%B4%EC%84%A4%EB%AA%85
  * 모듈은 같은 프로세스인가?: https://kldp.org/node/103647
@@ -384,7 +384,7 @@ static int css_set_count;
  */
 #define CSS_SET_HASH_BITS	7
 static DEFINE_HASHTABLE(css_set_table, CSS_SET_HASH_BITS);
-
+/*! 2017. 3.11 study -ing */
 static unsigned long css_set_hash(struct cgroup_subsys_state *css[])
 {
 	unsigned long key = 0UL;
@@ -1391,7 +1391,7 @@ static void init_cgroup_root(struct cgroupfs_root *root)
 	init_cgroup_housekeeping(cgrp);
 	idr_init(&root->cgroup_idr);
 }
-
+/*! 2017. 2.04 study -ing */
 static int cgroup_init_root_id(struct cgroupfs_root *root, int start, int end)
 {
 	int id;
@@ -4060,7 +4060,7 @@ static void css_release(struct percpu_ref *ref)
 	rcu_assign_pointer(css->cgroup->subsys[css->ss->subsys_id], NULL);
 	call_rcu(&css->rcu_head, css_free_rcu_fn);
 }
-
+/*! 2017. 3.11 study -ing */
 static void init_css(struct cgroup_subsys_state *css, struct cgroup_subsys *ss,
 		     struct cgroup *cgrp)
 {
@@ -4548,28 +4548,28 @@ static void __init_or_module cgroup_init_cftsets(struct cgroup_subsys *ss)
 	if (ss->base_cftypes) {
 		struct cftype *cft;
 
-/*!
- * cft++ 참고사항
- * +ex. mm/memcontrol.c 를 같이 참조해야 함
- *      -mem_cgroup_files 구조체 참고
- */
-		/*! 
+		/*!
+		 * cft++ 참고사항
+		 * +ex. mm/memcontrol.c 를 같이 참조해야 함
+		 *      -mem_cgroup_files 구조체 참고
+		 */
+		/*!
 		 * base_cftypes = cftype 배열 시작 주소
-		 * 
+		 *
 		 * struct cftype *base_cftypes;
 		 * struct cftype_set base_cftset;
 		 */
 		for (cft = ss->base_cftypes; cft->name[0] != '\0'; cft++)
 			cft->ss = ss;
-		/*!  
-		 * struct cftype *cfts 
+		/*!
+		 * struct cftype *cfts
 		 * struct list_head cftsets
 		 */
 		ss->base_cftset.cfts = ss->base_cftypes;
 		list_add_tail(&ss->base_cftset.node, &ss->cftsets);
 	}
 }
-
+/*! 2017. 3.11 study -ing */
 static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 {
 	struct cgroup_subsys_state *css;
@@ -4579,10 +4579,10 @@ static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 	mutex_lock(&cgroup_mutex);
 
 	/* init base cftset */
-	/*! https://github.com/torvalds/linux/commit/ddbcc7e8e50aefe467c01cac3dec71f118cd8ac2#diff-54e26b6ddd83c1405f62e995526ed7c8R99 
+	/*! https://github.com/torvalds/linux/commit/ddbcc7e8e50aefe467c01cac3dec71f118cd8ac2#diff-54e26b6ddd83c1405f62e995526ed7c8R99
 	 * http://thread.gmane.org/gmane.linux.kernel.containers/22623
 	 */
-	
+
 	cgroup_init_cftsets(ss);
 
 	/* Create the top cgroup state for this subsystem */
@@ -4820,12 +4820,12 @@ int __init cgroup_init_early(void)
 	/*! (1) */
 	/*! (2)
 	 * cgroupfs_root 구조체 변수인 rootnode(cgroup_dummy_root)를 초기화한다.
-	 * cgroup_dummy_root = 초기화 되지 않은 cgroupfs_root 변수 
+	 * cgroup_dummy_root = 초기화 되지 않은 cgroupfs_root 변수
 	 */
 	init_cgroup_root(&cgroup_dummy_root);
 	cgroup_root_count = 1;
 	/*! (2) */
-	/*! (3) 
+	/*! (3)
 	 * initcss set을 init 태스크의 css_set으로 지정한다.
 	 * 태스크의 css_set을 cgroup과 연결.
 	 */
@@ -4867,6 +4867,7 @@ int __init cgroup_init_early(void)
  * Register cgroup filesystem and /proc file, and initialize
  * any subsystems that didn't request early init.
  */
+/*! 2017. 3.11 study -ing */
 int __init cgroup_init(void)
 {
 	struct cgroup_subsys *ss;
@@ -4877,6 +4878,7 @@ int __init cgroup_init(void)
 	if (err)
 		return err;
 
+	/*! cgroup_subsys 배열 loop 돌면서 cgroup_init_subsys 수행  */
 	for_each_builtin_subsys(ss, i) {
 		if (!ss->early_init)
 			cgroup_init_subsys(ss);

@@ -132,7 +132,7 @@ retry:
 	mutex_unlock(domain->lock);
 	return NULL;
 }
-
+/*! 2017. 3.11 study -ing */
 struct kobj_map *kobj_map_init(kobj_probe_t *base_probe, struct mutex *lock)
 {
 	struct kobj_map *p = kmalloc(sizeof(struct kobj_map), GFP_KERNEL);

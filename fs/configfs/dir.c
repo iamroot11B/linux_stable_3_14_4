@@ -49,7 +49,7 @@ DECLARE_RWSEM(configfs_rename_sem);
  * rmdir()/unregister() and from configfs_attach_group()
  */
 DEFINE_SPINLOCK(configfs_dirent_lock);
-
+/*! 2017. 3.11 study -ing */
 static void configfs_d_iput(struct dentry * dentry,
 			    struct inode * inode)
 {

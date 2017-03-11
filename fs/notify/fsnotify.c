@@ -31,6 +31,7 @@
 /*
  * Clear all of the marks on an inode when it is being evicted from core
  */
+/*! 2017. 3.11 study -ing */
 void __fsnotify_inode_delete(struct inode *inode)
 {
 	fsnotify_clear_marks_by_inode(inode);

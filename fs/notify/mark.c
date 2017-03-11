@@ -101,9 +101,10 @@ void fsnotify_get_mark(struct fsnotify_mark *mark)
 {
 	atomic_inc(&mark->refcnt);
 }
-
+/*! 2017. 3.11 study -ing */
 void fsnotify_put_mark(struct fsnotify_mark *mark)
 {
+	/*! atomic_dec_and_test : 1 빼고 뺀 값이 0인지 테스트  */
 	if (atomic_dec_and_test(&mark->refcnt)) {
 		if (mark->group)
 			fsnotify_put_group(mark->group);

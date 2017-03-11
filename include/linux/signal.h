@@ -53,7 +53,7 @@ static inline void sigdelset(sigset_t *set, int _sig)
 	else
 		set->sig[sig / _NSIG_BPW] &= ~(1UL << (sig % _NSIG_BPW));
 }
-
+/*! 2017. 3.11 study -ing */
 static inline int sigismember(sigset_t *set, int _sig)
 {
 	unsigned long sig = _sig - 1;
@@ -269,7 +269,7 @@ struct k_sigaction {
 	__sigrestore_t ka_restorer;
 #endif
 };
- 
+
 #ifdef CONFIG_OLD_SIGACTION
 struct old_sigaction {
 	__sighandler_t sa_handler;

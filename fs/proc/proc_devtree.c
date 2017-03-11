@@ -16,7 +16,7 @@
 #include <linux/slab.h>
 #include <asm/uaccess.h>
 #include "internal.h"
-
+/*! 2017. 3.11 study -ing */
 static inline void set_node_proc_entry(struct device_node *np,
 				       struct proc_dir_entry *de)
 {
@@ -57,6 +57,7 @@ static const struct file_operations property_proc_fops = {
 /*
  * Add a property to a node
  */
+/*! 2017. 3.11 study -ing */
 static struct proc_dir_entry *
 __proc_device_tree_add_prop(struct proc_dir_entry *de, struct property *pp,
 		const char *name)
@@ -121,7 +122,7 @@ void proc_device_tree_update_prop(struct proc_dir_entry *pde,
  * conflicting names. That's generally ok, except for exporting via /proc,
  * so munge names here to ensure they're unique.
  */
-
+/*! 2017. 3.11 study -ing */
 static int duplicate_name(struct proc_dir_entry *de, const char *name)
 {
 	struct proc_dir_entry *ent;
@@ -140,7 +141,7 @@ static int duplicate_name(struct proc_dir_entry *de, const char *name)
 
 	return found;
 }
-
+/*! 2017. 3.11 study -ing */
 static const char *fixup_name(struct device_node *np, struct proc_dir_entry *de,
 		const char *name)
 {
@@ -182,6 +183,7 @@ retry:
 /*
  * Process a node, adding entries for its children and its properties.
  */
+/*! 2017. 3.11 study -ing */
 void proc_device_tree_add_node(struct device_node *np,
 			       struct proc_dir_entry *de)
 {
@@ -190,12 +192,15 @@ void proc_device_tree_add_node(struct device_node *np,
 	struct device_node *child;
 	const char *p;
 
+	/*! np->pde = de  */
 	set_node_proc_entry(np, de);
 	for (child = NULL; (child = of_get_next_child(np, child));) {
 		/* Use everything after the last slash, or the full name */
 		p = kbasename(child->full_name);
 
+		/*! 중복되는 이름인지 확인  */
 		if (duplicate_name(de, p))
+			/*! 중복되면 뒤에 숫자를 붙여서 이름 fix  */
 			p = fixup_name(np, de, p);
 
 		ent = proc_mkdir(p, de);
@@ -223,6 +228,7 @@ void proc_device_tree_add_node(struct device_node *np,
 /*
  * Called on initialization to set up the /proc/device-tree subtree
  */
+/*! 2017. 3.11 study -ing */
 void __init proc_device_tree_init(void)
 {
 	struct device_node *root;

@@ -55,7 +55,7 @@ static __always_inline u64 hash_64(u64 val, unsigned int bits)
 	/* High bits are more random, so use them. */
 	return hash >> (64 - bits);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline u32 hash_32(u32 val, unsigned int bits)
 {
 	/* On some cpus multiply is faster, on others gcc will do shifts */

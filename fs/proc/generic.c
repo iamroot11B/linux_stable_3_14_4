@@ -28,7 +28,7 @@
 #include "internal.h"
 
 DEFINE_SPINLOCK(proc_subdir_lock);
-
+/*! 2017. 3.11 study -ing */
 static int proc_match(unsigned int len, const char *name, struct proc_dir_entry *de)
 {
 	if (de->namelen != len)
@@ -75,6 +75,7 @@ static const struct inode_operations proc_file_inode_operations = {
  * returns the struct proc_dir_entry for "/proc/tty/driver", and
  * returns "serial" in residual.
  */
+/*! 2017. 3.11 study -ing */
 static int __xlate_proc_name(const char *name, struct proc_dir_entry **ret,
 			     const char **residual)
 {
@@ -106,7 +107,7 @@ static int __xlate_proc_name(const char *name, struct proc_dir_entry **ret,
 	*ret = de;
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 static int xlate_proc_name(const char *name, struct proc_dir_entry **ret,
 			   const char **residual)
 {
@@ -154,7 +155,7 @@ retry:
 	*inum = PROC_DYNAMIC_FIRST + i;
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 void proc_free_inum(unsigned int inum)
 {
 	unsigned long flags;
@@ -284,7 +285,7 @@ static const struct inode_operations proc_dir_inode_operations = {
 	.getattr	= proc_getattr,
 	.setattr	= proc_notify_change,
 };
-
+/*! 2017. 3.11 study -ing */
 static int proc_register(struct proc_dir_entry * dir, struct proc_dir_entry * dp)
 {
 	struct proc_dir_entry *tmp;
@@ -294,6 +295,7 @@ static int proc_register(struct proc_dir_entry * dir, struct proc_dir_entry * dp
 	if (ret)
 		return ret;
 
+	/*! 모드에 따라 적절한 operations init */
 	if (S_ISDIR(dp->mode)) {
 		dp->proc_fops = &proc_dir_operations;
 		dp->proc_iops = &proc_dir_inode_operations;
@@ -310,6 +312,7 @@ static int proc_register(struct proc_dir_entry * dir, struct proc_dir_entry * dp
 
 	spin_lock(&proc_subdir_lock);
 
+	/*! 이미 등록된 이름이 있는지 확인  */
 	for (tmp = dir->subdir; tmp; tmp = tmp->next)
 		if (strcmp(tmp->name, dp->name) == 0) {
 			WARN(1, "proc_dir_entry '%s/%s' already registered\n",
@@ -324,7 +327,7 @@ static int proc_register(struct proc_dir_entry * dir, struct proc_dir_entry * dp
 
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 static struct proc_dir_entry *__proc_create(struct proc_dir_entry **parent,
 					  const char *name,
 					  umode_t mode,
@@ -338,6 +341,11 @@ static struct proc_dir_entry *__proc_create(struct proc_dir_entry **parent,
 	if (!name || !strlen(name))
 		goto out;
 
+	/*! ex) name = tty/driver/serial
+	 *		-> parent = /proc/tty/driver,
+	 *		-> fn = serial
+	 *		   성공 시 0 리턴
+	 */
 	if (xlate_proc_name(name, parent, &fn) != 0)
 		goto out;
 
@@ -361,7 +369,7 @@ static struct proc_dir_entry *__proc_create(struct proc_dir_entry **parent,
 out:
 	return ent;
 }
-
+/*! 2017. 3.11 study -ing */
 struct proc_dir_entry *proc_symlink(const char *name,
 		struct proc_dir_entry *parent, const char *dest)
 {
@@ -375,11 +383,13 @@ struct proc_dir_entry *proc_symlink(const char *name,
 		if (ent->data) {
 			strcpy((char*)ent->data,dest);
 			if (proc_register(parent, ent) < 0) {
+				/*! regiser 실패 시 kfree  */
 				kfree(ent->data);
 				kfree(ent);
 				ent = NULL;
 			}
 		} else {
+			/*! ent->data kmalloc 실패해도 kfree */
 			kfree(ent);
 			ent = NULL;
 		}
@@ -387,7 +397,7 @@ struct proc_dir_entry *proc_symlink(const char *name,
 	return ent;
 }
 EXPORT_SYMBOL(proc_symlink);
-
+/*! 2017. 3.11 study -ing */
 struct proc_dir_entry *proc_mkdir_data(const char *name, umode_t mode,
 		struct proc_dir_entry *parent, void *data)
 {
@@ -407,21 +417,21 @@ struct proc_dir_entry *proc_mkdir_data(const char *name, umode_t mode,
 	return ent;
 }
 EXPORT_SYMBOL_GPL(proc_mkdir_data);
-
+/*! 2017. 3.11 study -ing */
 struct proc_dir_entry *proc_mkdir_mode(const char *name, umode_t mode,
 				       struct proc_dir_entry *parent)
 {
 	return proc_mkdir_data(name, mode, parent, NULL);
 }
 EXPORT_SYMBOL(proc_mkdir_mode);
-
+/*! 2017. 3.11 study -ing */
 struct proc_dir_entry *proc_mkdir(const char *name,
 		struct proc_dir_entry *parent)
 {
 	return proc_mkdir_data(name, 0, parent, NULL);
 }
 EXPORT_SYMBOL(proc_mkdir);
-
+/*! 2017. 3.11 study -ing */
 struct proc_dir_entry *proc_create_data(const char *name, umode_t mode,
 					struct proc_dir_entry *parent,
 					const struct file_operations *proc_fops,
@@ -452,7 +462,7 @@ out:
 	return NULL;
 }
 EXPORT_SYMBOL(proc_create_data);
-
+/*! 2017. 3.11 study -ing */
 void proc_set_size(struct proc_dir_entry *de, loff_t size)
 {
 	de->size = size;
@@ -465,7 +475,7 @@ void proc_set_user(struct proc_dir_entry *de, kuid_t uid, kgid_t gid)
 	de->gid = gid;
 }
 EXPORT_SYMBOL(proc_set_user);
-
+/*! 2017. 3.11 study -ing */
 static void free_proc_entry(struct proc_dir_entry *de)
 {
 	proc_free_inum(de->low_ino);
@@ -474,7 +484,7 @@ static void free_proc_entry(struct proc_dir_entry *de)
 		kfree(de->data);
 	kfree(de);
 }
-
+/*! 2017. 3.11 study -ing */
 void pde_put(struct proc_dir_entry *pde)
 {
 	if (atomic_dec_and_test(&pde->count))
@@ -484,6 +494,7 @@ void pde_put(struct proc_dir_entry *pde)
 /*
  * Remove a /proc entry and free it if it's not currently in use.
  */
+/*! 2017. 3.11 study -ing */
 void remove_proc_entry(const char *name, struct proc_dir_entry *parent)
 {
 	struct proc_dir_entry **p;

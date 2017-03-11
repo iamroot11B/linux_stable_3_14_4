@@ -24,12 +24,12 @@ static inline void * __must_check ERR_PTR(long error)
 {
 	return (void *) error;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline long __must_check PTR_ERR(__force const void *ptr)
 {
 	return (long) ptr;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline long __must_check IS_ERR(__force const void *ptr)
 {
 	return IS_ERR_VALUE((unsigned long)ptr);

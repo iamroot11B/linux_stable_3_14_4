@@ -222,6 +222,7 @@ static struct pernet_operations __net_initdata proc_net_ns_ops = {
 	.exit = proc_net_ns_exit,
 };
 
+/*! 2017. 3.11 study -ing */
 int __init proc_net_init(void)
 {
 	proc_symlink("net", NULL, "self/net");

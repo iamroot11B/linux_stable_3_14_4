@@ -132,6 +132,7 @@ static void inotify_freeing_mark(struct fsnotify_mark *fsn_mark, struct fsnotify
  * torn down.  This is only called if the idr is about to be freed but there
  * are still marks in it.
  */
+/*! 2017. 3.11 study -ing */
 static int idr_callback(int id, void *p, void *data)
 {
 	struct fsnotify_mark *fsn_mark;
@@ -159,7 +160,7 @@ static int idr_callback(int id, void *p, void *data)
 			fsn_mark->group, fsn_mark->i.inode, i_mark->wd);
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 static void inotify_free_group_priv(struct fsnotify_group *group)
 {
 	/* ideally the idr is empty and we won't hit the BUG in the callback */

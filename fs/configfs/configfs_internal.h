@@ -133,7 +133,7 @@ static inline struct config_item *configfs_get_config_item(struct dentry *dentry
 
 	return item;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline void release_configfs_dirent(struct configfs_dirent * sd)
 {
 	if (!(sd->s_type & CONFIGFS_ROOT)) {
@@ -150,11 +150,11 @@ static inline struct configfs_dirent * configfs_get(struct configfs_dirent * sd)
 	}
 	return sd;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline void configfs_put(struct configfs_dirent * sd)
 {
 	WARN_ON(!atomic_read(&sd->s_count));
+	/*! sd->s_count를 atomic하게 -1 해서 0이면,  */
 	if (atomic_dec_and_test(&sd->s_count))
 		release_configfs_dirent(sd);
 }
-

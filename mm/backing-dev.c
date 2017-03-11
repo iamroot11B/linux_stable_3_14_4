@@ -39,7 +39,7 @@ LIST_HEAD(bdi_list);
 
 /* bdi_wq serves all asynchronous writeback tasks */
 struct workqueue_struct *bdi_wq;
-
+/*! 2017. 3.11 study -ing */
 void bdi_lock_two(struct bdi_writeback *wb1, struct bdi_writeback *wb2)
 {
 	if (wb1 < wb2) {
@@ -273,6 +273,7 @@ static int __init default_bdi_init(void)
 }
 subsys_initcall(default_bdi_init);
 
+/*! 2017. 3.11 study -ing */
 int bdi_has_dirty_io(struct backing_dev_info *bdi)
 {
 	return wb_has_dirty_io(&bdi->wb);
@@ -486,7 +487,7 @@ err:
 	return err;
 }
 EXPORT_SYMBOL(bdi_init);
-
+/*! 2017. 3.11 study -ing */
 void bdi_destroy(struct backing_dev_info *bdi)
 {
 	int i;
@@ -506,6 +507,7 @@ void bdi_destroy(struct backing_dev_info *bdi)
 		spin_unlock(&dst->list_lock);
 	}
 
+	/*! 2017. 3.11 study end */
 	bdi_unregister(bdi);
 
 	/*

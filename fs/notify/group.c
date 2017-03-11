@@ -31,6 +31,7 @@
 /*
  * Final freeing of a group
  */
+/*! 2017. 3.11 study -ing */
 void fsnotify_final_destroy_group(struct fsnotify_group *group)
 {
 	if (group->ops->free_group_priv)
@@ -77,8 +78,10 @@ void fsnotify_get_group(struct fsnotify_group *group)
 /*
  * Drop a reference to a group.  Free it if it's through.
  */
+/*! 2017. 3.11 study -ing */
 void fsnotify_put_group(struct fsnotify_group *group)
 {
+	/*! atomic_dec_and_test : 1 빼고 뺀 값이 0인지 테스트  */
 	if (atomic_dec_and_test(&group->refcnt))
 		fsnotify_final_destroy_group(group);
 }

@@ -26,7 +26,7 @@ struct completion {
 	unsigned int done;
 	wait_queue_head_t wait;
 };
-
+/*! 2017. 3.11 study -ing */
 #define COMPLETION_INITIALIZER(work) \
 	{ 0, __WAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
 
@@ -41,6 +41,7 @@ struct completion {
  * for static declarations. You should use the _ONSTACK variant for automatic
  * variables.
  */
+/*! 2017. 3.11 study -ing */
 #define DECLARE_COMPLETION(work) \
 	struct completion work = COMPLETION_INITIALIZER(work)
 
@@ -60,6 +61,7 @@ struct completion {
 # define DECLARE_COMPLETION_ONSTACK(work) \
 	struct completion work = COMPLETION_INITIALIZER_ONSTACK(work)
 #else
+/*! 2017. 3.11 study -ing */
 # define DECLARE_COMPLETION_ONSTACK(work) DECLARE_COMPLETION(work)
 #endif
 

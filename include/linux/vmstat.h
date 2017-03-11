@@ -110,7 +110,7 @@ static inline void zone_page_state_add(long x, struct zone *zone,
 	atomic_long_add(x, &zone->vm_stat[item]);
 	atomic_long_add(x, &vm_stat[item]);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline unsigned long global_page_state(enum zone_stat_item item)
 {
 	long x = atomic_long_read(&vm_stat[item]);
@@ -120,7 +120,7 @@ static inline unsigned long global_page_state(enum zone_stat_item item)
 #endif
 	return x;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline unsigned long zone_page_state(struct zone *zone,
 					enum zone_stat_item item)
 {

@@ -451,7 +451,7 @@ static struct file_system_type bd_type = {
 };
 
 static struct super_block *blockdev_superblock __read_mostly;
-
+/*! 2017. 3.11 study -ing */
 void __init bdev_cache_init(void)
 {
 	int err;

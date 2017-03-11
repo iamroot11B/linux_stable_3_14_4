@@ -3622,7 +3622,7 @@ __attribute__((weak)) const char *arch_vma_name(struct vm_area_struct *vma)
 {
 	return NULL;
 }
-
+/*! 2017. 3.11 study -ing */
 void __init signals_init(void)
 {
 	sigqueue_cachep = KMEM_CACHE(sigqueue, SLAB_PANIC);

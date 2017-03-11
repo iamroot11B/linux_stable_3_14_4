@@ -88,6 +88,7 @@ static inline void kmemleak_free_recursive(const void *ptr, unsigned long flags)
 static inline void kmemleak_free_percpu(const void __percpu *ptr)
 {
 }
+/*! 2017. 3.11 study -ing */
 static inline void kmemleak_not_leak(const void *ptr)
 {
 }

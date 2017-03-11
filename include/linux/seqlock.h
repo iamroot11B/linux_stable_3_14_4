@@ -28,7 +28,7 @@
  * to increment the sequence variables because an interrupt routine could
  * change the state of the data.
  *
- * Based on x86_64 vsyscall gettimeofday 
+ * Based on x86_64 vsyscall gettimeofday
  * by Keith Owens and Andrea Arcangeli
  */
 
@@ -49,7 +49,7 @@ typedef struct seqcount {
 	struct lockdep_map dep_map;
 #endif
 } seqcount_t;
-
+/*! 2017. 3.11 study -ing */
 static inline void __seqcount_init(seqcount_t *s, const char *name,
 					  struct lock_class_key *key)
 {
@@ -83,6 +83,7 @@ static inline void seqcount_lockdep_reader_access(const seqcount_t *s)
 
 #else
 # define SEQCOUNT_DEP_MAP_INIT(lockname)
+/*! 2017. 3.11 study -ing */
 # define seqcount_init(s) __seqcount_init(s, NULL, NULL)
 /*! 2016.11.05 study -ing  */
 # define seqcount_lockdep_reader_access(x)

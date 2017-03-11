@@ -49,7 +49,7 @@ typedef struct raw_spinlock {
 #else
 # define SPIN_DEBUG_INIT(lockname)
 #endif
-
+/*! 2017. 3.11 study -ing */
 #define __RAW_SPIN_LOCK_INITIALIZER(lockname)	\
 	{					\
 	.raw_lock = __ARCH_SPIN_LOCK_UNLOCKED,	\
@@ -74,10 +74,10 @@ typedef struct spinlock {
 #endif
 	};
 } spinlock_t;
-
+/*! 2017. 3.11 study -ing */
 #define __SPIN_LOCK_INITIALIZER(lockname) \
 	{ { .rlock = __RAW_SPIN_LOCK_INITIALIZER(lockname) } }
-
+/*! 2017. 3.11 study -ing */
 #define __SPIN_LOCK_UNLOCKED(lockname) \
 	(spinlock_t ) __SPIN_LOCK_INITIALIZER(lockname)
 /*! 2016.07.09 study -ing */

@@ -505,6 +505,7 @@ void inotify_ignored_and_remove_idr(struct fsnotify_mark *fsn_mark,
 }
 
 /* ding dong the mark is dead */
+/*! 2017. 3.11 study -ing */
 static void inotify_free_mark(struct fsnotify_mark *fsn_mark)
 {
 	struct inotify_inode_mark *i_mark;

@@ -49,7 +49,7 @@ int proc_setup_self(struct super_block *s)
 	struct inode *root_inode = s->s_root->d_inode;
 	struct pid_namespace *ns = s->s_fs_info;
 	struct dentry *self;
-	
+
 	mutex_lock(&root_inode->i_mutex);
 	self = d_alloc_name(s->s_root, "self");
 	if (self) {
@@ -77,7 +77,7 @@ int proc_setup_self(struct super_block *s)
 	ns->proc_self = self;
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 void __init proc_self_init(void)
 {
 	proc_alloc_inum(&self_inum);

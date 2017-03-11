@@ -5,7 +5,7 @@
  *
  * We have a per-user structure to keep track of how many
  * processes, files etc the user has claimed, in order to be
- * able to have per-user limits for system resources. 
+ * able to have per-user limits for system resources.
  */
 
 #include <linux/init.h>
@@ -100,7 +100,7 @@ static void uid_hash_insert(struct user_struct *up, struct hlist_head *hashent)
 {
 	hlist_add_head(&up->uidhash_node, hashent);
 }
-
+/*! 2017. 3.11 study -ing */
 static void uid_hash_remove(struct user_struct *up)
 {
 	hlist_del_init(&up->uidhash_node);
@@ -124,11 +124,13 @@ static struct user_struct *uid_hash_find(kuid_t uid, struct hlist_head *hashent)
  * IRQ state (as stored in flags) is restored and uidhash_lock released
  * upon function exit.
  */
+/*! 2017. 3.11 study -ing */
 static void free_user(struct user_struct *up, unsigned long flags)
 	__releases(&uidhash_lock)
 {
 	uid_hash_remove(up);
 	spin_unlock_irqrestore(&uidhash_lock, flags);
+	/*! Do Nothing  */
 	key_put(up->uid_keyring);
 	key_put(up->session_keyring);
 	kmem_cache_free(uid_cachep, up);
@@ -150,7 +152,7 @@ struct user_struct *find_user(kuid_t uid)
 	spin_unlock_irqrestore(&uidhash_lock, flags);
 	return ret;
 }
-
+/*! 2017. 3.11 study -ing */
 void free_uid(struct user_struct *up)
 {
 	unsigned long flags;

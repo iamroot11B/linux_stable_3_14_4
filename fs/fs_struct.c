@@ -10,6 +10,7 @@
  * Replace the fs->{rootmnt,root} with {mnt,dentry}. Put the old values.
  * It can block.
  */
+/*! 2017. 3.11 study -ing */
 void set_fs_root(struct fs_struct *fs, const struct path *path)
 {
 	struct path old_root;

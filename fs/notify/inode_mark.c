@@ -85,12 +85,14 @@ void fsnotify_destroy_inode_mark(struct fsnotify_mark *mark)
 /*
  * Given an inode, destroy all of the marks associated with that inode.
  */
+/*! 2017. 3.11 study -ing */
 void fsnotify_clear_marks_by_inode(struct inode *inode)
 {
 	struct fsnotify_mark *mark, *lmark;
 	struct hlist_node *n;
 	LIST_HEAD(free_list);
 
+	/*! free_list에 추가 후, */
 	spin_lock(&inode->i_lock);
 	hlist_for_each_entry_safe(mark, n, &inode->i_fsnotify_marks, i.i_list) {
 		list_add(&mark->i.free_i_list, &free_list);
@@ -99,6 +101,7 @@ void fsnotify_clear_marks_by_inode(struct inode *inode)
 	}
 	spin_unlock(&inode->i_lock);
 
+	/*! free_list를 대상으로 loop  */
 	list_for_each_entry_safe(mark, lmark, &free_list, i.free_i_list) {
 		struct fsnotify_group *group;
 

@@ -309,6 +309,7 @@ static inline void __list_splice(const struct list_head *list,
  * @list: the new list to add.
  * @head: the place to add it in the first list.
  */
+/*! 2017. 3.11 study -ing */
 static inline void list_splice(const struct list_head *list,
 				struct list_head *head)
 {
@@ -663,9 +664,10 @@ static inline void hlist_del_init(struct hlist_node *n)
 		INIT_HLIST_NODE(n);
 	}
 }
-
+/*! 2017. 3.11 study -ing */
 static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
 {
+	/*! hlist에 n node 추가  */
 	struct hlist_node *first = h->first;
 	n->next = first;
 	if (first)

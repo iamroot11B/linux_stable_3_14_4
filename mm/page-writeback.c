@@ -198,10 +198,12 @@ static unsigned long writeout_period_time = 0;
  * Returns the zone's number of pages potentially available for dirty
  * page cache.  This is the base value for the per-zone dirty limits.
  */
+/*! 2017. 3.11 study -ing */
 static unsigned long zone_dirtyable_memory(struct zone *zone)
 {
 	unsigned long nr_pages;
 
+	/*! zone->vm_stat[NR_FREE_PAGES]  */
 	nr_pages = zone_page_state(zone, NR_FREE_PAGES);
 	nr_pages -= min(nr_pages, zone->dirty_balance_reserve);
 
@@ -210,7 +212,7 @@ static unsigned long zone_dirtyable_memory(struct zone *zone)
 
 	return nr_pages;
 }
-
+/*! 2017. 3.11 study -ing */
 static unsigned long highmem_dirtyable_memory(unsigned long total)
 {
 #ifdef CONFIG_HIGHMEM
@@ -252,10 +254,12 @@ static unsigned long highmem_dirtyable_memory(unsigned long total)
  * Returns the global number of pages potentially available for dirty
  * page cache.  This is the base value for the global dirty limits.
  */
+/*! 2017. 3.11 study -ing */
 static unsigned long global_dirtyable_memory(void)
 {
 	unsigned long x;
 
+	/*! vm_stat[NR_FREE_PAGES] */
 	x = global_page_state(NR_FREE_PAGES);
 	x -= min(x, dirty_balance_reserve);
 
@@ -277,6 +281,7 @@ static unsigned long global_dirtyable_memory(void)
  * The dirty limits will be lifted by 1/4 for PF_LESS_THROTTLE (ie. nfsd) and
  * real-time tasks.
  */
+/*! 2017. 3.11 study -ing */
 void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirty)
 {
 	unsigned long background;
@@ -287,11 +292,13 @@ void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirty)
 	if (!vm_dirty_bytes || !dirty_background_bytes)
 		available_memory = global_dirtyable_memory();
 
+	/*! vm_dirty_ratio = 20 */
 	if (vm_dirty_bytes)
 		dirty = DIV_ROUND_UP(vm_dirty_bytes, PAGE_SIZE);
 	else
 		dirty = (vm_dirty_ratio * available_memory) / 100;
 
+	/*! dirty_background_ratio = 10 */
 	if (dirty_background_bytes)
 		background = DIV_ROUND_UP(dirty_background_bytes, PAGE_SIZE);
 	else
@@ -1744,6 +1751,7 @@ void laptop_sync_completion(void)
  * thresholds.
  */
 
+/*! 2017. 3.11 study -ing */
 void writeback_set_ratelimit(void)
 {
 	unsigned long background_thresh;
@@ -1793,6 +1801,7 @@ static struct notifier_block ratelimit_nb = {
  * But we might still want to scale the dirty_ratio by how
  * much memory the box has..
  */
+/*! 2017. 3.11 study -ing */
 void __init page_writeback_init(void)
 {
 	writeback_set_ratelimit();

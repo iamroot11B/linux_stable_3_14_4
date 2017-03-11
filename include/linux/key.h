@@ -349,6 +349,7 @@ extern void key_init(void);
 #define key_get(k) 			({ NULL; })
 #define key_revoke(k)			do { } while(0)
 #define key_invalidate(k)		do { } while(0)
+/*! 2017. 3.11 study -ing */
 #define key_put(k)			do { } while(0)
 #define key_ref_put(k)			do { } while(0)
 #define make_key_ref(k, p)		NULL

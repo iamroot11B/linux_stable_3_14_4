@@ -23,6 +23,7 @@
 #define HASH_BITS(name) ilog2(HASH_SIZE(name))
 
 /* Use hash_32 when possible to allow for fast 32bit hashing in 64bit kernels. */
+/*! 2017. 3.11 study -ing */
 #define hash_min(val, bits)							\
 	(sizeof(val) <= 4 ? hash_32(val, bits) : hash_long(val, bits))
 
@@ -52,6 +53,7 @@ static inline void __hash_init(struct hlist_head *ht, unsigned int sz)
  * @node: the &struct hlist_node of the object to be added
  * @key: the key of the object to be added
  */
+/*! 2017. 3.11 study -ing */
 #define hash_add(hashtable, node, key)						\
 	hlist_add_head(node, &hashtable[hash_min(key, HASH_BITS(hashtable))])
 

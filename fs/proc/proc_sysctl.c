@@ -60,7 +60,7 @@ static void sysctl_print_dir(struct ctl_dir *dir)
 		sysctl_print_dir(dir->header.parent);
 	pr_cont("%s/", dir->header.ctl_table[0].procname);
 }
-
+/*! 2017. 3.11 study -ing */
 static int namecmp(const char *name1, int len1, const char *name2, int len2)
 {
 	int minlen;
@@ -77,9 +77,11 @@ static int namecmp(const char *name1, int len1, const char *name2, int len2)
 }
 
 /* Called under sysctl_lock */
+/*! 2017. 3.11 study -ing */
 static struct ctl_table *find_entry(struct ctl_table_header **phead,
 	struct ctl_dir *dir, const char *name, int namelen)
 {
+	/*! rb트리 root인 dir->root에서 tree 탐색하여 매칭되는 이름의 entry를 찾아서 리턴  */
 	struct ctl_table_header *head;
 	struct ctl_table *entry;
 	struct rb_node *node = dir->root.rb_node;
@@ -107,7 +109,7 @@ static struct ctl_table *find_entry(struct ctl_table_header **phead,
 	}
 	return NULL;
 }
-
+/*! 2017. 3.11 study -ing */
 static int insert_entry(struct ctl_table_header *head, struct ctl_table *entry)
 {
 	struct rb_node *node = &head->node[entry - head->ctl_table].node;
@@ -116,6 +118,7 @@ static int insert_entry(struct ctl_table_header *head, struct ctl_table *entry)
 	const char *name = entry->procname;
 	int namelen = strlen(name);
 
+	/*! head->parent->root.rb_node를 root로 하는 rb 트리 탐색 해 내려가면서,  */
 	while (*p) {
 		struct ctl_table_header *parent_head;
 		struct ctl_table *parent_entry;
@@ -129,12 +132,14 @@ static int insert_entry(struct ctl_table_header *head, struct ctl_table *entry)
 		parent_entry = &parent_head->ctl_table[parent_node - parent_head->node];
 		parent_name = parent_entry->procname;
 
+		/*! name과 paent_name을 비교하여 rb 트리 진행,  */
 		cmp = namecmp(name, namelen, parent_name, strlen(parent_name));
 		if (cmp < 0)
 			p = &(*p)->rb_left;
 		else if (cmp > 0)
 			p = &(*p)->rb_right;
 		else {
+			/*! name과 parnet_name이 같으면 에러  */
 			pr_err("sysctl duplicate entry: ");
 			sysctl_print_dir(head->parent);
 			pr_cont("/%s\n", entry->procname);
@@ -142,18 +147,19 @@ static int insert_entry(struct ctl_table_header *head, struct ctl_table *entry)
 		}
 	}
 
+	/*! 탐색 해 내려온 rb 트리 마지막에 insert  */
 	rb_link_node(node, parent, p);
 	rb_insert_color(node, &head->parent->root);
 	return 0;
 }
-
+/*! 2017. 3.11 study -ing */
 static void erase_entry(struct ctl_table_header *head, struct ctl_table *entry)
 {
 	struct rb_node *node = &head->node[entry - head->ctl_table].node;
 
 	rb_erase(node, &head->parent->root);
 }
-
+/*! 2017. 3.11 study -ing */
 static void init_header(struct ctl_table_header *head,
 	struct ctl_table_root *root, struct ctl_table_set *set,
 	struct ctl_node *node, struct ctl_table *table)
@@ -174,14 +180,14 @@ static void init_header(struct ctl_table_header *head,
 			node->header = head;
 	}
 }
-
+/*! 2017. 3.11 study -ing */
 static void erase_header(struct ctl_table_header *head)
 {
 	struct ctl_table *entry;
 	for (entry = head->ctl_table; entry->procname; entry++)
 		erase_entry(head, entry);
 }
-
+/*! 2017. 3.11 study -ing */
 static int insert_header(struct ctl_dir *dir, struct ctl_table_header *header)
 {
 	struct ctl_table *entry;
@@ -192,6 +198,7 @@ static int insert_header(struct ctl_dir *dir, struct ctl_table_header *header)
 	err = insert_links(header);
 	if (err)
 		goto fail_links;
+	/*! header->ctl_table loop 돌면서 insert_entry  */
 	for (entry = header->ctl_table; entry->procname; entry++) {
 		err = insert_entry(header, entry);
 		if (err)
@@ -821,7 +828,7 @@ static const struct dentry_operations proc_sys_dentry_operations = {
 	.d_delete	= proc_sys_delete,
 	.d_compare	= proc_sys_compare,
 };
-
+/*! 2017. 3.11 study -ing */
 static struct ctl_dir *find_subdir(struct ctl_dir *dir,
 				   const char *name, int namelen)
 {
@@ -835,7 +842,7 @@ static struct ctl_dir *find_subdir(struct ctl_dir *dir,
 		return ERR_PTR(-ENOTDIR);
 	return container_of(head, struct ctl_dir, header);
 }
-
+/*! 2017. 3.11 study -ing */
 static struct ctl_dir *new_dir(struct ctl_table_set *set,
 			       const char *name, int namelen)
 {
@@ -844,6 +851,7 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
 	struct ctl_node *node;
 	char *new_name;
 
+	/*! malloc 후 init  */
 	new = kzalloc(sizeof(*new) + sizeof(struct ctl_node) +
 		      sizeof(struct ctl_table)*2 +  namelen + 1,
 		      GFP_KERNEL);
@@ -874,6 +882,7 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
  * Upon error an error code is returned and the reference on @dir is
  * simply dropped.
  */
+/*! 2017. 3.11 study -ing */
 static struct ctl_dir *get_subdir(struct ctl_dir *dir,
 				  const char *name, int namelen)
 {
@@ -899,10 +908,12 @@ static struct ctl_dir *get_subdir(struct ctl_dir *dir,
 	subdir = find_subdir(dir, name, namelen);
 	if (!IS_ERR(subdir))
 		goto found;
+	/*! PTR_ERR(ptr) = ptr */
 	if (PTR_ERR(subdir) != -ENOENT)
 		goto failed;
 
 	/* Nope.  Use the our freshly made directory entry. */
+	/*! new->header->parent = dir  */
 	err = insert_header(dir, &new->header);
 	subdir = ERR_PTR(err);
 	if (err)
@@ -923,7 +934,7 @@ failed:
 	spin_unlock(&sysctl_lock);
 	return subdir;
 }
-
+/*! 2017. 3.11 study -ing */
 static struct ctl_dir *xlate_dir(struct ctl_table_set *set, struct ctl_dir *dir)
 {
 	struct ctl_dir *parent;
@@ -970,7 +981,7 @@ static int sysctl_follow_link(struct ctl_table_header **phead,
 	spin_unlock(&sysctl_lock);
 	return ret;
 }
-
+/*! 2017. 3.11 study -ing */
 static int sysctl_err(const char *path, struct ctl_table *table, char *fmt, ...)
 {
 	struct va_format vaf;
@@ -986,7 +997,7 @@ static int sysctl_err(const char *path, struct ctl_table *table, char *fmt, ...)
 	va_end(args);
 	return -EINVAL;
 }
-
+/*! 2017. 3.11 study -ing */
 static int sysctl_check_table(const char *path, struct ctl_table *table)
 {
 	int err = 0;
@@ -1017,6 +1028,7 @@ static int sysctl_check_table(const char *path, struct ctl_table *table)
 	return err;
 }
 
+/*! 2017. 3.11 study -ing */
 static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table *table,
 	struct ctl_table_root *link_root)
 {
@@ -1033,6 +1045,7 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table 
 		name_bytes += strlen(entry->procname) + 1;
 	}
 
+	/*! links malloc 후,  */
 	links = kzalloc(sizeof(struct ctl_table_header) +
 			sizeof(struct ctl_node)*nr_entries +
 			sizeof(struct ctl_table)*(nr_entries + 1) +
@@ -1042,6 +1055,7 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table 
 	if (!links)
 		return NULL;
 
+	/*! links 초기화  */
 	node = (struct ctl_node *)(links + 1);
 	link_table = (struct ctl_table *)(node + nr_entries);
 	link_name = (char *)&link_table[nr_entries + 1];
@@ -1059,7 +1073,7 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table 
 
 	return links;
 }
-
+/*! 2017. 3.11 study -ing */
 static bool get_links(struct ctl_dir *dir,
 	struct ctl_table *table, struct ctl_table_root *link_root)
 {
@@ -1067,8 +1081,10 @@ static bool get_links(struct ctl_dir *dir,
 	struct ctl_table *entry, *link;
 
 	/* Are there links available for every entry in table? */
+	/*! table->procname이 있으면 계속 loop 돌면서,  */
 	for (entry = table; entry->procname; entry++) {
 		const char *procname = entry->procname;
+		/*! dir->root.rb_node 아래로 트리 탐색하여 procname과 매칭되는 entry 리턴  */
 		link = find_entry(&head, dir, procname, strlen(procname));
 		if (!link)
 			return false;
@@ -1087,7 +1103,7 @@ static bool get_links(struct ctl_dir *dir,
 	}
 	return true;
 }
-
+/*! 2017. 3.11 study -ing */
 static int insert_links(struct ctl_table_header *head)
 {
 	struct ctl_table_set *root_set = &sysctl_table_root.default_set;
@@ -1102,9 +1118,11 @@ static int insert_links(struct ctl_table_header *head)
 	if (IS_ERR(core_parent))
 		return 0;
 
+	/*! link 찾으면 그대로 리턴  */
 	if (get_links(core_parent, head->ctl_table, head->root))
 		return 0;
 
+	/*! 못 찾으면 새로운 링크 생성  */
 	core_parent->header.nreg++;
 	spin_unlock(&sysctl_lock);
 
@@ -1116,6 +1134,7 @@ static int insert_links(struct ctl_table_header *head)
 		goto out;
 
 	err = 0;
+	/*! 정상적으로 new_links 만들어져서 get_links가 되면 err=0으로 리턴  */
 	if (get_links(core_parent, head->ctl_table, head->root)) {
 		kfree(links);
 		goto out;
@@ -1171,6 +1190,7 @@ out:
  * This routine returns %NULL on a failure to register, and a pointer
  * to the table header on success.
  */
+/*! 2017. 3.11 study -ing */
 struct ctl_table_header *__register_sysctl_table(
 	struct ctl_table_set *set,
 	const char *path, struct ctl_table *table)
@@ -1193,6 +1213,7 @@ struct ctl_table_header *__register_sysctl_table(
 
 	node = (struct ctl_node *)(header + 1);
 	init_header(header, root, set, node, table);
+	/*! table error 케이스 확인 */
 	if (sysctl_check_table(path, table))
 		goto fail;
 
@@ -1215,6 +1236,7 @@ struct ctl_table_header *__register_sysctl_table(
 		if (namelen == 0)
 			continue;
 
+		/*! dir->root를 루트로 하는 rb 트리에서 name에 매칭되는 entry를 찾아온다. */
 		dir = get_subdir(dir, name, namelen);
 		if (IS_ERR(dir))
 			goto fail;
@@ -1254,9 +1276,10 @@ struct ctl_table_header *register_sysctl(const char *path, struct ctl_table *tab
 					path, table);
 }
 EXPORT_SYMBOL(register_sysctl);
-
+/*! 2017. 3.11 study -ing */
 static char *append_path(const char *path, char *pos, const char *name)
 {
+	/*! pos에 name을 copy하고 마지막에 /와 널문자 추가  */
 	int namelen;
 	namelen = strlen(name);
 	if (((pos - path) + namelen + 2) >= PATH_MAX)
@@ -1267,7 +1290,7 @@ static char *append_path(const char *path, char *pos, const char *name)
 	pos += namelen + 1;
 	return pos;
 }
-
+/*! 2017. 3.11 study -ing */
 static int count_subheaders(struct ctl_table *table)
 {
 	int has_files = 0;
@@ -1286,7 +1309,7 @@ static int count_subheaders(struct ctl_table *table)
 	}
 	return nr_subheaders + has_files;
 }
-
+/*! 2017. 3.11 study -ing */
 static int register_leaf_sysctl_tables(const char *path, char *pos,
 	struct ctl_table_header ***subheader, struct ctl_table_set *set,
 	struct ctl_table *table)
@@ -1306,6 +1329,7 @@ static int register_leaf_sysctl_tables(const char *path, char *pos,
 
 	files = table;
 	/* If there are mixed files and directories we need a new table */
+	/*! 디렉토리, 파일이 같이 있으면 새로운 table 생성  */
 	if (nr_dirs && nr_files) {
 		struct ctl_table *new;
 		files = kzalloc(sizeof(struct ctl_table) * (nr_files + 1),
@@ -1323,6 +1347,7 @@ static int register_leaf_sysctl_tables(const char *path, char *pos,
 	}
 
 	/* Register everything except a directory full of subdirectories */
+	/*! 서브 디렉토리만 있는 경우가 아니라면 register  */
 	if (nr_files || !nr_dirs) {
 		struct ctl_table_header *header;
 		header = __register_sysctl_table(set, path, files);
@@ -1338,6 +1363,7 @@ static int register_leaf_sysctl_tables(const char *path, char *pos,
 	}
 
 	/* Recurse into the subdirectories. */
+	/*! table loop 돌면서(하위 디렉토리들) register_leaf_sysctl_tables 수행 */
 	for (entry = table; entry->procname; entry++) {
 		char *child_pos;
 
@@ -1372,6 +1398,7 @@ out:
  *
  * See __register_sysctl_table for more details.
  */
+/*! 2017. 3.11 study -ing */
 struct ctl_table_header *__register_sysctl_paths(
 	struct ctl_table_set *set,
 	const struct ctl_path *path, struct ctl_table *table)
@@ -1388,6 +1415,7 @@ struct ctl_table_header *__register_sysctl_paths(
 
 	pos[0] = '\0';
 	for (component = path; component->procname; component++) {
+		/*! pos 에 component->procname를 copy하고 마지막에 /와 널문자 추가 */
 		pos = append_path(new_path, pos, component->procname);
 		if (!pos)
 			goto out;
@@ -1443,6 +1471,7 @@ err_register_leaves:
  *
  * See __register_sysctl_paths for more details.
  */
+/*! 2017. 3.11 study -ing */
 struct ctl_table_header *register_sysctl_paths(const struct ctl_path *path,
 						struct ctl_table *table)
 {
@@ -1460,6 +1489,7 @@ EXPORT_SYMBOL(register_sysctl_paths);
  *
  * See register_sysctl_paths for more details.
  */
+/*! 2017. 3.11 study -ing */
 struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
 {
 	static const struct ctl_path null_path[] = { {} };
@@ -1467,7 +1497,7 @@ struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
 	return register_sysctl_paths(null_path, table);
 }
 EXPORT_SYMBOL(register_sysctl_table);
-
+/*! 2017. 3.11 study -ing */
 static void put_links(struct ctl_table_header *header)
 {
 	struct ctl_table_set *root_set = &sysctl_table_root.default_set;
@@ -1483,11 +1513,13 @@ static void put_links(struct ctl_table_header *header)
 	if (IS_ERR(core_parent))
 		return;
 
+	/*! header->ctl_table loop 돌면서,  */
 	for (entry = header->ctl_table; entry->procname; entry++) {
 		struct ctl_table_header *link_head;
 		struct ctl_table *link;
 		const char *name = entry->procname;
 
+		/*! name에 매칭되는 entry 찾은 후,  */
 		link = find_entry(&link_head, core_parent, name, strlen(name));
 		if (link &&
 		    ((S_ISDIR(link->mode) && S_ISDIR(entry->mode)) ||
@@ -1501,7 +1533,7 @@ static void put_links(struct ctl_table_header *header)
 		}
 	}
 }
-
+/*! 2017. 3.11 study -ing */
 static void drop_sysctl_table(struct ctl_table_header *header)
 {
 	struct ctl_dir *parent = header->parent;
@@ -1525,6 +1557,7 @@ static void drop_sysctl_table(struct ctl_table_header *header)
  * Unregisters the sysctl table and all children. proc entries may not
  * actually be removed until they are no longer used by anyone.
  */
+/*! 2017. 3.11 study -ing */
 void unregister_sysctl_table(struct ctl_table_header * header)
 {
 	int nr_subheaders;
@@ -1533,12 +1566,14 @@ void unregister_sysctl_table(struct ctl_table_header * header)
 	if (header == NULL)
 		return;
 
+	/*! subheaders 갯수 확인 후 1 이상이면, */
 	nr_subheaders = count_subheaders(header->ctl_table_arg);
 	if (unlikely(nr_subheaders > 1)) {
 		struct ctl_table_header **subheaders;
 		int i;
 
 		subheaders = (struct ctl_table_header **)(header + 1);
+		/*! subheaders 갯수만큼 loop돌면서 unregister_sysctl_table 재귀 수행 */
 		for (i = nr_subheaders -1; i >= 0; i--) {
 			struct ctl_table_header *subh = subheaders[i];
 			struct ctl_table *table = subh->ctl_table_arg;
@@ -1568,7 +1603,7 @@ void retire_sysctl_set(struct ctl_table_set *set)
 {
 	WARN_ON(!RB_EMPTY_ROOT(&set->dir.root));
 }
-
+/*! 2017. 3.11 study -ing */
 int __init proc_sys_init(void)
 {
 	struct proc_dir_entry *proc_sys_root;

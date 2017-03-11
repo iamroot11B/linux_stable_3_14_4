@@ -150,6 +150,7 @@ static inline void fsnotify_inoderemove(struct inode *inode)
 {
 	fsnotify(inode, FS_DELETE_SELF, inode, FSNOTIFY_EVENT_INODE, NULL, 0);
     /*! 2017. 3.04 study end */
+	/*! 2017. 3.11 study start */
 	__fsnotify_inode_delete(inode);
 }
 

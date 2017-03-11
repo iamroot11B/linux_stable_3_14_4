@@ -48,10 +48,10 @@ struct task_struct;
 	.private	= tsk,						\
 	.func		= default_wake_function,			\
 	.task_list	= { NULL, NULL } }
-
+/*! 2017. 3.11 study -ing */
 #define DECLARE_WAITQUEUE(name, tsk)					\
 	wait_queue_t name = __WAITQUEUE_INITIALIZER(name, tsk)
-
+/*! 2017. 3.11 study -ing */
 #define __WAIT_QUEUE_HEAD_INITIALIZER(name) {				\
 	.lock		= __SPIN_LOCK_UNLOCKED(name.lock),		\
 	.task_list	= { &(name).task_list, &(name).task_list } }
@@ -131,14 +131,14 @@ static inline void __add_wait_queue_tail(wait_queue_head_t *head,
 {
 	list_add_tail(&new->task_list, &head->task_list);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline void
 __add_wait_queue_tail_exclusive(wait_queue_head_t *q, wait_queue_t *wait)
 {
 	wait->flags |= WQ_FLAG_EXCLUSIVE;
 	__add_wait_queue_tail(q, wait);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline void
 __remove_wait_queue(wait_queue_head_t *head, wait_queue_t *old)
 {

@@ -26,6 +26,7 @@
  * It may be assumed that this function implies a write memory barrier before
  * changing the task state if and only if any tasks are woken up.
  */
+/*! 2017. 3.11 study -ing */
 void complete(struct completion *x)
 {
 	unsigned long flags;
@@ -57,7 +58,7 @@ void complete_all(struct completion *x)
 	spin_unlock_irqrestore(&x->wait.lock, flags);
 }
 EXPORT_SYMBOL(complete_all);
-
+/*! 2017. 3.11 study -ing */
 static inline long __sched
 do_wait_for_common(struct completion *x,
 		   long (*action)(long), long timeout, int state)
@@ -83,7 +84,7 @@ do_wait_for_common(struct completion *x,
 	x->done--;
 	return timeout ?: 1;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline long __sched
 __wait_for_common(struct completion *x,
 		  long (*action)(long), long timeout, int state)
@@ -95,7 +96,7 @@ __wait_for_common(struct completion *x,
 	spin_unlock_irq(&x->wait.lock);
 	return timeout;
 }
-
+/*! 2017. 3.11 study -ing */
 static long __sched
 wait_for_common(struct completion *x, long timeout, int state)
 {
@@ -118,6 +119,7 @@ wait_for_common_io(struct completion *x, long timeout, int state)
  * See also similar routines (i.e. wait_for_completion_timeout()) with timeout
  * and interrupt capability. Also see complete().
  */
+/*! 2017. 3.11 study -ing */
 void __sched wait_for_completion(struct completion *x)
 {
 	wait_for_common(x, MAX_SCHEDULE_TIMEOUT, TASK_UNINTERRUPTIBLE);

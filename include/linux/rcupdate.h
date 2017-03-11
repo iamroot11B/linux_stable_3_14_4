@@ -124,6 +124,7 @@ void call_rcu(struct rcu_head *head,
 #else /* #ifdef CONFIG_PREEMPT_RCU */
 
 /* In classic RCU, call_rcu() is just call_rcu_sched(). */
+/*! 2017. 3.11 study -ing */
 #define	call_rcu	call_rcu_sched
 
 #endif /* #else #ifdef CONFIG_PREEMPT_RCU */
@@ -531,6 +532,7 @@ static inline void rcu_preempt_sleep_check(void)
 		smp_read_barrier_depends(); \
 		((typeof(*p) __force __kernel *)(_________p1)); \
 	})
+/*! 2017. 3.11 study -ing */
 #define __rcu_dereference_protected(p, c, space) \
 	({ \
 		rcu_lockdep_assert(c, "suspicious rcu_dereference_protected()" \
@@ -748,6 +750,7 @@ static inline void rcu_preempt_sleep_check(void)
  * when protected only by rcu_read_lock() will result in infrequent
  * but very ugly failures.
  */
+/*! 2017. 3.11 study -ing */
 #define rcu_dereference_protected(p, c) \
 	__rcu_dereference_protected((p), (c), __rcu)
 

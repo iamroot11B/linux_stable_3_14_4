@@ -2565,7 +2565,7 @@ static inline int test_and_clear_tsk_thread_flag(struct task_struct *tsk, int fl
 {
 	return test_and_clear_ti_thread_flag(task_thread_info(tsk), flag);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline int test_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	return test_ti_thread_flag(task_thread_info(tsk), flag);
@@ -2591,12 +2591,12 @@ static inline int restart_syscall(void)
 	set_tsk_thread_flag(current, TIF_SIGPENDING);
 	return -ERESTARTNOINTR;
 }
-
+/*! 2017. 3.11 study -ing */
 static inline int signal_pending(struct task_struct *p)
 {
 	return unlikely(test_tsk_thread_flag(p,TIF_SIGPENDING));
 }
-
+/*! 2017. 3.11 study -ing */
 static inline int __fatal_signal_pending(struct task_struct *p)
 {
 	return unlikely(sigismember(&p->pending.signal, SIGKILL));
@@ -2606,7 +2606,7 @@ static inline int fatal_signal_pending(struct task_struct *p)
 {
 	return signal_pending(p) && __fatal_signal_pending(p);
 }
-
+/*! 2017. 3.11 study -ing */
 static inline int signal_pending_state(long state, struct task_struct *p)
 {
 	if (!(state & (TASK_INTERRUPTIBLE | TASK_WAKEKILL)))
@@ -2614,6 +2614,7 @@ static inline int signal_pending_state(long state, struct task_struct *p)
 	if (!signal_pending(p))
 		return 0;
 
+	/*! state 상태와 p의 signal flag 을 확인하여 리턴  */
 	return (state & TASK_INTERRUPTIBLE) || __fatal_signal_pending(p);
 }
 

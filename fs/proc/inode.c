@@ -97,7 +97,7 @@ static void init_once(void *foo)
 
 	inode_init_once(&ei->vfs_inode);
 }
-
+/*! 2017. 3.11 study -ing */
 void __init proc_init_inodecache(void)
 {
 	proc_inode_cachep = kmem_cache_create("proc_inode_cache",
@@ -144,6 +144,7 @@ static void unuse_pde(struct proc_dir_entry *pde)
 }
 
 /* pde is locked */
+/*! 2017. 3.11 study -ing */
 static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 {
 	if (pdeo->closing) {
@@ -166,7 +167,7 @@ static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 		kfree(pdeo);
 	}
 }
-
+/*! 2017. 3.11 study -ing */
 void proc_entry_rundown(struct proc_dir_entry *de)
 {
 	DECLARE_COMPLETION_ONSTACK(c);
@@ -449,7 +450,7 @@ int proc_fill_super(struct super_block *s)
 	s->s_magic = PROC_SUPER_MAGIC;
 	s->s_op = &proc_sops;
 	s->s_time_gran = 1;
-	
+
 	pde_get(&proc_root);
 	root_inode = proc_get_inode(s, &proc_root);
 	if (!root_inode) {

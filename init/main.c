@@ -802,6 +802,7 @@ asmlinkage void __init start_kernel(void)
 #ifdef CONFIG_PROC_FS
 	proc_root_init();
 #endif
+	/*! 2017. 3.11 study -ing */
 	cgroup_init();
 	cpuset_init();
 	taskstats_init_early();

@@ -222,7 +222,7 @@ struct dentry_operations {
 #define DCACHE_FILE_TYPE		0x00400000 /* Other file type */
 
 extern seqlock_t rename_lock;
-
+/*! 2017. 3.11 study -ing */
 static inline int dname_external(const struct dentry *dentry)
 {
 	return dentry->d_name.name != dentry->d_iname;
