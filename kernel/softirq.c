@@ -71,7 +71,7 @@ const char * const softirq_to_name[NR_SOFTIRQS] = {
 static void wakeup_softirqd(void)
 {
 	/* Interrupts are disabled: no need to stop preemption */
-	struct task_struct *tsk = __this_cpu_read(ksoftirqd);n
+	struct task_struct *tsk = __this_cpu_read(ksoftirqd);
 
 	/*! task가 running 상태가 아니면 wake up process 수행.  */
 	if (tsk && tsk->state != TASK_RUNNING)

@@ -77,7 +77,7 @@ do { \
 	barrier(); \
 	preempt_count_dec(); \
 } while (0)
-CONFIG_TRACE_IRQFLAGS
+/*! 2017. 3.18 study -ing */
 #define preempt_check_resched() do { } while (0)
 #endif
 
