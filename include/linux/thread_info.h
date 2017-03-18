@@ -67,7 +67,7 @@ extern long do_no_restart_syscall(struct restart_block *parm);
  * flag set/clear/test wrappers
  * - pass TIF_xxxx constants to these functions
  */
-
+/*! 2017. 3.18 study -ing */
 static inline void set_ti_thread_flag(struct thread_info *ti, int flag)
 {
 	set_bit(flag, (unsigned long *)&ti->flags);
@@ -101,6 +101,7 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
 	test_and_set_ti_thread_flag(current_thread_info(), flag)
 #define test_and_clear_thread_flag(flag) \
 	test_and_clear_ti_thread_flag(current_thread_info(), flag)
+/*! 2017. 3.18 study -ing */
 #define test_thread_flag(flag) \
 	test_ti_thread_flag(current_thread_info(), flag)
 
@@ -117,7 +118,7 @@ static inline __deprecated void set_need_resched(void)
 	 * instances.
 	 */
 }
-
+/*! 2017. 3.18 study -ing */
 #define tif_need_resched() test_thread_flag(TIF_NEED_RESCHED)
 
 #if defined TIF_RESTORE_SIGMASK && !defined HAVE_SET_RESTORE_SIGMASK

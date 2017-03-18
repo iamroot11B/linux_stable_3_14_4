@@ -170,6 +170,7 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
  *
  * return value: 1 if the timer is pending, 0 if not.
  */
+/*! 2017. 3.18 study -ing */
 static inline int timer_pending(const struct timer_list * timer)
 {
 	return timer->entry.next != NULL;
@@ -232,11 +233,11 @@ static inline void timer_stats_timer_clear_start_info(struct timer_list *timer)
 static inline void init_timer_stats(void)
 {
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void timer_stats_timer_set_start_info(struct timer_list *timer)
 {
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void timer_stats_timer_clear_start_info(struct timer_list *timer)
 {
 }

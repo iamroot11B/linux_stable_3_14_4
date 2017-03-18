@@ -1759,6 +1759,7 @@ static inline int is_global_init(struct task_struct *tsk)
 extern struct pid *cad_pid;
 
 extern void free_task(struct task_struct *tsk);
+/*! 2017. 3.18 study -ing */
 #define get_task_struct(tsk) do { atomic_inc(&(tsk)->usage); } while(0)
 
 extern void __put_task_struct(struct task_struct *t);
@@ -1869,14 +1870,14 @@ static inline gfp_t memalloc_noio_flags(gfp_t flags)
 		flags &= ~__GFP_IO;
 	return flags;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline unsigned int memalloc_noio_save(void)
 {
 	unsigned int flags = current->flags & PF_MEMALLOC_NOIO;
 	current->flags |= PF_MEMALLOC_NOIO;
 	return flags;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void memalloc_noio_restore(unsigned int flags)
 {
 	current->flags = (current->flags & ~PF_MEMALLOC_NOIO) | flags;
@@ -1937,7 +1938,7 @@ static inline void rcu_copy_process(struct task_struct *p)
 }
 
 #endif
-
+/*! 2017. 3.18 study -ing */
 static inline void tsk_restore_flags(struct task_struct *task,
 				unsigned long orig_flags, unsigned long flags)
 {
@@ -2546,6 +2547,7 @@ static inline unsigned long stack_not_used(struct task_struct *p)
 /* set thread flags in other task's structures
  * - see asm/thread_info.h for TIF_xxxx flags available
  */
+/*! 2017. 3.18 study -ing */
 static inline void set_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	set_ti_thread_flag(task_thread_info(tsk), flag);
@@ -2570,7 +2572,7 @@ static inline int test_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	return test_ti_thread_flag(task_thread_info(tsk), flag);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void set_tsk_need_resched(struct task_struct *tsk)
 {
 	set_tsk_thread_flag(tsk,TIF_NEED_RESCHED);
@@ -2767,6 +2769,7 @@ static inline bool __must_check current_clr_polling_and_test(void)
 }
 
 #else
+/*! 2017. 3.18 study -ing */
 static inline int tsk_is_polling(struct task_struct *p) { return 0; }
 static inline void __current_set_polling(void) { }
 static inline void __current_clr_polling(void) { }
@@ -2795,7 +2798,7 @@ static inline void current_clr_polling(void)
 
 	preempt_fold_need_resched();
 }
-
+/*! 2017. 3.18 study -ing */
 static __always_inline bool need_resched(void)
 {
 	return unlikely(tif_need_resched());

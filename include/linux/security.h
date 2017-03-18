@@ -2594,7 +2594,7 @@ static inline int security_secctx_to_secid(const char *secdata,
 {
 	return -EOPNOTSUPP;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void security_release_secctx(char *secdata, u32 seclen)
 {
 }

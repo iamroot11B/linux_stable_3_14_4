@@ -44,7 +44,7 @@
  */
 #define KNODE_DEAD		1LU
 #define KNODE_KLIST_MASK	~KNODE_DEAD
-
+/*! 2017. 3.18 study -ing */
 static struct klist *knode_klist(struct klist_node *knode)
 {
 	return (struct klist *)
@@ -62,7 +62,7 @@ static void knode_set_klist(struct klist_node *knode, struct klist *klist)
 	/* no knode deserves to start its life dead */
 	WARN_ON(knode_dead(knode));
 }
-
+/*! 2017. 3.18 study -ing */
 static void knode_kill(struct klist_node *knode)
 {
 	/* and no knode should die twice ever either, see we're very humane */
@@ -202,12 +202,12 @@ static void klist_release(struct kref *kref)
 	spin_unlock(&klist_remove_lock);
 	knode_set_klist(n, NULL);
 }
-
+/*! 2017. 3.18 study -ing */
 static int klist_dec_and_del(struct klist_node *n)
 {
 	return kref_put(&n->n_ref, klist_release);
 }
-
+/*! 2017. 3.18 study -ing */
 static void klist_put(struct klist_node *n, bool kill)
 {
 	struct klist *k = knode_klist(n);
@@ -227,6 +227,7 @@ static void klist_put(struct klist_node *n, bool kill)
  * klist_del - Decrement the reference count of node and try to remove.
  * @n: node we're deleting.
  */
+/*! 2017. 3.18 study -ing */
 void klist_del(struct klist_node *n)
 {
 	klist_put(n, true);
@@ -237,6 +238,7 @@ EXPORT_SYMBOL_GPL(klist_del);
  * klist_remove - Decrement the refcount of node and wait for it to go away.
  * @n: node we're removing.
  */
+/*! 2017. 3.18 study -ing */
 void klist_remove(struct klist_node *n)
 {
 	struct klist_waiter waiter;
@@ -245,6 +247,7 @@ void klist_remove(struct klist_node *n)
 	waiter.process = current;
 	waiter.woken = 0;
 	spin_lock(&klist_remove_lock);
+	/*! waiter 설정 후 klist_remove_waiters에 넣어준다.  */
 	list_add(&waiter.list, &klist_remove_waiters);
 	spin_unlock(&klist_remove_lock);
 
@@ -252,6 +255,7 @@ void klist_remove(struct klist_node *n)
 
 	for (;;) {
 		set_current_state(TASK_UNINTERRUPTIBLE);
+		/*! wake 될때까지 스케줄링하면서 기다린다.  */
 		if (waiter.woken)
 			break;
 		schedule();
@@ -264,6 +268,7 @@ EXPORT_SYMBOL_GPL(klist_remove);
  * klist_node_attached - Say whether a node is bound to a list or not.
  * @n: Node that we're testing.
  */
+/*! 2017. 3.18 study -ing */
 int klist_node_attached(struct klist_node *n)
 {
 	return (n->n_klist != NULL);

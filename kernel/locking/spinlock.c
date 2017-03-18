@@ -169,7 +169,7 @@ void __lockfunc _raw_spin_lock_irq(raw_spinlock_t *lock)
 }
 EXPORT_SYMBOL(_raw_spin_lock_irq);
 #endif
-
+/*! 2017. 3.18 study -ing */
 #ifndef CONFIG_INLINE_SPIN_LOCK_BH
 void __lockfunc _raw_spin_lock_bh(raw_spinlock_t *lock)
 {
@@ -205,6 +205,7 @@ EXPORT_SYMBOL(_raw_spin_unlock_irq);
 #endif
 
 #ifndef CONFIG_INLINE_SPIN_UNLOCK_BH
+/*! 2017. 3.18 study -ing */
 void __lockfunc _raw_spin_unlock_bh(raw_spinlock_t *lock)
 {
 	__raw_spin_unlock_bh(lock);

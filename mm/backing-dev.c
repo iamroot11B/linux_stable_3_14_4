@@ -135,7 +135,7 @@ static void bdi_debug_register(struct backing_dev_info *bdi, const char *name)
 	bdi->debug_stats = debugfs_create_file("stats", 0444, bdi->debug_dir,
 					       bdi, &bdi_debug_stats_fops);
 }
-
+/*! 2017. 3.18 study -ing */
 static void bdi_debug_unregister(struct backing_dev_info *bdi)
 {
 	debugfs_remove(bdi->debug_stats);
@@ -307,9 +307,11 @@ void bdi_wakeup_thread_delayed(struct backing_dev_info *bdi)
 /*
  * Remove bdi from bdi_list, and ensure that it is no longer visible
  */
+/*! 2017. 3.18 study -ing */
 static void bdi_remove_from_list(struct backing_dev_info *bdi)
 {
 	spin_lock_bh(&bdi_lock);
+	/*! list에서 entry를 지우고 entry의 prev를 LIST_POISON2로 설정  */
 	list_del_rcu(&bdi->bdi_list);
 	spin_unlock_bh(&bdi_lock);
 
@@ -354,6 +356,7 @@ EXPORT_SYMBOL(bdi_register_dev);
 /*
  * Remove bdi from the global list and shutdown any threads we have running
  */
+/*! 2017. 3.18 study -ing */
 static void bdi_wb_shutdown(struct backing_dev_info *bdi)
 {
 	if (!bdi_cap_writeback_dirty(bdi))
@@ -389,24 +392,28 @@ static void bdi_wb_shutdown(struct backing_dev_info *bdi)
 /*
  * This bdi is going away now, make sure that no super_blocks point to it
  */
+/*! 2017. 3.18 study -ing */
 static void bdi_prune_sb(struct backing_dev_info *bdi)
 {
 	struct super_block *sb;
 
 	spin_lock(&sb_lock);
+	/*! super_blocks을 헤드로 하는 list를 loop 돌면서  */
 	list_for_each_entry(sb, &super_blocks, s_list) {
+		/*! sb->s_bdi 가 bdi와 같으면 default_backing_dev_info로 초기화 */
 		if (sb->s_bdi == bdi)
 			sb->s_bdi = &default_backing_dev_info;
 	}
 	spin_unlock(&sb_lock);
 }
-
+/*! 2017. 3.18 study -ing */
 void bdi_unregister(struct backing_dev_info *bdi)
 {
 	struct device *dev = bdi->dev;
 
 	if (dev) {
 		bdi_set_min_ratio(bdi, 0);
+		/*! include/linux/trace.h 에서 매크로로 생성 */
 		trace_writeback_bdi_unregister(bdi);
 		bdi_prune_sb(bdi);
 
@@ -508,6 +515,7 @@ void bdi_destroy(struct backing_dev_info *bdi)
 	}
 
 	/*! 2017. 3.11 study end */
+	/*! 2017. 3.18 study start */
 	bdi_unregister(bdi);
 
 	/*

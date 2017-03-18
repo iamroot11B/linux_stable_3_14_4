@@ -27,6 +27,7 @@ static int rpm_suspend(struct device *dev, int rpmflags);
  * runtime_status field is updated, to account the time in the old state
  * correctly.
  */
+/*! 2017. 3.18 study -ing */
 void update_pm_runtime_accounting(struct device *dev)
 {
 	unsigned long now = jiffies;
@@ -44,7 +45,7 @@ void update_pm_runtime_accounting(struct device *dev)
 	else
 		dev->power.active_jiffies += delta;
 }
-
+/*! 2017. 3.18 study -ing */
 static void __update_runtime_status(struct device *dev, enum rpm_status status)
 {
 	update_pm_runtime_accounting(dev);
@@ -55,6 +56,7 @@ static void __update_runtime_status(struct device *dev, enum rpm_status status)
  * pm_runtime_deactivate_timer - Deactivate given device's suspend timer.
  * @dev: Device to handle.
  */
+/*! 2017. 3.18 study -ing */
 static void pm_runtime_deactivate_timer(struct device *dev)
 {
 	if (dev->power.timer_expires > 0) {
@@ -67,6 +69,7 @@ static void pm_runtime_deactivate_timer(struct device *dev)
  * pm_runtime_cancel_pending - Deactivate suspend timer and cancel requests.
  * @dev: Device to handle.
  */
+/*! 2017. 3.18 study -ing */
 static void pm_runtime_cancel_pending(struct device *dev)
 {
 	pm_runtime_deactivate_timer(dev);
@@ -89,6 +92,7 @@ static void pm_runtime_cancel_pending(struct device *dev)
  * This function may be called either with or without dev->power.lock held.
  * Either way it can be racy, since power.last_busy may be updated at any time.
  */
+/*! 2017. 3.18 study -ing */
 unsigned long pm_runtime_autosuspend_expiration(struct device *dev)
 {
 	int autosuspend_delay;
@@ -198,10 +202,12 @@ EXPORT_SYMBOL_GPL(pm_runtime_set_memalloc_noio);
  * rpm_check_suspend_allowed - Test whether a device may be suspended.
  * @dev: Device to test.
  */
+/*! 2017. 3.18 study -ing */
 static int rpm_check_suspend_allowed(struct device *dev)
 {
 	int retval = 0;
 
+	/*! pm_children_suspended : 리턴 false  */
 	if (dev->power.runtime_error)
 		retval = -EINVAL;
 	else if (dev->power.disable_depth > 0)
@@ -230,6 +236,7 @@ static int rpm_check_suspend_allowed(struct device *dev)
  * @cb: Runtime PM callback to run.
  * @dev: Device to run the callback for.
  */
+/*! 2017. 3.18 study -ing */
 static int __rpm_callback(int (*cb)(struct device *), struct device *dev)
 	__releases(&dev->power.lock) __acquires(&dev->power.lock)
 {
@@ -263,6 +270,7 @@ static int __rpm_callback(int (*cb)(struct device *), struct device *dev)
  *
  * This function must be called under dev->power.lock with interrupts disabled.
  */
+/*! 2017. 3.18 study -ing */
 static int rpm_idle(struct device *dev, int rpmflags)
 {
 	int (*callback)(struct device *);
@@ -310,6 +318,7 @@ static int rpm_idle(struct device *dev, int rpmflags)
 
 	dev->power.idle_notification = true;
 
+	/*! callback 설정  */
 	if (dev->pm_domain)
 		callback = dev->pm_domain->ops.runtime_idle;
 	else if (dev->type && dev->type->pm)
@@ -340,6 +349,7 @@ static int rpm_idle(struct device *dev, int rpmflags)
  * @cb: Runtime PM callback to run.
  * @dev: Device to run the callback for.
  */
+/*! 2017. 3.18 study -ing */
 static int rpm_callback(int (*cb)(struct device *), struct device *dev)
 {
 	int retval;
@@ -360,6 +370,7 @@ static int rpm_callback(int (*cb)(struct device *), struct device *dev)
 		 * be marked as memalloc_noio too.
 		 */
 		noio_flag = memalloc_noio_save();
+		/*! __rpm_callback 에서 실제 cb callback 함수 수행.  */
 		retval = __rpm_callback(cb, dev);
 		memalloc_noio_restore(noio_flag);
 	} else {
@@ -391,6 +402,7 @@ static int rpm_callback(int (*cb)(struct device *), struct device *dev)
  *
  * This function must be called under dev->power.lock with interrupts disabled.
  */
+/*! 2017. 3.18 study -ing */
 static int rpm_suspend(struct device *dev, int rpmflags)
 	__releases(&dev->power.lock) __acquires(&dev->power.lock)
 {
@@ -442,6 +454,7 @@ static int rpm_suspend(struct device *dev, int rpmflags)
 	/* Other scheduled or pending requests need to be canceled. */
 	pm_runtime_cancel_pending(dev);
 
+	/*! RPM_SUSPENDING 이면 결국 goto repeat  */
 	if (dev->power.runtime_status == RPM_SUSPENDING) {
 		DEFINE_WAIT(wait);
 
@@ -492,6 +505,7 @@ static int rpm_suspend(struct device *dev, int rpmflags)
 
 	__update_runtime_status(dev, RPM_SUSPENDING);
 
+	/*! callback 설정  */
 	if (dev->pm_domain)
 		callback = dev->pm_domain->ops.runtime_suspend;
 	else if (dev->type && dev->type->pm)
@@ -583,6 +597,7 @@ static int rpm_suspend(struct device *dev, int rpmflags)
  *
  * This function must be called under dev->power.lock with interrupts disabled.
  */
+/*! 2017. 3.18 study -ing */
 static int rpm_resume(struct device *dev, int rpmflags)
 	__releases(&dev->power.lock) __acquires(&dev->power.lock)
 {
@@ -618,8 +633,10 @@ static int rpm_resume(struct device *dev, int rpmflags)
 		goto out;
 	}
 
+	/*! RPM_RESUMING 이나 RPM_SUSPENDING이면 결국 goto repeat. */
 	if (dev->power.runtime_status == RPM_RESUMING
 	    || dev->power.runtime_status == RPM_SUSPENDING) {
+		/*! wait_queue_t 만들어 준다.  */
 		DEFINE_WAIT(wait);
 
 		if (rpmflags & (RPM_ASYNC | RPM_NOWAIT)) {
@@ -697,6 +714,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
 			goto skip_parent;
 		spin_unlock(&dev->power.lock);
 
+		/*! Do Nothing  */
 		pm_runtime_get_noresume(parent);
 
 		spin_lock(&parent->power.lock);
@@ -707,6 +725,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
 		if (!parent->power.disable_depth
 		    && !parent->power.ignore_children) {
 			rpm_resume(parent, 0);
+			/*! rpm_resume을 했는데 RPM_ACTIVE가 아니면 BUSY 에러.  */
 			if (parent->power.runtime_status != RPM_ACTIVE)
 				retval = -EBUSY;
 		}
@@ -724,6 +743,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
 
 	__update_runtime_status(dev, RPM_RESUMING);
 
+	/*! callack 설정  */
 	if (dev->pm_domain)
 		callback = dev->pm_domain->ops.runtime_resume;
 	else if (dev->type && dev->type->pm)
@@ -740,6 +760,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
 
 	retval = rpm_callback(callback, dev);
 	if (retval) {
+		/*! 리턴 에러면,  */
 		__update_runtime_status(dev, RPM_SUSPENDED);
 		pm_runtime_cancel_pending(dev);
 	} else {
@@ -882,6 +903,7 @@ EXPORT_SYMBOL_GPL(pm_schedule_suspend);
  * This routine may be called in atomic context if the RPM_ASYNC flag is set,
  * or if pm_runtime_irq_safe() has been called.
  */
+/*! 2017. 3.18 study -ing */
 int __pm_runtime_idle(struct device *dev, int rpmflags)
 {
 	unsigned long flags;
@@ -945,6 +967,7 @@ EXPORT_SYMBOL_GPL(__pm_runtime_suspend);
  * This routine may be called in atomic context if the RPM_ASYNC flag is set,
  * or if pm_runtime_irq_safe() has been called.
  */
+/*! 2017. 3.18 study -ing */
 int __pm_runtime_resume(struct device *dev, int rpmflags)
 {
 	unsigned long flags;

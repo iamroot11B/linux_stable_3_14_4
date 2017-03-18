@@ -137,8 +137,9 @@ static inline void pm_runtime_enable(struct device *dev) {}
 static inline void __pm_runtime_disable(struct device *dev, bool c) {}
 static inline void pm_runtime_allow(struct device *dev) {}
 static inline void pm_runtime_forbid(struct device *dev) {}
-
+/*! 2017. 3.18 study -ing */
 static inline bool pm_children_suspended(struct device *dev) { return false; }
+/*! 2017. 3.18 study -ing */
 static inline void pm_runtime_get_noresume(struct device *dev) {}
 static inline void pm_runtime_put_noidle(struct device *dev) {}
 static inline bool device_run_wake(struct device *dev) { return false; }
@@ -203,12 +204,12 @@ static inline int pm_runtime_get(struct device *dev)
 {
 	return __pm_runtime_resume(dev, RPM_GET_PUT | RPM_ASYNC);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int pm_runtime_get_sync(struct device *dev)
 {
 	return __pm_runtime_resume(dev, RPM_GET_PUT);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int pm_runtime_put(struct device *dev)
 {
 	return __pm_runtime_idle(dev, RPM_GET_PUT | RPM_ASYNC);
@@ -219,7 +220,7 @@ static inline int pm_runtime_put_autosuspend(struct device *dev)
 	return __pm_runtime_suspend(dev,
 	    RPM_GET_PUT | RPM_ASYNC | RPM_AUTO);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int pm_runtime_put_sync(struct device *dev)
 {
 	return __pm_runtime_idle(dev, RPM_GET_PUT);

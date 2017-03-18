@@ -435,6 +435,7 @@ EXPORT_SYMBOL(ns_to_timeval);
  *
  * We must also be careful about 32-bit overflows.
  */
+/*! 2017. 3.18 study -ing */
 unsigned long msecs_to_jiffies(const unsigned int m)
 {
 	/*

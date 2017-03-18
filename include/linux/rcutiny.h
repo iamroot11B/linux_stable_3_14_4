@@ -36,7 +36,7 @@ static inline void rcu_barrier_sched(void)
 {
 	wait_rcu_gp(call_rcu_sched);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void synchronize_rcu_expedited(void)
 {
 	synchronize_sched();	/* Only one CPU, so pretty fast anyway!!! */

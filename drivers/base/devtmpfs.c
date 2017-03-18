@@ -117,7 +117,7 @@ int devtmpfs_create_node(struct device *dev)
 
 	return req.err;
 }
-
+/*! 2017. 3.18 study -ing */
 int devtmpfs_delete_node(struct device *dev)
 {
 	const char *tmp = NULL;

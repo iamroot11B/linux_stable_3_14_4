@@ -55,6 +55,7 @@ static void devres_log(struct device *dev, struct devres_node *node,
 }
 #else /* CONFIG_DEBUG_DEVRES */
 #define set_node_dbginfo(node, n, s)	do {} while (0)
+/*! 2017. 3.18 study -ing */
 #define devres_log(dev, node, op)	do {} while (0)
 #endif /* CONFIG_DEBUG_DEVRES */
 
@@ -71,7 +72,7 @@ static void group_close_release(struct device *dev, void *res)
 {
 	/* noop */
 }
-
+/*! 2017. 3.18 study -ing */
 static struct devres_group * node_to_group(struct devres_node *node)
 {
 	if (node->release == &group_open_release)
@@ -403,7 +404,7 @@ int devres_release(struct device *dev, dr_release_t release,
 	return 0;
 }
 EXPORT_SYMBOL_GPL(devres_release);
-
+/*! 2017. 3.18 study -ing */
 static int remove_nodes(struct device *dev,
 			struct list_head *first, struct list_head *end,
 			struct list_head *todo)
@@ -414,6 +415,7 @@ static int remove_nodes(struct device *dev,
 	/* First pass - move normal devres entries to @todo and clear
 	 * devres_group colors.
 	 */
+	/*! first 에서 end까지 loop 돌면서  */
 	cur = first;
 	while (cur != end) {
 		struct devres_node *node;
@@ -472,7 +474,7 @@ static int remove_nodes(struct device *dev,
 
 	return cnt;
 }
-
+/*! 2017. 3.18 study -ing */
 static int release_nodes(struct device *dev, struct list_head *first,
 			 struct list_head *end, unsigned long flags)
 	__releases(&dev->devres_lock)
@@ -488,7 +490,9 @@ static int release_nodes(struct device *dev, struct list_head *first,
 	/* Release.  Note that both devres and devres_group are
 	 * handled as devres in the following loop.  This is safe.
 	 */
+	/*! todo list loop 돌면서  */
 	list_for_each_entry_safe_reverse(dr, tmp, &todo, node.entry) {
+		/*! Do Nothing  */
 		devres_log(dev, &dr->node, "REL");
 		dr->node.release(dev, dr->data);
 		kfree(dr);
@@ -504,6 +508,7 @@ static int release_nodes(struct device *dev, struct list_head *first,
  * Release all resources associated with @dev.  This function is
  * called on driver detach.
  */
+/*! 2017. 3.18 study -ing */
 int devres_release_all(struct device *dev)
 {
 	unsigned long flags;

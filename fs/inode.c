@@ -276,6 +276,7 @@ static void destroy_inode(struct inode *inode)
  * write when the file is truncated and actually unlinked
  * on the filesystem.
  */
+/*! 2017. 3.18 study -ing */
 void drop_nlink(struct inode *inode)
 {
 	WARN_ON(inode->i_nlink == 0);

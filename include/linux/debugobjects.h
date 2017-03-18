@@ -92,6 +92,7 @@ static inline void
 debug_object_deactivate(void *addr, struct debug_obj_descr *descr) { }
 static inline void
 debug_object_destroy   (void *addr, struct debug_obj_descr *descr) { }
+/*! 2017. 3.18 study -ing */
 static inline void
 debug_object_free      (void *addr, struct debug_obj_descr *descr) { }
 static inline void

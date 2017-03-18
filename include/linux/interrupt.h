@@ -324,6 +324,7 @@ extern bool force_irqthreads;
 #endif
 
 #ifndef __ARCH_SET_SOFTIRQ_PENDING
+/*! 2017. 3.18 study -ing */
 #define set_softirq_pending(x) (local_softirq_pending() = (x))
 #define or_softirq_pending(x)  (local_softirq_pending() |= (x))
 #endif
@@ -382,6 +383,7 @@ asmlinkage void __do_softirq(void);
 #ifdef __ARCH_HAS_DO_SOFTIRQ
 void do_softirq_own_stack(void);
 #else
+/*! 2017. 3.18 study -ing */
 static inline void do_softirq_own_stack(void)
 {
 	__do_softirq();
@@ -452,7 +454,7 @@ static inline int tasklet_trylock(struct tasklet_struct *t)
 
 static inline void tasklet_unlock(struct tasklet_struct *t)
 {
-	smp_mb__before_clear_bit(); 
+	smp_mb__before_clear_bit();
 	clear_bit(TASKLET_STATE_RUN, &(t)->state);
 }
 
@@ -580,7 +582,7 @@ void tasklet_hrtimer_cancel(struct tasklet_hrtimer *ttimer)
  * if more than one irq occurred.
  */
 
-#if !defined(CONFIG_GENERIC_IRQ_PROBE) 
+#if !defined(CONFIG_GENERIC_IRQ_PROBE)
 static inline unsigned long probe_irq_on(void)
 {
 	return 0;

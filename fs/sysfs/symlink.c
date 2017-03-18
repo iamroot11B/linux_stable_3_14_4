@@ -117,6 +117,7 @@ int sysfs_create_link_nowarn(struct kobject *kobj, struct kobject *target,
  *	Unlike sysfs_remove_link sysfs_delete_link has enough information
  *	to successfully delete symlinks in tagged directories.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
 			const char *name)
 {
@@ -139,6 +140,7 @@ void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
  *	@kobj:	object we're acting for.
  *	@name:	name of the symlink to remove.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_remove_link(struct kobject *kobj, const char *name)
 {
 	struct kernfs_node *parent = NULL;

@@ -331,6 +331,7 @@ static inline void kernfs_init(void) { }
 
 #endif	/* CONFIG_SYSFS */
 
+/*! 2017. 3.18 study -ing */
 static inline struct kernfs_node *
 kernfs_find_and_get(struct kernfs_node *kn, const char *name)
 {

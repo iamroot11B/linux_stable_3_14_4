@@ -51,6 +51,7 @@ void __fsnotify_vfsmount_delete(struct vfsmount *mnt)
  * parent cares.  Thus when an event happens on a child it can quickly tell if
  * if there is a need to find a parent and send the event to the parent.
  */
+/*! 2017. 3.18 study -ing */
 void __fsnotify_update_child_dentry_flags(struct inode *inode)
 {
 	struct dentry *alias;
@@ -72,6 +73,12 @@ void __fsnotify_update_child_dentry_flags(struct inode *inode)
 		 * d_flags to indicate parental interest (their parent is the
 		 * original inode) */
 		spin_lock(&alias->d_lock);
+		/*!
+		 * 모든 child를 loop 돌면서, watched 이면
+		 * child->d_flags에 DCACHE_FSNOTIFY_PARENT_WATCHED bit를 On 시켜주고,
+		 * watched가 아니면,
+		 * child->d_flags에 DCACHE_FSNOTIFY_PARENT_WATCHED bit를 Off 시켜준다.
+		 */
 		list_for_each_entry(child, &alias->d_subdirs, d_u.d_child) {
 			if (!child->d_inode)
 				continue;
@@ -89,6 +96,7 @@ void __fsnotify_update_child_dentry_flags(struct inode *inode)
 }
 
 /* Notify this dentry's parent about a child's events. */
+/*! 2017. 3.18 study -ing */
 int __fsnotify_parent(struct path *path, struct dentry *dentry, __u32 mask)
 {
 	struct dentry *parent;

@@ -127,6 +127,7 @@ static inline void list_add_tail_rcu(struct list_head *new,
  * or call_rcu() must be used to defer freeing until an RCU
  * grace period has elapsed.
  */
+/*! 2017. 3.18 study -ing */
 static inline void list_del_rcu(struct list_head *entry)
 {
 	__list_del_entry(entry);

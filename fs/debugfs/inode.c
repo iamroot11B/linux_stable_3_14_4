@@ -66,7 +66,7 @@ static struct inode *debugfs_get_inode(struct super_block *sb, umode_t mode, dev
 			break;
 		}
 	}
-	return inode; 
+	return inode;
 }
 
 /* SMP-safe */
@@ -120,7 +120,7 @@ static int debugfs_create(struct inode *dir, struct dentry *dentry, umode_t mode
 		fsnotify_create(dir, dentry);
 	return res;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int debugfs_positive(struct dentry *dentry)
 {
 	return dentry->d_inode && !d_unhashed(dentry);
@@ -317,7 +317,7 @@ static struct dentry *__create_file(const char *name, umode_t mode,
 		goto exit;
 
 	/* If the parent is not specified, we create it in the root.
-	 * We need the root dentry to do this, which is in the super 
+	 * We need the root dentry to do this, which is in the super
 	 * block. A pointer to that is in the struct vfsmount that we
 	 * have around.
 	 */
@@ -330,7 +330,7 @@ static struct dentry *__create_file(const char *name, umode_t mode,
 		switch (mode & S_IFMT) {
 		case S_IFDIR:
 			error = debugfs_mkdir(parent->d_inode, dentry, mode);
-					      
+
 			break;
 		case S_IFLNK:
 			error = debugfs_link(parent->d_inode, dentry, mode,
@@ -460,7 +460,7 @@ struct dentry *debugfs_create_symlink(const char *name, struct dentry *parent,
 	return result;
 }
 EXPORT_SYMBOL_GPL(debugfs_create_symlink);
-
+/*! 2017. 3.18 study -ing */
 static int __debugfs_remove(struct dentry *dentry, struct dentry *parent)
 {
 	int ret = 0;
@@ -500,6 +500,7 @@ static int __debugfs_remove(struct dentry *dentry, struct dentry *parent)
  * removed, no automatic cleanup of files will happen when a module is
  * removed, you are responsible here.
  */
+/*! 2017. 3.18 study -ing */
 void debugfs_remove(struct dentry *dentry)
 {
 	struct dentry *parent;
@@ -669,4 +670,3 @@ static int __init debugfs_init(void)
 	return retval;
 }
 core_initcall(debugfs_init);
-

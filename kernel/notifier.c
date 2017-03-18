@@ -302,6 +302,7 @@ EXPORT_SYMBOL_GPL(blocking_notifier_chain_unregister);
  *	Otherwise the return value is the return value
  *	of the last notifier function called.
  */
+/*! 2017. 3.18 study -ing */
 int __blocking_notifier_call_chain(struct blocking_notifier_head *nh,
 				   unsigned long val, void *v,
 				   int nr_to_call, int *nr_calls)
@@ -322,7 +323,7 @@ int __blocking_notifier_call_chain(struct blocking_notifier_head *nh,
 	return ret;
 }
 EXPORT_SYMBOL_GPL(__blocking_notifier_call_chain);
-
+/*! 2017. 3.18 study -ing */
 int blocking_notifier_call_chain(struct blocking_notifier_head *nh,
 		unsigned long val, void *v)
 {

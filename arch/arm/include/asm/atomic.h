@@ -38,6 +38,7 @@
  * store exclusive to ensure that these are atomic.  We may loop
  * to ensure that the update happens.
  */
+/*! 2017. 3.18 study -ing */
 static inline void atomic_add(int i, atomic_t *v)
 {
 	unsigned long tmp;
@@ -200,7 +201,7 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 		c = old;
 	return c;
 }
-
+/*! 2017. 3.18 study -ing */
 #define atomic_inc(v)		atomic_add(1, v)
 #define atomic_dec(v)		atomic_sub(1, v)
 
@@ -216,6 +217,7 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 
 #define smp_mb__before_atomic_dec()	smp_mb()
 #define smp_mb__after_atomic_dec()	smp_mb()
+/*! 2017. 3.18 study -ing */
 #define smp_mb__before_atomic_inc()	smp_mb()
 #define smp_mb__after_atomic_inc()	smp_mb()
 

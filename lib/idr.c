@@ -1203,6 +1203,7 @@ EXPORT_SYMBOL(ida_simple_get);
  * @ida: the (initialized) ida.
  * @id: the id returned by ida_simple_get.
  */
+/*! 2017. 3.18 study -ing */
 void ida_simple_remove(struct ida *ida, unsigned int id)
 {
 	unsigned long flags;

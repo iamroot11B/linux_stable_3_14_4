@@ -24,7 +24,7 @@
  * Please read Documentation/workqueue.txt for details.
  */
 
-/*! 2016.12.03 study 
+/*! 2016.12.03 study
  * 참고: http://egloos.zum.com/studyfoss/v/5626173
  */
 
@@ -521,7 +521,9 @@ void destroy_work_on_stack(struct work_struct *work)
 EXPORT_SYMBOL_GPL(destroy_work_on_stack);
 
 #else
+/*! 2017. 3.18 study -ing */
 static inline void debug_work_activate(struct work_struct *work) { }
+/*! 2017. 3.18 study -ing */
 static inline void debug_work_deactivate(struct work_struct *work) { }
 #endif
 
@@ -569,7 +571,7 @@ static unsigned int work_color_to_flags(int color)
 {
 	return color << WORK_STRUCT_COLOR_SHIFT;
 }
-
+/*! 2017. 2.04 study -ing */
 static int get_work_color(struct work_struct *work)
 {
 	return (*work_data_bits(work) >> WORK_STRUCT_COLOR_SHIFT) &
@@ -601,20 +603,21 @@ static int work_next_color(int color)
  * but stay off timer and worklist for arbitrarily long and nobody should
  * try to steal the PENDING bit.
  */
+/*! 2017. 3.18 study -ing */
 static inline void set_work_data(struct work_struct *work, unsigned long data,
 				 unsigned long flags)
 {
 	WARN_ON_ONCE(!work_pending(work));
 	atomic_long_set(&work->data, data | flags | work_static(work));
 }
-
+/*! 2017. 3.18 study -ing */
 static void set_work_pwq(struct work_struct *work, struct pool_workqueue *pwq,
 			 unsigned long extra_flags)
 {
 	set_work_data(work, (unsigned long)pwq,
 		      WORK_STRUCT_PENDING | WORK_STRUCT_PWQ | extra_flags);
 }
-
+/*! 2017. 3.18 study -ing */
 static void set_work_pool_and_keep_pending(struct work_struct *work,
 					   int pool_id)
 {
@@ -634,13 +637,13 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
 	smp_wmb();
 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
 }
-
+/*! 2017. 3.18 study -ing */
 static void clear_work_data(struct work_struct *work)
 {
 	smp_wmb();	/* see set_work_pool_and_clear_pending() */
 	set_work_data(work, WORK_STRUCT_NO_POOL, 0);
 }
-
+/*! 2017. 3.18 study -ing */
 static struct pool_workqueue *get_work_pwq(struct work_struct *work)
 {
 	unsigned long data = atomic_long_read(&work->data);
@@ -692,6 +695,7 @@ static struct worker_pool *get_work_pool(struct work_struct *work)
  * Return: The worker_pool ID @work was last associated with.
  * %WORK_OFFQ_POOL_NONE if none.
  */
+/*! 2017. 3.18 study -ing */
 static int get_work_pool_id(struct work_struct *work)
 {
 	unsigned long data = atomic_long_read(&work->data);
@@ -702,15 +706,17 @@ static int get_work_pool_id(struct work_struct *work)
 
 	return data >> WORK_OFFQ_POOL_SHIFT;
 }
-
+/*! 2017. 3.18 study -ing */
 static void mark_work_canceling(struct work_struct *work)
 {
+	/*! work의 worker pool ID를 가져온다.  */
 	unsigned long pool_id = get_work_pool_id(work);
 
 	pool_id <<= WORK_OFFQ_POOL_SHIFT;
+	/*! Canceling 임을 마크한다.  */
 	set_work_data(work, pool_id | WORK_OFFQ_CANCELING, WORK_STRUCT_PENDING);
 }
-
+/*! 2017. 3.18 study -ing */
 static bool work_is_canceling(struct work_struct *work)
 {
 	unsigned long data = atomic_long_read(&work->data);
@@ -723,7 +729,7 @@ static bool work_is_canceling(struct work_struct *work)
  * pools are managed.  Unless noted otherwise, these functions assume that
  * they're being called with pool->lock held.
  */
-
+/*! 2017. 3.18 study -ing */
 static bool __need_more_worker(struct worker_pool *pool)
 {
 	return !atomic_read(&pool->nr_running);
@@ -790,6 +796,7 @@ static bool too_many_workers(struct worker_pool *pool)
  */
 
 /* Return the first worker.  Safe with preemption disabled */
+/*! 2017. 3.18 study -ing */
 static struct worker *first_worker(struct worker_pool *pool)
 {
 	if (unlikely(list_empty(&pool->idle_list)))
@@ -807,6 +814,7 @@ static struct worker *first_worker(struct worker_pool *pool)
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 3.18 study -ing */
 static void wake_up_worker(struct worker_pool *pool)
 {
 	struct worker *worker = first_worker(pool);
@@ -1019,6 +1027,7 @@ static struct worker *find_worker_executing_work(struct worker_pool *pool,
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 3.18 study -ing */
 static void move_linked_works(struct work_struct *work, struct list_head *head,
 			      struct work_struct **nextp)
 {
@@ -1028,6 +1037,7 @@ static void move_linked_works(struct work_struct *work, struct list_head *head,
 	 * Linked worklist will always end before the end of the list,
 	 * use NULL for list head.
 	 */
+	/*! work->entry를 head로 하는 list loop 돌면서  */
 	list_for_each_entry_safe_from(work, n, NULL, entry) {
 		list_move_tail(&work->entry, head);
 		if (!(*work_data_bits(work) & WORK_STRUCT_LINKED))
@@ -1050,6 +1060,7 @@ static void move_linked_works(struct work_struct *work, struct list_head *head,
  * Obtain an extra reference on @pwq.  The caller should guarantee that
  * @pwq has positive refcnt and be holding the matching pool->lock.
  */
+/*! 2017. 3.18 study -ing */
 static void get_pwq(struct pool_workqueue *pwq)
 {
 	lockdep_assert_held(&pwq->pool->lock);
@@ -1064,6 +1075,7 @@ static void get_pwq(struct pool_workqueue *pwq)
  * Drop a reference of @pwq.  If its refcnt reaches zero, schedule its
  * destruction.  The caller should be holding the matching pool->lock.
  */
+/*! 2017. 3.18 study -ing */
 static void put_pwq(struct pool_workqueue *pwq)
 {
 	lockdep_assert_held(&pwq->pool->lock);
@@ -1100,17 +1112,18 @@ static void put_pwq_unlocked(struct pool_workqueue *pwq)
 		spin_unlock_irq(&pwq->pool->lock);
 	}
 }
-
+/*! 2017. 3.18 study -ing */
 static void pwq_activate_delayed_work(struct work_struct *work)
 {
 	struct pool_workqueue *pwq = get_work_pwq(work);
 
 	trace_workqueue_activate_work(work);
 	move_linked_works(work, &pwq->pool->worklist, NULL);
+	/*! work->data의 WORK_STRUCT_DELAYED_BIT번째 bit를 0으로 clear  */
 	__clear_bit(WORK_STRUCT_DELAYED_BIT, work_data_bits(work));
 	pwq->nr_active++;
 }
-
+/*! 2017. 3.18 study -ing */
 static void pwq_activate_first_delayed(struct pool_workqueue *pwq)
 {
 	struct work_struct *work = list_first_entry(&pwq->delayed_works,
@@ -1130,6 +1143,7 @@ static void pwq_activate_first_delayed(struct pool_workqueue *pwq)
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 2.04 study -ing */
 static void pwq_dec_nr_in_flight(struct pool_workqueue *pwq, int color)
 {
 	/* uncolored work items don't participate in flushing or nr_active */
@@ -1146,6 +1160,7 @@ static void pwq_dec_nr_in_flight(struct pool_workqueue *pwq, int color)
 	}
 
 	/* is flush in progress and are we at the flushing tip? */
+	/*! flush 진행중이 아니면 out_put으로 점프  */
 	if (likely(pwq->flush_color != color))
 		goto out_put;
 
@@ -1193,6 +1208,7 @@ out_put:
  *
  * This function is safe to call from any context including IRQ handler.
  */
+/*! 2017. 3.18 study -ing */
 static int try_to_grab_pending(struct work_struct *work, bool is_dwork,
 			       unsigned long *flags)
 {
@@ -1237,6 +1253,7 @@ static int try_to_grab_pending(struct work_struct *work, bool is_dwork,
 	 */
 	pwq = get_work_pwq(work);
 	if (pwq && pwq->pool == pool) {
+		/*! Do Nothing  */
 		debug_work_deactivate(work);
 
 		/*
@@ -1280,6 +1297,7 @@ fail:
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 3.18 study -ing */
 static void insert_work(struct pool_workqueue *pwq, struct work_struct *work,
 			struct list_head *head, unsigned int extra_flags)
 {
@@ -1288,6 +1306,7 @@ static void insert_work(struct pool_workqueue *pwq, struct work_struct *work,
 	/* we own @work, set data and link */
 	set_work_pwq(work, pwq, extra_flags);
 	list_add_tail(&work->entry, head);
+	/*! pwq->refcnt++;  */
 	get_pwq(pwq);
 
 	/*
@@ -1297,6 +1316,7 @@ static void insert_work(struct pool_workqueue *pwq, struct work_struct *work,
 	 */
 	smp_mb();
 
+	/*! pool->nr_running 이 있으면 need more worker 이다.  */
 	if (__need_more_worker(pool))
 		wake_up_worker(pool);
 }
@@ -1447,6 +1467,7 @@ retry:
  *
  * Return: %false if @work was already on a queue, %true otherwise.
  */
+/*! 2017. 3.18 study -ing */
 bool queue_work_on(int cpu, struct workqueue_struct *wq,
 		   struct work_struct *work)
 {
@@ -1474,7 +1495,7 @@ void delayed_work_timer_fn(unsigned long __data)
 	__queue_work(dwork->cpu, dwork->wq, &dwork->work);
 }
 EXPORT_SYMBOL(delayed_work_timer_fn);
-
+/*! 2017. 3.18 study -ing */
 static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
 				struct delayed_work *dwork, unsigned long delay)
 {
@@ -1558,6 +1579,7 @@ EXPORT_SYMBOL(queue_delayed_work_on);
  * This function is safe to call from any context including IRQ handler.
  * See try_to_grab_pending() for details.
  */
+/*! 2017. 3.18 study -ing */
 bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
 			 struct delayed_work *dwork, unsigned long delay)
 {
@@ -2518,6 +2540,7 @@ static void wq_barrier_func(struct work_struct *work)
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 3.18 study -ing */
 static void insert_wq_barrier(struct pool_workqueue *pwq,
 			      struct wq_barrier *barr,
 			      struct work_struct *target, struct worker *worker)
@@ -2547,9 +2570,10 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
 		head = target->entry.next;
 		/* there can already be other linked works, inherit and set */
 		linked = *bits & WORK_STRUCT_LINKED;
+		/*! bits : target->data  */
 		__set_bit(WORK_STRUCT_LINKED_BIT, bits);
 	}
-
+	/*! Do Nothing  */
 	debug_work_activate(&barr->work);
 	insert_work(pwq, &barr->work, head,
 		    work_color_to_flags(WORK_NO_COLOR) | linked);
@@ -2833,7 +2857,7 @@ reflush:
 	mutex_unlock(&wq->mutex);
 }
 EXPORT_SYMBOL_GPL(drain_workqueue);
-
+/*! 2017. 3.18 study -ing */
 static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr)
 {
 	struct worker *worker = NULL;
@@ -2871,6 +2895,7 @@ static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr)
 	 * flusher is not running on the same workqueue by verifying write
 	 * access.
 	 */
+	/*! Do Nothing  */
 	if (pwq->wq->saved_max_active == 1 || pwq->wq->rescuer)
 		lock_map_acquire(&pwq->wq->lockdep_map);
 	else
@@ -2894,15 +2919,19 @@ already_gone:
  * %true if flush_work() waited for the work to finish execution,
  * %false if it was already idle.
  */
+/*! 2017. 3.18 study -ing */
 bool flush_work(struct work_struct *work)
 {
 	struct wq_barrier barr;
 
+	/*! Do Nothing  */
 	lock_map_acquire(&work->lockdep_map);
+	/*! Do Nothing  */
 	lock_map_release(&work->lockdep_map);
 
 	if (start_flush_work(work, &barr)) {
 		wait_for_completion(&barr.done);
+		/*! Do Nothing  */
 		destroy_work_on_stack(&barr.work);
 		return true;
 	} else {
@@ -2910,7 +2939,7 @@ bool flush_work(struct work_struct *work)
 	}
 }
 EXPORT_SYMBOL_GPL(flush_work);
-
+/*! 2017. 3.18 study -ing */
 static bool __cancel_work_timer(struct work_struct *work, bool is_dwork)
 {
 	unsigned long flags;
@@ -2931,6 +2960,10 @@ static bool __cancel_work_timer(struct work_struct *work, bool is_dwork)
 	local_irq_restore(flags);
 
 	flush_work(work);
+	/*!
+	 * work->data 에 WORK_STRUCT_NO_POOL bit를 set 함으로서,
+	 * clear work data 수행.
+	 */
 	clear_work_data(work);
 	return ret;
 }
@@ -2971,6 +3004,7 @@ EXPORT_SYMBOL_GPL(cancel_work_sync);
  * %true if flush_work() waited for the work to finish execution,
  * %false if it was already idle.
  */
+/*! 2017. 3.18 study -ing */
 bool flush_delayed_work(struct delayed_work *dwork)
 {
 	local_irq_disable();
@@ -3025,6 +3059,7 @@ EXPORT_SYMBOL(cancel_delayed_work);
  * Return:
  * %true if @dwork was pending, %false otherwise.
  */
+/*! 2017. 3.18 study -ing */
 bool cancel_delayed_work_sync(struct delayed_work *dwork)
 {
 	return __cancel_work_timer(&dwork->work, true);

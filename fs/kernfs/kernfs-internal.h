@@ -36,6 +36,7 @@ struct kernfs_iattrs {
  *
  * Return the kernfs_root @kn belongs to.
  */
+/*! 2017. 3.18 study -ing */
 static inline struct kernfs_root *kernfs_root(struct kernfs_node *kn)
 {
 	/* if parent exists, it's always a dir; otherwise, @sd is a dir */

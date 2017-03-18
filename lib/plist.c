@@ -63,6 +63,7 @@ static void plist_check_head(struct plist_head *head)
 }
 
 #else
+/*! 2017. 3.18 study -ing */
 # define plist_check_head(h)	do { } while (0)
 #endif
 
@@ -72,11 +73,13 @@ static void plist_check_head(struct plist_head *head)
  * @node:	&struct plist_node pointer
  * @head:	&struct plist_head pointer
  */
+/*! 2017. 3.18 study -ing */
 void plist_add(struct plist_node *node, struct plist_head *head)
 {
 	struct plist_node *first, *iter, *prev = NULL;
 	struct list_head *node_next = &head->node_list;
 
+	/*! Do Nothing  */
 	plist_check_head(head);
 	WARN_ON(!plist_node_empty(node));
 	WARN_ON(!list_empty(&node->prio_list));

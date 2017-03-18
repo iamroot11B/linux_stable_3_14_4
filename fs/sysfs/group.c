@@ -17,7 +17,7 @@
 #include <linux/err.h>
 #include "sysfs.h"
 
-
+/*! 2017. 3.18 study -ing */
 static void remove_files(struct kernfs_node *parent, struct kobject *kobj,
 			 const struct attribute_group *grp)
 {
@@ -202,6 +202,7 @@ EXPORT_SYMBOL_GPL(sysfs_update_group);
  * This function removes a group of attributes from a kobject.  The attributes
  * previously have to have been created for this group, otherwise it will fail.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_remove_group(struct kobject *kobj,
 			const struct attribute_group *grp)
 {
@@ -237,6 +238,7 @@ EXPORT_SYMBOL_GPL(sysfs_remove_group);
  *
  * If groups is not NULL, remove the specified groups from the kobject.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_remove_groups(struct kobject *kobj,
 			 const struct attribute_group **groups)
 {
@@ -287,6 +289,7 @@ EXPORT_SYMBOL_GPL(sysfs_merge_group);
  * @kobj:	The kobject containing the group.
  * @grp:	The files to remove and the attribute group they belong to.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_unmerge_group(struct kobject *kobj,
 		       const struct attribute_group *grp)
 {

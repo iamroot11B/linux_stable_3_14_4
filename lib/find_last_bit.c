@@ -16,9 +16,10 @@
 #include <asm/byteorder.h>
 
 #ifndef find_last_bit
-
+/*! 2017. 3.18 study -ing */
 unsigned long find_last_bit(const unsigned long *addr, unsigned long size)
 {
+	/*! 가장 마지막에 on 되어있는 bit를 찾아서 몇번째인지 리턴  */
 	unsigned long words;
 	unsigned long tmp;
 

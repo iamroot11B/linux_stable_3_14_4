@@ -28,6 +28,7 @@
  * INIT_LIST_HEAD()
  * list head의 전 후에 list 대입하여 list 초기화
  */
+/*! 2016.10.15 study -ing */
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;
@@ -112,6 +113,7 @@ static inline void __list_del(struct list_head * prev, struct list_head * next)
  * in an undefined state.
  */
 #ifndef CONFIG_DEBUG_LIST
+/*! 2017. 3.18 study -ing */
 static inline void __list_del_entry(struct list_head *entry)
 {
 	__list_del(entry->prev, entry->next);
@@ -156,6 +158,7 @@ static inline void list_replace_init(struct list_head *old,
  * list_del_init - deletes entry from list and reinitialize it.
  * @entry: the element to delete from the list.
  */
+/*! 2017. 2.04 study -ing */
 static inline void list_del_init(struct list_head *entry)
 {
 	__list_del_entry(entry);
@@ -413,6 +416,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * @pos:	the type * to cursor
  * @member:	the name of the list_struct within the struct.
  */
+/*! 2017. 3.18 study -ing */
 #define list_next_entry(pos, member) \
 	list_entry((pos)->member.next, typeof(*(pos)), member)
 
@@ -576,6 +580,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * Iterate over list of given type from current point, safe against
  * removal of list entry.
  */
+/*! 2017. 3.18 study -ing */
 #define list_for_each_entry_safe_from(pos, n, head, member) 			\
 	for (n = list_next_entry(pos, member);					\
 	     &pos->member != (head);						\
@@ -591,6 +596,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * Iterate backwards over list of given type, safe against removal
  * of list entry.
  */
+/*! 2017. 3.18 study -ing */
 #define list_for_each_entry_safe_reverse(pos, n, head, member)		\
 	for (pos = list_last_entry(head, typeof(*pos), member),		\
 		n = list_prev_entry(pos, member);			\

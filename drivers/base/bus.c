@@ -44,7 +44,7 @@ static struct bus_type *bus_get(struct bus_type *bus)
 	}
 	return NULL;
 }
-
+/*! 2017. 3.18 study -ing */
 static void bus_put(struct bus_type *bus)
 {
 	if (bus)
@@ -482,7 +482,7 @@ static int device_add_attrs(struct bus_type *bus, struct device *dev)
 	}
 	return error;
 }
-
+/*! 2017. 3.18 study -ing */
 static void device_remove_attrs(struct bus_type *bus, struct device *dev)
 {
 	int i;
@@ -574,6 +574,7 @@ void bus_probe_device(struct device *dev)
  * - Detach from its driver.
  * - Drop reference taken in bus_add_device().
  */
+/*! 2017. 3.18 study -ing */
 void bus_remove_device(struct device *dev)
 {
 	struct bus_type *bus = dev->bus;

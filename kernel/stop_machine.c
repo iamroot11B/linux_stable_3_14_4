@@ -51,7 +51,7 @@ static bool stop_machine_initialized = false;
  * relatively cheap.
  */
 DEFINE_STATIC_LGLOCK(stop_cpus_lock);
-
+/*! 2017. 3.18 study -ing */
 static void cpu_stop_init_done(struct cpu_stop_done *done, unsigned int nr_todo)
 {
 	memset(done, 0, sizeof(*done));
@@ -60,6 +60,7 @@ static void cpu_stop_init_done(struct cpu_stop_done *done, unsigned int nr_todo)
 }
 
 /* signal completion unless @done is NULL */
+/*! 2017. 3.18 study -ing */
 static void cpu_stop_signal_done(struct cpu_stop_done *done, bool executed)
 {
 	if (done) {
@@ -71,6 +72,7 @@ static void cpu_stop_signal_done(struct cpu_stop_done *done, bool executed)
 }
 
 /* queue @work to @stopper.  if offline, @work is completed immediately */
+/*! 2017. 3.18 study -ing */
 static void cpu_stop_queue_work(unsigned int cpu, struct cpu_stop_work *work)
 {
 	struct cpu_stopper *stopper = &per_cpu(cpu_stopper, cpu);
@@ -113,6 +115,7 @@ static void cpu_stop_queue_work(unsigned int cpu, struct cpu_stop_work *work)
  * -ENOENT if @fn(@arg) was not executed because @cpu was offline;
  * otherwise, the return value of @fn.
  */
+/*! 2017. 3.18 study -ing */
 int stop_one_cpu(unsigned int cpu, cpu_stop_fn_t fn, void *arg)
 {
 	struct cpu_stop_done done;
@@ -574,7 +577,7 @@ int __stop_machine(int (*fn)(void *), void *data, const struct cpumask *cpus)
 		return ret;
 	}
 
-	/*! stop_machine_initialized 가 init 된 이후에는 아래 구문 수행 
+	/*! stop_machine_initialized 가 init 된 이후에는 아래 구문 수행
 	 *  msdata->attr.state 를 MULTI_STOP_PREPARE로 바꿔준 후,
 	 *  stop_cpus를 수행한 후 그 리턴값을 반환
 	 */

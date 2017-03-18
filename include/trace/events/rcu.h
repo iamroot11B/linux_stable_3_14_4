@@ -700,7 +700,7 @@ TRACE_EVENT(rcu_barrier,
 );
 
 #else /* #ifdef CONFIG_RCU_TRACE */
-
+/*! 2017. 3.18 study -ing */
 #define trace_rcu_grace_period(rcuname, gpnum, gpevent) do { } while (0)
 #define trace_rcu_grace_period_init(rcuname, gpnum, level, grplo, grphi, \
 				    qsmask) do { } while (0)

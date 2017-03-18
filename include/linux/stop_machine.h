@@ -74,7 +74,7 @@ static inline void stop_one_cpu_nowait(unsigned int cpu,
 		schedule_work(&work_buf->work);
 	}
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int stop_cpus(const struct cpumask *cpumask,
 			    cpu_stop_fn_t fn, void *arg)
 {
@@ -82,7 +82,7 @@ static inline int stop_cpus(const struct cpumask *cpumask,
 		return stop_one_cpu(raw_smp_processor_id(), fn, arg);
 	return -ENOENT;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int try_stop_cpus(const struct cpumask *cpumask,
 				cpu_stop_fn_t fn, void *arg)
 {

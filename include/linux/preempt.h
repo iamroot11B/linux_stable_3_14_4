@@ -22,6 +22,7 @@ extern void preempt_count_add(int val);
 extern void preempt_count_sub(int val);
 #define preempt_count_dec_and_test() ({ preempt_count_sub(1); should_resched(); })
 #else
+/*! 2017. 3.18 study -ing */
 #define preempt_count_add(val)	__preempt_count_add(val)
 #define preempt_count_sub(val)	__preempt_count_sub(val)
 #define preempt_count_dec_and_test() __preempt_count_dec_and_test()
@@ -32,11 +33,12 @@ extern void preempt_count_sub(int val);
 
 /*! 2016.03.05 study -ing */
 #define preempt_count_inc() preempt_count_add(1)
+/*! 2017. 3.18 study -ing */
 #define preempt_count_dec() preempt_count_sub(1)
 
 #ifdef CONFIG_PREEMPT_COUNT
 
-/*! 
+/*!
  * http://studyfoss.egloos.com/5128961
  */
 /*! 2016.07.16 study -ing */
@@ -75,6 +77,7 @@ do { \
 	barrier(); \
 	preempt_count_dec(); \
 } while (0)
+CONFIG_TRACE_IRQFLAGS
 #define preempt_check_resched() do { } while (0)
 #endif
 

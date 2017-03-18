@@ -23,6 +23,7 @@ void delayed_work_timer_fn(unsigned long __data);
  * The first word is the work queue pointer and the flags rolled into
  * one
  */
+/*! 2017. 3.18 study -ing */
 #define work_data_bits(work) ((unsigned long *)(&(work)->data))
 
 enum {
@@ -134,7 +135,7 @@ struct workqueue_attrs {
 	cpumask_var_t		cpumask;	/* allowed CPUs */
 	bool			no_numa;	/* disable NUMA affinity */
 };
-
+/*! 2017. 3.18 study -ing */
 static inline struct delayed_work *to_delayed_work(struct work_struct *work)
 {
 	return container_of(work, struct delayed_work, work);
@@ -201,7 +202,9 @@ static inline unsigned int work_static(struct work_struct *work)
 #else
 /*! 2016.07.09 study -ing */
 static inline void __init_work(struct work_struct *work, int onstack) { }
+/*! 2017. 3.18 study -ing */
 static inline void destroy_work_on_stack(struct work_struct *work) { }
+/*! 2017. 3.18 study -ing */
 static inline unsigned int work_static(struct work_struct *work) { return 0; }
 #endif
 
@@ -244,7 +247,7 @@ static inline unsigned int work_static(struct work_struct *work) { return 0; }
 	do {								\
 		__INIT_WORK((_work), (_func), 0);			\
 	} while (0)
-
+/*! 2017. 3.18 study -ing */
 #define INIT_WORK_ONSTACK(_work, _func)					\
 	do {								\
 		__INIT_WORK((_work), (_func), 1);			\
@@ -512,6 +515,7 @@ extern void print_worker_info(const char *log_lvl, struct task_struct *task);
  * We queue the work to the CPU on which it was submitted, but if the CPU dies
  * it can be processed by another CPU.
  */
+/*! 2017. 3.18 study -ing */
 static inline bool queue_work(struct workqueue_struct *wq,
 			      struct work_struct *work)
 {
@@ -541,6 +545,7 @@ static inline bool queue_delayed_work(struct workqueue_struct *wq,
  *
  * mod_delayed_work_on() on local CPU.
  */
+/*! 2017. 3.18 study -ing */
 static inline bool mod_delayed_work(struct workqueue_struct *wq,
 				    struct delayed_work *dwork,
 				    unsigned long delay)
@@ -571,6 +576,7 @@ static inline bool schedule_work_on(int cpu, struct work_struct *work)
  * queued and leaves it in the same position on the kernel-global
  * workqueue otherwise.
  */
+/*! 2017. 3.18 study -ing */
 static inline bool schedule_work(struct work_struct *work)
 {
 	return queue_work(system_wq, work);

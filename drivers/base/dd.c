@@ -223,7 +223,7 @@ static int driver_sysfs_add(struct device *dev)
 	}
 	return ret;
 }
-
+/*! 2017. 3.18 study -ing */
 static void driver_sysfs_remove(struct device *dev)
 {
 	struct device_driver *drv = dev->driver;
@@ -484,6 +484,7 @@ EXPORT_SYMBOL_GPL(driver_attach);
  * __device_release_driver() must be called with @dev lock held.
  * When called for a USB interface, @dev->parent lock must be held as well.
  */
+/*! 2017. 3.18 study -ing */
 static void __device_release_driver(struct device *dev)
 {
 	struct device_driver *drv;
@@ -524,6 +525,7 @@ static void __device_release_driver(struct device *dev)
  * Manually detach device from driver.
  * When called for a USB interface, @dev->parent lock must be held.
  */
+/*! 2017. 3.18 study -ing */
 void device_release_driver(struct device *dev)
 {
 	/*

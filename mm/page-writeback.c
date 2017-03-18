@@ -490,17 +490,20 @@ static void writeout_period(unsigned long t)
  * exceed 100%.
  */
 static unsigned int bdi_min_ratio;
-
+/*! 2017. 3.18 study -ing */
 int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_ratio)
 {
 	int ret = 0;
 
 	spin_lock_bh(&bdi_lock);
+	/*! min ratio 가 max ratio보다 크면 에러  */
 	if (min_ratio > bdi->max_ratio) {
 		ret = -EINVAL;
 	} else {
+		/*! min_ratio - bdi->min_ratio가 100 이상이면 에러   */
 		min_ratio -= bdi->min_ratio;
 		if (bdi_min_ratio + min_ratio < 100) {
+			/*! 인자로 받아온 min_ratio를 그대로 set하는게 아니라, 기존 min_ratio에 +  */
 			bdi_min_ratio += min_ratio;
 			bdi->min_ratio += min_ratio;
 		} else {

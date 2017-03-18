@@ -49,7 +49,7 @@ struct list_head {
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
-/*! 2016.10.15 study -ing */
+
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;
@@ -163,7 +163,6 @@ static inline void list_replace_init(struct list_head *old,
  * list_del_init - deletes entry from list and reinitialize it.
  * @entry: the element to delete from the list.
  */
-/*! 2017. 2.04 study -ing */
 static inline void list_del_init(struct list_head *entry)
 {
 	__list_del(entry->prev, entry->next);

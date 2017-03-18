@@ -585,6 +585,7 @@ unlock:
  * account when the CPU goes back to idle and evaluates the timer
  * wheel for the next timer event.
  */
+/*! 2017. 3.18 study -ing */
 static void wake_up_idle_cpu(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -611,12 +612,14 @@ static void wake_up_idle_cpu(int cpu)
 
 	/* NEED_RESCHED must be visible before we test polling */
 	smp_mb();
+	/*! tsk_is_polling : return 0  */
 	if (!tsk_is_polling(rq->idle))
 		smp_send_reschedule(cpu);
 }
-
+/*! 2017. 3.18 study -ing */
 static bool wake_up_full_nohz_cpu(int cpu)
 {
+	/*! tick_nohz_full_cpu : return false  */
 	if (tick_nohz_full_cpu(cpu)) {
 		if (cpu != smp_processor_id() ||
 		    tick_nohz_tick_stopped())
@@ -626,7 +629,7 @@ static bool wake_up_full_nohz_cpu(int cpu)
 
 	return false;
 }
-
+/*! 2017. 3.18 study -ing */
 void wake_up_nohz_cpu(int cpu)
 {
 	if (!wake_up_full_nohz_cpu(cpu))

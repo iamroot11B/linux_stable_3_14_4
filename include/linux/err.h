@@ -19,7 +19,7 @@
 
 /*! 2016.11.19 study -ing */
 #define IS_ERR_VALUE(x) unlikely((x) >= (unsigned long)-MAX_ERRNO)
-
+/*! 2017. 3.18 study -ing */
 static inline void * __must_check ERR_PTR(long error)
 {
 	return (void *) error;

@@ -67,8 +67,10 @@ static inline void vtime_account_irq_enter(struct task_struct *tsk)
 #else /* !CONFIG_VIRT_CPU_ACCOUNTING */
 
 static inline void vtime_task_switch(struct task_struct *prev) { }
+/*! 2017. 3.18 study -ing */
 static inline void vtime_account_system(struct task_struct *tsk) { }
 static inline void vtime_account_user(struct task_struct *tsk) { }
+/*! 2017. 3.18 study -ing */
 static inline void vtime_account_irq_enter(struct task_struct *tsk) { }
 #endif /* !CONFIG_VIRT_CPU_ACCOUNTING */
 
@@ -92,9 +94,11 @@ extern void vtime_guest_enter(struct task_struct *tsk);
 extern void vtime_guest_exit(struct task_struct *tsk);
 extern void vtime_init_idle(struct task_struct *tsk, int cpu);
 #else /* !CONFIG_VIRT_CPU_ACCOUNTING_GEN  */
+/*! 2017. 3.18 study -ing */
 static inline void vtime_account_irq_exit(struct task_struct *tsk)
 {
 	/* On hard|softirq exit we always account to hard|softirq cputime */
+	/*! Do Nothing  */
 	vtime_account_system(tsk);
 }
 static inline void vtime_user_enter(struct task_struct *tsk) { }
@@ -107,18 +111,23 @@ static inline void vtime_init_idle(struct task_struct *tsk, int cpu) { }
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 extern void irqtime_account_irq(struct task_struct *tsk);
 #else
+/*! 2017. 3.18 study -ing */
 static inline void irqtime_account_irq(struct task_struct *tsk) { }
 #endif
-
+/*! 2017. 3.18 study -ing */
 static inline void account_irq_enter_time(struct task_struct *tsk)
 {
+	/*! Do Nothing.  */
 	vtime_account_irq_enter(tsk);
+	/*! Do Nothing.  */
 	irqtime_account_irq(tsk);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void account_irq_exit_time(struct task_struct *tsk)
 {
+	/*! Do Nothing  */
 	vtime_account_irq_exit(tsk);
+	/*! Do Nothing  */
 	irqtime_account_irq(tsk);
 }
 

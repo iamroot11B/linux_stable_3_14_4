@@ -300,7 +300,7 @@ out:
 	return ret;
 }
 EXPORT_SYMBOL(simple_empty);
-
+/*! 2017. 3.18 study -ing */
 int simple_unlink(struct inode *dir, struct dentry *dentry)
 {
 	struct inode *inode = dentry->d_inode;
@@ -311,7 +311,7 @@ int simple_unlink(struct inode *dir, struct dentry *dentry)
 	return 0;
 }
 EXPORT_SYMBOL(simple_unlink);
-
+/*! 2017. 3.18 study -ing */
 int simple_rmdir(struct inode *dir, struct dentry *dentry)
 {
 	if (!simple_empty(dentry))
@@ -559,7 +559,7 @@ int simple_pin_fs(struct file_system_type *type, struct vfsmount **mount, int *c
 	return 0;
 }
 EXPORT_SYMBOL(simple_pin_fs);
-
+/*! 2017. 3.18 study -ing */
 void simple_release_fs(struct vfsmount **mount, int *count)
 {
 	struct vfsmount *mnt;

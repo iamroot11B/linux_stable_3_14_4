@@ -312,6 +312,7 @@ static void dentry_iput(struct dentry * dentry)
  * Release the dentry's inode, using the filesystem
  * d_iput() operation if defined. dentry remains in-use.
  */
+/*! 2017. 3.18 study -ing */
 static void dentry_unlink_inode(struct dentry * dentry)
 	__releases(dentry->d_lock)
 	__releases(dentry->d_inode->i_lock)
@@ -692,7 +693,7 @@ static inline void __dget(struct dentry *dentry)
 {
 	lockref_get(&dentry->d_lockref);
 }
-
+/*! 2017. 3.18 study -ing */
 struct dentry *dget_parent(struct dentry *dentry)
 {
 	int gotref;
@@ -2383,7 +2384,7 @@ EXPORT_SYMBOL(d_validate);
  * Turn the dentry into a negative dentry if possible, otherwise
  * remove it from the hash queues so it can be deleted later
  */
-
+/*! 2017. 3.18 study -ing */
 void d_delete(struct dentry * dentry)
 {
 	struct inode *inode;

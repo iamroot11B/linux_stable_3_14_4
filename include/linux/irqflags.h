@@ -32,6 +32,7 @@
 /*! 2016.07.16 study -ing */
 # define trace_hardirqs_on()		do { } while (0)
 # define trace_hardirqs_off()		do { } while (0)
+/*! 2017. 3.18 study -ing */
 # define trace_softirqs_on(ip)		do { } while (0)
 # define trace_softirqs_off(ip)		do { } while (0)
 # define trace_hardirq_context(p)	0
@@ -66,6 +67,7 @@
 		typecheck(unsigned long, flags);	\
 		flags = arch_local_irq_save();		\
 	} while (0)
+/*! 2017. 3.18 study -ing */
 #define raw_local_irq_restore(flags)			\
 	do {						\
 		typecheck(unsigned long, flags);	\
@@ -104,7 +106,7 @@
 		trace_hardirqs_off();			\
 	} while (0)
 
-
+/*! 2017. 3.18 study -ing */
 #define local_irq_restore(flags)			\
 	do {						\
 		if (raw_irqs_disabled_flags(flags)) {	\

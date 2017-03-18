@@ -155,7 +155,7 @@ static inline void atomic_long_set(atomic_long_t *l, long i)
 
 	atomic_set(v, i);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void atomic_long_inc(atomic_long_t *l)
 {
 	atomic_t *v = (atomic_t *)l;
@@ -229,7 +229,7 @@ static inline long atomic_long_sub_return(long i, atomic_long_t *l)
 
 	return (long)atomic_sub_return(i, v);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline long atomic_long_inc_return(atomic_long_t *l)
 {
 	atomic_t *v = (atomic_t *)l;

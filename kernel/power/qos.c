@@ -125,6 +125,7 @@ static const struct file_operations pm_qos_power_fops = {
 };
 
 /* unlocked internal variant */
+/*! 2017. 3.18 study -ing */
 static inline int pm_qos_get_value(struct pm_qos_constraints *c)
 {
 	if (plist_head_empty(&c->list))
@@ -143,12 +144,12 @@ static inline int pm_qos_get_value(struct pm_qos_constraints *c)
 		return PM_QOS_DEFAULT_VALUE;
 	}
 }
-
+/*! 2017. 3.18 study -ing */
 s32 pm_qos_read_value(struct pm_qos_constraints *c)
 {
 	return c->target_value;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void pm_qos_set_value(struct pm_qos_constraints *c, s32 value)
 {
 	c->target_value = value;
@@ -165,6 +166,7 @@ static inline void pm_qos_set_value(struct pm_qos_constraints *c, s32 value)
  * This function returns 1 if the aggregated constraint value has changed, 0
  *  otherwise.
  */
+/*! 2017. 3.18 study -ing */
 int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 			 enum pm_qos_req_action action, int value)
 {
@@ -199,6 +201,7 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 	}
 
 	curr_value = pm_qos_get_value(c);
+	/*! c->target_value = curr_value  */
 	pm_qos_set_value(c, curr_value);
 
 	spin_unlock_irqrestore(&pm_qos_lock, flags);
@@ -219,6 +222,7 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
  * @pqf: Device PM QoS flags set to remove the request from.
  * @req: Request to remove from the set.
  */
+/*! 2017. 3.18 study -ing */
 static void pm_qos_flags_remove_req(struct pm_qos_flags *pqf,
 				    struct pm_qos_flags_request *req)
 {
@@ -242,6 +246,7 @@ static void pm_qos_flags_remove_req(struct pm_qos_flags *pqf,
  * value has changed.  Returns 1 if the aggregate constraint value has changed,
  * 0 otherwise.
  */
+/*! 2017. 3.18 study -ing */
 bool pm_qos_update_flags(struct pm_qos_flags *pqf,
 			 struct pm_qos_flags_request *req,
 			 enum pm_qos_req_action action, s32 val)

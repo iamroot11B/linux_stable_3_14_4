@@ -67,11 +67,13 @@ const char * const softirq_to_name[NR_SOFTIRQS] = {
  * to the pending events, so lets the scheduler to balance
  * the softirq load for us.
  */
+/*! 2017. 3.18 study -ing */
 static void wakeup_softirqd(void)
 {
 	/* Interrupts are disabled: no need to stop preemption */
-	struct task_struct *tsk = __this_cpu_read(ksoftirqd);
+	struct task_struct *tsk = __this_cpu_read(ksoftirqd);n
 
+	/*! task가 running 상태가 아니면 wake up process 수행.  */
 	if (tsk && tsk->state != TASK_RUNNING)
 		wake_up_process(tsk);
 }
@@ -118,11 +120,12 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
 }
 EXPORT_SYMBOL(__local_bh_disable_ip);
 #endif /* CONFIG_TRACE_IRQFLAGS */
-
+/*! 2017. 3.18 study -ing */
 static void __local_bh_enable(unsigned int cnt)
 {
 	WARN_ON_ONCE(!irqs_disabled());
 
+	/*! trace_softirqs_on : Do Nothing  */
 	if (softirq_count() == (cnt & SOFTIRQ_MASK))
 		trace_softirqs_on(_RET_IP_);
 	preempt_count_sub(cnt);
@@ -139,7 +142,7 @@ void _local_bh_enable(void)
 	__local_bh_enable(SOFTIRQ_DISABLE_OFFSET);
 }
 EXPORT_SYMBOL(_local_bh_enable);
-
+/*! 2017. 3.18 study -ing */
 void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
 {
 	WARN_ON_ONCE(in_irq() || irqs_disabled());
@@ -149,6 +152,7 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
 	/*
 	 * Are softirqs going to be turned on now:
 	 */
+	/*! trace_softirqs_on : Do Nothing.  */
 	if (softirq_count() == SOFTIRQ_DISABLE_OFFSET)
 		trace_softirqs_on(ip);
 	/*
@@ -162,13 +166,16 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
 		 * Run softirq if any pending. And do it in its own stack
 		 * as we may be calling this deep in a task call stack already.
 		 */
+		/*! interrupt 상황이 아니고, irq가 pending 상태이면 do softirq 수행  */
 		do_softirq();
 	}
 
 	preempt_count_dec();
+	/*! CONFIG_TRACE_IRQFLAGS : Not defined.  */
 #ifdef CONFIG_TRACE_IRQFLAGS
 	local_irq_enable();
 #endif
+	/*! Do Nothing  */
 	preempt_check_resched();
 }
 EXPORT_SYMBOL(__local_bh_enable_ip);
@@ -218,10 +225,11 @@ static inline void lockdep_softirq_end(bool in_hardirq)
 		trace_hardirq_enter();
 }
 #else
+/*! 2017. 3.18 study -ing */
 static inline bool lockdep_softirq_start(void) { return false; }
 static inline void lockdep_softirq_end(bool in_hardirq) { }
 #endif
-
+/*! 2017. 3.18 study -ing */
 asmlinkage void __do_softirq(void)
 {
 	unsigned long end = jiffies + MAX_SOFTIRQ_TIME;
@@ -244,17 +252,20 @@ asmlinkage void __do_softirq(void)
 	account_irq_enter_time(current);
 
 	__local_bh_disable_ip(_RET_IP_, SOFTIRQ_OFFSET);
+	/*! lockdep_softirq_start : return false  */
 	in_hardirq = lockdep_softirq_start();
 
 	cpu = smp_processor_id();
 restart:
 	/* Reset the pending bitmask before enabling irqs */
+	/*! irq_stat[cpu].__softirq_pending 을 0으로 초기화  */
 	set_softirq_pending(0);
 
 	local_irq_enable();
 
 	h = softirq_vec;
 
+	/*! pending 된 bit 들 bit shift 하면서 0 이 될때까지 반복 수행  */
 	while ((softirq_bit = ffs(pending))) {
 		unsigned int vec_nr;
 		int prev_count;
@@ -267,12 +278,14 @@ restart:
 		kstat_incr_softirqs_this_cpu(vec_nr);
 
 		trace_softirq_entry(vec_nr);
+		/*! 해당 인터럽트 action 수행  */
 		h->action(h);
 		trace_softirq_exit(vec_nr);
 		if (unlikely(prev_count != preempt_count())) {
 			pr_err("huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n",
 			       vec_nr, softirq_to_name[vec_nr], h->action,
 			       prev_count, preempt_count());
+			/*! prev_count와 현재 preemt_count가 다르면 prev_count로 set  */
 			preempt_count_set(prev_count);
 		}
 		rcu_bh_qs(cpu);
@@ -283,6 +296,10 @@ restart:
 	local_irq_disable();
 
 	pending = local_softirq_pending();
+	/*!
+	 * 여전히 pending이 있고 아래 조건에 걸리면 restart로 점프,
+	 * 조건에 안 걸리면 wakeup_softirqd 수행
+	 */
 	if (pending) {
 		if (time_before(jiffies, end) && !need_resched() &&
 		    --max_restart)
@@ -291,13 +308,15 @@ restart:
 		wakeup_softirqd();
 	}
 
+	/*! Do Nothing  */
 	lockdep_softirq_end(in_hardirq);
+	/*! Do Nothing  */
 	account_irq_exit_time(current);
 	__local_bh_enable(SOFTIRQ_OFFSET);
 	WARN_ON_ONCE(in_interrupt());
 	tsk_restore_flags(current, old_flags, PF_MEMALLOC);
 }
-
+/*! 2017. 3.18 study -ing */
 asmlinkage void do_softirq(void)
 {
 	__u32 pending;

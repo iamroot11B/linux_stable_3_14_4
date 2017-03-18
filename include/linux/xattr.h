@@ -76,6 +76,7 @@ static inline void simple_xattrs_init(struct simple_xattrs *xattrs)
 /*
  * free all the xattrs
  */
+/*! Do Nothing  */
 static inline void simple_xattrs_free(struct simple_xattrs *xattrs)
 {
 	struct simple_xattr *xattr, *node;

@@ -111,6 +111,7 @@ __rwsem_do_wake(struct rw_semaphore *sem, int wakewrite)
 /*
  * wake a single writer
  */
+/*! 2017. 3.18 study -ing */
 static inline struct rw_semaphore *
 __rwsem_wake_one_writer(struct rw_semaphore *sem)
 {
@@ -125,6 +126,7 @@ __rwsem_wake_one_writer(struct rw_semaphore *sem)
 /*
  * get a read lock on the semaphore
  */
+/*! 2017. 3.18 study -ing */
 void __sched __down_read(struct rw_semaphore *sem)
 {
 	struct rwsem_waiter waiter;
@@ -133,6 +135,7 @@ void __sched __down_read(struct rw_semaphore *sem)
 
 	raw_spin_lock_irqsave(&sem->wait_lock, flags);
 
+	/*! 정상적으로 처리되면 sem->activity만 ++ 시켜주고 리턴  */
 	if (sem->activity >= 0 && list_empty(&sem->wait_list)) {
 		/* granted */
 		sem->activity++;
@@ -140,6 +143,7 @@ void __sched __down_read(struct rw_semaphore *sem)
 		goto out;
 	}
 
+	/*! 아니면 waiter를 만들어서 scheduling 하면서 wait 수행  */
 	tsk = current;
 	set_task_state(tsk, TASK_UNINTERRUPTIBLE);
 
@@ -264,6 +268,7 @@ int __down_write_trylock(struct rw_semaphore *sem)
 /*
  * release a read lock on the semaphore
  */
+/*! 2017. 3.18 study -ing */
 void __up_read(struct rw_semaphore *sem)
 {
 	unsigned long flags;
@@ -310,4 +315,3 @@ void __downgrade_write(struct rw_semaphore *sem)
 
 	raw_spin_unlock_irqrestore(&sem->wait_lock, flags);
 }
-

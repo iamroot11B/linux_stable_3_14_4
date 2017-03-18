@@ -75,7 +75,7 @@ static DECLARE_COMPLETION(cpu_running);
 
 /*!
  * smp_ops 초기화
- * 1. start_kernel/smp_set_ops() 에서 최초 초기화  
+ * 1. start_kernel/smp_set_ops() 에서 최초 초기화
  */
 static struct smp_operations smp_ops;
 
@@ -632,9 +632,13 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 	}
 	set_irq_regs(old_regs);
 }
-
+/*! 2017. 3.18 study -ing */
 void smp_send_reschedule(int cpu)
 {
+	/*!
+	 * smp_cross_call
+	 *  -> gic_init_base 함수에서 gic_raise_softirq 으로 set 한다.
+	 */
 	smp_cross_call(cpumask_of(cpu), IPI_RESCHEDULE);
 }
 

@@ -7,6 +7,7 @@
 #ifdef CONFIG_TRACE_IRQFLAGS
 extern void __local_bh_disable_ip(unsigned long ip, unsigned int cnt);
 #else
+/*! 2017. 3.18 study -ing */
 static __always_inline void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
 {
 	preempt_count_add(cnt);

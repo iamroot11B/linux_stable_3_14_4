@@ -26,6 +26,7 @@ static inline void fsnotify_d_instantiate(struct dentry *dentry,
 }
 
 /* Notify this dentry's parent about a child's events. */
+/*! 2017. 3.18 study -ing */
 static inline int fsnotify_parent(struct path *path, struct dentry *dentry, __u32 mask)
 {
 	if (!dentry)
@@ -132,6 +133,7 @@ static inline void fsnotify_vfsmount_delete(struct vfsmount *mnt)
 /*
  * fsnotify_nameremove - a filename was removed from a directory
  */
+/*! 2017. 3.18 study -ing */
 static inline void fsnotify_nameremove(struct dentry *dentry, int isdir)
 {
 	__u32 mask = FS_DELETE;

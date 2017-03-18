@@ -425,7 +425,7 @@ static inline int __must_check sysfs_create_file(struct kobject *kobj,
 {
 	return sysfs_create_file_ns(kobj, attr, NULL);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void sysfs_remove_file(struct kobject *kobj,
 				     const struct attribute *attr)
 {

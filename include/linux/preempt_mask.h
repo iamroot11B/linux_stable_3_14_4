@@ -43,7 +43,7 @@
 #define SOFTIRQ_OFFSET	(1UL << SOFTIRQ_SHIFT)
 #define HARDIRQ_OFFSET	(1UL << HARDIRQ_SHIFT)
 #define NMI_OFFSET	(1UL << NMI_SHIFT)
-
+/*! 2017. 3.18 study -ing */
 #define SOFTIRQ_DISABLE_OFFSET	(2 * SOFTIRQ_OFFSET)
 
 #define PREEMPT_ACTIVE_BITS	1
@@ -51,6 +51,7 @@
 #define PREEMPT_ACTIVE	(__IRQ_MASK(PREEMPT_ACTIVE_BITS) << PREEMPT_ACTIVE_SHIFT)
 
 #define hardirq_count()	(preempt_count() & HARDIRQ_MASK)
+/*! 2017. 3.18 study -ing */
 #define softirq_count()	(preempt_count() & SOFTIRQ_MASK)
 /*! 2016.10.22 study -ing */
 #define irq_count()	(preempt_count() & (HARDIRQ_MASK | SOFTIRQ_MASK \

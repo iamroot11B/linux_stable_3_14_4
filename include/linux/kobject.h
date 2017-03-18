@@ -186,7 +186,7 @@ static inline struct kset *kset_get(struct kset *k)
 {
 	return k ? to_kset(kobject_get(&k->kobj)) : NULL;
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void kset_put(struct kset *k)
 {
 	kobject_put(&k->kobj);

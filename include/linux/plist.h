@@ -125,6 +125,7 @@ plist_head_init(struct plist_head *head)
  * @node:	&struct plist_node pointer
  * @prio:	initial node priority
  */
+/*! 2017. 3.18 study -ing */
 static inline void plist_node_init(struct plist_node *node, int prio)
 {
 	node->prio = prio;
@@ -172,6 +173,7 @@ extern void plist_del(struct plist_node *node, struct plist_head *head);
  *
  * Iterate over list of given type, safe against removal of list entry.
  */
+/*! 2017. 3.18 study -ing */
 #define plist_for_each_entry_safe(pos, n, head, m)	\
 	list_for_each_entry_safe(pos, n, &(head)->node_list, m.node_list)
 
@@ -179,6 +181,7 @@ extern void plist_del(struct plist_node *node, struct plist_head *head);
  * plist_head_empty - return !0 if a plist_head is empty
  * @head:	&struct plist_head pointer
  */
+/*! 2017. 3.18 study -ing */
 static inline int plist_head_empty(const struct plist_head *head)
 {
 	return list_empty(&head->node_list);
@@ -235,6 +238,7 @@ static inline int plist_node_empty(const struct plist_node *node)
  *
  * Assumes the plist is _not_ empty.
  */
+/*! 2017. 3.18 study -ing */
 static inline struct plist_node *plist_first(const struct plist_head *head)
 {
 	return list_entry(head->node_list.next,

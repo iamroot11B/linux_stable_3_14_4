@@ -134,6 +134,7 @@ s32 dev_pm_qos_read_value(struct device *dev)
  * code and if needed call the per-device and the global notification
  * callbacks
  */
+/*! 2017. 3.18 study -ing */
 static int apply_constraint(struct dev_pm_qos_request *req,
 			    enum pm_qos_req_action action, s32 value)
 {
@@ -145,6 +146,7 @@ static int apply_constraint(struct dev_pm_qos_request *req,
 		ret = pm_qos_update_target(&qos->latency, &req->data.pnode,
 					   action, value);
 		if (ret) {
+			/*! qos->latency->target_value  */
 			value = pm_qos_read_value(&qos->latency);
 			blocking_notifier_call_chain(&dev_pm_notifiers,
 						     (unsigned long)value,
@@ -229,7 +231,9 @@ void dev_pm_qos_constraints_destroy(struct device *dev)
 
 	mutex_lock(&dev_pm_qos_mtx);
 
+	/*! Do Nothing  */
 	__dev_pm_qos_hide_latency_limit(dev);
+	/*! Do Nothing  */
 	__dev_pm_qos_hide_flags(dev);
 
 	qos = dev->power.qos;
@@ -769,6 +773,7 @@ int dev_pm_qos_update_flags(struct device *dev, s32 mask, bool set)
 	return ret;
 }
 #else /* !CONFIG_PM_RUNTIME */
+/*! 2017. 3.18 study -ing */
 static void __dev_pm_qos_hide_latency_limit(struct device *dev) {}
 static void __dev_pm_qos_hide_flags(struct device *dev) {}
 #endif /* CONFIG_PM_RUNTIME */

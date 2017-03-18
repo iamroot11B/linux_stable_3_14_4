@@ -685,7 +685,7 @@ int pm_qos_sysfs_add_latency(struct device *dev)
 {
 	return sysfs_merge_group(&dev->kobj, &pm_qos_latency_attr_group);
 }
-
+/*! 2017. 3.18 study -ing */
 void pm_qos_sysfs_remove_latency(struct device *dev)
 {
 	sysfs_unmerge_group(&dev->kobj, &pm_qos_latency_attr_group);
@@ -695,17 +695,17 @@ int pm_qos_sysfs_add_flags(struct device *dev)
 {
 	return sysfs_merge_group(&dev->kobj, &pm_qos_flags_attr_group);
 }
-
+/*! 2017. 3.18 study -ing */
 void pm_qos_sysfs_remove_flags(struct device *dev)
 {
 	sysfs_unmerge_group(&dev->kobj, &pm_qos_flags_attr_group);
 }
-
+/*! 2017. 3.18 study -ing */
 void rpm_sysfs_remove(struct device *dev)
 {
 	sysfs_unmerge_group(&dev->kobj, &pm_runtime_attr_group);
 }
-
+/*! 2017. 3.18 study -ing */
 void dpm_sysfs_remove(struct device *dev)
 {
 	dev_pm_qos_constraints_destroy(dev);

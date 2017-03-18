@@ -66,8 +66,10 @@ EXPORT_SYMBOL(lockref_get);
  * @lockref: pointer to lockref structure
  * Return: 1 if count updated successfully or 0 if count was zero
  */
+/*! 2017. 3.18 study -ing */
 int lockref_get_not_zero(struct lockref *lockref)
 {
+	/*! lockref->count를 ++ (0이 아니면)  */
 	int retval;
 
 	CMPXCHG_LOOP(

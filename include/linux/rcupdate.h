@@ -488,7 +488,7 @@ static inline void rcu_preempt_sleep_check(void)
 	} while (0)
 
 #else /* #ifdef CONFIG_PROVE_RCU */
-
+/*! 2017. 3.18 study -ing */
 #define rcu_lockdep_assert(c, s) do { } while (0)
 #define rcu_sleep_check() do { } while (0)
 

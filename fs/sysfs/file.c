@@ -364,6 +364,7 @@ EXPORT_SYMBOL_GPL(sysfs_chmod_file);
  *
  * Hash the attribute name and namespace tag and kill the victim.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_remove_file_ns(struct kobject *kobj, const struct attribute *attr,
 			  const void *ns)
 {
@@ -425,6 +426,7 @@ EXPORT_SYMBOL_GPL(sysfs_create_bin_file);
  *	@kobj:	object.
  *	@attr:	attribute descriptor.
  */
+/*! 2017. 3.18 study -ing */
 void sysfs_remove_bin_file(struct kobject *kobj,
 			   const struct bin_attribute *attr)
 {

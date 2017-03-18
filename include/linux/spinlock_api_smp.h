@@ -139,7 +139,7 @@ static inline void __raw_spin_lock_irq(raw_spinlock_t *lock)
 	spin_acquire(&lock->dep_map, 0, 0, _RET_IP_);
 	LOCK_CONTENDED(lock, do_raw_spin_trylock, do_raw_spin_lock);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void __raw_spin_lock_bh(raw_spinlock_t *lock)
 {
 	__local_bh_disable_ip(_RET_IP_, SOFTIRQ_LOCK_OFFSET);
@@ -180,7 +180,7 @@ static inline void __raw_spin_unlock_irq(raw_spinlock_t *lock)
 	local_irq_enable();
 	preempt_enable();
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void __raw_spin_unlock_bh(raw_spinlock_t *lock)
 {
 	spin_release(&lock->dep_map, 1, _RET_IP_);

@@ -230,6 +230,7 @@ EXPORT_SYMBOL_GPL(kernfs_get);
  *
  * Put a reference count of @kn and destroy it if it reached zero.
  */
+/*! 2017. 3.18 study -ing */
 void kernfs_put(struct kernfs_node *kn)
 {
 	struct kernfs_node *parent;
@@ -253,6 +254,7 @@ void kernfs_put(struct kernfs_node *kn)
 		kfree(kn->name);
 	if (kn->iattr) {
 		if (kn->iattr->ia_secdata)
+			/*! Do Nothing  */
 			security_release_secctx(kn->iattr->ia_secdata,
 						kn->iattr->ia_secdata_len);
 		simple_xattrs_free(&kn->iattr->xattrs);
@@ -598,6 +600,7 @@ static struct kernfs_node *kernfs_find_ns(struct kernfs_node *parent,
  * if found.  This function may sleep and returns pointer to the found
  * kernfs_node on success, %NULL on failure.
  */
+/*! 2017. 3.18 study -ing */
 struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
 					   const char *name, const void *ns)
 {

@@ -59,7 +59,7 @@ do {							\
 	__this_cpu_inc(*(DESC)->kstat_irqs);		\
 	__this_cpu_inc(kstat.irqs_sum);			\
 } while (0)
-
+/*! 2017. 3.18 study -ing */
 static inline void kstat_incr_softirqs_this_cpu(unsigned int irq)
 {
 	__this_cpu_inc(kstat.softirqs[irq]);

@@ -198,11 +198,12 @@ void rcu_sched_qs(int cpu)
 		trace_rcu_grace_period(TPS("rcu_sched"), rdp->gpnum, TPS("cpuqs"));
 	rdp->passed_quiesce = 1;
 }
-
+/*! 2017. 3.18 study -ing */
 void rcu_bh_qs(int cpu)
 {
 	struct rcu_data *rdp = &per_cpu(rcu_bh_data, cpu);
 
+	/*! trace_rcu_grace_period : Do Nothing.  */
 	if (rdp->passed_quiesce == 0)
 		trace_rcu_grace_period(TPS("rcu_bh"), rdp->gpnum, TPS("cpuqs"));
 	rdp->passed_quiesce = 1;
@@ -2550,6 +2551,7 @@ EXPORT_SYMBOL_GPL(call_rcu_bh);
  * when there was in fact only one the whole time, as this just adds
  * some overhead: RCU still operates correctly.
  */
+/*! 2017. 3.18 study -ing */
 static inline int rcu_blocking_is_gp(void)
 {
 	int ret;
@@ -2602,12 +2604,15 @@ static inline int rcu_blocking_is_gp(void)
  * In "classic RCU", these two guarantees happen to be one and
  * the same, but can differ in realtime RCU implementations.
  */
+/*! 2017. 3.18 study -ing */
 void synchronize_sched(void)
 {
+	/*! Do Nothing  */
 	rcu_lockdep_assert(!lock_is_held(&rcu_bh_lock_map) &&
 			   !lock_is_held(&rcu_lock_map) &&
 			   !lock_is_held(&rcu_sched_lock_map),
 			   "Illegal synchronize_sched() in RCU-sched read-side critical section");
+	/*! num_online_cpus() <= 1 인지 확인  */
 	if (rcu_blocking_is_gp())
 		return;
 	if (rcu_expedited)
@@ -2698,6 +2703,7 @@ static int synchronize_sched_expedited_cpu_stop(void *data)
  *
  * If we fail too many times in a row, we fall back to synchronize_sched().
  */
+/*! 2017. 3.18 study -ing */
 void synchronize_sched_expedited(void)
 {
 	long firstsnap, s, snap;
@@ -2733,6 +2739,7 @@ void synchronize_sched_expedited(void)
 	 * Each pass through the following loop attempts to force a
 	 * context switch on each CPU.
 	 */
+	/*! try_stop_cpus 결과가 에러면 계속 loop 수행  */
 	while (try_stop_cpus(cpu_online_mask,
 			     synchronize_sched_expedited_cpu_stop,
 			     NULL) == -EAGAIN) {
@@ -2743,6 +2750,7 @@ void synchronize_sched_expedited(void)
 		s = atomic_long_read(&rsp->expedited_done);
 		if (ULONG_CMP_GE((ulong)s, (ulong)firstsnap)) {
 			/* ensure test happens before caller kfree */
+			/*! 배리어  */
 			smp_mb__before_atomic_inc(); /* ^^^ */
 			atomic_long_inc(&rsp->expedited_workdone1);
 			return;
@@ -2750,8 +2758,10 @@ void synchronize_sched_expedited(void)
 
 		/* No joy, try again later.  Or just synchronize_sched(). */
 		if (trycount++ < 10) {
+			/*! delay 주고 재시도.(10번까지)  */
 			udelay(trycount * num_online_cpus());
 		} else {
+			/*! 10번 실패하면 아래 수행 후 리턴  */
 			wait_rcu_gp(call_rcu_sched);
 			atomic_long_inc(&rsp->expedited_normal);
 			return;
@@ -2761,6 +2771,7 @@ void synchronize_sched_expedited(void)
 		s = atomic_long_read(&rsp->expedited_done);
 		if (ULONG_CMP_GE((ulong)s, (ulong)firstsnap)) {
 			/* ensure test happens before caller kfree */
+			/*! 배리어  */
 			smp_mb__before_atomic_inc(); /* ^^^ */
 			atomic_long_inc(&rsp->expedited_workdone2);
 			return;
@@ -3430,7 +3441,7 @@ static void __init rcu_init_geometry(void)
 
     /*! 2016.07.16 study end */
 	/*! 2016.07.23 study start */
-    
+
 	/*
 	 * Initialize any unspecified boot parameters.
 	 * The default values of jiffies_till_first_fqs and

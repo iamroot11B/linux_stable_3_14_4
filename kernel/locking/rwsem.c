@@ -15,9 +15,11 @@
 /*
  * lock for reading
  */
+/*! 2017. 3.18 study -ing */
 void __sched down_read(struct rw_semaphore *sem)
 {
 	might_sleep();
+	/*! Do Nothing  */
 	rwsem_acquire_read(&sem->dep_map, 0, 0, _RET_IP_);
 
 	LOCK_CONTENDED(sem, __down_read_trylock, __down_read);
@@ -72,8 +74,10 @@ EXPORT_SYMBOL(down_write_trylock);
 /*
  * release a read lock
  */
+/*! 2017. 3.18 study -ing */
 void up_read(struct rw_semaphore *sem)
 {
+	/*! Do Nothing  */
 	rwsem_release(&sem->dep_map, 1, _RET_IP_);
 
 	__up_read(sem);
@@ -158,5 +162,3 @@ void up_read_non_owner(struct rw_semaphore *sem)
 EXPORT_SYMBOL(up_read_non_owner);
 
 #endif
-
-

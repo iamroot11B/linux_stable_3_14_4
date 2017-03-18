@@ -185,17 +185,19 @@ static void wakeme_after_rcu(struct rcu_head  *head)
 	rcu = container_of(head, struct rcu_synchronize, head);
 	complete(&rcu->completion);
 }
-
+/*! 2017. 3.18 study -ing */
 void wait_rcu_gp(call_rcu_func_t crf)
 {
 	struct rcu_synchronize rcu;
 
+	/*! Do Nothing  */
 	init_rcu_head_on_stack(&rcu.head);
 	init_completion(&rcu.completion);
 	/* Will wake me after RCU finished. */
 	crf(&rcu.head, wakeme_after_rcu);
 	/* Wait for it. */
 	wait_for_completion(&rcu.completion);
+	/*! Do Nothing  */
 	destroy_rcu_head_on_stack(&rcu.head);
 }
 EXPORT_SYMBOL_GPL(wait_rcu_gp);
@@ -246,8 +248,10 @@ static int rcuhead_fixup_activate(void *addr, enum debug_obj_state state)
  * that are dynamically allocated on the heap.  This function has no
  * effect for !CONFIG_DEBUG_OBJECTS_RCU_HEAD kernel builds.
  */
+/*! 2017. 3.18 study -ing */
 void init_rcu_head_on_stack(struct rcu_head *head)
 {
+	/*! Do Nothing  */
 	debug_object_init_on_stack(head, &rcuhead_debug_descr);
 }
 EXPORT_SYMBOL_GPL(init_rcu_head_on_stack);
@@ -263,8 +267,10 @@ EXPORT_SYMBOL_GPL(init_rcu_head_on_stack);
  * init_rcu_head_on_stack(), this function has no effect for
  * !CONFIG_DEBUG_OBJECTS_RCU_HEAD kernel builds.
  */
+/*! Do Nothing  */
 void destroy_rcu_head_on_stack(struct rcu_head *head)
 {
+	/*! Do Nothing  */
 	debug_object_free(head, &rcuhead_debug_descr);
 }
 EXPORT_SYMBOL_GPL(destroy_rcu_head_on_stack);

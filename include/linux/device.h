@@ -889,7 +889,7 @@ static inline int device_trylock(struct device *dev)
 {
 	return mutex_trylock(&dev->mutex);
 }
-
+klist_remove_waiters
 static inline void device_unlock(struct device *dev)
 {
 	mutex_unlock(&dev->mutex);

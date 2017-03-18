@@ -239,6 +239,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #endif
 
 #define raw_spin_lock_irq(lock)		_raw_spin_lock_irq(lock)
+/*! 2017. 3.18 study -ing */
 #define raw_spin_lock_bh(lock)		_raw_spin_lock_bh(lock)
 #define raw_spin_unlock(lock)		_raw_spin_unlock(lock)
 #define raw_spin_unlock_irq(lock)	_raw_spin_unlock_irq(lock)
@@ -249,6 +250,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 		typecheck(unsigned long, flags);		\
 		_raw_spin_unlock_irqrestore(lock, flags);	\
 	} while (0)
+/*! 2017. 3.18 study -ing */
 #define raw_spin_unlock_bh(lock)	_raw_spin_unlock_bh(lock)
 
 #define raw_spin_trylock_bh(lock) \
@@ -305,7 +307,7 @@ static inline void spin_lock(spinlock_t *lock)
 {
 	raw_spin_lock(&lock->rlock);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void spin_lock_bh(spinlock_t *lock)
 {
 	raw_spin_lock_bh(&lock->rlock);
@@ -346,7 +348,7 @@ static inline void spin_unlock(spinlock_t *lock)
 {
 	raw_spin_unlock(&lock->rlock);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void spin_unlock_bh(spinlock_t *lock)
 {
 	raw_spin_unlock_bh(&lock->rlock);

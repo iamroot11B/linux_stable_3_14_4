@@ -98,17 +98,17 @@ static inline unsigned int tbase_get_deferrable(struct tvec_base *base)
 {
 	return ((unsigned int)(unsigned long)base & TIMER_DEFERRABLE);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline unsigned int tbase_get_irqsafe(struct tvec_base *base)
 {
 	return ((unsigned int)(unsigned long)base & TIMER_IRQSAFE);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline struct tvec_base *tbase_get_base(struct tvec_base *base)
 {
 	return ((struct tvec_base *)((unsigned long)base & ~TIMER_FLAG_MASK));
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void
 timer_set_base(struct timer_list *timer, struct tvec_base *new_base)
 {
@@ -227,6 +227,7 @@ EXPORT_SYMBOL_GPL(__round_jiffies_relative);
  *
  * The return value is the rounded version of the @j parameter.
  */
+/*! 2017. 3.18 study -ing */
 unsigned long round_jiffies(unsigned long j)
 {
 	return round_jiffies_common(j, raw_smp_processor_id(), false);
@@ -337,14 +338,19 @@ void set_timer_slack(struct timer_list *timer, int slack_hz)
 	timer->slack = slack_hz;
 }
 EXPORT_SYMBOL_GPL(set_timer_slack);
-
+/*! 2017. 3.18 study -ing */
 static void
 __internal_add_timer(struct tvec_base *base, struct timer_list *timer)
 {
+	/*!
+	 * 요청 타이머를 5개의 타이머 그룹에 있는
+	 * 벡터 리스트 배열 중 하나의 적절한 리스트에 추가한다.
+	 */
 	unsigned long expires = timer->expires;
 	unsigned long idx = expires - base->timer_jiffies;
 	struct list_head *vec;
 
+	/*! vec 를 찾아서,  */
 	if (idx < TVR_SIZE) {
 		int i = expires & TVR_MASK;
 		vec = base->tv1.vec + i;
@@ -379,9 +385,10 @@ __internal_add_timer(struct tvec_base *base, struct timer_list *timer)
 	/*
 	 * Timers are FIFO:
 	 */
+	/*! 위에서 찾은 vec에 timer->entry 추가. */
 	list_add_tail(&timer->entry, vec);
 }
-
+/*! 2017. 3.18 study -ing */
 static void internal_add_timer(struct tvec_base *base, struct timer_list *timer)
 {
 	__internal_add_timer(base, timer);
@@ -591,8 +598,10 @@ EXPORT_SYMBOL_GPL(destroy_timer_on_stack);
 #else
 /*! 2016.07.09 study -ing */
 static inline void debug_timer_init(struct timer_list *timer) { }
+/*! 2017. 3.18 study -ing */
 static inline void debug_timer_activate(struct timer_list *timer) { }
 static inline void debug_timer_deactivate(struct timer_list *timer) { }
+/*! 2017. 3.18 study -ing */
 static inline void debug_timer_assert_init(struct timer_list *timer) { }
 #endif
 /*! 2016.07.09 study -ing */
@@ -601,10 +610,11 @@ static inline void debug_init(struct timer_list *timer)
 	debug_timer_init(timer);
 	trace_timer_init(timer);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void
 debug_activate(struct timer_list *timer, unsigned long expires)
 {
+	/*! Do Nothing  */
 	debug_timer_activate(timer);
 	trace_timer_start(timer, expires);
 }
@@ -614,9 +624,10 @@ static inline void debug_deactivate(struct timer_list *timer)
 	debug_timer_deactivate(timer);
 	trace_timer_cancel(timer);
 }
-
+/*! 2017. 3.18 study -ing */
 static inline void debug_assert_init(struct timer_list *timer)
 {
+	/*! Do Nothing  */
 	debug_timer_assert_init(timer);
 }
 
@@ -656,7 +667,7 @@ void init_timer_key(struct timer_list *timer, unsigned int flags,
 	do_init_timer(timer, flags, name, key);
 }
 EXPORT_SYMBOL(init_timer_key);
-
+/*! 2017. 3.18 study -ing */
 static inline void detach_timer(struct timer_list *timer, bool clear_pending)
 {
 	struct list_head *entry = &timer->entry;
@@ -676,7 +687,7 @@ detach_expired_timer(struct timer_list *timer, struct tvec_base *base)
 	if (!tbase_get_deferrable(timer->base))
 		base->active_timers--;
 }
-
+/*! 2017. 3.18 study -ing */
 static int detach_if_pending(struct timer_list *timer, struct tvec_base *base,
 			     bool clear_pending)
 {
@@ -704,6 +715,7 @@ static int detach_if_pending(struct timer_list *timer, struct tvec_base *base,
  * possible to set timer->base = NULL and drop the lock: the timer remains
  * locked.
  */
+/*! 2017. 3.18 study -ing */
 static struct tvec_base *lock_timer_base(struct timer_list *timer,
 					unsigned long *flags)
 	__acquires(timer->base->lock)
@@ -723,7 +735,7 @@ static struct tvec_base *lock_timer_base(struct timer_list *timer,
 		cpu_relax();
 	}
 }
-
+/*! 2017. 3.18 study -ing */
 static inline int
 __mod_timer(struct timer_list *timer, unsigned long expires,
 						bool pending_only, int pinned)
@@ -745,6 +757,7 @@ __mod_timer(struct timer_list *timer, unsigned long expires,
 
 	cpu = smp_processor_id();
 
+	/*! CONFIG_NO_HZ_COMMON : Not defined.  */
 #if defined(CONFIG_NO_HZ_COMMON) && defined(CONFIG_SMP)
 	if (!pinned && get_sysctl_timer_migration() && idle_cpu(cpu))
 		cpu = get_nohz_timer_target();
@@ -804,6 +817,7 @@ EXPORT_SYMBOL(mod_timer_pending);
  *   4) use the bitmask to round down the maximum time, so that all last
  *      bits are zeros
  */
+/*! 2017. 3.18 study -ing */
 static inline
 unsigned long apply_slack(struct timer_list *timer, unsigned long expires)
 {
@@ -853,6 +867,7 @@ unsigned long apply_slack(struct timer_list *timer, unsigned long expires)
  * (ie. mod_timer() of an inactive timer returns 0, mod_timer() of an
  * active timer returns 1.)
  */
+/*! 2017. 3.18 study -ing */
 int mod_timer(struct timer_list *timer, unsigned long expires)
 {
 	expires = apply_slack(timer, expires);
@@ -911,6 +926,7 @@ EXPORT_SYMBOL(mod_timer_pinned);
  * Timers with an ->expires field in the past will be executed in the next
  * timer tick.
  */
+/*! 2017. 3.18 study -ing */
 void add_timer(struct timer_list *timer)
 {
 	BUG_ON(timer_pending(timer));
@@ -925,11 +941,13 @@ EXPORT_SYMBOL(add_timer);
  *
  * This is not very scalable on SMP. Double adds are not possible.
  */
+/*! 2017. 3.18 study -ing */
 void add_timer_on(struct timer_list *timer, int cpu)
 {
 	struct tvec_base *base = per_cpu(tvec_bases, cpu);
 	unsigned long flags;
 
+	/*! Do Nothing  */
 	timer_stats_timer_set_start_info(timer);
 	BUG_ON(timer_pending(timer) || !timer->function);
 	spin_lock_irqsave(&base->lock, flags);
@@ -960,18 +978,24 @@ EXPORT_SYMBOL_GPL(add_timer_on);
  * (ie. del_timer() of an inactive timer returns 0, del_timer() of an
  * active timer returns 1.)
  */
+/*! 2017. 3.18 study -ing */
 int del_timer(struct timer_list *timer)
 {
 	struct tvec_base *base;
 	unsigned long flags;
 	int ret = 0;
 
+	/*! Do Nothing  */
 	debug_assert_init(timer);
 
+	/*! Do Nothing  */
 	timer_stats_timer_clear_start_info(timer);
+	/*! timer->entry.next 가 있으면 pending.  */
 	if (timer_pending(timer)) {
+		/*! timer->base 의 lock을 걸고 그 base를 리턴  */
 		base = lock_timer_base(timer, &flags);
 		ret = detach_if_pending(timer, base, true);
+		/*! 위에서 걸은 base lock을 unlock  */
 		spin_unlock_irqrestore(&base->lock, flags);
 	}
 
@@ -986,17 +1010,20 @@ EXPORT_SYMBOL(del_timer);
  * This function tries to deactivate a timer. Upon successful (ret >= 0)
  * exit the timer is not queued and the handler is not running on any CPU.
  */
+/*! 2017. 3.18 study -ing */
 int try_to_del_timer_sync(struct timer_list *timer)
 {
 	struct tvec_base *base;
 	unsigned long flags;
 	int ret = -1;
 
+	/*! Do Nothing  */
 	debug_assert_init(timer);
 
 	base = lock_timer_base(timer, &flags);
 
 	if (base->running_timer != timer) {
+		/*! Do Nothing  */
 		timer_stats_timer_clear_start_info(timer);
 		ret = detach_if_pending(timer, base, true);
 	}
@@ -1043,6 +1070,7 @@ EXPORT_SYMBOL(try_to_del_timer_sync);
  *
  * The function returns whether it has deactivated a pending timer or not.
  */
+/*! 2017. 3.18 study -ing */
 int del_timer_sync(struct timer_list *timer)
 {
 #ifdef CONFIG_LOCKDEP

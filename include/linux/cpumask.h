@@ -92,6 +92,7 @@ extern const struct cpumask *const cpu_present_mask;
 extern const struct cpumask *const cpu_active_mask;
 
 #if NR_CPUS > 1
+/*! 2017. 3.18 study -ing */
 #define num_online_cpus()	cpumask_weight(cpu_online_mask)
 /*! 2016.11.05 study -ing  */
 #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
@@ -828,7 +829,7 @@ static inline const struct cpumask *get_cpu_mask(unsigned int cpu)
 	p -= cpu / BITS_PER_LONG;
 	return to_cpumask(p);
 }
-
+/*! 2017. 3.18 study -ing */
 #define cpu_is_offline(cpu)	unlikely(!cpu_online(cpu))
 
 #if NR_CPUS <= BITS_PER_LONG

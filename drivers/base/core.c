@@ -73,6 +73,7 @@ int lock_device_hotplug_sysfs(void)
 }
 
 #ifdef CONFIG_BLOCK
+/*! 2017. 3.18 study -ing */
 static inline int device_is_not_partition(struct device *dev)
 {
 	return !(dev->type == &part_type);
@@ -459,7 +460,7 @@ int device_add_groups(struct device *dev, const struct attribute_group **groups)
 {
 	return sysfs_create_groups(&dev->kobj, groups);
 }
-
+/*! 2017. 3.18 study -ing */
 void device_remove_groups(struct device *dev,
 			  const struct attribute_group **groups)
 {
@@ -564,6 +565,7 @@ EXPORT_SYMBOL_GPL(device_create_file);
  * @dev: device.
  * @attr: device attribute descriptor.
  */
+/*! 2017. 3.18 study -ing */
 void device_remove_file(struct device *dev,
 			const struct device_attribute *attr)
 {
@@ -873,7 +875,7 @@ out_subsys:
 out:
 	return error;
 }
-
+/*! 2017. 3.18 study -ing */
 static void device_remove_class_symlinks(struct device *dev)
 {
 	if (!dev->class)
@@ -918,6 +920,7 @@ EXPORT_SYMBOL_GPL(dev_set_name);
  * device_remove_sys_dev_entry() will disagree about the presence of
  * the link.
  */
+/*! 2017. 3.18 study -ing */
 static struct kobject *device_to_dev_kobj(struct device *dev)
 {
 	struct kobject *kobj;
@@ -943,7 +946,7 @@ static int device_create_sys_dev_entry(struct device *dev)
 
 	return error;
 }
-
+/*! 2017. 3.18 study -ing */
 static void device_remove_sys_dev_entry(struct device *dev)
 {
 	struct kobject *kobj = device_to_dev_kobj(dev);
@@ -1208,6 +1211,7 @@ EXPORT_SYMBOL_GPL(put_device);
  * NOTE: this should be called manually _iff_ device_add() was
  * also called manually.
  */
+/*! 2017. 3.18 study -ing */
 void device_del(struct device *dev)
 {
 	struct device *parent = dev->parent;
@@ -1222,6 +1226,7 @@ void device_del(struct device *dev)
 	dpm_sysfs_remove(dev);
 	if (parent)
 		klist_del(&dev->p->knode_parent);
+	/*! MAJOR = 하위 20bit를 제외한 상위 bit값  */
 	if (MAJOR(dev->devt)) {
 		devtmpfs_delete_node(dev);
 		device_remove_sys_dev_entry(dev);
@@ -1232,8 +1237,10 @@ void device_del(struct device *dev)
 
 		mutex_lock(&dev->class->p->mutex);
 		/* notify any interfaces that the device is now gone */
+		/*! dev->class->p->interfaces list loop 돌면서 remove_dev 수행  */
 		list_for_each_entry(class_intf,
 				    &dev->class->p->interfaces, node)
+			/*! 해당 interfacce에 remove_dev가 있으면 수행 해 준다.  */
 			if (class_intf->remove_dev)
 				class_intf->remove_dev(dev, class_intf);
 		/* remove the device from the class list */
@@ -1243,6 +1250,7 @@ void device_del(struct device *dev)
 	device_remove_file(dev, &dev_attr_uevent);
 	device_remove_attrs(dev);
 	bus_remove_device(dev);
+	/*! 2017. 3.18 study end */
 	device_pm_remove(dev);
 	driver_deferred_probe_del(dev);
 
@@ -1269,6 +1277,7 @@ EXPORT_SYMBOL_GPL(device_del);
  * via device_release() above. Otherwise, the structure will
  * stick around until the final reference to the device is dropped.
  */
+/*! 2017. 3.18 study -ing */
 void device_unregister(struct device *dev)
 {
 	pr_debug("device: '%s': %s\n", dev_name(dev), __func__);
@@ -1303,10 +1312,12 @@ static struct device *next_device(struct klist_iter *i)
  * a name. This memory is returned in tmp and needs to be
  * freed by the caller.
  */
+/*! 2017. 3.18 study -ing */
 const char *device_get_devnode(struct device *dev,
 			       umode_t *mode, kuid_t *uid, kgid_t *gid,
 			       const char **tmp)
 {
+	/*! relative path를 가져온다.  */
 	char *s;
 
 	*tmp = NULL;
