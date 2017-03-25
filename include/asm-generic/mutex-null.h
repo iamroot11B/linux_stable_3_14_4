@@ -10,6 +10,7 @@
 #ifndef _ASM_GENERIC_MUTEX_NULL_H
 #define _ASM_GENERIC_MUTEX_NULL_H
 
+/*! 2017. 3.25 study -ing */
 #define __mutex_fastpath_lock(count, fail_fn)		fail_fn(count)
 #define __mutex_fastpath_lock_retval(count)		(-1)
 /*! 2016-06-04 study -ing */

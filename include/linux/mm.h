@@ -266,6 +266,7 @@ struct inode;
 
 /*! 2017. 2.11 study -ing */
 #define page_private(page)		((page)->private)
+/*! 2017. 3.25 study -ing */
 #define set_page_private(page, v)	((page)->private = (v))
 
 /* It's valid only if the page is free path or free_list */
@@ -348,6 +349,7 @@ unsigned long vmalloc_to_pfn(const void *addr);
  * On nommu, vmalloc/vfree wrap through kmalloc/kfree directly, so there
  * is no special casing required.
  */
+/*! 2017. 3.25 study -ing */
 static inline int is_vmalloc_addr(const void *x)
 {
 #ifdef CONFIG_MMU
@@ -490,6 +492,7 @@ static inline void get_huge_page_tail(struct page *page)
 
 extern bool __get_page_tail(struct page *page);
 
+/*! 2017. 3.25 study -ing */
 static inline void get_page(struct page *page)
 {
 	if (unlikely(PageTail(page)))

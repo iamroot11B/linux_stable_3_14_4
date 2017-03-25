@@ -204,6 +204,7 @@ static inline void __rcu_read_unlock(void)
 	preempt_enable();
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void synchronize_rcu(void)
 {
 	synchronize_sched();

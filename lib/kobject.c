@@ -105,6 +105,7 @@ static int create_dir(struct kobject *kobj)
 	return 0;
 }
 
+/*! 2017. 3.25 study -ing */
 static int get_kobj_path_length(struct kobject *kobj)
 {
 	int length = 1;
@@ -123,6 +124,7 @@ static int get_kobj_path_length(struct kobject *kobj)
 	return length;
 }
 
+/*! 2017. 3.25 study -ing */
 static void fill_kobj_path(struct kobject *kobj, char *path, int length)
 {
 	struct kobject *parent;
@@ -148,6 +150,7 @@ static void fill_kobj_path(struct kobject *kobj, char *path, int length)
  *
  * The result must be freed by the caller with kfree().
  */
+/*! 2017. 3.25 study -ing */
 char *kobject_get_path(struct kobject *kobj, gfp_t gfp_mask)
 {
 	char *path;
@@ -179,6 +182,7 @@ static void kobj_kset_join(struct kobject *kobj)
 }
 
 /* remove the kobject from its kset's list */
+/*! 2017. 3.25 study -ing */
 static void kobj_kset_leave(struct kobject *kobj)
 {
 	if (!kobj->kset)
@@ -574,6 +578,7 @@ out:
  * kobject_del - unlink kobject from hierarchy.
  * @kobj: object.
  */
+/*! 2017. 3.25 study -ing */
 void kobject_del(struct kobject *kobj)
 {
 	struct kernfs_node *sd;

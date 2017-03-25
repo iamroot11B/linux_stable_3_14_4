@@ -804,6 +804,7 @@ asmlinkage void __init start_kernel(void)
 #endif
 	/*! 2017. 3.11 study -ing */
 	cgroup_init();
+	/*! 2017. 3.25 study end */
 	cpuset_init();
 	taskstats_init_early();
 	delayacct_init();

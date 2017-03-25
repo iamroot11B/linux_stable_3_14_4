@@ -44,6 +44,7 @@
  *
  * Exported for the bpf jit load helper.
  */
+/*! 2017. 3.25 study -ing */
 void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb, int k, unsigned int size)
 {
 	u8 *ptr = NULL;
@@ -58,6 +59,7 @@ void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb, int k, uns
 	return NULL;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void *load_pointer(const struct sk_buff *skb, int k,
 				 unsigned int size, void *buffer)
 {
@@ -78,6 +80,7 @@ static inline void *load_pointer(const struct sk_buff *skb, int k,
  * be accepted or -EPERM if the packet should be tossed.
  *
  */
+/*! 2017. 3.25 study -ing */
 int sk_filter(struct sock *sk, struct sk_buff *skb)
 {
 	int err;
@@ -91,6 +94,7 @@ int sk_filter(struct sock *sk, struct sk_buff *skb)
 	if (skb_pfmemalloc(skb) && !sock_flag(sk, SOCK_MEMALLOC))
 		return -ENOMEM;
 
+	/*! security_sock_rcv_skb() -> return 0 */
 	err = security_sock_rcv_skb(sk, skb);
 	if (err)
 		return err;
@@ -120,6 +124,8 @@ EXPORT_SYMBOL(sk_filter);
  * and last instruction guaranteed to be a RET, we dont need to check
  * flen. (We used to pass to this function the length of filter)
  */
+/*! 2017. 3.25 study -ing */
+/*! 각 entry의 code에 대한 filter를 수행한다. - 간략히 봄 */
 unsigned int sk_run_filter(const struct sk_buff *skb,
 			   const struct sock_filter *fentry)
 {

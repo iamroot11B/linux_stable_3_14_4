@@ -271,10 +271,15 @@ static struct kobj_type device_ktype = {
 };
 
 
+/*! 2017. 3.25 study -ing */
 static int dev_uevent_filter(struct kset *kset, struct kobject *kobj)
 {
 	struct kobj_type *ktype = get_ktype(kobj);
 
+	/*! ktype 구조체와 같은지 보고,
+	 * 같지 않으면 return 0
+	 * 같을 때, bus가 있거나, class가 있으면 return 1
+	 */
 	if (ktype == &device_ktype) {
 		struct device *dev = kobj_to_dev(kobj);
 		if (dev->bus)
@@ -285,6 +290,7 @@ static int dev_uevent_filter(struct kset *kset, struct kobject *kobj)
 	return 0;
 }
 
+/*! 2017. 3.25 study -ing */
 static const char *dev_uevent_name(struct kset *kset, struct kobject *kobj)
 {
 	struct device *dev = kobj_to_dev(kobj);
@@ -296,6 +302,7 @@ static const char *dev_uevent_name(struct kset *kset, struct kobject *kobj)
 	return NULL;
 }
 
+/*! 2017. 3.25 study -ing */
 static int dev_uevent(struct kset *kset, struct kobject *kobj,
 		      struct kobj_uevent_env *env)
 {
@@ -335,6 +342,7 @@ static int dev_uevent(struct kset *kset, struct kobject *kobj,
 	of_device_uevent(dev, env);
 
 	/* have the bus specific function add its stuff */
+	/*! 아래 bus->uevent()는 각 디바이스 별로 상이함 */
 	if (dev->bus && dev->bus->uevent) {
 		retval = dev->bus->uevent(dev, env);
 		if (retval)
@@ -343,6 +351,7 @@ static int dev_uevent(struct kset *kset, struct kobject *kobj,
 	}
 
 	/* have the class specific function add its stuff */
+	/*! 아래 class->uevent()는 각 디바이스 별로 상이함 */
 	if (dev->class && dev->class->dev_uevent) {
 		retval = dev->class->dev_uevent(dev, env);
 		if (retval)
@@ -352,6 +361,7 @@ static int dev_uevent(struct kset *kset, struct kobject *kobj,
 	}
 
 	/* have the device type specific function add its stuff */
+	/*! 아래 type->uevent()는 각 디바이스 별로 상이함 */
 	if (dev->type && dev->type->uevent) {
 		retval = dev->type->uevent(dev, env);
 		if (retval)
@@ -818,6 +828,7 @@ static struct kobject *get_device_parent(struct device *dev,
 	return NULL;
 }
 
+/*! 2017. 3.25 study -ing */
 static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
 {
 	/* see if we live in a "glue" directory */
@@ -828,6 +839,7 @@ static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
 	kobject_put(glue_dir);
 }
 
+/*! 2017. 3.25 study -ing */
 static void cleanup_device_parent(struct device *dev)
 {
 	cleanup_glue_dir(dev, dev->kobj.parent);
@@ -1190,6 +1202,7 @@ EXPORT_SYMBOL_GPL(get_device);
  * put_device - decrement reference count.
  * @dev: device in question.
  */
+/*! 2017. 3.25 study -ing */
 void put_device(struct device *dev)
 {
 	/* might_sleep(); */
@@ -1251,12 +1264,14 @@ void device_del(struct device *dev)
 	device_remove_attrs(dev);
 	bus_remove_device(dev);
 	/*! 2017. 3.18 study end */
+	/*! 2017. 3.25 study start */
 	device_pm_remove(dev);
 	driver_deferred_probe_del(dev);
 
 	/* Notify the platform of the removal, in case they
 	 * need to do anything...
 	 */
+	/*! ARM은 없음 */
 	if (platform_notify_remove)
 		platform_notify_remove(dev);
 	kobject_uevent(&dev->kobj, KOBJ_REMOVE);

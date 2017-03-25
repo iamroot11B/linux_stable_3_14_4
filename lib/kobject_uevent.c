@@ -109,6 +109,7 @@ static int kobj_bcast_filter(struct sock *dsk, struct sk_buff *skb, void *data)
 }
 #endif
 
+/*! 2017. 3.25 study -ing */
 static int kobj_usermode_filter(struct kobject *kobj)
 {
 	const struct kobj_ns_type_operations *ops;
@@ -134,6 +135,7 @@ static int kobj_usermode_filter(struct kobject *kobj)
  * Returns 0 if kobject_uevent_env() is completed with success or the
  * corresponding error when it fails.
  */
+/*! 2017. 3.25 study -ing */
 int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 		       char *envp_ext[])
 {
@@ -154,6 +156,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 		 kobject_name(kobj), kobj, __func__);
 
 	/* search the kset we belong to */
+	/*! root로 찾아가서 top_kobj에 저장 */
 	top_kobj = kobj;
 	while (!top_kobj->kset && top_kobj->parent)
 		top_kobj = top_kobj->parent;
@@ -166,6 +169,11 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 	}
 
 	kset = top_kobj->kset;
+	/*!
+	 * core.c device_uevent_ops에 함수 포인터가 있고
+	 * start_kernel() -> rest_init() -> ... -> devices_init()에서 최초 초기화함
+	 * 현시점엔 아직 초기화 전이지만 본다.
+	 */
 	uevent_ops = kset->uevent_ops;
 
 	/* skip the event, if uevent_suppress is set*/
@@ -176,6 +184,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 		return 0;
 	}
 	/* skip the event, if the filter returns zero. */
+	/*! ex) core.c -> device_uevent_ops -> dev_uevent_filter() */
 	if (uevent_ops && uevent_ops->filter)
 		if (!uevent_ops->filter(kset, kobj)) {
 			pr_debug("kobject: '%s' (%p): %s: filter function "
@@ -185,6 +194,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 		}
 
 	/* originating subsystem */
+	/*! ex) core.c -> device_uevent_ops -> dev_uevent_name() */
 	if (uevent_ops && uevent_ops->name)
 		subsystem = uevent_ops->name(kset, kobj);
 	else
@@ -229,6 +239,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 	}
 
 	/* let the kset specific function add its stuff */
+	/*! ex) core.c -> device_uevent_ops -> dev_uevent() */
 	if (uevent_ops && uevent_ops->uevent) {
 		retval = uevent_ops->uevent(kset, kobj, env);
 		if (retval) {
@@ -286,6 +297,8 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
 			}
 
 			NETLINK_CB(skb).dst_group = 1;
+/*! 2017. 3.25 net 관련 코드는 여기까지만 봄 */
+/*! 2017. 3.25 아래로 넘어감 */
 			retval = netlink_broadcast_filtered(uevent_sock, skb,
 							    0, 1, GFP_KERNEL,
 							    kobj_bcast_filter,
@@ -334,6 +347,7 @@ EXPORT_SYMBOL_GPL(kobject_uevent_env);
  * Returns 0 if kobject_uevent() is completed with success or the
  * corresponding error when it fails.
  */
+/*! 2017. 3.25 study -ing */
 int kobject_uevent(struct kobject *kobj, enum kobject_action action)
 {
 	return kobject_uevent_env(kobj, action, NULL);
@@ -348,6 +362,7 @@ EXPORT_SYMBOL_GPL(kobject_uevent);
  * Returns 0 if environment variable was added successfully or -ENOMEM
  * if no space was available.
  */
+/*! 2017. 3.25 study -ing */
 int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...)
 {
 	va_list args;
@@ -358,6 +373,10 @@ int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...)
 		return -ENOMEM;
 	}
 
+	/*!
+	 * Variable Arguments 설명 블로그
+	 * http://jangsalt.tistory.com/entry/%EA%B0%80%EB%B3%80-%EC%9D%B8%EC%88%98-vastart-vaend-vaarg-valist
+	 */
 	va_start(args, format);
 	len = vsnprintf(&env->buf[env->buflen],
 			sizeof(env->buf) - env->buflen,

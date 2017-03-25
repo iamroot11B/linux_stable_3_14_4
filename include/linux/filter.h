@@ -80,6 +80,7 @@ static inline void bpf_jit_free(struct sk_filter *fp)
 {
 	kfree(fp);
 }
+/*! 2017. 3.25 study -ing */
 #define SK_RUN_FILTER(FILTER, SKB) sk_run_filter(SKB, FILTER->insns)
 #endif
 

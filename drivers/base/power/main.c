@@ -134,6 +134,7 @@ void device_pm_add(struct device *dev)
  * device_pm_remove - Remove a device from the PM core's list of active devices.
  * @dev: Device to be removed from the list.
  */
+/*! 2017. 3.25 study -ing */
 void device_pm_remove(struct device *dev)
 {
 	pr_debug("PM: Removing info for %s:%s\n",
@@ -143,6 +144,7 @@ void device_pm_remove(struct device *dev)
 	list_del_init(&dev->power.entry);
 	mutex_unlock(&dpm_list_mtx);
 	device_wakeup_disable(dev);
+	/*! Do nothing */
 	pm_runtime_remove(dev);
 }
 

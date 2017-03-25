@@ -118,6 +118,7 @@ static void driver_deferred_probe_add(struct device *dev)
 	mutex_unlock(&deferred_probe_mutex);
 }
 
+/*! 2017. 3.25 study -ing */
 void driver_deferred_probe_del(struct device *dev)
 {
 	mutex_lock(&deferred_probe_mutex);

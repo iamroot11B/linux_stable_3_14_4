@@ -142,6 +142,7 @@ loop:
 	mutex_unlock(&dst_gc_mutex);
 }
 
+/*! 2017. 3.25 study -ing */
 int dst_discard(struct sk_buff *skb)
 {
 	kfree_skb(skb);
@@ -204,6 +205,7 @@ void *dst_alloc(struct dst_ops *ops, struct net_device *dev,
 }
 EXPORT_SYMBOL(dst_alloc);
 
+/*! 2017. 3.25 study -ing */
 static void ___dst_free(struct dst_entry *dst)
 {
 	/* The first case (dev==NULL) is required, when
@@ -214,6 +216,7 @@ static void ___dst_free(struct dst_entry *dst)
 	dst->obsolete = DST_OBSOLETE_DEAD;
 }
 
+/*! 2017. 3.25 study -ing */
 void __dst_free(struct dst_entry *dst)
 {
 	spin_lock_bh(&dst_garbage.lock);
@@ -230,6 +233,7 @@ void __dst_free(struct dst_entry *dst)
 }
 EXPORT_SYMBOL(__dst_free);
 
+/*! 2017. 3.25 study -ing */
 struct dst_entry *dst_destroy(struct dst_entry * dst)
 {
 	struct dst_entry *child;
@@ -267,6 +271,7 @@ again:
 }
 EXPORT_SYMBOL(dst_destroy);
 
+/*! 2017. 3.25 study -ing */
 void dst_release(struct dst_entry *dst)
 {
 	if (dst) {

@@ -1099,6 +1099,7 @@ do {						     \
 #define dev_dbg(dev, format, arg...)		\
 	dev_printk(KERN_DEBUG, dev, format, ##arg)
 #else
+/*! 2017. 3.25 study -ing */
 #define dev_dbg(dev, format, arg...)				\
 ({								\
 	if (0)							\

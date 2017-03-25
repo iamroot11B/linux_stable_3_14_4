@@ -184,11 +184,13 @@ struct skb_frag_struct {
 #endif
 };
 
+/*! 2017. 3.25 study -ing */
 static inline unsigned int skb_frag_size(const skb_frag_t *frag)
 {
 	return frag->size;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
 {
 	frag->size = size;
@@ -557,6 +559,7 @@ struct sk_buff {
 #define SKB_ALLOC_RX		0x02
 
 /* Returns true if the skb was allocated from PFMEMALLOC reserves */
+/*! 2017. 3.25 study -ing */
 static inline bool skb_pfmemalloc(const struct sk_buff *skb)
 {
 	return unlikely(skb->pfmemalloc);
@@ -662,6 +665,7 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
 struct sk_buff *__alloc_skb(unsigned int size, gfp_t priority, int flags,
 			    int node);
 struct sk_buff *build_skb(void *data, unsigned int frag_size);
+/*! 2017. 3.25 study -ing */
 static inline struct sk_buff *alloc_skb(unsigned int size,
 					gfp_t priority)
 {
@@ -805,11 +809,13 @@ static inline unsigned int skb_end_offset(const struct sk_buff *skb)
 	return skb->end;
 }
 #else
+/*! 2017. 3.25 study -ing */
 static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 {
 	return skb->end;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline unsigned int skb_end_offset(const struct sk_buff *skb)
 {
 	return skb->end - skb->head;
@@ -817,6 +823,7 @@ static inline unsigned int skb_end_offset(const struct sk_buff *skb)
 #endif
 
 /* Internal */
+/*! 2017. 3.25 study -ing */
 #define skb_shinfo(SKB)	((struct skb_shared_info *)(skb_end_pointer(SKB)))
 
 static inline struct skb_shared_hwtstamps *skb_hwtstamps(struct sk_buff *skb)
@@ -904,6 +911,7 @@ static inline struct sk_buff *skb_queue_prev(const struct sk_buff_head *list,
  *	Makes another reference to a socket buffer and returns a pointer
  *	to the buffer.
  */
+/*! 2017. 3.25 study -ing */
 static inline struct sk_buff *skb_get(struct sk_buff *skb)
 {
 	atomic_inc(&skb->users);
@@ -923,6 +931,7 @@ static inline struct sk_buff *skb_get(struct sk_buff *skb)
  *	one of multiple shared copies of the buffer. Cloned buffers are
  *	shared data so must not be written to under normal circumstances.
  */
+/*! 2017. 3.25 study -ing */
 static inline int skb_cloned(const struct sk_buff *skb)
 {
 	return skb->cloned &&
@@ -980,6 +989,7 @@ static inline void skb_header_release(struct sk_buff *skb)
  *	Returns true if more than one person has a reference to this
  *	buffer.
  */
+/*! 2017. 3.25 study -ing */
 static inline int skb_shared(const struct sk_buff *skb)
 {
 	return atomic_read(&skb->users) != 1;
@@ -1366,6 +1376,7 @@ static inline struct sk_buff *__skb_dequeue_tail(struct sk_buff_head *list)
 }
 
 
+/*! 2017. 3.25 study -ing */
 static inline bool skb_is_nonlinear(const struct sk_buff *skb)
 {
 	return skb->data_len;
@@ -1398,6 +1409,7 @@ static inline int skb_pagelen(const struct sk_buff *skb)
  *
  * Does not take any additional reference on the fragment.
  */
+/*! 2017. 3.25 study -ing */
 static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
 					struct page *page, int off, int size)
 {
@@ -1470,11 +1482,13 @@ static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
 }
 
 #else /* NET_SKBUFF_DATA_USES_OFFSET */
+/*! 2017. 3.25 study -ing */
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void skb_reset_tail_pointer(struct sk_buff *skb)
 {
 	skb->tail = skb->data;
@@ -1553,6 +1567,7 @@ static inline int pskb_may_pull(struct sk_buff *skb, unsigned int len)
  *
  *	Return the number of bytes of free space at the head of an &sk_buff.
  */
+/*! 2017. 3.25 study -ing */
 static inline unsigned int skb_headroom(const struct sk_buff *skb)
 {
 	return skb->data - skb->head;
@@ -1683,6 +1698,7 @@ static inline void skb_set_transport_header(struct sk_buff *skb,
 	skb->transport_header += offset;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline unsigned char *skb_network_header(const struct sk_buff *skb)
 {
 	return skb->head + skb->network_header;
@@ -1699,6 +1715,7 @@ static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
 	skb->network_header += offset;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
 {
 	return skb->head + skb->mac_header;
@@ -1845,6 +1862,7 @@ static inline void __skb_trim(struct sk_buff *skb, unsigned int len)
 
 void skb_trim(struct sk_buff *skb, unsigned int len);
 
+/*! 2017. 3.25 study -ing */
 static inline int __pskb_trim(struct sk_buff *skb, unsigned int len)
 {
 	if (skb->data_len)
@@ -1881,6 +1899,7 @@ static inline void pskb_trim_unique(struct sk_buff *skb, unsigned int len)
  *	destructor function and make the @skb unowned. The buffer continues
  *	to exist but is no longer charged to its former owner.
  */
+/*! 2017. 3.25 study -ing */
 static inline void skb_orphan(struct sk_buff *skb)
 {
 	if (skb->destructor) {
@@ -1901,6 +1920,7 @@ static inline void skb_orphan(struct sk_buff *skb)
  *	owner) create a copy of that frag and release the original
  *	page by calling the destructor.
  */
+/*! 2017. 3.25 study -ing */
 static inline int skb_orphan_frags(struct sk_buff *skb, gfp_t gfp_mask)
 {
 	if (likely(!(skb_shinfo(skb)->tx_flags & SKBTX_DEV_ZEROCOPY)))
@@ -2043,6 +2063,7 @@ static inline void skb_propagate_pfmemalloc(struct page *page,
  *
  * Returns the &struct page associated with @frag.
  */
+/*! 2017. 3.25 study -ing */
 static inline struct page *skb_frag_page(const skb_frag_t *frag)
 {
 	return frag->page.p;
@@ -2054,6 +2075,7 @@ static inline struct page *skb_frag_page(const skb_frag_t *frag)
  *
  * Takes an additional reference on the paged fragment @frag.
  */
+/*! 2017. 3.25 study -ing */
 static inline void __skb_frag_ref(skb_frag_t *frag)
 {
 	get_page(skb_frag_page(frag));
@@ -2066,6 +2088,7 @@ static inline void __skb_frag_ref(skb_frag_t *frag)
  *
  * Takes an additional reference on the @f'th paged fragment of @skb.
  */
+/*! 2017. 3.25 study -ing */
 static inline void skb_frag_ref(struct sk_buff *skb, int f)
 {
 	__skb_frag_ref(&skb_shinfo(skb)->frags[f]);
@@ -2077,6 +2100,7 @@ static inline void skb_frag_ref(struct sk_buff *skb, int f)
  *
  * Releases a reference on the paged fragment @frag.
  */
+/*! 2017. 3.25 study -ing */
 static inline void __skb_frag_unref(skb_frag_t *frag)
 {
 	put_page(skb_frag_page(frag));
@@ -2089,6 +2113,7 @@ static inline void __skb_frag_unref(skb_frag_t *frag)
  *
  * Releases a reference on the @f'th paged fragment of @skb.
  */
+/*! 2017. 3.25 study -ing */
 static inline void skb_frag_unref(struct sk_buff *skb, int f)
 {
 	__skb_frag_unref(&skb_shinfo(skb)->frags[f]);
@@ -2402,6 +2427,7 @@ static inline int pskb_trim_rcsum(struct sk_buff *skb, unsigned int len)
 		     skb != (struct sk_buff *)(queue);				\
 		     skb = tmp, tmp = skb->prev)
 
+/*! 2017. 3.25 study -ing */
 static inline bool skb_has_frag_list(const struct sk_buff *skb)
 {
 	return skb_shinfo(skb)->frag_list != NULL;
@@ -2418,6 +2444,7 @@ static inline void skb_frag_add_head(struct sk_buff *skb, struct sk_buff *frag)
 	skb_shinfo(skb)->frag_list = frag;
 }
 
+/*! 2017. 3.25 study -ing */
 #define skb_walk_frags(skb, iter)	\
 	for (iter = skb_shinfo(skb)->frag_list; iter; iter = iter->next)
 
@@ -2469,6 +2496,7 @@ __wsum __skb_checksum(const struct sk_buff *skb, int offset, int len,
 __wsum skb_checksum(const struct sk_buff *skb, int offset, int len,
 		    __wsum csum);
 
+/*! 2017. 3.25 study -ing */
 static inline void *skb_header_pointer(const struct sk_buff *skb, int offset,
 				       int len, void *buffer)
 {
@@ -2501,6 +2529,7 @@ static inline bool skb_needs_linearize(struct sk_buff *skb,
 		(skb_shinfo(skb)->nr_frags && !(features & NETIF_F_SG)));
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void skb_copy_from_linear_data(const struct sk_buff *skb,
 					     void *to,
 					     const unsigned int len)

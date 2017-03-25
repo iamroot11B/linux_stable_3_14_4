@@ -143,6 +143,7 @@ static inline int __raw_write_trylock(rwlock_t *lock)
  */
 #if !defined(CONFIG_GENERIC_LOCKBREAK) || defined(CONFIG_DEBUG_LOCK_ALLOC)
 
+/*! 2017. 3.25 study -ing */
 static inline void __raw_read_lock(rwlock_t *lock)
 {
 	preempt_disable();
@@ -197,6 +198,7 @@ static inline void __raw_write_lock_irq(rwlock_t *lock)
 	LOCK_CONTENDED(lock, do_raw_write_trylock, do_raw_write_lock);
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void __raw_write_lock_bh(rwlock_t *lock)
 {
 	__local_bh_disable_ip(_RET_IP_, SOFTIRQ_LOCK_OFFSET);

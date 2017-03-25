@@ -62,6 +62,7 @@ do {								\
 #define write_trylock(lock)	__cond_lock(lock, _raw_write_trylock(lock))
 
 #define write_lock(lock)	_raw_write_lock(lock)
+/*! 2017. 3.25 study -ing */
 #define read_lock(lock)		_raw_read_lock(lock)
 
 #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
@@ -95,6 +96,7 @@ do {								\
 #define read_lock_irq(lock)		_raw_read_lock_irq(lock)
 #define read_lock_bh(lock)		_raw_read_lock_bh(lock)
 #define write_lock_irq(lock)		_raw_write_lock_irq(lock)
+/*! 2017. 3.25 study -ing */
 #define write_lock_bh(lock)		_raw_write_lock_bh(lock)
 #define read_unlock(lock)		_raw_read_unlock(lock)
 #define write_unlock(lock)		_raw_write_unlock(lock)

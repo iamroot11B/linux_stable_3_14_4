@@ -132,6 +132,7 @@ static inline unsigned long __raw_spin_lock_irqsave(raw_spinlock_t *lock)
 	return flags;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void __raw_spin_lock_irq(raw_spinlock_t *lock)
 {
 	local_irq_disable();

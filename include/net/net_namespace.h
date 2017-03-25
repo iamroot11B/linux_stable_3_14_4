@@ -221,6 +221,7 @@ static inline struct net *maybe_get_net(struct net *net)
 	return net;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline
 int net_eq(const struct net *net1, const struct net *net2)
 {
@@ -257,6 +258,8 @@ static inline void release_net(struct net *net)
 
 #ifdef CONFIG_NET_NS
 
+/*! exynos는 Define */
+
 static inline void write_pnet(struct net **pnet, struct net *net)
 {
 	*pnet = net;
@@ -269,7 +272,10 @@ static inline struct net *read_pnet(struct net * const *pnet)
 
 #else
 
+/*! vexpress는 Define 없음 */
+
 #define write_pnet(pnet, net)	do { (void)(net);} while (0)
+/*! 2017. 3.25 study -ing */
 #define read_pnet(pnet)		(&init_net)
 
 #endif

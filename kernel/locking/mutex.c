@@ -91,6 +91,7 @@ __mutex_lock_slowpath(atomic_t *lock_count);
  *
  * This function is similar to (but not equivalent to) down().
  */
+/*! 2017. 3.25 study -ing */
 void __sched mutex_lock(struct mutex *lock)
 {
 	might_sleep();
@@ -98,6 +99,7 @@ void __sched mutex_lock(struct mutex *lock)
 	 * The locking fastpath is the 1->0 transition from
 	 * 'unlocked' into 'locked' state.
 	 */
+	/*! __mutex_lock_slowpath를 바로 호출함 */
 	__mutex_fastpath_lock(&lock->count, __mutex_lock_slowpath);
 	mutex_set_owner(lock);
 }
@@ -811,6 +813,7 @@ int __sched mutex_lock_killable(struct mutex *lock)
 }
 EXPORT_SYMBOL(mutex_lock_killable);
 
+/*! 2017. 3.25 study -ing */
 static __used noinline void __sched
 __mutex_lock_slowpath(atomic_t *lock_count)
 {

@@ -17,6 +17,7 @@
 		__list_del((waiter)->list.prev, (waiter)->list.next)
 
 #ifdef CONFIG_SMP
+/*! 2017. 3.25 study -ing */
 static inline void mutex_set_owner(struct mutex *lock)
 {
 	lock->owner = current;

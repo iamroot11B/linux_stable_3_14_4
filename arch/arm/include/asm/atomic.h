@@ -56,6 +56,7 @@ static inline void atomic_add(int i, atomic_t *v)
 	: "cc");
 }
 
+/*! 2017. 3.25 study -ing */
 static inline int atomic_add_return(int i, atomic_t *v)
 {
 	unsigned long tmp;
@@ -219,6 +220,7 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 #define smp_mb__after_atomic_dec()	smp_mb()
 /*! 2017. 3.18 study -ing */
 #define smp_mb__before_atomic_inc()	smp_mb()
+/*! 2017. 3.25 study -ing */
 #define smp_mb__after_atomic_inc()	smp_mb()
 
 #ifndef CONFIG_GENERIC_ATOMIC64

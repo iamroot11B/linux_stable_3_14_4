@@ -89,6 +89,7 @@ static struct kmem_cache *skbuff_fclone_cache __read_mostly;
  *	Keep out of line to prevent kernel bloat.
  *	__builtin_return_address is not used because it is not always reliable.
  */
+/*! 2017. 3.25 study -ing */
 static void skb_panic(struct sk_buff *skb, unsigned int sz, void *addr,
 		      const char msg[])
 {
@@ -99,6 +100,7 @@ static void skb_panic(struct sk_buff *skb, unsigned int sz, void *addr,
 	BUG();
 }
 
+/*! 2017. 3.25 study -ing */
 static void skb_over_panic(struct sk_buff *skb, unsigned int sz, void *addr)
 {
 	skb_panic(skb, sz, addr, __func__);
@@ -116,9 +118,11 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
  * may be used. Otherwise, the packet data may be discarded until enough
  * memory is free
  */
+/*! 2017. 3.25 study -ing */
 #define kmalloc_reserve(size, gfp, node, pfmemalloc) \
 	 __kmalloc_reserve(size, gfp, node, _RET_IP_, pfmemalloc)
 
+/*! 2017. 3.25 study -ing */
 static void *__kmalloc_reserve(size_t size, gfp_t flags, int node,
 			       unsigned long ip, bool *pfmemalloc)
 {
@@ -194,6 +198,7 @@ out:
  *	Buffers may only be allocated from interrupts using a @gfp_mask of
  *	%GFP_ATOMIC.
  */
+/*! 2017. 3.25 study -ing */
 struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 			    int flags, int node)
 {
@@ -253,13 +258,16 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 	shinfo = skb_shinfo(skb);
 	memset(shinfo, 0, offsetof(struct skb_shared_info, dataref));
 	atomic_set(&shinfo->dataref, 1);
+	/*! Do nothing */
 	kmemcheck_annotate_variable(shinfo->destructor_arg);
 
 	if (flags & SKB_ALLOC_FCLONE) {
 		struct sk_buff *child = skb + 1;
 		atomic_t *fclone_ref = (atomic_t *) (child + 1);
 
+		/*! Do nothing */
 		kmemcheck_annotate_bitfield(child, flags1);
+		/*! Do nothing */
 		kmemcheck_annotate_bitfield(child, flags2);
 		skb->fclone = SKB_FCLONE_ORIG;
 		atomic_set(fclone_ref, 1);
@@ -461,17 +469,20 @@ void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
 }
 EXPORT_SYMBOL(skb_coalesce_rx_frag);
 
+/*! 2017. 3.25 study -ing */
 static void skb_drop_list(struct sk_buff **listp)
 {
 	kfree_skb_list(*listp);
 	*listp = NULL;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void skb_drop_fraglist(struct sk_buff *skb)
 {
 	skb_drop_list(&skb_shinfo(skb)->frag_list);
 }
 
+/*! 2017. 3.25 study -ing */
 static void skb_clone_fraglist(struct sk_buff *skb)
 {
 	struct sk_buff *list;
@@ -480,6 +491,7 @@ static void skb_clone_fraglist(struct sk_buff *skb)
 		skb_get(list);
 }
 
+/*! 2017. 3.25 study -ing */
 static void skb_free_head(struct sk_buff *skb)
 {
 	if (skb->head_frag)
@@ -488,6 +500,7 @@ static void skb_free_head(struct sk_buff *skb)
 		kfree(skb->head);
 }
 
+/*! 2017. 3.25 study -ing */
 static void skb_release_data(struct sk_buff *skb)
 {
 	if (!skb->cloned ||
@@ -521,6 +534,7 @@ static void skb_release_data(struct sk_buff *skb)
 /*
  *	Free an skbuff by memory without cleaning the state.
  */
+/*! 2017. 3.25 study -ing */
 static void kfree_skbmem(struct sk_buff *skb)
 {
 	struct sk_buff *other;
@@ -552,6 +566,7 @@ static void kfree_skbmem(struct sk_buff *skb)
 	}
 }
 
+/*! 2017. 3.25 study -ing */
 static void skb_release_head_state(struct sk_buff *skb)
 {
 	skb_dst_drop(skb);
@@ -578,6 +593,7 @@ static void skb_release_head_state(struct sk_buff *skb)
 }
 
 /* Free everything but the sk_buff shell. */
+/*! 2017. 3.25 study -ing */
 static void skb_release_all(struct sk_buff *skb)
 {
 	skb_release_head_state(skb);
@@ -594,6 +610,7 @@ static void skb_release_all(struct sk_buff *skb)
  *	always call kfree_skb
  */
 
+/*! 2017. 3.25 study -ing */
 void __kfree_skb(struct sk_buff *skb)
 {
 	skb_release_all(skb);
@@ -608,6 +625,7 @@ EXPORT_SYMBOL(__kfree_skb);
  *	Drop a reference to the buffer and free it if the usage count has
  *	hit zero.
  */
+/*! 2017. 3.25 study -ing */
 void kfree_skb(struct sk_buff *skb)
 {
 	if (unlikely(!skb))
@@ -621,6 +639,7 @@ void kfree_skb(struct sk_buff *skb)
 }
 EXPORT_SYMBOL(kfree_skb);
 
+/*! 2017. 3.25 study -ing */
 void kfree_skb_list(struct sk_buff *segs)
 {
 	while (segs) {
@@ -660,6 +679,7 @@ EXPORT_SYMBOL(skb_tx_error);
  *	Functions identically to kfree_skb, but kfree_skb assumes that the frame
  *	is being dropped after a failure and notes that
  */
+/*! 2017. 3.25 study -ing */
 void consume_skb(struct sk_buff *skb)
 {
 	if (unlikely(!skb))
@@ -673,6 +693,7 @@ void consume_skb(struct sk_buff *skb)
 }
 EXPORT_SYMBOL(consume_skb);
 
+/*! 2017. 3.25 study -ing */
 static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
 {
 	new->tstamp		= old->tstamp;
@@ -727,6 +748,7 @@ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
  * You should not add any new code to this function.  Add it to
  * __copy_skb_header above instead.
  */
+/*! 2017. 3.25 study -ing */
 static struct sk_buff *__skb_clone(struct sk_buff *n, struct sk_buff *skb)
 {
 #define C(x) n->x = skb->x
@@ -789,6 +811,7 @@ EXPORT_SYMBOL_GPL(skb_morph);
  *	Returns 0 on success or a negative error code on failure
  *	to allocate kernel memory to copy to.
  */
+/*! 2017. 3.25 study -ing */
 int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
 {
 	int i;
@@ -849,6 +872,7 @@ EXPORT_SYMBOL_GPL(skb_copy_ubufs);
  *	%GFP_ATOMIC.
  */
 
+/*! 2017. 3.25 study -ing */
 struct sk_buff *skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
 {
 	struct sk_buff *n;
@@ -870,7 +894,9 @@ struct sk_buff *skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
 		if (!n)
 			return NULL;
 
+		/*! Do nothing */
 		kmemcheck_annotate_bitfield(n, flags1);
+		/*! Do nothing */
 		kmemcheck_annotate_bitfield(n, flags2);
 		n->fclone = SKB_FCLONE_UNAVAILABLE;
 	}
@@ -879,6 +905,7 @@ struct sk_buff *skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(skb_clone);
 
+/*! 2017. 3.25 study -ing */
 static void skb_headers_offset_update(struct sk_buff *skb, int off)
 {
 	/* Only adjust this if it actually is csum_start rather than csum */
@@ -1026,6 +1053,7 @@ EXPORT_SYMBOL(__pskb_copy);
  *	reloaded after call to this function.
  */
 
+/*! 2017. 3.25 study -ing */
 int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
 		     gfp_t gfp_mask)
 {
@@ -1261,6 +1289,7 @@ EXPORT_SYMBOL_GPL(pskb_put);
  *	exceed the total buffer size the kernel will panic. A pointer to the
  *	first byte of the extra data is returned.
  */
+/*! 2017. 3.25 study -ing */
 unsigned char *skb_put(struct sk_buff *skb, unsigned int len)
 {
 	unsigned char *tmp = skb_tail_pointer(skb);
@@ -1327,6 +1356,8 @@ EXPORT_SYMBOL(skb_trim);
 /* Trims skb to length len. It can change skb pointers.
  */
 
+/*! 2017. 3.25 study later */
+/*! 나중에 본다 */
 int ___pskb_trim(struct sk_buff *skb, unsigned int len)
 {
 	struct sk_buff **fragp;
@@ -1567,6 +1598,7 @@ EXPORT_SYMBOL(__pskb_pull_tail);
  *		check arch/{*}/net/{*}.S files,
  *		since it is called from BPF assembly code.
  */
+/*! 2017. 3.25 study -ing */
 int skb_copy_bits(const struct sk_buff *skb, int offset, void *to, int len)
 {
 	int start = skb_headlen(skb);

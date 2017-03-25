@@ -238,6 +238,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 
 #endif
 
+/*! 2017. 3.25 study -ing */
 #define raw_spin_lock_irq(lock)		_raw_spin_lock_irq(lock)
 /*! 2017. 3.18 study -ing */
 #define raw_spin_lock_bh(lock)		_raw_spin_lock_bh(lock)
@@ -329,10 +330,12 @@ do {									\
 	raw_spin_lock_nest_lock(spinlock_check(lock), nest_lock);	\
 } while (0)
 
+/*! 2017. 3.25 study -ing */
 static inline void spin_lock_irq(spinlock_t *lock)
 {
 	raw_spin_lock_irq(&lock->rlock);
 }
+
 /*! 2016.10.29 study -ing */
 #define spin_lock_irqsave(lock, flags)				\
 do {								\

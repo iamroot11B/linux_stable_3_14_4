@@ -4285,6 +4285,7 @@ static struct notifier_block slab_notifier = {
 
 #endif
 
+/*! 2017. 1.07 study -ing */
 void *__kmalloc_track_caller(size_t size, gfp_t gfpflags, unsigned long caller)
 {
 	struct kmem_cache *s;

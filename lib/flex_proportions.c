@@ -180,6 +180,7 @@ int fprop_local_init_percpu(struct fprop_local_percpu *pl)
 	return 0;
 }
 
+/*! 2017. 3.25 study -ing */
 void fprop_local_destroy_percpu(struct fprop_local_percpu *pl)
 {
 	percpu_counter_destroy(&pl->events);

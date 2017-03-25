@@ -34,6 +34,8 @@ static atomic_t combined_event_count = ATOMIC_INIT(0);
 #define IN_PROGRESS_BITS	(sizeof(int) * 4)
 #define MAX_IN_PROGRESS		((1 << IN_PROGRESS_BITS) - 1)
 
+/*! 2017. 3.25 study -ing */
+/*! 상위 비트에 Wakeup Events, 하위에 In_Progress에 저장되어 있으므로, 분리 */
 static void split_counters(unsigned int *cnt, unsigned int *inpr)
 {
 	unsigned int comb = atomic_read(&combined_event_count);
@@ -94,6 +96,7 @@ EXPORT_SYMBOL_GPL(wakeup_source_create);
  * Callers must ensure that __pm_stay_awake() or __pm_wakeup_event() will never
  * be run in parallel with this function for the same wakeup source object.
  */
+/*! 2017. 3.25 study -ing */
 void wakeup_source_drop(struct wakeup_source *ws)
 {
 	if (!ws)
@@ -110,6 +113,7 @@ EXPORT_SYMBOL_GPL(wakeup_source_drop);
  *
  * Use only for wakeup source objects created with wakeup_source_create().
  */
+/*! 2017. 3.25 study -ing */
 void wakeup_source_destroy(struct wakeup_source *ws)
 {
 	if (!ws)
@@ -147,6 +151,7 @@ EXPORT_SYMBOL_GPL(wakeup_source_add);
  * wakeup_source_remove - Remove given object from the wakeup sources list.
  * @ws: Wakeup source object to remove from the list.
  */
+/*! 2017. 3.25 study -ing */
 void wakeup_source_remove(struct wakeup_source *ws)
 {
 	unsigned long flags;
@@ -181,6 +186,7 @@ EXPORT_SYMBOL_GPL(wakeup_source_register);
  * wakeup_source_unregister - Remove wakeup source from the list and remove it.
  * @ws: Wakeup source object to unregister.
  */
+/*! 2017. 3.25 study -ing */
 void wakeup_source_unregister(struct wakeup_source *ws)
 {
 	if (ws) {
@@ -241,6 +247,7 @@ EXPORT_SYMBOL_GPL(device_wakeup_enable);
  *
  * After it returns, @dev will not be treated as a wakeup device any more.
  */
+/*! 2017. 3.25 study -ing */
 static struct wakeup_source *device_wakeup_detach(struct device *dev)
 {
 	struct wakeup_source *ws;
@@ -259,6 +266,7 @@ static struct wakeup_source *device_wakeup_detach(struct device *dev)
  * Detach the @dev's wakeup source object from it, unregister this wakeup source
  * object and destroy it.
  */
+/*! 2017. 3.25 study -ing */
 int device_wakeup_disable(struct device *dev)
 {
 	struct wakeup_source *ws;
@@ -481,6 +489,7 @@ static inline void update_prevent_sleep_time(struct wakeup_source *ws,
  * become inactive by decrementing the counter of wakeup events being processed
  * and incrementing the counter of registered wakeup events.
  */
+/*! 2017. 3.25 study -ing */
 static void wakeup_source_deactivate(struct wakeup_source *ws)
 {
 	unsigned int cnt, inpr, cec;
@@ -504,6 +513,7 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 
 	ws->active = false;
 
+	/*! 시간 계산해서 ws에 저장 */
 	now = ktime_get();
 	duration = ktime_sub(now, ws->last_time);
 	ws->total_time = ktime_add(ws->total_time, duration);
@@ -515,6 +525,7 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 	ws->timer_expires = 0;
 
 	if (ws->autosleep_enabled)
+		/*! Do nothing */
 		update_prevent_sleep_time(ws, now);
 
 	/*
@@ -538,6 +549,7 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
  *
  * It is safe to call it from interrupt context.
  */
+/*! 2017. 3.25 study -ing */
 void __pm_relax(struct wakeup_source *ws)
 {
 	unsigned long flags;

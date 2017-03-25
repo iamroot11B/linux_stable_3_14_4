@@ -2563,6 +2563,7 @@ void netdev_run_todo(void);
  *
  * Release reference to device to allow it to be freed.
  */
+/*! 2017. 3.25 study -ing */
 static inline void dev_put(struct net_device *dev)
 {
 	this_cpu_dec(*dev->pcpu_refcnt);

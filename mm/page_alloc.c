@@ -2550,6 +2550,18 @@ static void wake_all_kswapds(unsigned int order,
 		wakeup_kswapd(zone, order, zone_idx(preferred_zone));
 }
 
+/*! 2017. 3.25 study -ing */
+/*!
+ * 함수 설명 자료
+ * http://jake.dothome.co.kr/zonned-allocator-alloc-pages-slowpath/
+ * alloc_flags = gfp_to_alloc_flags(gfp_mask);
+ *  gfp_mask에 따라 다음 항목을 alloc_flags에 추가할 수 있다.
+ *   ALLOC_WMARK_MIN 또는 ALLOC_NO_WATERMARKS
+ *   ALLOC_CPUSET
+ *   __GFP_HIGH
+ *   ALLOC_HARDER
+ *   ALLOC_CMA
+ */
 static inline int
 gfp_to_alloc_flags(gfp_t gfp_mask)
 {

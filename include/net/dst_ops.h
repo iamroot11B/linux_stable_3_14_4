@@ -54,6 +54,7 @@ static inline int dst_entries_get_slow(struct dst_ops *dst)
 	return res;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void dst_entries_add(struct dst_ops *dst, int val)
 {
 	local_bh_disable();

@@ -29,6 +29,7 @@ static inline void pm_runtime_early_init(struct device *dev)
 }
 /*! 2016.10.22 study -ing */
 static inline void pm_runtime_init(struct device *dev) {}
+/*! 2017. 3.25 study -ing */
 static inline void pm_runtime_remove(struct device *dev) {}
 
 #endif /* !CONFIG_PM_RUNTIME */

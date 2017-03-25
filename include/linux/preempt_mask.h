@@ -67,6 +67,8 @@
 #define in_softirq()		(softirq_count())
 /*! 2016.10.22 study -ing */
 #define in_interrupt()		(irq_count())
+/*! 2017. 3.25 study -ing */
+/*! SOFTIRQ_OFFSET -> 1UL << 8 */
 #define in_serving_softirq()	(softirq_count() & SOFTIRQ_OFFSET)
 
 /*

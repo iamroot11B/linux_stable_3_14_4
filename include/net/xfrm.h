@@ -234,6 +234,7 @@ struct xfrm_state {
 	void			*data;
 };
 
+/*! 2017. 3.25 study -ing */
 static inline struct net *xs_net(struct xfrm_state *x)
 {
 	return read_pnet(&x->xs_net);
@@ -807,6 +808,7 @@ static inline void __xfrm_state_put(struct xfrm_state *x)
 	atomic_dec(&x->refcnt);
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void xfrm_state_put(struct xfrm_state *x)
 {
 	if (atomic_dec_and_test(&x->refcnt))
@@ -1002,6 +1004,7 @@ secpath_get(struct sec_path *sp)
 
 void __secpath_destroy(struct sec_path *sp);
 
+/*! 2017. 3.25 study -ing */
 static inline void
 secpath_put(struct sec_path *sp)
 {

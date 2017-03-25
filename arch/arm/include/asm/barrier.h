@@ -56,6 +56,7 @@
 #else
 /*! 2017. 2.11 study -ing */
 #define smp_mb()	dmb(ish)
+/*! 2017. 3.25 study -ing */
 #define smp_rmb()	smp_mb()
 /*! 2016.07.09 study -ing */
 #define smp_wmb()	dmb(ishst)

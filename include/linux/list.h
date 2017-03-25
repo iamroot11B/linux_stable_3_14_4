@@ -17,6 +17,7 @@
  */
 
 /*! 2016-06-18 study -ing */
+/*! LIST 초기화. 자신의 previous 도 자신, 자신의 next도 자신인 원형 list */
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 /*! 2016-06-18 study -ing */

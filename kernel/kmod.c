@@ -258,6 +258,7 @@ static int call_helper(void *data)
 	return ____call_usermodehelper(data);
 }
 
+/*! 2017. 3.25 study -ing */
 static void call_usermodehelper_freeinfo(struct subprocess_info *info)
 {
 	if (info->cleanup)
@@ -265,6 +266,7 @@ static void call_usermodehelper_freeinfo(struct subprocess_info *info)
 	kfree(info);
 }
 
+/*! 2017. 3.25 study -ing */
 static void umh_complete(struct subprocess_info *sub_info)
 {
 	struct completion *comp = xchg(&sub_info->complete, NULL);
@@ -495,12 +497,15 @@ int __usermodehelper_disable(enum umh_disable_depth depth)
 	return -EAGAIN;
 }
 
+/*! 2017. 3.25 study -ing */
 static void helper_lock(void)
 {
 	atomic_inc(&running_helpers);
+	/*! barrier() */
 	smp_mb__after_atomic_inc();
 }
 
+/*! 2017. 3.25 study -ing */
 static void helper_unlock(void)
 {
 	if (atomic_dec_and_test(&running_helpers))
@@ -530,6 +535,7 @@ static void helper_unlock(void)
  * Function must be runnable in either a process context or the
  * context in which call_usermodehelper_exec is called.
  */
+/*! 2017. 3.25 study -ing */
 struct subprocess_info *call_usermodehelper_setup(char *path, char **argv,
 		char **envp, gfp_t gfp_mask,
 		int (*init)(struct subprocess_info *info, struct cred *new),
@@ -541,6 +547,7 @@ struct subprocess_info *call_usermodehelper_setup(char *path, char **argv,
 	if (!sub_info)
 		goto out;
 
+	/*! __call_usermodehelper를 init work에 추가 */
 	INIT_WORK(&sub_info->work, __call_usermodehelper);
 	sub_info->path = path;
 	sub_info->argv = argv;
@@ -566,6 +573,7 @@ EXPORT_SYMBOL(call_usermodehelper_setup);
  * asynchronously if wait is not set, and runs as a child of keventd.
  * (ie. it runs with full root capabilities).
  */
+/*! 2017. 3.25 study -ing */
 int call_usermodehelper_exec(struct subprocess_info *sub_info, int wait)
 {
 	DECLARE_COMPLETION_ONSTACK(done);
@@ -633,6 +641,7 @@ EXPORT_SYMBOL(call_usermodehelper_exec);
  * This function is the equivalent to use call_usermodehelper_setup() and
  * call_usermodehelper_exec().
  */
+/*! 2017. 3.25 study -ing */
 int call_usermodehelper(char *path, char **argv, char **envp, int wait)
 {
 	struct subprocess_info *info;

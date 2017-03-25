@@ -2752,6 +2752,7 @@ static inline int security_socket_shutdown(struct socket *sock, int how)
 {
 	return 0;
 }
+/*! 2017. 3.25 study -ing */
 static inline int security_sock_rcv_skb(struct sock *sk,
 					struct sk_buff *skb)
 {

@@ -156,6 +156,7 @@ static inline ktime_t ktime_set(const long secs, const unsigned long nsecs)
  *
  * Return: The remainder of the subtraction.
  */
+/*! 2017. 3.25 study -ing */
 static inline ktime_t ktime_sub(const ktime_t lhs, const ktime_t rhs)
 {
 	ktime_t res;

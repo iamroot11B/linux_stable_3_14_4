@@ -550,6 +550,7 @@ static inline bool __sk_del_node_init(struct sock *sk)
    modifications.
  */
 
+/*! 2017. 3.25 study -ing */
 static inline void sock_hold(struct sock *sk)
 {
 	atomic_inc(&sk->sk_refcnt);
@@ -651,6 +652,7 @@ static inline void sk_add_bind_node(struct sock *sk,
 		hlist_nulls_for_each_entry_from(__sk, node, sk_nulls_node)
 #define sk_for_each_safe(__sk, tmp, list) \
 	hlist_for_each_entry_safe(__sk, tmp, list, sk_node)
+/*! 2017. 3.25 study -ing */
 #define sk_for_each_bound(__sk, list) \
 	hlist_for_each_entry(__sk, list, sk_bind_node)
 
@@ -715,6 +717,7 @@ static inline void sock_reset_flag(struct sock *sk, enum sock_flags flag)
 	__clear_bit(flag, &sk->sk_flags);
 }
 
+/*! 2017. 3.25 study -ing */
 static inline bool sock_flag(const struct sock *sk, enum sock_flags flag)
 {
 	return test_bit(flag, &sk->sk_flags);
@@ -2236,6 +2239,7 @@ static inline void sk_eat_skb(struct sock *sk, struct sk_buff *skb, bool copied_
 }
 #endif
 
+/*! 2017. 3.25 study -ing */
 static inline
 struct net *sock_net(const struct sock *sk)
 {

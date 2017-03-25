@@ -455,6 +455,7 @@ static inline struct kernfs_node *sysfs_get(struct kernfs_node *kn)
 	return kn;
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void sysfs_put(struct kernfs_node *kn)
 {
 	kernfs_put(kn);

@@ -132,6 +132,7 @@ ssize_t of_device_get_modalias(struct device *dev, char *str, ssize_t len)
 /**
  * of_device_uevent - Display OF related uevent information
  */
+/*! 2017. 3.25 study -ing */
 void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	const char *compat;
@@ -149,6 +150,9 @@ void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
 	/* Since the compatible field can contain pretty much anything
 	 * it's not really legal to split it out with commas. We split it
 	 * up using a number of environment variables instead. */
+	/*!
+	 * ex) DeviceTree의 compatible
+	 */
 	compat = of_get_property(dev->of_node, "compatible", &cplen);
 	while (compat && *compat && cplen > 0) {
 		add_uevent_var(env, "OF_COMPATIBLE_%d=%s", seen, compat);
@@ -161,6 +165,7 @@ void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
 
 	seen = 0;
 	mutex_lock(&of_aliases_mutex);
+	/*! aliases_lookup은 drivers/of/base.c를 참고 */
 	list_for_each_entry(app, &aliases_lookup, link) {
 		if (dev->of_node == app->np) {
 			add_uevent_var(env, "OF_ALIAS_%d=%s", seen,

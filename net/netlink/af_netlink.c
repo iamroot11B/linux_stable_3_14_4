@@ -81,6 +81,7 @@ struct listeners {
 #define NETLINK_BROADCAST_SEND_ERROR	0x4
 #define NETLINK_RECV_NO_ENOBUFS	0x8
 
+/*! 2017. 3.25 study -ing */
 static inline int netlink_is_kernel(struct sock *sk)
 {
 	return nlk_sk(sk)->flags & NETLINK_KERNEL_SOCKET;
@@ -247,6 +248,7 @@ static void netlink_deliver_tap_kernel(struct sock *dst, struct sock *src,
 		netlink_deliver_tap(skb);
 }
 
+/*! 2017. 3.25 study -ing */
 static void netlink_overrun(struct sock *sk)
 {
 	struct netlink_sock *nlk = nlk_sk(sk);
@@ -832,6 +834,7 @@ static void netlink_ring_set_copied(struct sock *sk, struct sk_buff *skb)
 }
 
 #else /* CONFIG_NETLINK_MMAP */
+/*! 2017. 3.25 study -ing */
 #define netlink_skb_is_mmaped(skb)	false
 #define netlink_rx_is_mmaped(sk)	false
 #define netlink_tx_is_mmaped(sk)	false
@@ -968,6 +971,7 @@ void netlink_table_ungrab(void)
 	wake_up(&nl_table_wait);
 }
 
+/*! 2017. 3.25 study -ing */
 static inline void
 netlink_lock_table(void)
 {
@@ -1671,11 +1675,13 @@ void netlink_detachskb(struct sock *sk, struct sk_buff *skb)
 	sock_put(sk);
 }
 
+/*! 2017. 3.25 study -ing */
 static struct sk_buff *netlink_trim(struct sk_buff *skb, gfp_t allocation)
 {
 	int delta;
 
 	WARN_ON(skb->sk != NULL);
+	/*! netlink_skb_is_mmaped -> false */
 	if (netlink_skb_is_mmaped(skb))
 		return skb;
 
@@ -1821,6 +1827,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(netlink_alloc_skb);
 
+/*! 2017. 3.25 study -ing */
 int netlink_has_listeners(struct sock *sk, unsigned int group)
 {
 	int res = 0;
@@ -1868,6 +1875,7 @@ struct netlink_broadcast_data {
 	void *tx_data;
 };
 
+/*! 2017. 3.25 study -ing */
 static int do_one_broadcast(struct sock *sk,
 				   struct netlink_broadcast_data *p)
 {
@@ -1914,6 +1922,7 @@ static int do_one_broadcast(struct sock *sk,
 	} else if (sk_filter(sk, p->skb2)) {
 		kfree_skb(p->skb2);
 		p->skb2 = NULL;
+/*! 2017. 3.25 net 관련 코드는 여기까지만 봄 */
 	} else if ((val = netlink_broadcast_deliver(sk, p->skb2)) < 0) {
 		netlink_overrun(sk);
 		if (nlk->flags & NETLINK_BROADCAST_SEND_ERROR)
@@ -1929,6 +1938,7 @@ out:
 	return 0;
 }
 
+/*! 2017. 3.25 study -ing */
 int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb, u32 portid,
 	u32 group, gfp_t allocation,
 	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),

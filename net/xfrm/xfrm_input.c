@@ -16,6 +16,7 @@
 
 static struct kmem_cache *secpath_cachep __read_mostly;
 
+/*! 2017. 3.25 study -ing */
 void __secpath_destroy(struct sec_path *sp)
 {
 	int i;
