@@ -354,6 +354,7 @@ static inline void touch_softlockup_watchdog_sync(void)
 static inline void touch_all_softlockup_watchdogs(void)
 {
 }
+/*! 2017. 4.30 study -ing */
 static inline void lockup_detector_init(void)
 {
 }
@@ -1595,6 +1596,7 @@ struct task_struct {
 };
 
 /* Future-safe accessor for struct task_struct's cpus_allowed. */
+/*! 2017. 4.30 study -ing */
 #define tsk_cpus_allowed(tsk) (&(tsk)->cpus_allowed)
 
 #define TNF_MIGRATED	0x01
@@ -1626,6 +1628,7 @@ static inline void task_numa_free(struct task_struct *p)
 }
 #endif
 
+/*! 2017. 4.30 study -ing */
 static inline struct pid *task_pid(struct task_struct *task)
 {
 	return task->pids[PIDTYPE_PID].pid;
@@ -2583,6 +2586,7 @@ static inline void clear_tsk_need_resched(struct task_struct *tsk)
 	clear_tsk_thread_flag(tsk,TIF_NEED_RESCHED);
 }
 
+/*! 2017. 4.30 study -ing */
 static inline int test_tsk_need_resched(struct task_struct *tsk)
 {
 	return unlikely(test_tsk_thread_flag(tsk,TIF_NEED_RESCHED));
@@ -2840,6 +2844,7 @@ static inline void ptrace_signal_wake_up(struct task_struct *t, bool resume)
  */
 #ifdef CONFIG_SMP
 
+/*! 2017. 4.30 study -ing */
 static inline unsigned int task_cpu(const struct task_struct *p)
 {
 	return task_thread_info(p)->cpu;

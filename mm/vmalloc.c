@@ -1457,6 +1457,7 @@ struct vm_struct *get_vm_area(unsigned long size, unsigned long flags)
 				  __builtin_return_address(0));
 }
 
+/*! 2017. 4.30 study -ing */
 struct vm_struct *get_vm_area_caller(unsigned long size, unsigned long flags,
 				const void *caller)
 {
@@ -1606,6 +1607,7 @@ EXPORT_SYMBOL(vfree);
  *
  *	Must not be called in interrupt context.
  */
+/*! 2017. 4.30 study -ing */
 void vunmap(const void *addr)
 {
 	BUG_ON(in_interrupt());
@@ -1625,6 +1627,7 @@ EXPORT_SYMBOL(vunmap);
  *	Maps @count pages from @pages into contiguous kernel virtual
  *	space.
  */
+/*! 2017. 4.30 study -ing */
 void *vmap(struct page **pages, unsigned int count,
 		unsigned long flags, pgprot_t prot)
 {

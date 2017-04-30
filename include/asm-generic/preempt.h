@@ -35,6 +35,7 @@ static __always_inline void preempt_count_set(int pc)
 	task_thread_info(p)->preempt_count = PREEMPT_ENABLED; \
 } while (0)
 
+/*! 2017. 4.30 study -ing */
 static __always_inline void set_preempt_need_resched(void)
 {
 }

@@ -392,6 +392,7 @@ static void __init setup_command_line(char *command_line)
 
 static __initdata DECLARE_COMPLETION(kthreadd_done);
 
+/*! 2017. 4.30 study -ing */
 static noinline void __init_refok rest_init(void)
 {
 	int pid;
@@ -402,6 +403,7 @@ static noinline void __init_refok rest_init(void)
 	 * the init task will end up wanting to create kthreads, which, if
 	 * we schedule it before we create kthreadd, will OOPS.
 	 */
+	/*! fork는 나중에 보기로하고, kernel_init을 봄 */
 	kernel_thread(kernel_init, NULL, CLONE_FS | CLONE_SIGHAND);
 	numa_default_policy();
 	pid = kernel_thread(kthreadd, NULL, CLONE_FS | CLONE_FILES);
@@ -805,19 +807,26 @@ asmlinkage void __init start_kernel(void)
 	/*! 2017. 3.11 study -ing */
 	cgroup_init();
 	/*! 2017. 3.25 study end */
+	/*! 2017. 4.30 study start */
 	cpuset_init();
+	/*! Do nothing */
 	taskstats_init_early();
+	/*! Do nothing */
 	delayacct_init();
 
+	/*! #define check_bugs() check_writebuffer_bugs() */
 	check_bugs();
 
+	/*! Do nothing */
 	sfi_init_late();
 
+	/*! efi_enabled는 0 반환 */
 	if (efi_enabled(EFI_RUNTIME_SERVICES)) {
 		efi_late_init();
 		efi_free_boot_services();
 	}
 
+	/*! Do nothing */
 	ftrace_init();
 
 	/* Do the rest non-__init'ed, we're now alive */
@@ -856,6 +865,7 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	return ret;
 }
 
+/*! 2017. 4.30 study -ing */
 int __init_or_module do_one_initcall(initcall_t fn)
 {
 	int count = preempt_count();
@@ -962,10 +972,14 @@ static void __init do_basic_setup(void)
 	random_int_secret_init();
 }
 
+/*! 2017. 4.30 study -ing */
 static void __init do_pre_smp_initcalls(void)
 {
 	initcall_t *fn;
 
+	/*! vmlinux.lds에 보면
+	 * __initcall_start와 __initcall0_start의 사이에 있는 함수다.
+	 */
 	for (fn = __initcall_start; fn < __initcall0_start; fn++)
 		do_one_initcall(*fn);
 }
@@ -1005,6 +1019,7 @@ static int try_to_run_init_process(const char *init_filename)
 
 static noinline void __init kernel_init_freeable(void);
 
+/*! 2017. 4.30 study -ing */
 static int __ref kernel_init(void *unused)
 {
 	int ret;
@@ -1050,6 +1065,7 @@ static int __ref kernel_init(void *unused)
 	      "See Linux Documentation/init.txt for guidance.");
 }
 
+/*! 2017. 4.30 study -ing */
 static noinline void __init kernel_init_freeable(void)
 {
 	/*
@@ -1074,6 +1090,7 @@ static noinline void __init kernel_init_freeable(void)
 	smp_prepare_cpus(setup_max_cpus);
 
 	do_pre_smp_initcalls();
+	/*! Do nothing */
 	lockup_detector_init();
 
 	smp_init();

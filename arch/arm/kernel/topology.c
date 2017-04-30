@@ -47,6 +47,7 @@ unsigned long arch_scale_freq_power(struct sched_domain *sd, int cpu)
 	return per_cpu(cpu_scale, cpu);
 }
 
+/*! 2017. 4.30 study -ing */
 static void set_power_scale(unsigned int cpu, unsigned long power)
 {
 	per_cpu(cpu_scale, cpu) = power;
@@ -87,6 +88,7 @@ static unsigned long middle_capacity = 1;
  * 'average' CPU is of middle power. Also see the comments near
  * table_efficiency[] and update_cpu_power().
  */
+/*! 2017. 4.30 study -ing */
 static void __init parse_dt_topology(void)
 {
 	const struct cpu_efficiency *cpu_eff;
@@ -158,6 +160,7 @@ static void __init parse_dt_topology(void)
  * boot. The update of all CPUs is in O(n^2) for heteregeneous system but the
  * function returns directly for SMP system.
  */
+/*! 2017. 4.30 study -ing */
 static void update_cpu_power(unsigned int cpu)
 {
 	if (!cpu_capacity(cpu))
@@ -185,6 +188,7 @@ const struct cpumask *cpu_coregroup_mask(int cpu)
 	return &cpu_topology[cpu].core_sibling;
 }
 
+/*! 2017. 4.30 study -ing */
 static void update_siblings_masks(unsigned int cpuid)
 {
 	struct cputopo_arm *cpu_topo, *cpuid_topo = &cpu_topology[cpuid];
@@ -216,6 +220,7 @@ static void update_siblings_masks(unsigned int cpuid)
  * and with the mutex cpu_hotplug.lock locked, when several cpus have booted,
  * which prevents simultaneous write access to cpu_topology array
  */
+/*! 2017. 4.30 study -ing */
 void store_cpu_topology(unsigned int cpuid)
 {
 	struct cputopo_arm *cpuid_topo = &cpu_topology[cpuid];
@@ -234,6 +239,10 @@ void store_cpu_topology(unsigned int cpuid)
 		 * multiprocessor format & multiprocessor mode field are set
 		 */
 
+		/*! #define MPIDR_AFFINITY_LEVEL(mpidr, level)
+		 * -> ((mpidr >> (MPIDR_LEVEL_BITS * level)) & MPIDR_LEVEL_MASK)
+		 * -> ((mpidr >> (8                * level)) & (2^8 -1)        )
+		 */
 		if (mpidr & MPIDR_MT_BITMASK) {
 			/* core performance interdependency */
 			cpuid_topo->thread_id = MPIDR_AFFINITY_LEVEL(mpidr, 0);
@@ -270,6 +279,7 @@ void store_cpu_topology(unsigned int cpuid)
  * init_cpu_topology is called at boot when only one cpu is running
  * which prevent simultaneous write access to cpu_topology array
  */
+/*! 2017. 4.30 study -ing */
 void __init init_cpu_topology(void)
 {
 	unsigned int cpu;

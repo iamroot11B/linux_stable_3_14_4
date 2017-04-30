@@ -232,6 +232,7 @@ int __bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
 }
 EXPORT_SYMBOL(__bitmap_andnot);
 
+/*! 2017. 4.30 study -ing */
 int __bitmap_intersects(const unsigned long *bitmap1,
 				const unsigned long *bitmap2, int bits)
 {

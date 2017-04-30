@@ -108,6 +108,7 @@ static inline bool put_mems_allowed(unsigned int seq)
 	return !read_seqcount_retry(&current->mems_allowed_seq, seq);
 }
 
+/*! 2017. 4.30 study -ing */
 static inline void set_mems_allowed(nodemask_t nodemask)
 {
 	unsigned long flags;

@@ -120,6 +120,7 @@ static inline void __node_clear(int node, volatile nodemask_t *dstp)
 	clear_bit(node, dstp->bits);
 }
 
+/*! 2017. 4.30 study -ing */
 #define nodes_setall(dst) __nodes_setall(&(dst), MAX_NUMNODES)
 static inline void __nodes_setall(nodemask_t *dstp, int nbits)
 {

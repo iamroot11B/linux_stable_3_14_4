@@ -114,6 +114,7 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 
 static void update_rq_clock_task(struct rq *rq, s64 delta);
 
+/*! 2017. 4.30 study -ing */
 void update_rq_clock(struct rq *rq)
 {
 	s64 delta;
@@ -123,6 +124,7 @@ void update_rq_clock(struct rq *rq)
 
 	delta = sched_clock_cpu(cpu_of(rq)) - rq->clock;
 	rq->clock += delta;
+	/*! Do nothing */
 	update_rq_clock_task(rq, delta);
 }
 
@@ -318,6 +320,7 @@ static inline struct rq *__task_rq_lock(struct task_struct *p)
 /*
  * task_rq_lock - lock p->pi_lock and lock the rq @p resides on.
  */
+/*! 2017. 4.30 study -ing */
 static struct rq *task_rq_lock(struct task_struct *p, unsigned long *flags)
 	__acquires(p->pi_lock)
 	__acquires(rq->lock)
@@ -512,6 +515,7 @@ static inline void init_hrtick(void)
  * might also involve a cross-CPU call to trigger the scheduler on
  * the target CPU.
  */
+/*! 2017. 4.30 study -ing */
 void resched_task(struct task_struct *p)
 {
 	int cpu;
@@ -525,12 +529,14 @@ void resched_task(struct task_struct *p)
 
 	cpu = task_cpu(p);
 	if (cpu == smp_processor_id()) {
+		/*! Do nothing */
 		set_preempt_need_resched();
 		return;
 	}
 
 	/* NEED_RESCHED must be visible before we test polling */
 	smp_mb();
+	/*! tsk_is_polling -> return 0 */
 	if (!tsk_is_polling(p))
 		smp_send_reschedule(cpu);
 }
@@ -764,16 +770,20 @@ static void set_load_weight(struct task_struct *p)
 	load->inv_weight = prio_to_wmult[prio];
 }
 
+/*! 2017. 4.30 study -ing */
 static void enqueue_task(struct rq *rq, struct task_struct *p, int flags)
 {
 	update_rq_clock(rq);
+	/*! Do nothing */
 	sched_info_queued(rq, p);
 	p->sched_class->enqueue_task(rq, p, flags);
 }
 
+/*! 2017. 4.30 study -ing */
 static void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 {
 	update_rq_clock(rq);
+	/*! Do nothing */
 	sched_info_dequeued(rq, p);
 	p->sched_class->dequeue_task(rq, p, flags);
 }
@@ -794,6 +804,8 @@ void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
 	dequeue_task(rq, p, flags);
 }
 
+/*! 2017. 4.30 study -ing */
+/*! Do nothing */
 static void update_rq_clock_task(struct rq *rq, s64 delta)
 {
 /*
@@ -955,6 +967,7 @@ static inline void check_class_changed(struct rq *rq, struct task_struct *p,
 		p->sched_class->prio_changed(rq, p, oldprio);
 }
 
+/*! 2017. 4.30 study -ing */
 void check_preempt_curr(struct rq *rq, struct task_struct *p, int flags)
 {
 	const struct sched_class *class;
@@ -981,6 +994,7 @@ void check_preempt_curr(struct rq *rq, struct task_struct *p, int flags)
 }
 
 #ifdef CONFIG_SMP
+/*! 2017. 4.30 study -ing */
 void set_task_cpu(struct task_struct *p, unsigned int new_cpu)
 {
 #ifdef CONFIG_SCHED_DEBUG
@@ -4563,6 +4577,7 @@ void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new_mask)
  * task must not exit() & deallocate itself prematurely. The
  * call is not atomic; no spinlocks may be held.
  */
+/*! 2017. 4.30 study -ing */
 int set_cpus_allowed_ptr(struct task_struct *p, const struct cpumask *new_mask)
 {
 	unsigned long flags;
@@ -4591,6 +4606,7 @@ int set_cpus_allowed_ptr(struct task_struct *p, const struct cpumask *new_mask)
 		struct migration_arg arg = { p, dest_cpu };
 		/* Need help from migration thread: drop lock and wait. */
 		task_rq_unlock(rq, p, &flags);
+		/*! migration_cpu_stop()도 봄 */
 		stop_one_cpu(cpu_of(rq), migration_cpu_stop, &arg);
 		tlb_migrate_finish(p->mm);
 		return 0;
@@ -4613,6 +4629,7 @@ EXPORT_SYMBOL_GPL(set_cpus_allowed_ptr);
  *
  * Returns non-zero if task was successfully migrated.
  */
+/*! 2017. 4.30 study -ing */
 static int __migrate_task(struct task_struct *p, int src_cpu, int dest_cpu)
 {
 	struct rq *rq_dest, *rq_src;
@@ -4704,6 +4721,7 @@ void sched_setnuma(struct task_struct *p, int nid)
  * and performs thread migration by bumping thread off CPU then
  * 'pushing' onto another runqueue.
  */
+/*! 2017. 4.30 study -ing */
 static int migration_cpu_stop(void *data)
 {
 	struct migration_arg *arg = data;

@@ -668,6 +668,7 @@ static inline int efi_enabled(int facility)
 }
 # endif
 #else
+/*! 2017. 4.30 study -ing */
 static inline int efi_enabled(int facility)
 {
 	return 0;

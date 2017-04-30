@@ -1398,6 +1398,7 @@ out:
 #define FM_SCALE 1000		/* faux fixed point scale */
 
 /* Initialize a frequency meter */
+/*! 2017. 4.30 study -ing */
 static void fmeter_init(struct fmeter *fmp)
 {
 	fmp->cnt = 0;
@@ -2039,14 +2040,16 @@ struct cgroup_subsys cpuset_subsys = {
  *
  * Description: Initialize top_cpuset and the cpuset internal file system,
  **/
-
+/*! 2017. 4.30 study -ing */
 int __init cpuset_init(void)
 {
 	int err = 0;
 
+	/*! 우리는 true */
 	if (!alloc_cpumask_var(&top_cpuset.cpus_allowed, GFP_KERNEL))
 		BUG();
 
+	/*! cpumask와 nodes의 모든 비트를 Set */
 	cpumask_setall(top_cpuset.cpus_allowed);
 	nodes_setall(top_cpuset.mems_allowed);
 

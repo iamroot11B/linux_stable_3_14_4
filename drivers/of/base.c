@@ -450,6 +450,7 @@ static int __of_device_is_compatible(const struct device_node *device,
 /** Checks if the given "compat" string matches one of the strings in
  * the device's "compatible" property
  */
+/*! 2017. 4.30 study -ing */
 int of_device_is_compatible(const struct device_node *device,
 		const char *compat)
 {

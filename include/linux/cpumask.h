@@ -43,6 +43,7 @@ extern int nr_cpu_ids;
  * not all bits may be allocated. */
 #define nr_cpumask_bits	nr_cpu_ids
 #else
+/*! 2017. 4.30 study -ing */
 #define nr_cpumask_bits	NR_CPUS
 #endif
 
@@ -98,6 +99,7 @@ extern const struct cpumask *const cpu_active_mask;
 #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
 #define num_present_cpus()	cpumask_weight(cpu_present_mask)
 #define num_active_cpus()	cpumask_weight(cpu_active_mask)
+/*! 2017. 4.30 study -ing */
 #define cpu_online(cpu)		cpumask_test_cpu((cpu), cpu_online_mask)
 #define cpu_possible(cpu)	cpumask_test_cpu((cpu), cpu_possible_mask)
 #define cpu_present(cpu)	cpumask_test_cpu((cpu), cpu_present_mask)
@@ -180,6 +182,7 @@ static inline unsigned int cpumask_first(const struct cpumask *srcp)
  *
  * Returns >= nr_cpu_ids if no further cpus set.
  */
+/*! 2015. 6.28 study -ing */
 static inline unsigned int cpumask_next(int n, const struct cpumask *srcp)
 {
 	/* -1 is a legal arg here. */
@@ -446,6 +449,7 @@ static inline bool cpumask_equal(const struct cpumask *src1p,
  * @src1p: the first input
  * @src2p: the second input
  */
+/*! 2017. 4.30 study -ing */
 static inline bool cpumask_intersects(const struct cpumask *src1p,
 				     const struct cpumask *src2p)
 {
@@ -551,6 +555,7 @@ static inline void cpumask_copy(struct cpumask *dstp,
  *
  * Returns >= nr_cpu_ids if no cpus set in both.  See also cpumask_next_and().
  */
+/*! 2017. 4.30 study -ing */
 #define cpumask_first_and(src1p, src2p) cpumask_next_and(-1, (src1p), (src2p))
 
 /**
@@ -560,6 +565,7 @@ static inline void cpumask_copy(struct cpumask *dstp,
  *
  * Returns >= nr_cpu_ids if no cpus set.
  */
+/*! 2017. 4.30 study -ing */
 #define cpumask_any_and(mask1, mask2) cpumask_first_and((mask1), (mask2))
 
 /**

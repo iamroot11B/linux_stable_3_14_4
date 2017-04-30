@@ -213,6 +213,7 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long addr,
  * we have several shared mappings of the same object in user
  * space.
  */
+/*! 2017. 4.30 study -ing */
 static int __init check_writebuffer(unsigned long *p1, unsigned long *p2)
 {
 	register unsigned long zero = 0, one = 1, val;
@@ -229,6 +230,7 @@ static int __init check_writebuffer(unsigned long *p1, unsigned long *p2)
 	return val != zero;
 }
 
+/*! 2017. 4.30 study -ing */
 void __init check_writebuffer_bugs(void)
 {
 	struct page *page;
@@ -240,6 +242,7 @@ void __init check_writebuffer_bugs(void)
 	page = alloc_page(GFP_KERNEL);
 	if (page) {
 		unsigned long *p1, *p2;
+		/*! ((PAGE_KERNEL) & ~(L_PTE_MT_MASK)) | (L_PTE_MT_BUFFERABLE) */
 		pgprot_t prot = __pgprot_modify(PAGE_KERNEL,
 					L_PTE_MT_MASK, L_PTE_MT_BUFFERABLE);
 

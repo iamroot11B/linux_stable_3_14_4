@@ -669,6 +669,7 @@ DECLARE_PER_CPU(struct rq, runqueues);
 /*! 2016.07.09 study -ing */
 #define cpu_rq(cpu)		(&per_cpu(runqueues, (cpu)))
 #define this_rq()		(&__get_cpu_var(runqueues))
+/*! 2017. 4.30 study -ing */
 #define task_rq(p)		cpu_rq(task_cpu(p))
 #define cpu_curr(cpu)		(cpu_rq(cpu)->curr)
 #define raw_rq()		(&__raw_get_cpu_var(runqueues))
@@ -1410,6 +1411,7 @@ static inline void double_raw_lock(raw_spinlock_t *l1, raw_spinlock_t *l2)
  * Note this does not disable interrupts like task_rq_lock,
  * you need to do so manually before calling.
  */
+/*! 2017. 4.30 study -ing */
 static inline void double_rq_lock(struct rq *rq1, struct rq *rq2)
 	__acquires(rq1->lock)
 	__acquires(rq2->lock)
@@ -1417,13 +1419,16 @@ static inline void double_rq_lock(struct rq *rq1, struct rq *rq2)
 	BUG_ON(!irqs_disabled());
 	if (rq1 == rq2) {
 		raw_spin_lock(&rq1->lock);
+		/*! Sparse를 위한 코드로, rq2를 lock이라고 Sparse에 알림 */
 		__acquire(rq2->lock);	/* Fake it out ;) */
 	} else {
 		if (rq1 < rq2) {
 			raw_spin_lock(&rq1->lock);
+			/*! raw_spin_lock과 같음  */
 			raw_spin_lock_nested(&rq2->lock, SINGLE_DEPTH_NESTING);
 		} else {
 			raw_spin_lock(&rq2->lock);
+			/*! raw_spin_lock과 같음  */
 			raw_spin_lock_nested(&rq1->lock, SINGLE_DEPTH_NESTING);
 		}
 	}
@@ -1435,6 +1440,7 @@ static inline void double_rq_lock(struct rq *rq1, struct rq *rq2)
  * Note this does not restore interrupts like task_rq_unlock,
  * you need to do so manually after calling.
  */
+/*! 2017. 4.30 study -ing */
 static inline void double_rq_unlock(struct rq *rq1, struct rq *rq2)
 	__releases(rq1->lock)
 	__releases(rq2->lock)
@@ -1443,6 +1449,7 @@ static inline void double_rq_unlock(struct rq *rq1, struct rq *rq2)
 	if (rq1 != rq2)
 		raw_spin_unlock(&rq2->lock);
 	else
+		/*! Sparce에게 rq2가 unlock이라고 알림 */
 		__release(rq2->lock);
 }
 

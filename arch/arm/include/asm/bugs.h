@@ -13,6 +13,7 @@
 #ifdef CONFIG_MMU
 extern void check_writebuffer_bugs(void);
 
+/*! 2017. 4.30 study -ing */
 #define check_bugs() check_writebuffer_bugs()
 #else
 #define check_bugs() do { } while (0)

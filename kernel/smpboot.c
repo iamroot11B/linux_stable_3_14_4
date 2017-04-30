@@ -47,6 +47,7 @@ void __init idle_thread_set_boot_cpu(void)
  *
  * Creates the thread if it does not exist.
  */
+/*! 2017. 4.30 study -ing */
 static inline void idle_init(unsigned int cpu)
 {
 	struct task_struct *tsk = per_cpu(idle_threads, cpu);
@@ -63,6 +64,7 @@ static inline void idle_init(unsigned int cpu)
 /**
  * idle_threads_init - Initialize idle threads for all cpus
  */
+/*! 2017. 4.30 study -ing */
 void __init idle_threads_init(void)
 {
 	unsigned int cpu, boot_cpu;

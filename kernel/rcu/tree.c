@@ -3291,6 +3291,7 @@ early_initcall(rcu_spawn_gp_kthread);
  * idle tasks are prohibited from containing RCU read-side critical
  * sections.  This function also enables RCU lockdep checking.
  */
+/*! 2017. 4.30 study -ing */
 void rcu_scheduler_starting(void)
 {
 	WARN_ON(num_online_cpus() != 1);

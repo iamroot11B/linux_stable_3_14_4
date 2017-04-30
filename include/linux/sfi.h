@@ -191,6 +191,7 @@ static inline void sfi_init(void)
 {
 }
 
+/*! 2017. 4.30 study -ing */
 static inline void sfi_init_late(void)
 {
 }

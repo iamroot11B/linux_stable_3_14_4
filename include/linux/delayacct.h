@@ -126,6 +126,7 @@ static inline void delayacct_set_flag(int flag)
 {}
 static inline void delayacct_clear_flag(int flag)
 {}
+/*! 2017. 4.30 study -ing */
 static inline void delayacct_init(void)
 {}
 static inline void delayacct_tsk_init(struct task_struct *tsk)

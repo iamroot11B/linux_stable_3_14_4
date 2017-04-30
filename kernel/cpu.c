@@ -450,6 +450,7 @@ out:
 	return ret;
 }
 
+/*! 2017. 4.30 study -ing */
 int cpu_up(unsigned int cpu)
 {
 	int err = 0;
@@ -463,6 +464,8 @@ int cpu_up(unsigned int cpu)
 #endif
 		return -EINVAL;
 	}
+
+	/*! 2017. 4.30 study end */
 
 	err = try_online_node(cpu_to_node(cpu));
 	if (err)
@@ -759,6 +762,7 @@ void set_cpu_active(unsigned int cpu, bool active)
 		cpumask_clear_cpu(cpu, to_cpumask(cpu_active_bits));
 }
 
+/*! 2017. 4.30 study -ing */
 void init_cpu_present(const struct cpumask *src)
 {
 	cpumask_copy(to_cpumask(cpu_present_bits), src);

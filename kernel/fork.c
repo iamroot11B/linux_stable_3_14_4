@@ -1132,6 +1132,7 @@ init_task_pid(struct task_struct *task, enum pid_type type, struct pid *pid)
  * parts of the process environment (as per the clone
  * flags). The actual kick-off is left to the caller.
  */
+/*! 2017. 4.30 study later */
 static struct task_struct *copy_process(unsigned long clone_flags,
 					unsigned long stack_start,
 					unsigned long stack_size,
@@ -1542,6 +1543,7 @@ fork_out:
 	return ERR_PTR(retval);
 }
 
+/*! 2017. 4.30 study -ing */
 static inline void init_idle_pids(struct pid_link *links)
 {
 	enum pid_type type;
@@ -1552,6 +1554,7 @@ static inline void init_idle_pids(struct pid_link *links)
 	}
 }
 
+/*! 2017. 4.30 study -ing */
 struct task_struct *fork_idle(int cpu)
 {
 	struct task_struct *task;
@@ -1569,6 +1572,17 @@ struct task_struct *fork_idle(int cpu)
  *
  * It copies the process, and if successful kick-starts
  * it and waits for it to finish using the VM if required.
+ */
+/*! 2017. 4.30 study later */
+/*!
+ * sched/core.c -> dequeue_task()에서
+ * p->sched_class->dequeue_task(rq, p, flags); 호출함
+ *
+ * sched/core.c -> set_task_cpu()에서
+ * p->sched_class->migrate_task_rq(p, new_cpu); 호출함
+ *
+ * sched/core.c -> enqueue_task()에서
+ * p->sched_class->enqueue_task(rq, p, flags); 호출함
  */
 long do_fork(unsigned long clone_flags,
 	      unsigned long stack_start,

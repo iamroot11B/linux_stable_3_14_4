@@ -2,7 +2,7 @@
 #define __LINUX_COMPILER_H
 
 #ifndef __ASSEMBLY__
-/*! __CHECKER__ 는 gcc가 아닌 sprase를 위한 코드.  */
+/*! __CHECKER__ 는 gcc가 아닌 Sparse를 위한 코드.  */
 #ifdef __CHECKER__
 # define __user		__attribute__((noderef, address_space(1)))
 # define __kernel	__attribute__((address_space(0)))
@@ -14,6 +14,8 @@
 /*! context - sparse를 위한 attribute  */
 # define __acquires(x)	__attribute__((context(x,0,1)))
 # define __releases(x)	__attribute__((context(x,1,0)))
+/*! 2017. 4.30 study -ing */
+/*! __context__는 http://jake.dothome.co.kr/sparse/ 를 참고 */
 # define __acquire(x)	__context__(x,1)
 # define __release(x)	__context__(x,-1)
 # define __cond_lock(x,c)	((c) ? ({ __acquire(x); 1; }) : 0)

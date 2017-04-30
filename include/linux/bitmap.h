@@ -248,6 +248,10 @@ static inline int bitmap_equal(const unsigned long *src1,
 		return __bitmap_equal(src1, src2, nbits);
 }
 
+/*! 2017. 4.30 study -ing */
+/*! 비트 0번째부터 ~ nbits번째 중에서
+ * src1, src2가 동시에 set된 비트가 있다면 true, 없다면 false
+ */
 static inline int bitmap_intersects(const unsigned long *src1,
 			const unsigned long *src2, int nbits)
 {

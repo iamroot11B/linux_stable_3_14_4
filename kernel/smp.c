@@ -518,6 +518,7 @@ void __weak smp_announce(void)
 }
 
 /* Called by boot processor to activate the rest. */
+/*! 2017. 4.30 study -ing */
 void __init smp_init(void)
 {
 	unsigned int cpu;

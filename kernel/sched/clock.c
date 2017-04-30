@@ -399,6 +399,7 @@ void sched_clock_init(void)
 	sched_clock_running = 1;
 }
 
+/*! 2017. 4.30 study -ing */
 u64 sched_clock_cpu(int cpu)
 {
 	if (unlikely(!sched_clock_running))
