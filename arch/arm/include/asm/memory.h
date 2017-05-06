@@ -313,6 +313,7 @@ extern phys_addr_t (*arch_virt_to_idmap)(unsigned long x);
  * physical memory for idmap purposes.  Most cases should leave these
  * untouched.
  */
+/*! 2017. 5. 6 study -ing */
 static inline phys_addr_t __virt_to_idmap(unsigned long x)
 {
 	if (arch_virt_to_idmap)
@@ -321,6 +322,7 @@ static inline phys_addr_t __virt_to_idmap(unsigned long x)
 		return __virt_to_phys(x);
 }
 
+/*! 2017. 5. 6 study -ing */
 #define virt_to_idmap(x)	__virt_to_idmap((unsigned long)(x))
 
 /*

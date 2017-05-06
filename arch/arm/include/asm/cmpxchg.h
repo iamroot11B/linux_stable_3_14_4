@@ -100,6 +100,8 @@ static inline unsigned long __xchg(unsigned long x, volatile void *ptr, int size
 	return ret;
 }
 
+/*! 2017. 5. 6 study later */
+/*! __xchg는 ret = ptr; ptr = x; return ret; 임 */
 #define xchg(ptr,x) \
 	((__typeof__(*(ptr)))__xchg((unsigned long)(x),(ptr),sizeof(*(ptr))))
 

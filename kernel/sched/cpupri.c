@@ -237,6 +237,7 @@ cleanup:
  * cpupri_cleanup - clean up the cpupri structure
  * @cp: The cpupri context
  */
+/*! 2017. 5. 6 study -ing */
 void cpupri_cleanup(struct cpupri *cp)
 {
 	int i;

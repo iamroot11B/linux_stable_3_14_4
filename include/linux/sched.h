@@ -969,6 +969,7 @@ struct sched_domain {
 	unsigned long span[0];
 };
 
+/*! 2017. 5. 6 study -ing */
 static inline struct cpumask *sched_domain_span(struct sched_domain *sd)
 {
 	return to_cpumask(sd->span);
@@ -2510,6 +2511,7 @@ static inline void threadgroup_unlock(struct task_struct *tsk) {}
 
 /*! 2016-05-28 study -ing */
 #define task_thread_info(task)	((struct thread_info *)(task)->stack)
+/*! 2017. 5. 6 study -ing */
 #define task_stack_page(task)	((task)->stack)
 
 static inline void setup_thread_stack(struct task_struct *p, struct task_struct *org)

@@ -512,6 +512,7 @@ void __init setup_nr_cpu_ids(void)
 	nr_cpu_ids = find_last_bit(cpumask_bits(cpu_possible_mask),NR_CPUS) + 1;
 }
 
+/*! 2017. 5. 6 study -ing */
 void __weak smp_announce(void)
 {
 	printk(KERN_INFO "Brought up %d CPUs\n", num_online_cpus());

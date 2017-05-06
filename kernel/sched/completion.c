@@ -138,6 +138,7 @@ EXPORT_SYMBOL(wait_for_completion);
  * Return: 0 if timed out, and positive (at least 1, or number of jiffies left
  * till timeout) if completed.
  */
+/*! 2017. 5. 6 study -ing */
 unsigned long __sched
 wait_for_completion_timeout(struct completion *x, unsigned long timeout)
 {

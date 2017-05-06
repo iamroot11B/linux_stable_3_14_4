@@ -34,6 +34,7 @@ EXPORT_SYMBOL(__next_cpu_nr);
  *
  * Returns >= nr_cpu_ids if no further cpus set in both.
  */
+/*! 2017. 5. 6 study -ing */
 int cpumask_next_and(int n, const struct cpumask *src1p,
 		     const struct cpumask *src2p)
 {

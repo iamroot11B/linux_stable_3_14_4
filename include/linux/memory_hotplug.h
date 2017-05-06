@@ -227,6 +227,7 @@ static inline void register_page_bootmem_info_node(struct pglist_data *pgdat)
 {
 }
 
+/*! 2017. 5. 6 study -ing */
 static inline int try_online_node(int nid)
 {
 	return 0;

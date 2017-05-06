@@ -53,6 +53,7 @@ enum KTHREAD_BITS {
 	KTHREAD_IS_PARKED,
 };
 
+/*! 2017. 5. 6 study -ing */
 #define __to_kthread(vfork)	\
 	container_of(vfork, struct kthread, exited)
 
@@ -61,6 +62,7 @@ static inline struct kthread *to_kthread(struct task_struct *k)
 	return __to_kthread(k->vfork_done);
 }
 
+/*! 2017. 5. 6 study -ing */
 static struct kthread *to_live_kthread(struct task_struct *k)
 {
 	struct completion *vfork = ACCESS_ONCE(k->vfork_done);
@@ -264,6 +266,7 @@ static void create_kthread(struct kthread_create_info *create)
  *
  * Returns a task_struct or ERR_PTR(-ENOMEM).
  */
+/*! 2017. 5. 6 study -ing */
 struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 					   void *data, int node,
 					   const char namefmt[],
@@ -325,6 +328,7 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 }
 EXPORT_SYMBOL(kthread_create_on_node);
 
+/*! 2017. 5. 6 study -ing */
 static void __kthread_bind(struct task_struct *p, unsigned int cpu, long state)
 {
 	/* Must have done schedule() in kthread() before we set_task_cpu */
@@ -363,6 +367,7 @@ EXPORT_SYMBOL(kthread_bind);
  * Description: This helper function creates and names a kernel thread
  * The thread will be woken and put into park mode.
  */
+/*! 2017. 5. 6 study -ing */
 struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
 					  void *data, unsigned int cpu,
 					  const char *namefmt)
@@ -380,6 +385,7 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
 	return p;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void __kthread_unpark(struct task_struct *k, struct kthread *kthread)
 {
 	clear_bit(KTHREAD_SHOULD_PARK, &kthread->flags);
@@ -404,6 +410,7 @@ static void __kthread_unpark(struct task_struct *k, struct kthread *kthread)
  * waits for it to return. If the thread is marked percpu then its
  * bound to the cpu again.
  */
+/*! 2017. 5. 6 study -ing */
 void kthread_unpark(struct task_struct *k)
 {
 	struct kthread *kthread = to_live_kthread(k);
@@ -424,6 +431,7 @@ void kthread_unpark(struct task_struct *k)
  * Returns 0 if the thread is parked, -ENOSYS if the thread exited.
  * If called by the kthread itself just the park bit is set.
  */
+/*! 2017. 5. 6 study -ing */
 int kthread_park(struct task_struct *k)
 {
 	struct kthread *kthread = to_live_kthread(k);

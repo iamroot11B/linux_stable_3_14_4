@@ -399,12 +399,14 @@ static inline void flush_cache_vunmap(unsigned long start, unsigned long end)
  * There is no __cpuc_clean_dcache_area but we use it anyway for
  * code intent clarity, and alias it to __cpuc_flush_dcache_area.
  */
+/*! 2017. 5. 6 study -ing */
 #define __cpuc_clean_dcache_area __cpuc_flush_dcache_area
 
 /*
  * Ensure preceding writes to *p by this CPU are visible to
  * subsequent reads by other CPUs:
  */
+/*! 2017. 5. 6 study -ing */
 static inline void __sync_cache_range_w(volatile void *p, size_t size)
 {
 	char *_p = (char *)p;
@@ -419,6 +421,7 @@ static inline void __sync_cache_range_w(volatile void *p, size_t size)
  * discard data simultaneously written by another CPU, hence the
  * usage of flush rather than invalidate operations.
  */
+/*! 2017. 5. 6 study -ing */
 static inline void __sync_cache_range_r(volatile void *p, size_t size)
 {
 	char *_p = (char *)p;
@@ -440,7 +443,9 @@ static inline void __sync_cache_range_r(volatile void *p, size_t size)
 	__cpuc_flush_dcache_area(_p, size);
 }
 
+/*! 2017. 5. 6 study -ing */
 #define sync_cache_w(ptr) __sync_cache_range_w(ptr, sizeof *(ptr))
+/*! 2017. 5. 6 study -ing */
 #define sync_cache_r(ptr) __sync_cache_range_r(ptr, sizeof *(ptr))
 
 /*

@@ -135,6 +135,7 @@ void update_rq_clock(struct rq *rq)
 #define SCHED_FEAT(name, enabled)	\
 	(1UL << __SCHED_FEAT_##name) * enabled |
 
+/*! kernel/sched/features.h */
 const_debug unsigned int sysctl_sched_features =
 #include "features.h"
 	0;
@@ -503,6 +504,7 @@ static inline void init_rq_hrtick(struct rq *rq)
 {
 }
 
+/*! 2016.07.09 study -ing */
 static inline void init_hrtick(void)
 {
 }
@@ -1158,6 +1160,7 @@ static int migration_cpu_stop(void *data);
  * smp_call_function() if an IPI is sent by the same process we are
  * waiting to become inactive.
  */
+/*! 2017. 5. 6 study later */
 unsigned long wait_task_inactive(struct task_struct *p, long match_state)
 {
 	unsigned long flags;
@@ -1716,6 +1719,7 @@ int wake_up_process(struct task_struct *p)
 }
 EXPORT_SYMBOL(wake_up_process);
 
+/*! 2017. 5. 6 study -ing */
 int wake_up_state(struct task_struct *p, unsigned int state)
 {
 	return try_to_wake_up(p, state, 0);
@@ -2679,6 +2683,7 @@ pick_next_task(struct rq *rq)
  *          - return from syscall or exception to user-space
  *          - return from interrupt-handler to user-space
  */
+/*! 2016.10.15 study later */
 static void __sched __schedule(void)
 {
 	struct task_struct *prev, *next;
@@ -3302,6 +3307,7 @@ static bool check_same_owner(struct task_struct *p)
 	return match;
 }
 
+/*! 2017. 5. 6 study later */
 static int __sched_setscheduler(struct task_struct *p,
 				const struct sched_attr *attr,
 				bool user)
@@ -3509,6 +3515,7 @@ change:
 	return 0;
 }
 
+/*! 2017. 5. 6 study -ing */
 static int _sched_setscheduler(struct task_struct *p, int policy,
 			       const struct sched_param *param, bool check)
 {
@@ -3565,6 +3572,7 @@ EXPORT_SYMBOL_GPL(sched_setattr);
  *
  * Return: 0 on success. An error code otherwise.
  */
+/*! 2017. 5. 6 study -ing */
 int sched_setscheduler_nocheck(struct task_struct *p, int policy,
 			       const struct sched_param *param)
 {
@@ -4992,6 +5000,7 @@ static void unregister_sched_domain_sysctl(void)
 		sd_free_ctl_entry(&sd_ctl_dir[0].child);
 }
 #else
+/*! 2017. 5. 6 study -ing */
 static void register_sched_domain_sysctl(void)
 {
 }
@@ -5298,6 +5307,7 @@ static inline bool sched_debug(void)
 }
 #endif /* CONFIG_SCHED_DEBUG */
 
+/*! 2017. 5. 6 study -ing */
 static int sd_degenerate(struct sched_domain *sd)
 {
 	if (cpumask_weight(sched_domain_span(sd)) == 1)
@@ -5321,6 +5331,7 @@ static int sd_degenerate(struct sched_domain *sd)
 	return 1;
 }
 
+/*! 2017. 5. 6 study -ing */
 static int
 sd_parent_degenerate(struct sched_domain *sd, struct sched_domain *parent)
 {
@@ -5350,16 +5361,19 @@ sd_parent_degenerate(struct sched_domain *sd, struct sched_domain *parent)
 	return 1;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void free_rootdomain(struct rcu_head *rcu)
 {
 	struct root_domain *rd = container_of(rcu, struct root_domain, rcu);
 
+	/*! 아래 다 Do nothing */
 	cpupri_cleanup(&rd->cpupri);
 	cpudl_cleanup(&rd->cpudl);
 	free_cpumask_var(rd->dlo_mask);
 	free_cpumask_var(rd->rto_mask);
 	free_cpumask_var(rd->online);
 	free_cpumask_var(rd->span);
+	/*! rd만 free */
 	kfree(rd);
 }
 /*! 2016.07.09 study -ing */
@@ -5456,6 +5470,7 @@ static void init_defrootdomain(void)
 	atomic_set(&def_root_domain.refcount, 1);
 }
 
+/*! 2017. 5. 6 study -ing */
 static struct root_domain *alloc_rootdomain(void)
 {
 	struct root_domain *rd;
@@ -5472,6 +5487,7 @@ static struct root_domain *alloc_rootdomain(void)
 	return rd;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void free_sched_groups(struct sched_group *sg, int free_sgp)
 {
 	struct sched_group *tmp, *first;
@@ -5491,6 +5507,7 @@ static void free_sched_groups(struct sched_group *sg, int free_sgp)
 	} while (sg != first);
 }
 
+/*! 2017. 5. 6 study -ing */
 static void free_sched_domain(struct rcu_head *rcu)
 {
 	struct sched_domain *sd = container_of(rcu, struct sched_domain, rcu);
@@ -5508,6 +5525,7 @@ static void free_sched_domain(struct rcu_head *rcu)
 	kfree(sd);
 }
 
+/*! 2017. 5. 6 study -ing */
 static void destroy_sched_domain(struct sched_domain *sd, int cpu)
 {
 	call_rcu(&sd->rcu, free_sched_domain);
@@ -5535,6 +5553,7 @@ DEFINE_PER_CPU(struct sched_domain *, sd_numa);
 DEFINE_PER_CPU(struct sched_domain *, sd_busy);
 DEFINE_PER_CPU(struct sched_domain *, sd_asym);
 
+/*! 2017. 5. 6 study -ing */
 static void update_top_cache_domain(int cpu)
 {
 	struct sched_domain *sd;
@@ -5565,6 +5584,7 @@ static void update_top_cache_domain(int cpu)
  * Attach the domain 'sd' to 'cpu' as its base domain. Callers must
  * hold the hotplug lock.
  */
+/*! 2017. 5. 6 study -ing */
 static void
 cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 {
@@ -5675,6 +5695,7 @@ struct sched_domain_topology_level {
  * cpu they're built on, so check that.
  *
  */
+/*! 2017. 5. 6 study -ing */
 static void build_group_mask(struct sched_domain *sd, struct sched_group *sg)
 {
 	const struct cpumask *span = sched_domain_span(sd);
@@ -5695,11 +5716,13 @@ static void build_group_mask(struct sched_domain *sd, struct sched_group *sg)
  * Return the canonical balance cpu for this group, this is the first cpu
  * of this group that's also in the iteration mask.
  */
+/*! 2017. 5. 6 study -ing */
 int group_balance_cpu(struct sched_group *sg)
 {
 	return cpumask_first_and(sched_group_cpus(sg), sched_group_mask(sg));
 }
 
+/*! 2017. 5. 6 study -ing */
 static int
 build_overlap_sched_groups(struct sched_domain *sd, int cpu)
 {
@@ -5777,6 +5800,7 @@ fail:
 	return -ENOMEM;
 }
 
+/*! 2017. 5. 6 study -ing */
 static int get_group(int cpu, struct sd_data *sdd, struct sched_group **sg)
 {
 	struct sched_domain *sd = *per_cpu_ptr(sdd->sd, cpu);
@@ -5801,6 +5825,7 @@ static int get_group(int cpu, struct sd_data *sdd, struct sched_group **sg)
  *
  * Assumes the sched_domain tree is fully constructed
  */
+/*! 2017. 5. 6 study -ing */
 static int
 build_sched_groups(struct sched_domain *sd, int cpu)
 {
@@ -5862,6 +5887,7 @@ build_sched_groups(struct sched_domain *sd, int cpu)
  * having more cpu_power will pickup more load compared to the group having
  * less cpu_power.
  */
+/*! 2017. 5. 6 study -ing */
 static void init_sched_groups_power(int cpu, struct sched_domain *sd)
 {
 	struct sched_group *sg = sd->groups;
@@ -5930,6 +5956,7 @@ static int __init setup_relax_domain_level(char *str)
 }
 __setup("relax_domain_level=", setup_relax_domain_level);
 
+/*! 2017. 5. 6 study -ing */
 static void set_domain_attribute(struct sched_domain *sd,
 				 struct sched_domain_attr *attr)
 {
@@ -5954,6 +5981,7 @@ static void set_domain_attribute(struct sched_domain *sd,
 static void __sdt_free(const struct cpumask *cpu_map);
 static int __sdt_alloc(const struct cpumask *cpu_map);
 
+/*! 2017. 5. 6 study -ing */
 static void __free_domain_allocs(struct s_data *d, enum s_alloc what,
 				 const struct cpumask *cpu_map)
 {
@@ -5970,6 +5998,7 @@ static void __free_domain_allocs(struct s_data *d, enum s_alloc what,
 	}
 }
 
+/*! 2017. 5. 6 study -ing */
 static enum s_alloc __visit_domain_allocation_hell(struct s_data *d,
 						   const struct cpumask *cpu_map)
 {
@@ -5991,6 +6020,7 @@ static enum s_alloc __visit_domain_allocation_hell(struct s_data *d,
  * sched_group structure so that the subsequent __free_domain_allocs()
  * will not free the data we're using.
  */
+/*! 2017. 5. 6 study -ing */
 static void claim_allocations(int cpu, struct sched_domain *sd)
 {
 	struct sd_data *sdd = sd->private;
@@ -6031,6 +6061,7 @@ static struct sched_domain_topology_level default_topology[] = {
 
 static struct sched_domain_topology_level *sched_domain_topology = default_topology;
 
+/*! 2017. 5. 6 study -ing */
 #define for_each_sd_topology(tl)			\
 	for (tl = sched_domain_topology; tl->init; tl++)
 
@@ -6315,6 +6346,7 @@ static int sched_domains_numa_masks_update(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 #else
+/*! 2017. 5. 6 study -ing */
 static inline void sched_init_numa(void)
 {
 }
@@ -6327,11 +6359,16 @@ static int sched_domains_numa_masks_update(struct notifier_block *nfb,
 }
 #endif /* CONFIG_NUMA */
 
+/*! 2017. 5. 6 study -ing */
 static int __sdt_alloc(const struct cpumask *cpu_map)
 {
 	struct sched_domain_topology_level *tl;
 	int j;
 
+	/*! for (tl = sched_domain_topology; tl->init; tl++)
+	 * 6025 line의 default_topology를 참고
+	 * vexpress : 	{ sd_init_CPU, cpu_cpu_mask, }
+	 */
 	for_each_sd_topology(tl) {
 		struct sd_data *sdd = &tl->data;
 
@@ -6352,7 +6389,7 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
 			struct sched_group *sg;
 			struct sched_group_power *sgp;
 
-		       	sd = kzalloc_node(sizeof(struct sched_domain) + cpumask_size(),
+			sd = kzalloc_node(sizeof(struct sched_domain) + cpumask_size(),
 					GFP_KERNEL, cpu_to_node(j));
 			if (!sd)
 				return -ENOMEM;
@@ -6380,6 +6417,7 @@ static int __sdt_alloc(const struct cpumask *cpu_map)
 	return 0;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void __sdt_free(const struct cpumask *cpu_map)
 {
 	struct sched_domain_topology_level *tl;
@@ -6412,14 +6450,21 @@ static void __sdt_free(const struct cpumask *cpu_map)
 	}
 }
 
+/*! 2017. 5. 6 study -ing */
 struct sched_domain *build_sched_domain(struct sched_domain_topology_level *tl,
 		const struct cpumask *cpu_map, struct sched_domain_attr *attr,
 		struct sched_domain *child, int cpu)
 {
+	/*! NUMA가 아닌 vexpress에서는 init : sd_init_CPU
+	 * SD_INIT_FUNC(CPU)
+	 */
 	struct sched_domain *sd = tl->init(tl, cpu);
 	if (!sd)
 		return child;
 
+	/*! NUMA가 아닌 vexpress에서는 mask : cpu_cpu_mask
+	 * --> return cpu_online_mask
+	 */
 	cpumask_and(sched_domain_span(sd), cpu_map, tl->mask(cpu));
 	if (child) {
 		sd->level = child->level + 1;
@@ -6436,6 +6481,7 @@ struct sched_domain *build_sched_domain(struct sched_domain_topology_level *tl,
  * Build sched domains for a given set of cpus and attach the sched domains
  * to the individual cpus
  */
+/*! 2017. 5. 6 study -ing */
 static int build_sched_domains(const struct cpumask *cpu_map,
 			       struct sched_domain_attr *attr)
 {
@@ -6520,11 +6566,13 @@ static cpumask_var_t fallback_doms;
  * cpu core maps. It is supposed to return 1 if the topology changed
  * or 0 if it stayed the same.
  */
+/*! 2017. 5. 6 study -ing */
 int __attribute__((weak)) arch_update_cpu_topology(void)
 {
 	return 0;
 }
 
+/*! 2017. 5. 6 study -ing */
 cpumask_var_t *alloc_sched_domains(unsigned int ndoms)
 {
 	int i;
@@ -6542,6 +6590,7 @@ cpumask_var_t *alloc_sched_domains(unsigned int ndoms)
 	return doms;
 }
 
+/*! 2017. 5. 6 study -ing */
 void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms)
 {
 	unsigned int i;
@@ -6555,6 +6604,7 @@ void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms)
  * For now this just excludes isolated cpus, but could be used to
  * exclude other special cases in the future.
  */
+/*! 2017. 5. 6 study -ing */
 static int init_sched_domains(const struct cpumask *cpu_map)
 {
 	int err;
@@ -6752,13 +6802,16 @@ static int cpuset_cpu_inactive(struct notifier_block *nfb, unsigned long action,
 	return NOTIFY_OK;
 }
 
+/*! 2017. 5. 6 study -ing */
 void __init sched_init_smp(void)
 {
 	cpumask_var_t non_isolated_cpus;
 
+	/*! return true */
 	alloc_cpumask_var(&non_isolated_cpus, GFP_KERNEL);
 	alloc_cpumask_var(&fallback_doms, GFP_KERNEL);
 
+	/*! Do nothing */
 	sched_init_numa();
 
 	/*

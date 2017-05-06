@@ -210,6 +210,7 @@ int cpudl_init(struct cpudl *cp)
  * cpudl_cleanup - clean up the cpudl structure
  * @cp: the cpudl max-heap context
  */
+/*! 2017. 5. 6 study -ing */
 void cpudl_cleanup(struct cpudl *cp)
 {
 	/*

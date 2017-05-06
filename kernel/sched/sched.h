@@ -718,6 +718,7 @@ extern int migrate_swap(struct task_struct *, struct task_struct *);
  *
  * Returns the highest sched_domain of a cpu which contains the given flag.
  */
+/*! 2017. 5. 6 study -ing */
 static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 {
 	struct sched_domain *sd, *hsd = NULL;
@@ -731,6 +732,7 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 	return hsd;
 }
 
+/*! 2017. 5. 6 study -ing */
 static inline struct sched_domain *lowest_flag_domain(int cpu, int flag)
 {
 	struct sched_domain *sd;
@@ -784,6 +786,7 @@ struct sched_group {
 	unsigned long cpumask[0];
 };
 
+/*! 2017. 5. 6 study -ing */
 static inline struct cpumask *sched_group_cpus(struct sched_group *sg)
 {
 	return to_cpumask(sg->cpumask);
@@ -793,6 +796,7 @@ static inline struct cpumask *sched_group_cpus(struct sched_group *sg)
  * cpumask masking which cpus in the group are allowed to iterate up the domain
  * tree.
  */
+/*! 2017. 5. 6 study -ing */
 static inline struct cpumask *sched_group_mask(struct sched_group *sg)
 {
 	return to_cpumask(sg->sgp->cpumask);
@@ -925,6 +929,9 @@ static __always_inline bool static_branch_##name(struct static_key *key) \
 extern struct static_key sched_feat_keys[__SCHED_FEAT_NR];
 #define sched_feat(x) (static_branch_##x(&sched_feat_keys[__SCHED_FEAT_##x]))
 #else /* !(SCHED_DEBUG && HAVE_JUMP_LABEL) */
+/*! core.c의 sysctl_sched_features
+ * __SCHED_FEAT_ 매크로는 __SCHED_FEAT_NR 가 포함된 enum
+ */
 #define sched_feat(x) (sysctl_sched_features & (1UL << __SCHED_FEAT_##x))
 #endif /* SCHED_DEBUG && HAVE_JUMP_LABEL */
 

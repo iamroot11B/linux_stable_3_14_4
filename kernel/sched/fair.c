@@ -140,6 +140,7 @@ static inline void update_load_set(struct load_weight *lw, unsigned long w)
  *
  * This idea comes from the SD scheduler of Con Kolivas:
  */
+/*! 2017. 5. 6 study -ing */
 static int get_update_sysctl_factor(void)
 {
 	unsigned int cpus = min_t(int, num_online_cpus(), 8);
@@ -161,6 +162,7 @@ static int get_update_sysctl_factor(void)
 	return factor;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void update_sysctl(void)
 {
 	unsigned int factor = get_update_sysctl_factor();
@@ -173,6 +175,7 @@ static void update_sysctl(void)
 #undef SET_SYSCTL
 }
 
+/*! 2017. 5. 6 study -ing */
 void sched_init_granularity(void)
 {
 	update_sysctl();
@@ -3802,6 +3805,7 @@ static unsigned long target_load(int cpu, int type)
 	return max(rq->cpu_load[type-1], total);
 }
 
+/*! 2017. 5. 6 study -ing */
 static unsigned long power_of(int cpu)
 {
 	return cpu_rq(cpu)->cpu_power;
@@ -5336,6 +5340,7 @@ static void update_cpu_power(struct sched_domain *sd, int cpu)
 	sdg->sgp->power = power;
 }
 
+/*! 2017. 5. 6 study -ing */
 void update_group_power(struct sched_domain *sd, int cpu)
 {
 	struct sched_domain *child = sd->child;

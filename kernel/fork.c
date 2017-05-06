@@ -1653,6 +1653,7 @@ long do_fork(unsigned long clone_flags,
 /*
  * Create a kernel thread.
  */
+/*! 2017. 4.30 study later */
 pid_t kernel_thread(int (*fn)(void *), void *arg, unsigned long flags)
 {
 	return do_fork(flags|CLONE_VM|CLONE_UNTRACED, (unsigned long)fn,

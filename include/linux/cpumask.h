@@ -102,6 +102,7 @@ extern const struct cpumask *const cpu_active_mask;
 /*! 2017. 4.30 study -ing */
 #define cpu_online(cpu)		cpumask_test_cpu((cpu), cpu_online_mask)
 #define cpu_possible(cpu)	cpumask_test_cpu((cpu), cpu_possible_mask)
+/*! 2017. 5. 6 study -ing */
 #define cpu_present(cpu)	cpumask_test_cpu((cpu), cpu_present_mask)
 #define cpu_active(cpu)		cpumask_test_cpu((cpu), cpu_active_mask)
 #else
@@ -170,6 +171,7 @@ static inline unsigned int cpumask_any_but(const struct cpumask *mask,
  *
  * Returns >= nr_cpu_ids if no cpus set.
  */
+/*! 2017. 5. 6 study -ing */
 static inline unsigned int cpumask_first(const struct cpumask *srcp)
 {
 	return find_first_bit(cpumask_bits(srcp), nr_cpumask_bits);
@@ -410,6 +412,7 @@ static inline void cpumask_xor(struct cpumask *dstp,
  *
  * If *@dstp is empty, returns 0, else returns 1
  */
+/*! 2017. 5. 6 study -ing */
 static inline int cpumask_andnot(struct cpumask *dstp,
 				  const struct cpumask *src1p,
 				  const struct cpumask *src2p)
@@ -775,6 +778,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
 /*! 2016-04-02 study -ing */
 #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
 #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
+/*! 2017. 5. 6 study -ing */
 #define for_each_present_cpu(cpu)  for_each_cpu((cpu), cpu_present_mask)
 
 /* Wrappers for arch boot code to manipulate normally-constant masks */

@@ -392,6 +392,7 @@ EXPORT_SYMBOL_GPL(raw_notifier_chain_unregister);
  *	Otherwise the return value is the return value
  *	of the last notifier function called.
  */
+/*! 2017. 5. 6 study -ing */
 int __raw_notifier_call_chain(struct raw_notifier_head *nh,
 			      unsigned long val, void *v,
 			      int nr_to_call, int *nr_calls)

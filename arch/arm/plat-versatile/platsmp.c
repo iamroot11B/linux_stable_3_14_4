@@ -23,6 +23,7 @@
  * observers, irrespective of whether they're taking part in coherency
  * or not.  This is necessary for the hotplug code to work reliably.
  */
+/*! 2017. 5. 6 study -ing */
 static void write_pen_release(int val)
 {
 	pen_release = val;
@@ -47,6 +48,7 @@ void versatile_secondary_init(unsigned int cpu)
 	spin_unlock(&boot_lock);
 }
 
+/*! 2017. 5. 6 study -ing */
 int versatile_boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
 	unsigned long timeout;
@@ -72,6 +74,7 @@ int versatile_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	 */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
 
+	/*! 1 HZ 뒤에 timeout */
 	timeout = jiffies + (1 * HZ);
 	while (time_before(jiffies, timeout)) {
 		smp_rmb();

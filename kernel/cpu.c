@@ -30,11 +30,13 @@ static DEFINE_MUTEX(cpu_add_remove_lock);
  * The following two API's must be used when attempting
  * to serialize the updates to cpu_online_mask, cpu_present_mask.
  */
+/*! 2017. 5. 6 study -ing */
 void cpu_maps_update_begin(void)
 {
 	mutex_lock(&cpu_add_remove_lock);
 }
 
+/*! 2017. 5. 6 study -ing */
 void cpu_maps_update_done(void)
 {
 	mutex_unlock(&cpu_add_remove_lock);
@@ -118,10 +120,12 @@ EXPORT_SYMBOL_GPL(put_online_cpus);
  * get_online_cpus() not an api which is called all that often.
  *
  */
+/*! 2017. 5. 6 study -ing */
 void cpu_hotplug_begin(void)
 {
 	cpu_hotplug.active_writer = current;
 
+	/*! refcount가 0일 때 까지 기다림 */
 	for (;;) {
 		mutex_lock(&cpu_hotplug.lock);
 		if (likely(!cpu_hotplug.refcount))
@@ -132,6 +136,7 @@ void cpu_hotplug_begin(void)
 	}
 }
 
+/*! 2017. 5. 6 study -ing */
 void cpu_hotplug_done(void)
 {
 	cpu_hotplug.active_writer = NULL;
@@ -180,6 +185,7 @@ int __ref register_cpu_notifier(struct notifier_block *nb)
 	return ret;
 }
 
+/*! 2017. 5. 6 study -ing */
 static int __cpu_notify(unsigned long val, void *v, int nr_to_call,
 			int *nr_calls)
 {
@@ -191,6 +197,7 @@ static int __cpu_notify(unsigned long val, void *v, int nr_to_call,
 	return notifier_to_errno(ret);
 }
 
+/*! 2017. 5. 6 study -ing */
 static int cpu_notify(unsigned long val, void *v)
 {
 	return __cpu_notify(val, v, -1, NULL);
@@ -397,6 +404,7 @@ EXPORT_SYMBOL(cpu_down);
 #endif /*CONFIG_HOTPLUG_CPU*/
 
 /* Requires cpu_add_remove_lock to be held */
+/*! 2017. 5. 6 study -ing */
 static int _cpu_up(unsigned int cpu, int tasks_frozen)
 {
 	int ret, nr_calls = 0;
@@ -466,11 +474,16 @@ int cpu_up(unsigned int cpu)
 	}
 
 	/*! 2017. 4.30 study end */
+	/*! 2017. 5. 6 study start */
 
+	/*! cpu_to_node -> return 0
+	 * try_online_node -> return 0
+	 */
 	err = try_online_node(cpu_to_node(cpu));
 	if (err)
 		return err;
 
+	/*! 락 cpu_add_remove_lock*/
 	cpu_maps_update_begin();
 
 	if (cpu_hotplug_disabled) {
@@ -481,6 +494,7 @@ int cpu_up(unsigned int cpu)
 	err = _cpu_up(cpu, 0);
 
 out:
+	/*! 언락 cpu_add_remove_lock*/
 	cpu_maps_update_done();
 	return err;
 }

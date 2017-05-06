@@ -46,11 +46,14 @@ static inline void outer_inv_range(phys_addr_t start, phys_addr_t end)
 	if (outer_cache.inv_range)
 		outer_cache.inv_range(start, end);
 }
+/*! 2017. 5. 6 study -ing */
 static inline void outer_clean_range(phys_addr_t start, phys_addr_t end)
 {
+	/*! clean_range를 초기화하지 않는 것 같음 */
 	if (outer_cache.clean_range)
 		outer_cache.clean_range(start, end);
 }
+/*! 2017. 5. 6 study -ing */
 static inline void outer_flush_range(phys_addr_t start, phys_addr_t end)
 {
 	if (outer_cache.flush_range)

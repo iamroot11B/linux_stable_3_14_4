@@ -24,6 +24,7 @@
  */
 static DEFINE_PER_CPU(struct task_struct *, idle_threads);
 
+/*! 2017. 5. 6 study -ing */
 struct task_struct *idle_thread_get(unsigned int cpu)
 {
 	struct task_struct *tsk = per_cpu(idle_threads, cpu);
@@ -166,6 +167,7 @@ static int smpboot_thread_fn(void *data)
 	}
 }
 
+/*! 2017. 5. 6 study -ing */
 static int
 __smpboot_create_thread(struct smp_hotplug_thread *ht, unsigned int cpu)
 {
@@ -204,6 +206,7 @@ __smpboot_create_thread(struct smp_hotplug_thread *ht, unsigned int cpu)
 	return 0;
 }
 
+/*! 2017. 5. 6 study -ing */
 int smpboot_create_threads(unsigned int cpu)
 {
 	struct smp_hotplug_thread *cur;
@@ -219,6 +222,7 @@ int smpboot_create_threads(unsigned int cpu)
 	return ret;
 }
 
+/*! 2017. 5. 6 study -ing */
 static void smpboot_unpark_thread(struct smp_hotplug_thread *ht, unsigned int cpu)
 {
 	struct task_struct *tsk = *per_cpu_ptr(ht->store, cpu);
@@ -228,6 +232,7 @@ static void smpboot_unpark_thread(struct smp_hotplug_thread *ht, unsigned int cp
 	kthread_unpark(tsk);
 }
 
+/*! 2017. 5. 6 study -ing */
 void smpboot_unpark_threads(unsigned int cpu)
 {
 	struct smp_hotplug_thread *cur;

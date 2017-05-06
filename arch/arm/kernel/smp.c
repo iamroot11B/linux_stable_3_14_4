@@ -85,6 +85,7 @@ void __init smp_set_ops(struct smp_operations *ops)
 		smp_ops = *ops;
 };
 
+/*! 2017. 5. 6 study -ing */
 static unsigned long get_arch_pgd(pgd_t *pgd)
 {
 	phys_addr_t pgdir = virt_to_idmap(pgd);
@@ -92,6 +93,7 @@ static unsigned long get_arch_pgd(pgd_t *pgd)
 	return pgdir >> ARCH_PGD_SHIFT;
 }
 
+/*! 2017. 5. 6 study -ing */
 int __cpu_up(unsigned int cpu, struct task_struct *idle)
 {
 	int ret;
@@ -99,6 +101,9 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 	/*
 	 * We need to tell the secondary core where to find
 	 * its stack and the page tables.
+	 */
+	/*! task_stack_page(idle) : idle->stack
+	 * THREAD_START_SP : 8
 	 */
 	secondary_data.stack = task_stack_page(idle) + THREAD_START_SP;
 #ifdef CONFIG_ARM_MPU
@@ -147,8 +152,13 @@ void __init smp_init_cpus(void)
 		smp_ops.smp_init_cpus();
 }
 
+/*! 2017. 5. 6 study -ing */
 int boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
+	/*!
+	 * exynos : exynos_boot_secondary
+	 * vexpress : versatile_boot_secondary
+	 */
 	if (smp_ops.smp_boot_secondary)
 		return smp_ops.smp_boot_secondary(cpu, idle);
 	return -ENOSYS;
@@ -395,6 +405,7 @@ asmlinkage void secondary_start_kernel(void)
 	cpu_startup_entry(CPUHP_ONLINE);
 }
 
+/*! 2017. 5. 6 study -ing */
 void __init smp_cpus_done(unsigned int max_cpus)
 {
 	printk(KERN_INFO "SMP: Total of %d processors activated.\n",
@@ -461,8 +472,10 @@ void arch_send_call_function_ipi_mask(const struct cpumask *mask)
 	smp_cross_call(mask, IPI_CALL_FUNC);
 }
 
+/*! 2017. 5. 6 study -ing */
 void arch_send_wakeup_ipi_mask(const struct cpumask *mask)
 {
+	/*! 본 파일 464 line 참고 : gic_raise_softirq */
 	smp_cross_call(mask, IPI_WAKEUP);
 }
 

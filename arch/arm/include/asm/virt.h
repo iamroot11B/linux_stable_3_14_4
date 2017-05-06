@@ -42,6 +42,7 @@
  */
 extern int __boot_cpu_mode;
 
+/*! 2017. 5. 6 study -ing */
 static inline void sync_boot_mode(void)
 {
 	/*

@@ -1096,6 +1096,8 @@ static noinline void __init kernel_init_freeable(void)
 	smp_init();
 	sched_init_smp();
 
+	/*! 2017. 5. 6 study end */
+
 	do_basic_setup();
 
 	/* Open the /dev/console on the rootfs, this should never fail */
