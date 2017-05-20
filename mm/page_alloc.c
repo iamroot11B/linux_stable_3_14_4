@@ -3006,6 +3006,7 @@ void __free_pages(struct page *page, unsigned int order)
 
 EXPORT_SYMBOL(__free_pages);
 
+/*! 2017. 5.20 study -ing */
 void free_pages(unsigned long addr, unsigned int order)
 {
 	if (addr != 0) {

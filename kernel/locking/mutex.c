@@ -44,6 +44,7 @@
  */
 #define	MUTEX_SHOW_NO_WAITER(mutex)	(atomic_read(&(mutex)->count) >= 0)
 
+/*! 2017. 5.20 study -ing */
 void
 __mutex_init(struct mutex *lock, const char *name, struct lock_class_key *key)
 {
@@ -858,6 +859,7 @@ __ww_mutex_lock_interruptible_slowpath(struct ww_mutex *lock,
  * Spinlock based trylock, we take the spinlock and check whether we
  * can get the lock:
  */
+/*! 2017. 5.20 study -ing */
 static inline int __mutex_trylock_slowpath(atomic_t *lock_count)
 {
 	struct mutex *lock = container_of(lock_count, struct mutex, count);
@@ -895,6 +897,7 @@ static inline int __mutex_trylock_slowpath(atomic_t *lock_count)
  * This function must not be used in interrupt context. The
  * mutex must be released by the same task that acquired it.
  */
+/*! 2017. 5.20 study -ing */
 int __sched mutex_trylock(struct mutex *lock)
 {
 	int ret;

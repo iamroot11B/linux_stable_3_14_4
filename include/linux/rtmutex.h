@@ -63,6 +63,7 @@ struct hrtimer_sleeper;
 #else
 # define __DEBUG_RT_MUTEX_INITIALIZER(mutexname)
 # define rt_mutex_init(mutex)			__rt_mutex_init(mutex, NULL)
+/*! 2017. 5.20 study -ing */
 # define rt_mutex_debug_task_free(t)			do { } while (0)
 #endif
 

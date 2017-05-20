@@ -90,6 +90,7 @@ struct mutex_waiter {
  *
  * It is not allowed to initialize an already locked mutex.
  */
+/*! 2017. 5.20 study -ing */
 # define mutex_init(mutex) \
 do {							\
 	static struct lock_class_key __key;		\

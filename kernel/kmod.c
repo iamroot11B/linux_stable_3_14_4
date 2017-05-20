@@ -734,6 +734,7 @@ struct ctl_table usermodehelper_table[] = {
 	{ }
 };
 
+/*! 2017. 5.20 study -ing */
 void __init usermodehelper_init(void)
 {
 	khelper_wq = create_singlethread_workqueue("khelper");

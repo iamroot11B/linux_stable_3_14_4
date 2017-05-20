@@ -1176,6 +1176,7 @@ EXPORT_SYMBOL_GPL(device_add);
  * if it returned an error! Always use put_device() to give up the
  * reference initialized in this function instead.
  */
+/*! 2017. 5.20 study -ing */
 int device_register(struct device *dev)
 {
 	device_initialize(dev);

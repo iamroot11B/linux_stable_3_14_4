@@ -445,6 +445,7 @@ EXPORT_SYMBOL(__idr_get_new_above);
  *	if (id < 0)
  *		error;
  */
+/*! 2017. 5.20 study -ing */
 void idr_preload(gfp_t gfp_mask)
 {
 	/*
@@ -865,6 +866,7 @@ EXPORT_SYMBOL(idr_get_next);
  *
  * The caller must serialize with writers.
  */
+/*! 2017. 5.20 study -ing */
 void *idr_replace(struct idr *idp, void *ptr, int id)
 {
 	int n;

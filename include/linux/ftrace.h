@@ -759,6 +759,7 @@ static inline void unpause_graph_tracing(void)
 #define INIT_FTRACE_GRAPH
 
 static inline void ftrace_graph_init_task(struct task_struct *t) { }
+/*! 2017. 5.20 study -ing */
 static inline void ftrace_graph_exit_task(struct task_struct *t) { }
 /*! 2016.07.09 study -ing */
 static inline void ftrace_graph_init_idle_task(struct task_struct *t, int cpu) { }

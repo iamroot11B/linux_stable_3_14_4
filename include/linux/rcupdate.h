@@ -508,9 +508,11 @@ static inline void rcu_preempt_sleep_check(void)
 #define rcu_dereference_sparse(p, space) \
 	((void)(((typeof(*p) space *)p) == p))
 #else /* #ifdef __CHECKER__ */
+/*! 2017. 5.20 study -ing */
 #define rcu_dereference_sparse(p, space)
 #endif /* #else #ifdef __CHECKER__ */
 
+/*! 2017. 5.20 study -ing */
 #define __rcu_access_pointer(p, space) \
 	({ \
 		typeof(*p) *_________p1 = (typeof(*p)*__force )ACCESS_ONCE(p); \
@@ -624,6 +626,7 @@ static inline void rcu_preempt_sleep_check(void)
  * when tearing down multi-linked structures after a grace period
  * has elapsed.
  */
+/*! 2017. 5.20 study -ing */
 #define rcu_access_pointer(p) __rcu_access_pointer((p), __rcu)
 
 /**

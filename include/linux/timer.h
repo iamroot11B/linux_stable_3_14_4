@@ -100,6 +100,7 @@ extern void init_timer_on_stack_key(struct timer_list *timer,
 				    struct lock_class_key *key);
 extern void destroy_timer_on_stack(struct timer_list *timer);
 #else
+/*! 2017. 5.20 study -ing */
 static inline void destroy_timer_on_stack(struct timer_list *timer) { }
 static inline void init_timer_on_stack_key(struct timer_list *timer,
 					   unsigned int flags, const char *name,
@@ -127,12 +128,14 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
 #define __init_timer(_timer, _flags)					\
 	init_timer_key((_timer), (_flags), NULL, NULL)
 
+/*! 2017. 5.20 study -ing */
 #define __init_timer_on_stack(_timer, _flags)				\
 	init_timer_on_stack_key((_timer), (_flags), NULL, NULL)
 #endif
 
 #define init_timer(timer)						\
 	__init_timer((timer), 0)
+/*! 2017. 5.20 study -ing */
 #define init_timer_deferrable(timer)					\
 	__init_timer((timer), TIMER_DEFERRABLE)
 #define init_timer_on_stack(timer)					\
@@ -146,6 +149,7 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
 		(_timer)->data = (_data);				\
 	} while (0)
 
+/*! 2017. 5.20 study -ing */
 #define __setup_timer_on_stack(_timer, _fn, _data, _flags)		\
 	do {								\
 		__init_timer_on_stack((_timer), (_flags));		\
@@ -153,8 +157,10 @@ static inline void init_timer_on_stack_key(struct timer_list *timer,
 		(_timer)->data = (_data);				\
 	} while (0)
 
+/*! 2017. 5.20 study -ing */
 #define setup_timer(timer, fn, data)					\
 	__setup_timer((timer), (fn), (data), 0)
+/*! 2017. 5.20 study -ing */
 #define setup_timer_on_stack(timer, fn, data)				\
 	__setup_timer_on_stack((timer), (fn), (data), 0)
 #define setup_deferrable_timer_on_stack(timer, fn, data)		\
@@ -250,6 +256,7 @@ extern int try_to_del_timer_sync(struct timer_list *timer);
 #ifdef CONFIG_SMP
   extern int del_timer_sync(struct timer_list *timer);
 #else
+/*! 2017. 5.20 study -ing */
 # define del_timer_sync(t)		del_timer(t)
 #endif
 

@@ -92,6 +92,7 @@ void idr_init(struct idr *idp);
  * Each idr_preload() should be matched with an invocation of this
  * function.  See idr_preload() for details.
  */
+/*! 2017. 5.20 study -ing */
 static inline void idr_preload_end(void)
 {
 	preempt_enable();

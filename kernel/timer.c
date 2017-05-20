@@ -581,6 +581,7 @@ static inline void debug_timer_assert_init(struct timer_list *timer)
 static void do_init_timer(struct timer_list *timer, unsigned int flags,
 			  const char *name, struct lock_class_key *key);
 
+/*! 2017. 5.20 study -ing */
 void init_timer_on_stack_key(struct timer_list *timer, unsigned int flags,
 			     const char *name, struct lock_class_key *key)
 {
@@ -1430,6 +1431,7 @@ SYSCALL_DEFINE1(alarm, unsigned int, seconds)
 
 #endif
 
+/*! 2017. 5.20 study -ing */
 static void process_timeout(unsigned long __data)
 {
 	wake_up_process((struct task_struct *)__data);
@@ -1461,6 +1463,7 @@ static void process_timeout(unsigned long __data)
  *
  * In all cases the return value is guaranteed to be non-negative.
  */
+/*! 2017. 5.20 study -ing */
 signed long __sched schedule_timeout(signed long timeout)
 {
 	struct timer_list timer;
@@ -1503,6 +1506,7 @@ signed long __sched schedule_timeout(signed long timeout)
 	del_singleshot_timer_sync(&timer);
 
 	/* Remove the timer from the object tracker */
+	/*! Do nothing */
 	destroy_timer_on_stack(&timer);
 
 	timeout = expire - jiffies;

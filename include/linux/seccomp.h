@@ -78,6 +78,7 @@ extern void put_seccomp_filter(struct task_struct *tsk);
 extern void get_seccomp_filter(struct task_struct *tsk);
 extern u32 seccomp_bpf_load(int off);
 #else  /* CONFIG_SECCOMP_FILTER */
+/*! 2017. 5.20 study -ing */
 static inline void put_seccomp_filter(struct task_struct *tsk)
 {
 	return;

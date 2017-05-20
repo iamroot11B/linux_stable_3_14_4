@@ -17,6 +17,7 @@
  * Call the driver model init functions to initialize their
  * subsystems. Called early from init/main.c.
  */
+/*! 2017. 5.20 study -ing */
 void __init driver_init(void)
 {
 	/* These are the core pieces */

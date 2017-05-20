@@ -26,6 +26,7 @@ extern void taskstats_init_early(void);
 #else
 static inline void taskstats_exit(struct task_struct *tsk, int group_dead)
 {}
+/*! 2017. 5.20 study -ing */
 static inline void taskstats_tgid_free(struct signal_struct *sig)
 {}
 /*! 2017. 4.30 study -ing */

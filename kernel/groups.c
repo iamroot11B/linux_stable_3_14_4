@@ -50,6 +50,7 @@ out_undo_partial_alloc:
 
 EXPORT_SYMBOL(groups_alloc);
 
+/*! 2017. 5.20 study -ing */
 void groups_free(struct group_info *group_info)
 {
 	if (group_info->blocks[0] != group_info->small_block) {

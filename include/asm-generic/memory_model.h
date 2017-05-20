@@ -72,6 +72,7 @@
 
 /*! 2016.10.29 study -ing */
 #define page_to_pfn __page_to_pfn
+/*! 2017. 5.20 study -ing */
 #define pfn_to_page __pfn_to_page
 
 #endif /* __ASSEMBLY__ */

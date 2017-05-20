@@ -373,10 +373,11 @@ static int handle(const char *name, umode_t mode, kuid_t uid, kgid_t gid,
 		return handle_remove(name, dev);
 }
 
-static int devtmpfsd(void *p)
+\static int devtmpfsd(void *p)
 {
 	char options[] = "mode=0755";
 	int *err = p;
+	/*! sys_unshare는 fork.c의 "SYSCALL_DEFINE1(unshare" 를 참조 */
 	*err = sys_unshare(CLONE_NEWNS);
 	if (*err)
 		goto out;
@@ -415,6 +416,7 @@ out:
  * Create devtmpfs instance, driver-core devices will add their device
  * nodes here.
  */
+/*! 2017. 5.20 study -ing */
 int __init devtmpfs_init(void)
 {
 	int err = register_filesystem(&dev_fs_type);
@@ -423,6 +425,8 @@ int __init devtmpfs_init(void)
 		       "type %i\n", err);
 		return err;
 	}
+
+	/*! 2017. 5.20 study end */
 
 	thread = kthread_run(devtmpfsd, &err, "kdevtmpfs");
 	if (!IS_ERR(thread)) {

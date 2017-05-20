@@ -56,6 +56,7 @@ static inline struct group_info *get_group_info(struct group_info *gi)
  * put_group_info - Release a reference to a group info structure
  * @group_info: The group info to release
  */
+/*! 2017. 5.20 study -ing */
 #define put_group_info(group_info)			\
 do {							\
 	if (atomic_dec_and_test(&(group_info)->usage))	\
@@ -185,6 +186,7 @@ do {								\
 
 extern void validate_creds_for_do_exit(struct task_struct *);
 #else
+/*! 2017. 5.20 study -ing */
 static inline void validate_creds(const struct cred *cred)
 {
 }
@@ -240,6 +242,7 @@ static inline const struct cred *get_cred(const struct cred *cred)
  * on task_struct are attached by const pointers to prevent accidental
  * alteration of otherwise immutable credential sets.
  */
+/*! 2017. 5.20 study -ing */
 static inline void put_cred(const struct cred *_cred)
 {
 	struct cred *cred = (struct cred *) _cred;

@@ -115,6 +115,7 @@ int nr_processes(void)
 	return total;
 }
 
+/*! 2017. 5.20 study -ing */
 void __weak arch_release_task_struct(struct task_struct *tsk)
 {
 }
@@ -127,12 +128,14 @@ static inline struct task_struct *alloc_task_struct_node(int node)
 	return kmem_cache_alloc_node(task_struct_cachep, GFP_KERNEL, node);
 }
 
+/*! 2017. 5.20 study -ing */
 static inline void free_task_struct(struct task_struct *tsk)
 {
 	kmem_cache_free(task_struct_cachep, tsk);
 }
 #endif
 
+/*! 2017. 5.20 study -ing */
 void __weak arch_release_thread_info(struct thread_info *ti)
 {
 }
@@ -166,6 +169,7 @@ static struct thread_info *alloc_thread_info_node(struct task_struct *tsk,
 	return kmem_cache_alloc_node(thread_info_cache, THREADINFO_GFP, node);
 }
 
+/*! 2017. 5.20 study -ing */
 static void free_thread_info(struct thread_info *ti)
 {
 	kmem_cache_free(thread_info_cache, ti);
@@ -199,6 +203,7 @@ struct kmem_cache *vm_area_cachep;
 /* SLAB cache for mm_struct structures (tsk->mm) */
 static struct kmem_cache *mm_cachep;
 
+/*! 2017. 5.20 study -ing */
 static void account_kernel_stack(struct thread_info *ti, int account)
 {
 	struct zone *zone = page_zone(virt_to_page(ti));
@@ -206,40 +211,53 @@ static void account_kernel_stack(struct thread_info *ti, int account)
 	mod_zone_page_state(zone, NR_KERNEL_STACK, account);
 }
 
+/*! 2017. 5.20 study -ing */
 void free_task(struct task_struct *tsk)
 {
 	account_kernel_stack(tsk->stack, -1);
+	/*! Do nothing */
 	arch_release_thread_info(tsk->stack);
 	free_thread_info(tsk->stack);
+	/*! Do nothing */
 	rt_mutex_debug_task_free(tsk);
+	/*! Do nothing */
 	ftrace_graph_exit_task(tsk);
+	/*! Do nothing */
 	put_seccomp_filter(tsk);
+	/*! Do nothing */
 	arch_release_task_struct(tsk);
 	free_task_struct(tsk);
 }
 EXPORT_SYMBOL(free_task);
 
+/*! 2017. 5.20 study -ing */
 static inline void free_signal_struct(struct signal_struct *sig)
 {
+	/*! Do nothing */
 	taskstats_tgid_free(sig);
+	/*! Do nothing */
 	sched_autogroup_exit(sig);
 	kmem_cache_free(signal_cachep, sig);
 }
 
+/*! 2017. 5.20 study -ing */
 static inline void put_signal_struct(struct signal_struct *sig)
 {
 	if (atomic_dec_and_test(&sig->sigcnt))
 		free_signal_struct(sig);
 }
 
+/*! 2017. 5.20 study -ing */
 void __put_task_struct(struct task_struct *tsk)
 {
 	WARN_ON(!tsk->exit_state);
 	WARN_ON(atomic_read(&tsk->usage));
 	WARN_ON(tsk == current);
 
+	/*! Do nothing */
 	security_task_free(tsk);
 	exit_creds(tsk);
+	/*! Do nothing */
 	delayacct_tsk_free(tsk);
 	put_signal_struct(tsk->signal);
 

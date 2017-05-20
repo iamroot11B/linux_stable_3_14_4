@@ -534,6 +534,7 @@ static inline void debug_work_deactivate(struct work_struct *work) { }
  * Returns 0 if ID in [0, WORK_OFFQ_POOL_NONE) is allocated and assigned
  * successfully, -errno on failure.
  */
+/*! 2017. 5.20 study -ing */
 static int worker_pool_assign_id(struct worker_pool *pool)
 {
 	int ret;
@@ -625,6 +626,7 @@ static void set_work_pool_and_keep_pending(struct work_struct *work,
 		      WORK_STRUCT_PENDING);
 }
 
+/*! 2017. 5.20 study -ing */
 static void set_work_pool_and_clear_pending(struct work_struct *work,
 					    int pool_id)
 {
@@ -743,18 +745,21 @@ static bool __need_more_worker(struct worker_pool *pool)
  * function will always return %true for unbound pools as long as the
  * worklist isn't empty.
  */
+/*! 2017. 5.20 study -ing */
 static bool need_more_worker(struct worker_pool *pool)
 {
 	return !list_empty(&pool->worklist) && __need_more_worker(pool);
 }
 
 /* Can I start working?  Called from busy but !running workers. */
+/*! 2017. 5.20 study -ing */
 static bool may_start_working(struct worker_pool *pool)
 {
 	return pool->nr_idle;
 }
 
 /* Do I need to keep working?  Called from currently running workers. */
+/*! 2017. 5.20 study -ing */
 static bool keep_working(struct worker_pool *pool)
 {
 	return !list_empty(&pool->worklist) &&
@@ -762,12 +767,14 @@ static bool keep_working(struct worker_pool *pool)
 }
 
 /* Do we need a new worker?  Called from manager. */
+/*! 2017. 5.20 study -ing */
 static bool need_to_create_worker(struct worker_pool *pool)
 {
 	return need_more_worker(pool) && !may_start_working(pool);
 }
 
 /* Do I need to be the manager? */
+/*! 2017. 5.20 study -ing */
 static bool need_to_manage_workers(struct worker_pool *pool)
 {
 	return need_to_create_worker(pool) ||
@@ -775,6 +782,7 @@ static bool need_to_manage_workers(struct worker_pool *pool)
 }
 
 /* Do we have too many workers and should some go away? */
+/*! 2017. 5.20 study -ing */
 static bool too_many_workers(struct worker_pool *pool)
 {
 	bool managing = mutex_is_locked(&pool->manager_arb);
@@ -908,6 +916,7 @@ struct task_struct *wq_worker_sleeping(struct task_struct *task, int cpu)
  * CONTEXT:
  * spin_lock_irq(pool->lock)
  */
+/*! 2017. 5.20 study -ing */
 static inline void worker_set_flags(struct worker *worker, unsigned int flags,
 				    bool wakeup)
 {
@@ -943,6 +952,7 @@ static inline void worker_set_flags(struct worker *worker, unsigned int flags,
  * CONTEXT:
  * spin_lock_irq(pool->lock)
  */
+/*! 2017. 5.20 study -ing */
 static inline void worker_clr_flags(struct worker *worker, unsigned int flags)
 {
 	struct worker_pool *pool = worker->pool;
@@ -1100,6 +1110,7 @@ static void put_pwq(struct pool_workqueue *pwq)
  *
  * put_pwq() with locking.  This function also allows %NULL @pwq.
  */
+/*! 2017. 5.20 study -ing */
 static void put_pwq_unlocked(struct pool_workqueue *pwq)
 {
 	if (pwq) {
@@ -1610,6 +1621,7 @@ EXPORT_SYMBOL_GPL(mod_delayed_work_on);
  * LOCKING:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 5.20 study -ing */
 static void worker_enter_idle(struct worker *worker)
 {
 	struct worker_pool *pool = worker->pool;
@@ -1650,6 +1662,7 @@ static void worker_enter_idle(struct worker *worker)
  * LOCKING:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 5.20 study -ing */
 static void worker_leave_idle(struct worker *worker)
 {
 	struct worker_pool *pool = worker->pool;
@@ -1693,6 +1706,7 @@ static void worker_leave_idle(struct worker *worker)
  * %true if the associated pool is online (@worker is successfully
  * bound), %false if offline.
  */
+/*! 2017. 5.20 study -ing */
 static bool worker_maybe_bind_and_lock(struct worker_pool *pool)
 __acquires(&pool->lock)
 {
@@ -1725,6 +1739,7 @@ __acquires(&pool->lock)
 	}
 }
 
+/*! 2017. 5.20 study -ing */
 static struct worker *alloc_worker(void)
 {
 	struct worker *worker;
@@ -1753,6 +1768,7 @@ static struct worker *alloc_worker(void)
  * Return:
  * Pointer to the newly created worker.
  */
+/*! 2017. 5.20 study -ing */
 static struct worker *create_worker(struct worker_pool *pool)
 {
 	struct worker *worker = NULL;
@@ -1838,6 +1854,7 @@ fail:
  * CONTEXT:
  * spin_lock_irq(pool->lock).
  */
+/*! 2017. 5.20 study -ing */
 static void start_worker(struct worker *worker)
 {
 	worker->flags |= WORKER_STARTED;
@@ -1854,6 +1871,7 @@ static void start_worker(struct worker *worker)
  *
  * Return: 0 on success. A negative error code otherwise.
  */
+/*! 2017. 5.20 study -ing */
 static int create_and_start_worker(struct worker_pool *pool)
 {
 	struct worker *worker;
@@ -1881,6 +1899,7 @@ static int create_and_start_worker(struct worker_pool *pool)
  * CONTEXT:
  * spin_lock_irq(pool->lock) which is released and regrabbed.
  */
+/*! 2017. 5.20 study -ing */
 static void destroy_worker(struct worker *worker)
 {
 	struct worker_pool *pool = worker->pool;
@@ -1918,6 +1937,7 @@ static void destroy_worker(struct worker *worker)
 	spin_lock_irq(&pool->lock);
 }
 
+/*! 2017. 5.20 study -ing */
 static void idle_worker_timeout(unsigned long __pool)
 {
 	struct worker_pool *pool = (void *)__pool;
@@ -1944,6 +1964,7 @@ static void idle_worker_timeout(unsigned long __pool)
 	spin_unlock_irq(&pool->lock);
 }
 
+/*! 2017. 5.20 study -ing */
 static void send_mayday(struct work_struct *work)
 {
 	struct pool_workqueue *pwq = get_work_pwq(work);
@@ -1961,6 +1982,7 @@ static void send_mayday(struct work_struct *work)
 	}
 }
 
+/*! 2017. 5.20 study -ing */
 static void pool_mayday_timeout(unsigned long __pool)
 {
 	struct worker_pool *pool = (void *)__pool;
@@ -2008,6 +2030,7 @@ static void pool_mayday_timeout(unsigned long __pool)
  * %false if no action was taken and pool->lock stayed locked, %true
  * otherwise.
  */
+/*! 2017. 5.20 study -ing */
 static bool maybe_create_worker(struct worker_pool *pool)
 __releases(&pool->lock)
 __acquires(&pool->lock)
@@ -2065,6 +2088,7 @@ restart:
  * %false if no action was taken and pool->lock stayed locked, %true
  * otherwise.
  */
+/*! 2017. 5.20 study -ing */
 static bool maybe_destroy_workers(struct worker_pool *pool)
 {
 	bool ret = false;
@@ -2111,6 +2135,7 @@ static bool maybe_destroy_workers(struct worker_pool *pool)
  * conditions that the caller verified while holding the lock before
  * calling the function might no longer be true.
  */
+/*! 2017. 5.20 study -ing */
 static bool manage_workers(struct worker *worker)
 {
 	struct worker_pool *pool = worker->pool;
@@ -2179,6 +2204,7 @@ static bool manage_workers(struct worker *worker)
  * CONTEXT:
  * spin_lock_irq(pool->lock) which is released and regrabbed.
  */
+/*! 2017. 5.20 study -ing */
 static void process_one_work(struct worker *worker, struct work_struct *work)
 __releases(&pool->lock)
 __acquires(&pool->lock)
@@ -2312,6 +2338,7 @@ __acquires(&pool->lock)
  * spin_lock_irq(pool->lock) which may be released and regrabbed
  * multiple times.
  */
+/*! 2017. 5.20 study -ing */
 static void process_scheduled_works(struct worker *worker)
 {
 	while (!list_empty(&worker->scheduled)) {
@@ -2333,6 +2360,7 @@ static void process_scheduled_works(struct worker *worker)
  *
  * Return: 0
  */
+/*! 2017. 5.20 study -ing */
 static int worker_thread(void *__worker)
 {
 	struct worker *worker = __worker;
@@ -2433,6 +2461,7 @@ sleep:
  *
  * Return: 0
  */
+/*! 2017. 5.20 study -ing */
 static int rescuer_thread(void *__rescuer)
 {
 	struct worker *rescuer = __rescuer;
@@ -3404,6 +3433,7 @@ static void wq_device_release(struct device *dev)
  *
  * Return: 0 on success, -errno on failure.
  */
+/*! 2017. 5.20 study -ing */
 int workqueue_sysfs_register(struct workqueue_struct *wq)
 {
 	struct wq_device *wq_dev;
@@ -3482,6 +3512,7 @@ static void workqueue_sysfs_unregister(struct workqueue_struct *wq)	{ }
  *
  * Undo alloc_workqueue_attrs().
  */
+/*! 2017. 5.20 study -ing */
 void free_workqueue_attrs(struct workqueue_attrs *attrs)
 {
 	if (attrs) {
@@ -3499,6 +3530,7 @@ void free_workqueue_attrs(struct workqueue_attrs *attrs)
  *
  * Return: The allocated new workqueue_attr on success. %NULL on failure.
  */
+/*! 2017. 5.20 study -ing */
 struct workqueue_attrs *alloc_workqueue_attrs(gfp_t gfp_mask)
 {
 	struct workqueue_attrs *attrs;
@@ -3516,6 +3548,7 @@ fail:
 	return NULL;
 }
 
+/*! 2017. 5.20 study -ing */
 static void copy_workqueue_attrs(struct workqueue_attrs *to,
 				 const struct workqueue_attrs *from)
 {
@@ -3530,10 +3563,13 @@ static void copy_workqueue_attrs(struct workqueue_attrs *to,
 }
 
 /* hash value of the content of @attr */
+/*! 2017. 5.20 study -ing */
 static u32 wqattrs_hash(const struct workqueue_attrs *attrs)
 {
 	u32 hash = 0;
 
+	/*! 2017. 5.20 study later */
+	/*! hash는 지금 안본다. */
 	hash = jhash_1word(attrs->nice, hash);
 	hash = jhash(cpumask_bits(attrs->cpumask),
 		     BITS_TO_LONGS(nr_cpumask_bits) * sizeof(long), hash);
@@ -3541,6 +3577,7 @@ static u32 wqattrs_hash(const struct workqueue_attrs *attrs)
 }
 
 /* content equality test */
+/*! 2017. 5.20 study -ing */
 static bool wqattrs_equal(const struct workqueue_attrs *a,
 			  const struct workqueue_attrs *b)
 {
@@ -3561,6 +3598,7 @@ static bool wqattrs_equal(const struct workqueue_attrs *a,
  * inside @pool proper are initialized and put_unbound_pool() can be called
  * on @pool safely to release it.
  */
+/*! 2017. 5.20 study -ing */
 static int init_worker_pool(struct worker_pool *pool)
 {
 	spin_lock_init(&pool->lock);
@@ -3593,6 +3631,7 @@ static int init_worker_pool(struct worker_pool *pool)
 	return 0;
 }
 
+/*! 2017. 5.20 study -ing */
 static void rcu_free_pool(struct rcu_head *rcu)
 {
 	struct worker_pool *pool = container_of(rcu, struct worker_pool, rcu);
@@ -3613,6 +3652,7 @@ static void rcu_free_pool(struct rcu_head *rcu)
  *
  * Should be called with wq_pool_mutex held.
  */
+/*! 2017. 5.20 study -ing */
 static void put_unbound_pool(struct worker_pool *pool)
 {
 	struct worker *worker;
@@ -3671,6 +3711,7 @@ static void put_unbound_pool(struct worker_pool *pool)
  * Return: On success, a worker_pool with the same attributes as @attrs.
  * On failure, %NULL.
  */
+/*! 2017. 5.20 study -ing */
 static struct worker_pool *get_unbound_pool(const struct workqueue_attrs *attrs)
 {
 	u32 hash = wqattrs_hash(attrs);
@@ -3787,6 +3828,7 @@ static void pwq_unbound_release_workfn(struct work_struct *work)
  * workqueue's saved_max_active and activate delayed work items
  * accordingly.  If @pwq is freezing, clear @pwq->max_active to zero.
  */
+/*! 2017. 5.20 study -ing */
 static void pwq_adjust_max_active(struct pool_workqueue *pwq)
 {
 	struct workqueue_struct *wq = pwq->wq;
@@ -3821,6 +3863,7 @@ static void pwq_adjust_max_active(struct pool_workqueue *pwq)
 }
 
 /* initialize newly alloced @pwq which is associated with @wq and @pool */
+/*! 2017. 5.20 study -ing */
 static void init_pwq(struct pool_workqueue *pwq, struct workqueue_struct *wq,
 		     struct worker_pool *pool)
 {
@@ -3835,10 +3878,12 @@ static void init_pwq(struct pool_workqueue *pwq, struct workqueue_struct *wq,
 	INIT_LIST_HEAD(&pwq->delayed_works);
 	INIT_LIST_HEAD(&pwq->pwqs_node);
 	INIT_LIST_HEAD(&pwq->mayday_node);
+	/*! 2017. 5.20 study later */
 	INIT_WORK(&pwq->unbound_release_work, pwq_unbound_release_workfn);
 }
 
 /* sync @pwq with the current state of its associated wq and link it */
+/*! 2017. 5.20 study -ing */
 static void link_pwq(struct pool_workqueue *pwq)
 {
 	struct workqueue_struct *wq = pwq->wq;
@@ -3863,6 +3908,7 @@ static void link_pwq(struct pool_workqueue *pwq)
 }
 
 /* obtain a pool matching @attr and create a pwq associating the pool and @wq */
+/*! 2017. 5.20 study -ing */
 static struct pool_workqueue *alloc_unbound_pwq(struct workqueue_struct *wq,
 					const struct workqueue_attrs *attrs)
 {
@@ -3886,6 +3932,7 @@ static struct pool_workqueue *alloc_unbound_pwq(struct workqueue_struct *wq,
 }
 
 /* undo alloc_unbound_pwq(), used only in the error path */
+/*! 2017. 5.20 study -ing */
 static void free_unbound_pwq(struct pool_workqueue *pwq)
 {
 	lockdep_assert_held(&wq_pool_mutex);
@@ -3918,6 +3965,7 @@ static void free_unbound_pwq(struct pool_workqueue *pwq)
  * Return: %true if the resulting @cpumask is different from @attrs->cpumask,
  * %false if equal.
  */
+/*! 2017. 5.20 study -ing */
 static bool wq_calc_node_cpumask(const struct workqueue_attrs *attrs, int node,
 				 int cpu_going_down, cpumask_t *cpumask)
 {
@@ -3942,6 +3990,7 @@ use_dfl:
 }
 
 /* install @pwq into @wq's numa_pwq_tbl[] for @node and return the old pwq */
+/*! 2017. 5.20 study -ing */
 static struct pool_workqueue *numa_pwq_tbl_install(struct workqueue_struct *wq,
 						   int node,
 						   struct pool_workqueue *pwq)
@@ -3974,6 +4023,7 @@ static struct pool_workqueue *numa_pwq_tbl_install(struct workqueue_struct *wq,
  *
  * Return: 0 on success and -errno on failure.
  */
+/*! 2017. 5.20 study -ing */
 int apply_workqueue_attrs(struct workqueue_struct *wq,
 			  const struct workqueue_attrs *attrs)
 {
@@ -4176,6 +4226,7 @@ out_unlock:
 	put_pwq_unlocked(old_pwq);
 }
 
+/*! 2017. 5.20 study -ing */
 static int alloc_and_link_pwqs(struct workqueue_struct *wq)
 {
 	bool highpri = wq->flags & WQ_HIGHPRI;
@@ -4211,6 +4262,7 @@ static int alloc_and_link_pwqs(struct workqueue_struct *wq)
 	}
 }
 
+/*! 2017. 5.20 study -ing */
 static int wq_clamp_max_active(int max_active, unsigned int flags,
 			       const char *name)
 {
@@ -4223,6 +4275,7 @@ static int wq_clamp_max_active(int max_active, unsigned int flags,
 	return clamp_val(max_active, 1, lim);
 }
 
+/*! 2017. 5.20 study -ing */
 struct workqueue_struct *__alloc_workqueue_key(const char *fmt,
 					       unsigned int flags,
 					       int max_active,

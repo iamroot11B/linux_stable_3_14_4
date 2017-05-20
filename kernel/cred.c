@@ -72,6 +72,7 @@ static inline int read_cred_subscribers(const struct cred *cred)
 #endif
 }
 
+/*! 2017. 5.20 study -ing */
 static inline void alter_cred_subscribers(const struct cred *_cred, int n)
 {
 #ifdef CONFIG_DEBUG_CREDENTIALS
@@ -84,6 +85,7 @@ static inline void alter_cred_subscribers(const struct cred *_cred, int n)
 /*
  * The RCU callback to actually dispose of a set of credentials
  */
+/*! 2017. 5.20 study -ing */
 static void put_cred_rcu(struct rcu_head *rcu)
 {
 	struct cred *cred = container_of(rcu, struct cred, rcu);
@@ -105,6 +107,7 @@ static void put_cred_rcu(struct rcu_head *rcu)
 		      cred, atomic_read(&cred->usage));
 #endif
 
+	/*! Do nothing */
 	security_cred_free(cred);
 	key_put(cred->session_keyring);
 	key_put(cred->process_keyring);
@@ -123,6 +126,7 @@ static void put_cred_rcu(struct rcu_head *rcu)
  *
  * Destroy a set of credentials on which no references remain.
  */
+/*! 2017. 5.20 study -ing */
 void __put_cred(struct cred *cred)
 {
 	kdebug("__put_cred(%p{%d,%d})", cred,
@@ -145,6 +149,7 @@ EXPORT_SYMBOL(__put_cred);
 /*
  * Clean up a task's credentials when it exits
  */
+/*! 2017. 5.20 study -ing */
 void exit_creds(struct task_struct *tsk)
 {
 	struct cred *cred;
@@ -155,7 +160,9 @@ void exit_creds(struct task_struct *tsk)
 
 	cred = (struct cred *) tsk->real_cred;
 	tsk->real_cred = NULL;
+	/*! Do nothing */
 	validate_creds(cred);
+	/*! Do nothing */
 	alter_cred_subscribers(cred, -1);
 	put_cred(cred);
 

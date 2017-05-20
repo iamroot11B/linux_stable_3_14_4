@@ -191,6 +191,7 @@ static inline int atomic_cmpxchg(atomic_t *v, int old, int new)
 
 #endif /* __LINUX_ARM_ARCH__ */
 
+/*! 2017. 5.20 study -ing */
 #define atomic_xchg(v, new) (xchg(&((v)->counter), new))
 /*! 2017. 2.11 study -ing */
 static inline int __atomic_add_unless(atomic_t *v, int a, int u)

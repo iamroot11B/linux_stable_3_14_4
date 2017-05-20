@@ -84,6 +84,7 @@ static inline int unshare_userns(unsigned long unshare_flags,
 	return 0;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline void put_user_ns(struct user_namespace *ns)
 {
 }

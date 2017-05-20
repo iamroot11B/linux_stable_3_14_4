@@ -358,6 +358,7 @@ enum {
 };
 
 /* unbound wq's aren't per-cpu, scale max_active according to #cpus */
+/*! 2017. 5.20 study -ing */
 #define WQ_UNBOUND_MAX_ACTIVE	\
 	max_t(int, WQ_MAX_ACTIVE, num_possible_cpus() * WQ_MAX_UNBOUND_PER_CPU)
 
@@ -439,6 +440,7 @@ __alloc_workqueue_key(const char *fmt, unsigned int flags, int max_active,
 			      &__key, __lock_name, ##args);		\
 })
 #else
+/*! 2017. 5.20 study -ing */
 #define alloc_workqueue(fmt, flags, max_active, args...)		\
 	__alloc_workqueue_key((fmt), (flags), (max_active),		\
 			      NULL, NULL, ##args)
@@ -465,6 +467,7 @@ __alloc_workqueue_key(const char *fmt, unsigned int flags, int max_active,
 #define create_freezable_workqueue(name)				\
 	alloc_workqueue("%s", WQ_FREEZABLE | WQ_UNBOUND | WQ_MEM_RECLAIM, \
 			1, (name))
+/*! 2017. 5.20 study -ing */
 #define create_singlethread_workqueue(name)				\
 	alloc_workqueue("%s", WQ_UNBOUND | WQ_MEM_RECLAIM, 1, (name))
 

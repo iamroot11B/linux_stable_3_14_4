@@ -164,6 +164,7 @@ void profile_task_exit(struct task_struct *task)
 	blocking_notifier_call_chain(&task_exit_notifier, 0, task);
 }
 
+/*! 2017. 5.20 study -ing */
 int profile_handoff_task(struct task_struct *task)
 {
 	int ret;

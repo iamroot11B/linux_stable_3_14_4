@@ -15,6 +15,7 @@
 #define __mutex_fastpath_lock_retval(count)		(-1)
 /*! 2016-06-04 study -ing */
 #define __mutex_fastpath_unlock(count, fail_fn)		fail_fn(count)
+/*! 2017. 5.20 study -ing */
 #define __mutex_fastpath_trylock(count, fail_fn)	fail_fn(count)
 #define __mutex_slowpath_needs_to_unlock()		1
 

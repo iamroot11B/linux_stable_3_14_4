@@ -959,6 +959,7 @@ static void __init do_initcalls(void)
  *
  * Now we can finally start doing some real work..
  */
+/*! 2017. 5.20 study -ing */
 static void __init do_basic_setup(void)
 {
 	cpuset_init_smp();
@@ -1097,6 +1098,7 @@ static noinline void __init kernel_init_freeable(void)
 	sched_init_smp();
 
 	/*! 2017. 5. 6 study end */
+	/*! 2017. 5.20 study start */
 
 	do_basic_setup();
 

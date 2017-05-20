@@ -78,6 +78,7 @@ static struct kthread *to_live_kthread(struct task_struct *k)
  * and this will return true.  You should then return, and your return
  * value will be passed through to kthread_stop().
  */
+/*! 2017. 5.20 study -ing */
 bool kthread_should_stop(void)
 {
 	return test_bit(KTHREAD_SHOULD_STOP, &to_kthread(current)->flags);
@@ -465,6 +466,7 @@ int kthread_park(struct task_struct *k)
  * Returns the result of threadfn(), or %-EINTR if wake_up_process()
  * was never called.
  */
+/*! 2017. 5.20 study -ing */
 int kthread_stop(struct task_struct *k)
 {
 	struct kthread *kthread;

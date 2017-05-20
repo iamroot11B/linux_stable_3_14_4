@@ -174,6 +174,7 @@ EXPORT_SYMBOL_GPL(atomic_notifier_chain_unregister);
  *	Otherwise the return value is the return value
  *	of the last notifier function called.
  */
+/*! 2017. 5.20 study -ing */
 int __kprobes __atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 					unsigned long val, void *v,
 					int nr_to_call, int *nr_calls)
@@ -187,6 +188,7 @@ int __kprobes __atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 }
 EXPORT_SYMBOL_GPL(__atomic_notifier_call_chain);
 
+/*! 2017. 5.20 study -ing */
 int __kprobes atomic_notifier_call_chain(struct atomic_notifier_head *nh,
 		unsigned long val, void *v)
 {

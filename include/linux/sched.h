@@ -1768,6 +1768,7 @@ extern void free_task(struct task_struct *tsk);
 
 extern void __put_task_struct(struct task_struct *t);
 
+/*! 2017. 5.20 study -ing */
 static inline void put_task_struct(struct task_struct *t)
 {
 	if (atomic_dec_and_test(&t->usage))
@@ -2090,6 +2091,7 @@ extern int proc_sched_autogroup_set_nice(struct task_struct *p, int nice);
 #else
 static inline void sched_autogroup_create_attach(struct task_struct *p) { }
 static inline void sched_autogroup_detach(struct task_struct *p) { }
+/*! 2017. 5.20 study -ing */
 static inline void sched_autogroup_fork(struct signal_struct *sig) { }
 static inline void sched_autogroup_exit(struct signal_struct *sig) { }
 #endif

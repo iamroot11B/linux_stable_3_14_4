@@ -397,6 +397,7 @@ static inline void lockdep_on(void)
 		do { (void)(key); (void)(name); } while (0)
 #define lockdep_set_class_and_subclass(lock, key, sub) \
 		do { (void)(key); } while (0)
+/*! 2017. 5.20 study -ing */
 #define lockdep_set_subclass(lock, sub)		do { } while (0)
 /*! 2016.10.22 study -ing */
 #define lockdep_set_novalidate_class(lock) do { } while (0)
@@ -514,6 +515,7 @@ static inline void print_irqtrace_events(struct task_struct *curr)
 /*! 2016.10.15 study -ing */
 #define seqcount_release(l, n, i)		lock_release(l, n, i)
 
+/*! 2017. 5.20 study -ing */
 #define mutex_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
 #define mutex_acquire_nest(l, s, t, n, i)	lock_acquire_exclusive(l, s, t, n, i)
 #define mutex_release(l, n, i)			lock_release(l, n, i)
@@ -526,6 +528,7 @@ static inline void print_irqtrace_events(struct task_struct *curr)
 #define rwsem_release(l, n, i)			lock_release(l, n, i)
 /*! 2017. 3.18 study -ing */
 #define lock_map_acquire(l)			lock_acquire_exclusive(l, 0, 0, NULL, _THIS_IP_)
+/*! 2017. 5.20 study -ing */
 #define lock_map_acquire_read(l)		lock_acquire_shared_recursive(l, 0, 0, NULL, _THIS_IP_)
 /*! 2017. 3.18 study -ing */
 #define lock_map_release(l)			lock_release(l, 1, _THIS_IP_)

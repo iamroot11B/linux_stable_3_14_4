@@ -96,21 +96,25 @@ static inline int fair_policy(int policy)
 	return policy == SCHED_NORMAL || policy == SCHED_BATCH;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int rt_policy(int policy)
 {
 	return policy == SCHED_FIFO || policy == SCHED_RR;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int dl_policy(int policy)
 {
 	return policy == SCHED_DEADLINE;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int task_has_rt_policy(struct task_struct *p)
 {
 	return rt_policy(p->policy);
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int task_has_dl_policy(struct task_struct *p)
 {
 	return dl_policy(p->policy);
@@ -960,11 +964,13 @@ static inline u64 global_rt_runtime(void)
 	return (u64)sysctl_sched_rt_runtime * NSEC_PER_USEC;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int task_current(struct rq *rq, struct task_struct *p)
 {
 	return rq->curr == p;
 }
 
+/*! 2017. 5.20 study -ing */
 static inline int task_running(struct rq *rq, struct task_struct *p)
 {
 #ifdef CONFIG_SMP

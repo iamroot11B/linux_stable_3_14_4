@@ -27,6 +27,7 @@
 #define hash_min(val, bits)							\
 	(sizeof(val) <= 4 ? hash_32(val, bits) : hash_long(val, bits))
 
+/*! 2017. 5.20 study -ing */
 static inline void __hash_init(struct hlist_head *ht, unsigned int sz)
 {
 	unsigned int i;
@@ -45,6 +46,7 @@ static inline void __hash_init(struct hlist_head *ht, unsigned int sz)
  * This has to be a macro since HASH_BITS() will not work on pointers since
  * it calculates the size during preprocessing.
  */
+/*! 2017. 5.20 study -ing */
 #define hash_init(hashtable) __hash_init(hashtable, HASH_SIZE(hashtable))
 
 /**

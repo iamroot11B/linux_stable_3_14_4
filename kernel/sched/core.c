@@ -345,6 +345,7 @@ static void __task_rq_unlock(struct rq *rq)
 	raw_spin_unlock(&rq->lock);
 }
 
+/*! 2017. 5.20 study -ing */
 static inline void
 task_rq_unlock(struct rq *rq, struct task_struct *p, unsigned long *flags)
 	__releases(rq->lock)
@@ -933,6 +934,7 @@ static inline int normal_prio(struct task_struct *p)
  * interactivity modifiers. Will be RT if the task got
  * RT-boosted. If not then it returns p->normal_prio.
  */
+/*! 2017. 5.20 study -ing */
 static int effective_prio(struct task_struct *p)
 {
 	p->normal_prio = normal_prio(p);
@@ -3028,6 +3030,7 @@ out_unlock:
 }
 #endif
 
+/*! 2017. 5.20 study -ing */
 void set_user_nice(struct task_struct *p, long nice)
 {
 	int old_prio, delta, on_rq;
