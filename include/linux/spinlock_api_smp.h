@@ -66,7 +66,7 @@ _raw_spin_unlock_irqrestore(raw_spinlock_t *lock, unsigned long flags)
 #ifdef CONFIG_INLINE_SPIN_TRYLOCK_BH
 #define _raw_spin_trylock_bh(lock) __raw_spin_trylock_bh(lock)
 #endif
-
+/*! 2017. 6. 3 study -ing */
 #ifndef CONFIG_UNINLINE_SPIN_UNLOCK
 #define _raw_spin_unlock(lock) __raw_spin_unlock(lock)
 #endif
@@ -156,7 +156,7 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock)
 }
 
 #endif /* !CONFIG_GENERIC_LOCKBREAK || CONFIG_DEBUG_LOCK_ALLOC */
-
+/*! 2017. 6. 3 study -ing */
 static inline void __raw_spin_unlock(raw_spinlock_t *lock)
 {
 	spin_release(&lock->dep_map, 1, _RET_IP_);

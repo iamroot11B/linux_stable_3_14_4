@@ -147,6 +147,7 @@ struct net *copy_net_ns(unsigned long flags, struct user_namespace *user_ns,
 #else /* CONFIG_NET_NS */
 #include <linux/sched.h>
 #include <linux/nsproxy.h>
+/*! 2017. 6. 3 study -ing */
 static inline struct net *copy_net_ns(unsigned long flags,
 	struct user_namespace *user_ns, struct net *old_net)
 {
@@ -206,12 +207,12 @@ int net_eq(const struct net *net1, const struct net *net2)
 void net_drop_ns(void *);
 
 #else
-
+/*! 2017. 6. 3 study -ing */
 static inline struct net *get_net(struct net *net)
 {
 	return net;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void put_net(struct net *net)
 {
 }

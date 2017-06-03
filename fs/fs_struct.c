@@ -85,7 +85,7 @@ void chroot_fs_refs(const struct path *old_root, const struct path *new_root)
 	while (count--)
 		path_put(old_root);
 }
-
+/*! 2017. 6. 3 study -ing */
 void free_fs_struct(struct fs_struct *fs)
 {
 	path_put(&fs->root);
@@ -110,6 +110,7 @@ void exit_fs(struct task_struct *tsk)
 	}
 }
 
+/*! 2017. 6. 3 study -ing */
 struct fs_struct *copy_fs_struct(struct fs_struct *old)
 {
 	struct fs_struct *fs = kmem_cache_alloc(fs_cachep, GFP_KERNEL);

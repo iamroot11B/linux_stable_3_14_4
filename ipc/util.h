@@ -97,7 +97,7 @@ void __init ipc_init_proc_interface(const char *path, const char *header,
 #define IPC_SEM_IDS	0
 #define IPC_MSG_IDS	1
 #define IPC_SHM_IDS	2
-
+/*! 2017. 6. 3 study -ing */
 #define ipcid_to_idx(id) ((id) % SEQ_MULTIPLIER)
 #define ipcid_to_seqx(id) ((id) / SEQ_MULTIPLIER)
 #define IPCID_SEQ_MAX min_t(int, INT_MAX/SEQ_MULTIPLIER, USHRT_MAX)
@@ -142,7 +142,7 @@ struct kern_ipc_perm *ipcctl_pre_down_nolock(struct ipc_namespace *ns,
 					     struct ipc64_perm *perm, int extra_perm);
 
 #ifndef CONFIG_ARCH_WANT_IPC_PARSE_VERSION
-  /* On IA-64, we always use the "64-bit version" of the IPC structures.  */ 
+  /* On IA-64, we always use the "64-bit version" of the IPC structures.  */
 # define ipc_parse_version(cmd)	IPC_64
 #else
 int ipc_parse_version(int *cmd);
@@ -159,22 +159,22 @@ static inline int ipc_buildid(int id, int seq)
 {
 	return SEQ_MULTIPLIER * seq + id;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int ipc_checkid(struct kern_ipc_perm *ipcp, int uid)
 {
 	return uid / SEQ_MULTIPLIER != ipcp->seq;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void ipc_lock_object(struct kern_ipc_perm *perm)
 {
 	spin_lock(&perm->lock);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void ipc_unlock_object(struct kern_ipc_perm *perm)
 {
 	spin_unlock(&perm->lock);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void ipc_assert_locked_object(struct kern_ipc_perm *perm)
 {
 	assert_spin_locked(&perm->lock);
@@ -194,6 +194,7 @@ static inline void ipc_unlock(struct kern_ipc_perm *perm)
  * Needs to be called with kern_ipc_perm.lock held -- exception made for one
  * checkpoint case at sys_semtimedop() as noted in code commentary.
  */
+/*! 2017. 6. 3 study -ing */
 static inline bool ipc_valid_object(struct kern_ipc_perm *perm)
 {
 	return !perm->deleted;

@@ -355,7 +355,9 @@ extern void key_init(void);
 #define make_key_ref(k, p)		NULL
 #define key_ref_to_ptr(k)		NULL
 #define is_key_possessed(k)		0
+/*! 2017. 6. 3 study -ing */
 #define key_fsuid_changed(t)		do { } while(0)
+/*! 2017. 6. 3 study -ing */
 #define key_fsgid_changed(t)		do { } while(0)
 #define key_init()			do { } while(0)
 

@@ -160,7 +160,7 @@ static int sysvipc_sem_proc_show(struct seq_file *s, void *it);
  *	sem_array.pending{_alter,_cont},
  *	sem_array.sem_undo: global sem_lock() for read/write
  *	sem_undo.proc_next: only "current" is allowed to read/write that field.
- *	
+ *
  *	sem_array.sem_base[i].pending_{const,alter}:
  *		global or semaphore sem_lock() for read/write
  */
@@ -203,6 +203,7 @@ void __init sem_init(void)
  * The function unmerges the wait queues if complex_count is 0.
  * It must be called prior to dropping the global semaphore array lock.
  */
+/*! 2017. 6. 3 study -ing */
 static void unmerge_queues(struct sem_array *sma)
 {
 	struct sem_queue *q, *tq;
@@ -215,6 +216,7 @@ static void unmerge_queues(struct sem_array *sma)
 	 * Move all pending operation back into the per-semaphore
 	 * queues.
 	 */
+	/*! sma->pending_alter 리스트 loop  */
 	list_for_each_entry_safe(q, tq, &sma->pending_alter, list) {
 		struct sem *curr;
 		curr = &sma->sem_base[q->sops[0].sem_num];
@@ -259,6 +261,7 @@ static void sem_rcu_free(struct rcu_head *head)
  * that sem_perm.lock is free.
  * that a) sem_perm.lock is free and b) complex_count is 0.
  */
+/*! 2017. 6. 3 study -ing */
 static void sem_wait_array(struct sem_array *sma)
 {
 	int i;
@@ -284,6 +287,7 @@ static void sem_wait_array(struct sem_array *sma)
  * multiple semaphores in our own semops, or we need to look at
  * semaphores from other pending complex operations.
  */
+/*! 2017. 6. 3 study -ing */
 static inline int sem_lock(struct sem_array *sma, struct sembuf *sops,
 			      int nsops)
 {
@@ -360,7 +364,7 @@ static inline int sem_lock(struct sem_array *sma, struct sembuf *sops,
 		return -1;
 	}
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void sem_unlock(struct sem_array *sma, int locknum)
 {
 	if (locknum == -1) {
@@ -410,7 +414,7 @@ static inline struct sem_array *sem_obtain_object(struct ipc_namespace *ns, int 
 
 	return container_of(ipcp, struct sem_array, sem_perm);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline struct sem_array *sem_obtain_object_check(struct ipc_namespace *ns,
 							int id)
 {
@@ -595,6 +599,7 @@ SYSCALL_DEFINE3(semget, key_t, key, int, nsems, int, semflg)
  * Returns 1 if the operation is impossible, the caller must sleep.
  * Negative values are error codes.
  */
+/*! 2017. 6. 3 study -ing */
 static int perform_atomic_semop(struct sem_array *sma, struct sembuf *sops,
 			     int nsops, struct sem_undo *un, int pid)
 {
@@ -664,6 +669,7 @@ undo:
  *
  * Prepare the wake-up of the queue entry q.
  */
+/*! 2017. 6. 3 study -ing */
 static void wake_up_sem_queue_prepare(struct list_head *pt,
 				struct sem_queue *q, int error)
 {
@@ -689,6 +695,7 @@ static void wake_up_sem_queue_prepare(struct list_head *pt,
  * could be destroyed already and the tasks can disappear as soon as the
  * status is set to the actual return code.
  */
+/*! 2017. 6. 3 study -ing */
 static void wake_up_sem_queue_do(struct list_head *pt)
 {
 	struct sem_queue *q, *t;
@@ -704,7 +711,7 @@ static void wake_up_sem_queue_do(struct list_head *pt)
 	if (did_something)
 		preempt_enable();
 }
-
+/*! 2017. 6. 3 study -ing */
 static void unlink_queue(struct sem_array *sma, struct sem_queue *q)
 {
 	list_del(&q->list);
@@ -722,6 +729,7 @@ static void unlink_queue(struct sem_array *sma, struct sem_queue *q)
  * modified the array.
  * Note that wait-for-zero operations are handled without restart.
  */
+/*! 2017. 6. 3 study -ing */
 static int check_restart(struct sem_array *sma, struct sem_queue *q)
 {
 	/* pending complex alter operations are too difficult to analyse */
@@ -760,6 +768,7 @@ static int check_restart(struct sem_array *sma, struct sem_queue *q)
  * is stored in q->pid.
  * The function returns 1 if at least one operation was completed successfully.
  */
+/*! 2017. 6. 3 study -ing */
 static int wake_const_ops(struct sem_array *sma, int semnum,
 				struct list_head *pt)
 {
@@ -774,6 +783,7 @@ static int wake_const_ops(struct sem_array *sma, int semnum,
 		pending_list = &sma->sem_base[semnum].pending_const;
 
 	walk = pending_list->next;
+	/*! pending_list 리스트 loop  */
 	while (walk != pending_list) {
 		int error;
 
@@ -807,6 +817,7 @@ static int wake_const_ops(struct sem_array *sma, int semnum,
  * on the actual changes that were performed on the semaphore array.
  * The function returns 1 if at least one operation was completed successfully.
  */
+/*! 2017. 6. 3 study -ing */
 static int do_smart_wakeup_zero(struct sem_array *sma, struct sembuf *sops,
 					int nsops, struct list_head *pt)
 {
@@ -863,6 +874,7 @@ static int do_smart_wakeup_zero(struct sem_array *sma, struct sembuf *sops,
  *
  * The function return 1 if at least one semop was completed successfully.
  */
+/*! 2017. 6. 3 study -ing */
 static int update_queue(struct sem_array *sma, int semnum, struct list_head *pt)
 {
 	struct sem_queue *q;
@@ -877,6 +889,7 @@ static int update_queue(struct sem_array *sma, int semnum, struct list_head *pt)
 
 again:
 	walk = pending_list->next;
+	/*! pending_list 리스트 loop  */
 	while (walk != pending_list) {
 		int error, restart;
 
@@ -925,6 +938,7 @@ again:
  * sem_otime is replicated to avoid cache line trashing.
  * This function sets one instance to the current time.
  */
+/*! 2017. 6. 3 study -ing */
 static void set_semotime(struct sem_array *sma, struct sembuf *sops)
 {
 	if (sops == NULL) {
@@ -949,6 +963,7 @@ static void set_semotime(struct sem_array *sma, struct sembuf *sops)
  * responsible for calling wake_up_sem_queue_do(@pt).
  * It is safe to perform this call after dropping all locks.
  */
+/*! 2017. 6. 3 study -ing */
 static void do_smart_update(struct sem_array *sma, struct sembuf *sops, int nsops,
 			int otime, struct list_head *pt)
 {
@@ -1161,7 +1176,7 @@ static int semctl_nolock(struct ipc_namespace *ns, int semid,
 		err = security_sem_semctl(NULL, cmd);
 		if (err)
 			return err;
-		
+
 		memset(&seminfo, 0, sizeof(seminfo));
 		seminfo.semmni = ns->sc_semmni;
 		seminfo.semmns = ns->sc_semmns;
@@ -1181,7 +1196,7 @@ static int semctl_nolock(struct ipc_namespace *ns, int semid,
 		}
 		max_id = ipc_get_maxid(&sem_ids(ns));
 		up_read(&sem_ids(ns).rwsem);
-		if (copy_to_user(p, &seminfo, sizeof(struct seminfo))) 
+		if (copy_to_user(p, &seminfo, sizeof(struct seminfo)))
 			return -EFAULT;
 		return (max_id < 0) ? 0 : max_id;
 	}
@@ -1618,7 +1633,7 @@ static inline int get_undo_list(struct sem_undo_list **undo_listp)
 	*undo_listp = undo_list;
 	return 0;
 }
-
+/*! 2017. 6. 3 study -ing */
 static struct sem_undo *__lookup_undo(struct sem_undo_list *ulp, int semid)
 {
 	struct sem_undo *un;
@@ -1883,7 +1898,7 @@ SYSCALL_DEFINE4(semtimedop, int, semid, struct sembuf __user *, tsops,
 	/* We need to sleep on this operation, so we put the current
 	 * task into the pending queue and go to sleep.
 	 */
-		
+
 	queue.sops = sops;
 	queue.nsops = nsops;
 	queue.undo = un;
@@ -2016,7 +2031,7 @@ int copy_semundo(unsigned long clone_flags, struct task_struct *tsk)
 			return error;
 		atomic_inc(&undo_list->refcnt);
 		tsk->sysvsem.undo_list = undo_list;
-	} else 
+	} else
 		tsk->sysvsem.undo_list = NULL;
 
 	return 0;
@@ -2034,6 +2049,7 @@ int copy_semundo(unsigned long clone_flags, struct task_struct *tsk)
  * The current implementation does not do so. The POSIX standard
  * and SVID should be consulted to determine what behavior is mandated.
  */
+/*! 2017. 6. 3 study -ing */
 void exit_sem(struct task_struct *tsk)
 {
 	struct sem_undo_list *ulp;

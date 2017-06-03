@@ -508,7 +508,7 @@ pid_t pid_nr_ns(struct pid *pid, struct pid_namespace *ns)
 	return nr;
 }
 EXPORT_SYMBOL_GPL(pid_nr_ns);
-
+/*! 2017. 6. 3 study -ing */
 pid_t pid_vnr(struct pid *pid)
 {
 	return pid_nr_ns(pid, task_active_pid_ns(current));
@@ -539,7 +539,7 @@ pid_t task_tgid_nr_ns(struct task_struct *tsk, struct pid_namespace *ns)
 	return pid_nr_ns(task_tgid(tsk), ns);
 }
 EXPORT_SYMBOL(task_tgid_nr_ns);
-
+/*! 2017. 6. 3 study -ing */
 struct pid_namespace *task_active_pid_ns(struct task_struct *tsk)
 {
 	return ns_of_pid(task_pid(tsk));
@@ -595,7 +595,7 @@ void __init pidmap_init(void)
 	 *  pid_max = PID_MAX_DEFAULT (0x8000) = 32768
 	 *  pid_max_min = 301
 	 *  PIDS_PER_CPU_DEFAULT = 1024
-	 *  PIDS_PER_CPU_MIN = 8  
+	 *  PIDS_PER_CPU_MIN = 8
 	 */
 
 	pid_max = min(pid_max_max, max_t(int, pid_max,

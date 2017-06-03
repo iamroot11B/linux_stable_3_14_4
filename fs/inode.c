@@ -387,6 +387,7 @@ static void init_once(void *foo)
 /*
  * inode->i_lock must be held
  */
+/*! 2017. 6. 3 study -ing */
 void __iget(struct inode *inode)
 {
 	atomic_inc(&inode->i_count);
@@ -1182,7 +1183,7 @@ ino_t iunique(struct super_block *sb, ino_t max_reserved)
 	return res;
 }
 EXPORT_SYMBOL(iunique);
-
+/*! 2017. 6. 3 study -ing */
 struct inode *igrab(struct inode *inode)
 {
 	spin_lock(&inode->i_lock);

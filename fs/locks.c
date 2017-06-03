@@ -11,11 +11,11 @@
  *
  *  Miscellaneous edits, and a total rewrite of posix_lock_file() code.
  *  Kai Petzke (wpp@marie.physik.tu-berlin.de), 1994
- *  
+ *
  *  Converted file_lock_table to a linked list from an array, which eliminates
  *  the limits on how many active file locks are open.
  *  Chad Page (pageone@netcom.com), November 27, 1994
- * 
+ *
  *  Removed dependency on file descriptors. dup()'ed file descriptors now
  *  get the same locks as the original file descriptors, and a close() on
  *  any file descriptor removes ALL the locks on the file for the current
@@ -41,7 +41,7 @@
  *  with a file pointer (filp). As a result they can be shared by a parent
  *  process and its children after a fork(). They are removed when the last
  *  file descriptor referring to the file pointer is closed (unless explicitly
- *  unlocked). 
+ *  unlocked).
  *
  *  FL_FLOCK locks never deadlock, an existing lock is always removed before
  *  upgrading from shared to exclusive (or vice versa). When this happens
@@ -50,7 +50,7 @@
  *  Andy Walker (andy@lysaker.kvaerner.no), June 09, 1995
  *
  *  Removed some race conditions in flock_lock_file(), marked other possible
- *  races. Just grep for FIXME to see them. 
+ *  races. Just grep for FIXME to see them.
  *  Dmitry Gorodchanin (pgmdsg@ibi.com), February 09, 1996.
  *
  *  Addressed Dmitry's concerns. Deadlock checking no longer recursive.
@@ -315,7 +315,7 @@ static int flock_make_lock(struct file *filp, struct file_lock **lock,
 	int type = flock_translate_cmd(cmd);
 	if (type < 0)
 		return type;
-	
+
 	fl = locks_alloc_lock();
 	if (fl == NULL)
 		return -ENOMEM;
@@ -325,7 +325,7 @@ static int flock_make_lock(struct file *filp, struct file_lock **lock,
 	fl->fl_flags = FL_FLOCK;
 	fl->fl_type = type;
 	fl->fl_end = OFFSET_MAX;
-	
+
 	*lock = fl;
 	return 0;
 }
@@ -385,7 +385,7 @@ static int flock_to_posix_lock(struct file *filp, struct file_lock *fl,
 	fl->fl_start = start;	/* we record the absolute position */
 	if (fl->fl_end < fl->fl_start)
 		return -EOVERFLOW;
-	
+
 	fl->fl_owner = current->files;
 	fl->fl_pid = current->tgid;
 	fl->fl_file = filp;
@@ -431,7 +431,7 @@ static int flock64_to_posix_lock(struct file *filp, struct file_lock *fl,
 	fl->fl_start = start;	/* we record the absolute position */
 	if (fl->fl_end < fl->fl_start)
 		return -EOVERFLOW;
-	
+
 	fl->fl_owner = current->files;
 	fl->fl_pid = current->tgid;
 	fl->fl_file = filp;
@@ -953,7 +953,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
 	/*
 	 * Find the first old lock with the same owner as the new lock.
 	 */
-	
+
 	before = &inode->i_flock;
 
 	/* First skip locks owned by other processes.  */
@@ -1115,9 +1115,11 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
  * whether or not a lock was successfully freed by testing the return
  * value for -ENOENT.
  */
+/*! 2017. 6. 3 study -ing */
 int posix_lock_file(struct file *filp, struct file_lock *fl,
 			struct file_lock *conflock)
 {
+	/*! __posix_lock_file 함수는 추후에 보기로 함  */
 	return __posix_lock_file(file_inode(filp), fl, conflock);
 }
 EXPORT_SYMBOL(posix_lock_file);
@@ -1895,7 +1897,7 @@ int fcntl_getlk(struct file *filp, struct flock __user *l)
 	error = vfs_test_lock(filp, &file_lock);
 	if (error)
 		goto out;
- 
+
 	flock.l_type = file_lock.fl_type;
 	if (file_lock.fl_type != F_UNLCK) {
 		error = posix_lock_to_flock(&flock, &file_lock);
@@ -1942,6 +1944,7 @@ out:
  * ->lm_grant() before returning to the caller with a FILE_LOCK_DEFERRED
  * return code.
  */
+/*! 2017. 6. 3 study -ing */
 int vfs_lock_file(struct file *filp, unsigned int cmd, struct file_lock *fl, struct file_lock *conf)
 {
 	if (filp->f_op->lock)
@@ -2014,7 +2017,7 @@ again:
 	if (cmd == F_SETLKW) {
 		file_lock->fl_flags |= FL_SLEEP;
 	}
-	
+
 	error = -EBADF;
 	switch (flock.l_type) {
 	case F_RDLCK:
@@ -2088,7 +2091,7 @@ int fcntl_getlk64(struct file *filp, struct flock64 __user *l)
 	error = -EFAULT;
 	if (!copy_to_user(l, &flock, sizeof(flock)))
 		error = 0;
-  
+
 out:
 	return error;
 }
@@ -2132,7 +2135,7 @@ again:
 	if (cmd == F_SETLKW64) {
 		file_lock->fl_flags |= FL_SLEEP;
 	}
-	
+
 	error = -EBADF;
 	switch (flock.l_type) {
 	case F_RDLCK:
@@ -2175,6 +2178,7 @@ out:
  * from the task's fd array.  POSIX locks belonging to this task
  * are deleted at this time.
  */
+/*! 2017. 6. 3 study -ing */
 void locks_remove_posix(struct file *filp, fl_owner_t owner)
 {
 	struct file_lock lock;

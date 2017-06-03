@@ -372,6 +372,7 @@ static inline void hlist_replace_rcu(struct hlist_node *old,
 /*
  * return the first or the next element in an RCU protected hlist
  */
+/*! 2017. 6. 3 study -ing */
 #define hlist_first_rcu(head)	(*((struct hlist_node __rcu **)(&(head)->first)))
 #define hlist_next_rcu(node)	(*((struct hlist_node __rcu **)(&(node)->next)))
 #define hlist_pprev_rcu(node)	(*((struct hlist_node __rcu **)((node)->pprev)))
@@ -395,6 +396,7 @@ static inline void hlist_replace_rcu(struct hlist_node *old,
  * problems on Alpha CPUs.  Regardless of the type of CPU, the
  * list-traversal primitive must be guarded by rcu_read_lock().
  */
+/*! 2017. 6. 3 study -ing */
 static inline void hlist_add_head_rcu(struct hlist_node *n,
 					struct hlist_head *h)
 {
@@ -402,6 +404,7 @@ static inline void hlist_add_head_rcu(struct hlist_node *n,
 
 	n->next = first;
 	n->pprev = &h->first;
+	/*! h->first = n  */
 	rcu_assign_pointer(hlist_first_rcu(h), n);
 	if (first)
 		first->pprev = &n->next;
@@ -425,6 +428,7 @@ static inline void hlist_add_head_rcu(struct hlist_node *n,
  * hlist_for_each_entry_rcu(), used to prevent memory-consistency
  * problems on Alpha CPUs.
  */
+/*! 2017. 6. 3 study -ing */
 static inline void hlist_add_before_rcu(struct hlist_node *n,
 					struct hlist_node *next)
 {
@@ -477,6 +481,7 @@ static inline void hlist_add_after_rcu(struct hlist_node *prev,
  * the _rcu list-mutation primitives such as hlist_add_head_rcu()
  * as long as the traversal is guarded by rcu_read_lock().
  */
+/*! 2017. 6. 3 study -ing */
 #define hlist_for_each_entry_rcu(pos, head, member)			\
 	for (pos = hlist_entry_safe (rcu_dereference_raw(hlist_first_rcu(head)),\
 			typeof(*(pos)), member);			\

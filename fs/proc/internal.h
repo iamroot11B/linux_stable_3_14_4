@@ -72,6 +72,8 @@ struct proc_inode {
 /*
  * General functions
  */
+
+/*! 2017. 6. 3 study -ing */
 static inline struct proc_inode *PROC_I(const struct inode *inode)
 {
 	return container_of(inode, struct proc_inode, vfs_inode);

@@ -75,7 +75,7 @@ static inline int create_user_ns(struct cred *new)
 {
 	return -EINVAL;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int unshare_userns(unsigned long unshare_flags,
 				 struct cred **new_cred)
 {

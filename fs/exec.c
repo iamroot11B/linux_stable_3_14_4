@@ -19,7 +19,7 @@
  * current->executable is only used by the procfs.  This allows a dispatch
  * table to check for several different types  of binary formats.  We keep
  * trying until we recognize the file or we run out of supported binary
- * formats. 
+ * formats.
  */
 
 #include <linux/slab.h>
@@ -1598,6 +1598,7 @@ EXPORT_SYMBOL(set_binfmt);
 /*
  * set_dumpable stores three-value SUID_DUMP_* into mm->flags.
  */
+/*! 2017. 6. 3 study -ing */
 void set_dumpable(struct mm_struct *mm, int value)
 {
 	unsigned long old, new;

@@ -84,6 +84,7 @@ static inline void set_fs(mm_segment_t fs)
 	(flag == 0); })
 
 /* We use 33-bit arithmetic here... */
+/*! 2017. 6. 3 study -ing */
 #define __range_ok(addr,size) ({ \
 	unsigned long flag, roksum; \
 	__chk_user_ptr(addr);	\
@@ -219,7 +220,7 @@ static inline void set_fs(mm_segment_t fs)
 #define put_user(x,p)	__put_user(x,p)
 
 #endif /* CONFIG_MMU */
-
+/*! 2017. 6. 3 study -ing */
 #define access_ok(type,addr,size)	(__range_ok(addr,size) == 0)
 
 #define user_addr_max() \
@@ -234,6 +235,7 @@ static inline void set_fs(mm_segment_t fs)
  * error occurs, and leave it unchanged on success.  Note that these
  * versions are void (ie, don't return a value as such).
  */
+/*! 2017. 6. 3 study -ing */
 #define __get_user(x,ptr)						\
 ({									\
 	long __gu_err = 0;						\
@@ -246,7 +248,7 @@ static inline void set_fs(mm_segment_t fs)
 	__get_user_err((x),(ptr),err);					\
 	(void) 0;							\
 })
-
+/*! 2017. 6. 3 study -ing */
 #define __get_user_err(x,ptr,err)					\
 do {									\
 	unsigned long __gu_addr = (unsigned long)(ptr);			\
@@ -435,10 +437,11 @@ extern unsigned long __must_check __clear_user_std(void __user *addr, unsigned l
 #define __copy_to_user(to,from,n)	(memcpy((void __force *)to, from, n), 0)
 #define __clear_user(addr,n)		(memset((void __force *)addr, 0, n), 0)
 #endif
-
+/*! 2017. 6. 3 study -ing */
 static inline unsigned long __must_check copy_from_user(void *to, const void __user *from, unsigned long n)
 {
 	if (access_ok(VERIFY_READ, from, n))
+		/*! arch/arm/lib/copy_from_user.S  */
 		n = __copy_from_user(to, from, n);
 	else /* security hole - plug it */
 		memset(to, 0, n);

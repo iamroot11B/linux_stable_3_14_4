@@ -954,6 +954,7 @@ static int effective_prio(struct task_struct *p)
  *
  * Return: 1 if the task is currently executing. 0 otherwise.
  */
+/*! 2017. 6. 3 study -ing */
 inline int task_curr(const struct task_struct *p)
 {
 	return cpu_curr(task_cpu(p)) == p;
@@ -1268,6 +1269,7 @@ unsigned long wait_task_inactive(struct task_struct *p, long match_state)
  * to another CPU then no harm is done and the purpose has been
  * achieved as well.
  */
+/*! 2017. 6. 3 study -ing */
 void kick_process(struct task_struct *p)
 {
 	int cpu;

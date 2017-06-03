@@ -1634,7 +1634,7 @@ static inline struct pid *task_pid(struct task_struct *task)
 {
 	return task->pids[PIDTYPE_PID].pid;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline struct pid *task_tgid(struct task_struct *task)
 {
 	return task->group_leader->pids[PIDTYPE_PID].pid;
@@ -1697,6 +1697,7 @@ static inline pid_t task_tgid_nr(struct task_struct *tsk)
 
 pid_t task_tgid_nr_ns(struct task_struct *tsk, struct pid_namespace *ns);
 
+/*! 2017. 6. 3 study -ing */
 static inline pid_t task_tgid_vnr(struct task_struct *tsk)
 {
 	return pid_vnr(task_tgid(tsk));
@@ -2432,11 +2433,12 @@ static inline int thread_group_empty(struct task_struct *p)
  * It must not be nested with write_lock_irq(&tasklist_lock),
  * neither inside nor outside.
  */
+/*! 2017. 6. 3 study -ing */
 static inline void task_lock(struct task_struct *p)
 {
 	spin_lock(&p->alloc_lock);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void task_unlock(struct task_struct *p)
 {
 	spin_unlock(&p->alloc_lock);
@@ -2564,7 +2566,7 @@ static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	clear_ti_thread_flag(task_thread_info(tsk), flag);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);

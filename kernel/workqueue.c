@@ -1552,6 +1552,7 @@ static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
  * @delay is zero and @dwork is idle, it will be scheduled for immediate
  * execution.
  */
+/*! 2017. 6. 3 study -ing */
 bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
 			   struct delayed_work *dwork, unsigned long delay)
 {

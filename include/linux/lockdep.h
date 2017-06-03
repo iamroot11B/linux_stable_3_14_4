@@ -502,6 +502,7 @@ static inline void print_irqtrace_events(struct task_struct *curr)
 /*! 2016.03.05 study -ing */
 #define spin_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
 #define spin_acquire_nest(l, s, t, n, i)	lock_acquire_exclusive(l, s, t, n, i)
+/*! 2017. 6. 3 study -ing */
 #define spin_release(l, n, i)			lock_release(l, n, i)
 
 /*! 2017. 3.25 study -ing */

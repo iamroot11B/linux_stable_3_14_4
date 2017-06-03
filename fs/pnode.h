@@ -11,10 +11,15 @@
 #include <linux/list.h>
 #include "mount.h"
 
+/*! 2017. 6. 3 study -ing */
 #define IS_MNT_SHARED(m) ((m)->mnt.mnt_flags & MNT_SHARED)
+/*! 2017. 6. 3 study -ing */
 #define IS_MNT_SLAVE(m) ((m)->mnt_master)
+/*! 2017. 6. 3 study -ing */
 #define IS_MNT_NEW(m)  (!(m)->mnt_ns)
+/*! 2017. 6. 3 study -ing */
 #define CLEAR_MNT_SHARED(m) ((m)->mnt.mnt_flags &= ~MNT_SHARED)
+/*! 2017. 6. 3 study -ing */
 #define IS_MNT_UNBINDABLE(m) ((m)->mnt.mnt_flags & MNT_UNBINDABLE)
 #define IS_MNT_MARKED(m) ((m)->mnt.mnt_flags & MNT_MARKED)
 #define SET_MNT_MARK(m) ((m)->mnt.mnt_flags |= MNT_MARKED)
@@ -31,6 +36,7 @@
 
 #define CL_COPY_ALL		(CL_COPY_UNBINDABLE | CL_COPY_MNT_NS_FILE)
 
+/*! 2017. 6. 3 study -ing */
 static inline void set_mnt_shared(struct mount *mnt)
 {
 	mnt->mnt.mnt_flags &= ~MNT_SHARED_MASK;

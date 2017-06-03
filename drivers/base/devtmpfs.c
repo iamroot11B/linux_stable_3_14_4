@@ -372,7 +372,7 @@ static int handle(const char *name, umode_t mode, kuid_t uid, kgid_t gid,
 	else
 		return handle_remove(name, dev);
 }
-
+/*! 2017. 6. 3 study -ing */
 static int devtmpfsd(void *p)
 {
 	char options[] = "mode=0755";
@@ -381,6 +381,7 @@ static int devtmpfsd(void *p)
 	*err = sys_unshare(CLONE_NEWNS);
 	if (*err)
 		goto out;
+	/*! sys_mount는 fs/namespace.c의 "SYSCALL_DEFINE5(mount" 를 참조 */
 	*err = sys_mount("devtmpfs", "/", "devtmpfs", MS_SILENT, options);
 	if (*err)
 		goto out;
@@ -427,6 +428,7 @@ int __init devtmpfs_init(void)
 	}
 
 	/*! 2017. 5.20 study end */
+	/*! 2017. 6. 3 study start */
 
 	thread = kthread_run(devtmpfsd, &err, "kdevtmpfs");
 	if (!IS_ERR(thread)) {

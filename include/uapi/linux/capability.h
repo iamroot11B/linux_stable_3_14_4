@@ -345,6 +345,7 @@ struct vfs_cap_data {
 
 #define CAP_LAST_CAP         CAP_BLOCK_SUSPEND
 
+/*! 2017. 6. 3 study -ing */
 #define cap_valid(x) ((x) >= 0 && (x) <= CAP_LAST_CAP)
 
 /*

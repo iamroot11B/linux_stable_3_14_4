@@ -14,11 +14,13 @@
 #include "pnode.h"
 
 /* return the next shared peer mount of @p */
+/*! 2017. 6. 3 study -ing */
 static inline struct mount *next_peer(struct mount *p)
 {
 	return list_entry(p->mnt_share.next, struct mount, mnt_share);
 }
 
+/*! 2017. 6. 3 study -ing */
 static inline struct mount *first_slave(struct mount *p)
 {
 	return list_entry(p->mnt_slave_list.next, struct mount, mnt_slave);
@@ -64,7 +66,7 @@ int get_dominating_id(struct mount *mnt, const struct path *root)
 
 	return 0;
 }
-
+/*! 2017. 6. 3 study -ing */
 static int do_make_slave(struct mount *mnt)
 {
 	struct mount *peer_mnt = mnt, *master = mnt->mnt_master;
@@ -116,6 +118,7 @@ static int do_make_slave(struct mount *mnt)
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 6. 3 study -ing */
 void change_mnt_propagation(struct mount *mnt, int type)
 {
 	if (type == MS_SHARED) {
@@ -143,6 +146,7 @@ void change_mnt_propagation(struct mount *mnt, int type)
  * vfsmount found while iterating with propagation_next() is
  * a peer of one we'd found earlier.
  */
+/*! 2017. 6. 3 study -ing */
 static struct mount *propagation_next(struct mount *m,
 					 struct mount *origin)
 {
@@ -364,6 +368,7 @@ int propagate_mount_busy(struct mount *mnt, int refcnt)
  * NOTE: unmounting 'mnt' naturally propagates to all other mounts its
  * parent propagates to.
  */
+/*! 2017. 6. 3 study -ing */
 static void __propagate_umount(struct mount *mnt)
 {
 	struct mount *parent = mnt->mnt_parent;
@@ -380,6 +385,7 @@ static void __propagate_umount(struct mount *mnt)
 		 * umount the child only if the child has no
 		 * other children
 		 */
+		/*! child가 더이상 자신의 child가 없을때  */
 		if (child && list_empty(&child->mnt_mounts)) {
 			hlist_del_init_rcu(&child->mnt_hash);
 			hlist_add_before_rcu(&child->mnt_hash, &mnt->mnt_hash);
@@ -394,6 +400,7 @@ static void __propagate_umount(struct mount *mnt)
  *
  * vfsmount lock must be held for write
  */
+/*! 2017. 6. 3 study -ing */
 int propagate_umount(struct hlist_head *list)
 {
 	struct mount *mnt;

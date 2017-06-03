@@ -401,6 +401,7 @@ EXPORT_SYMBOL(strlen);
  * @s: The string to be sized
  * @count: The maximum number of bytes to search
  */
+/*! 2017. 6. 3 study -ing */
 size_t strnlen(const char *s, size_t count)
 {
 	const char *sc;

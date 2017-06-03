@@ -77,7 +77,7 @@ static inline void clear_ti_thread_flag(struct thread_info *ti, int flag)
 {
 	clear_bit(flag, (unsigned long *)&ti->flags);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int test_and_set_ti_thread_flag(struct thread_info *ti, int flag)
 {
 	return test_and_set_bit(flag, (unsigned long *)&ti->flags);

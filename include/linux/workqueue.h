@@ -533,6 +533,7 @@ static inline bool queue_work(struct workqueue_struct *wq,
  *
  * Equivalent to queue_delayed_work_on() but tries to use the local CPU.
  */
+/*! 2017. 6. 3 study -ing */
 static inline bool queue_delayed_work(struct workqueue_struct *wq,
 				      struct delayed_work *dwork,
 				      unsigned long delay)
@@ -608,6 +609,7 @@ static inline bool schedule_delayed_work_on(int cpu, struct delayed_work *dwork,
  * After waiting for a given time this puts a job in the kernel-global
  * workqueue.
  */
+/*! 2017. 6. 3 study -ing */
 static inline bool schedule_delayed_work(struct delayed_work *dwork,
 					 unsigned long delay)
 {

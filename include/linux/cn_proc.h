@@ -34,7 +34,7 @@ static inline void proc_fork_connector(struct task_struct *task)
 
 static inline void proc_exec_connector(struct task_struct *task)
 {}
-
+/*! 2017. 6. 3 study -ing */
 static inline void proc_id_connector(struct task_struct *task,
 				     int which_id)
 {}

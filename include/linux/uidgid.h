@@ -29,11 +29,12 @@ typedef struct {
 #define KUIDT_INIT(value) (kuid_t){ value }
 #define KGIDT_INIT(value) (kgid_t){ value }
 
+/*! 2017. 6. 3 study -ing */
 static inline uid_t __kuid_val(kuid_t uid)
 {
 	return uid.val;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline gid_t __kgid_val(kgid_t gid)
 {
 	return gid.val;
@@ -45,11 +46,12 @@ static inline gid_t __kgid_val(kgid_t gid)
 #define INVALID_UID KUIDT_INIT(-1)
 #define INVALID_GID KGIDT_INIT(-1)
 
+/*! 2017. 6. 3 study -ing */
 static inline bool uid_eq(kuid_t left, kuid_t right)
 {
 	return __kuid_val(left) == __kuid_val(right);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline bool gid_eq(kgid_t left, kgid_t right)
 {
 	return __kgid_val(left) == __kgid_val(right);

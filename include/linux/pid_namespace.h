@@ -71,6 +71,7 @@ static inline struct pid_namespace *get_pid_ns(struct pid_namespace *ns)
 	return ns;
 }
 
+/*! 2017. 6. 3 study -ing */
 static inline struct pid_namespace *copy_pid_ns(unsigned long flags,
 	struct user_namespace *user_ns, struct pid_namespace *ns)
 {
@@ -78,7 +79,7 @@ static inline struct pid_namespace *copy_pid_ns(unsigned long flags,
 		ns = ERR_PTR(-EINVAL);
 	return ns;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void put_pid_ns(struct pid_namespace *ns)
 {
 }

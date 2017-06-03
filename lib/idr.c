@@ -715,6 +715,7 @@ void idr_destroy(struct idr *idp)
 }
 EXPORT_SYMBOL(idr_destroy);
 
+/*! 2017. 6. 3 study -ing */
 void *idr_find_slowpath(struct idr *idp, int id)
 {
 	int n;

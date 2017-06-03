@@ -77,7 +77,7 @@ EXPORT_SYMBOL_GPL(fs_kobj);
  * tree or hash is modified or when a vfsmount structure is modified.
  */
 __cacheline_aligned_in_smp DEFINE_SEQLOCK(mount_lock);
-
+/*! 2017. 6. 3 study -ing */
 static inline struct hlist_head *m_hash(struct vfsmount *mnt, struct dentry *dentry)
 {
 	unsigned long tmp = ((unsigned long)mnt / L1_CACHE_BYTES);
@@ -115,6 +115,7 @@ retry:
 	return res;
 }
 
+/*! 2017. 6. 3 study -ing */
 static void mnt_free_id(struct mount *mnt)
 {
 	int id = mnt->mnt_id;
@@ -130,6 +131,7 @@ static void mnt_free_id(struct mount *mnt)
  *
  * mnt_group_ida is protected by namespace_sem
  */
+/*! 2017. 6. 3 study -ing */
 static int mnt_alloc_group_id(struct mount *mnt)
 {
 	int res;
@@ -149,6 +151,7 @@ static int mnt_alloc_group_id(struct mount *mnt)
 /*
  * Release a peer group ID
  */
+/*! 2017. 6. 3 study -ing */
 void mnt_release_group_id(struct mount *mnt)
 {
 	int id = mnt->mnt_group_id;
@@ -573,6 +576,7 @@ int sb_prepare_remount_readonly(struct super_block *sb)
 	return err;
 }
 
+/*! 2017. 6. 3 study -ing */
 static void free_vfsmnt(struct mount *mnt)
 {
 	kfree(mnt->mnt_devname);
@@ -609,6 +613,7 @@ bool legitimize_mnt(struct vfsmount *bastard, unsigned seq)
  * find the first mount at @dentry on vfsmount @mnt.
  * call under rcu_read_lock()
  */
+/*! 2017. 6. 3 study -ing */
 struct mount *__lookup_mnt(struct vfsmount *mnt, struct dentry *dentry)
 {
 	struct hlist_head *head = m_hash(mnt, dentry);
@@ -624,6 +629,7 @@ struct mount *__lookup_mnt(struct vfsmount *mnt, struct dentry *dentry)
  * find the last mount at @dentry on vfsmount @mnt.
  * mount_lock must be held.
  */
+/*! 2017. 6. 3 study -ing */
 struct mount *__lookup_mnt_last(struct vfsmount *mnt, struct dentry *dentry)
 {
 	struct mount *p, *res;
@@ -702,7 +708,7 @@ static struct mountpoint *new_mountpoint(struct dentry *dentry)
 	hlist_add_head(&mp->m_hash, chain);
 	return mp;
 }
-
+/*! 2017. 6. 3 study -ing */
 static void put_mountpoint(struct mountpoint *mp)
 {
 	if (!--mp->m_count) {
@@ -734,6 +740,7 @@ static void touch_mnt_namespace(struct mnt_namespace *ns)
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 6. 3 study -ing */
 static void __touch_mnt_namespace(struct mnt_namespace *ns)
 {
 	if (ns && ns->event != event) {
@@ -760,6 +767,7 @@ static void detach_mnt(struct mount *mnt, struct path *old_path)
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 6. 3 study -ing */
 void mnt_set_mountpoint(struct mount *mnt,
 			struct mountpoint *mp,
 			struct mount *child_mnt)
@@ -774,6 +782,7 @@ void mnt_set_mountpoint(struct mount *mnt,
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 6. 3 study -ing */
 static void attach_mnt(struct mount *mnt,
 			struct mount *parent,
 			struct mountpoint *mp)
@@ -810,9 +819,11 @@ static void commit_tree(struct mount *mnt, struct mount *shadows)
 	touch_mnt_namespace(n);
 }
 
+/*! 2017. 6. 3 study -ing */
 static struct mount *next_mnt(struct mount *p, struct mount *root)
 {
 	struct list_head *next = p->mnt_mounts.next;
+	/*! next가 자기 자신이면 entry가 하나.  */
 	if (next == &p->mnt_mounts) {
 		while (1) {
 			if (p == root)
@@ -825,7 +836,7 @@ static struct mount *next_mnt(struct mount *p, struct mount *root)
 	}
 	return list_entry(next, struct mount, mnt_child);
 }
-
+/*! 2017. 6. 3 study -ing */
 static struct mount *skip_mnt_tree(struct mount *p)
 {
 	struct list_head *prev = p->mnt_mounts.prev;
@@ -871,6 +882,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 }
 EXPORT_SYMBOL_GPL(vfs_kern_mount);
 
+/*! 2017. 6. 3 study -ing */
 static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 					int flag)
 {
@@ -893,6 +905,7 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 			goto out_free;
 	}
 
+	/*! old의 flags에서 MNT_WRITE_HOLD와 MNT_MARKED를 제외하고 복사  */
 	mnt->mnt.mnt_flags = old->mnt.mnt_flags & ~(MNT_WRITE_HOLD|MNT_MARKED);
 	/* Don't allow unprivileged users to change mount flags */
 	if ((flag & CL_UNPRIVILEGED) && (mnt->mnt.mnt_flags & MNT_READONLY))
@@ -919,6 +932,7 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 	} else if (!(flag & CL_PRIVATE)) {
 		if ((flag & CL_MAKE_SHARED) || IS_MNT_SHARED(old))
 			list_add(&mnt->mnt_share, &old->mnt_share);
+		/*! mnt->mnt_master 가 존재하면 이건 slave  */
 		if (IS_MNT_SLAVE(old))
 			list_add(&mnt->mnt_slave, &old->mnt_slave);
 		mnt->mnt_master = old->mnt_master;
@@ -1202,6 +1216,7 @@ EXPORT_SYMBOL(may_umount);
 
 static HLIST_HEAD(unmounted);	/* protected by namespace_sem */
 
+/*! 2017. 6. 3 study -ing */
 static void namespace_unlock(void)
 {
 	struct mount *mnt;
@@ -1227,7 +1242,7 @@ static void namespace_unlock(void)
 		mntput(&mnt->mnt);
 	}
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void namespace_lock(void)
 {
 	down_write(&namespace_sem);
@@ -1240,6 +1255,7 @@ static inline void namespace_lock(void)
  * how = 1 => propagate; we know that nobody else has reference to any victims
  * how = 2 => lazy umount
  */
+/*! 2017. 6. 3 study -ing */
 void umount_tree(struct mount *mnt, int how)
 {
 	HLIST_HEAD(tmp_list);
@@ -1440,6 +1456,7 @@ SYSCALL_DEFINE1(oldumount, char __user *, name)
 
 #endif
 
+/*! 2017. 6. 3 study -ing */
 static bool is_mnt_ns_file(struct dentry *dentry)
 {
 	/* Is this a proxy for a mount namespace? */
@@ -1469,6 +1486,7 @@ static bool mnt_ns_loop(struct dentry *dentry)
 	return current->nsproxy->mnt_ns->seq >= mnt_ns->seq;
 }
 
+/*! 2017. 6. 3 study -ing */
 struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
 					int flag)
 {
@@ -1488,6 +1506,7 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
 	q->mnt_mountpoint = mnt->mnt_mountpoint;
 
 	p = mnt;
+	/*! mnt->mnt_mounts의 list loop  */
 	list_for_each_entry(r, &mnt->mnt_mounts, mnt_child) {
 		struct mount *s;
 		if (!is_subdir(r->mnt_mountpoint, dentry))
@@ -1542,7 +1561,7 @@ struct vfsmount *collect_mounts(struct path *path)
 		return ERR_CAST(tree);
 	return &tree->mnt;
 }
-
+/*! 2017. 6. 3 study -ing */
 void drop_collected_mounts(struct vfsmount *mnt)
 {
 	namespace_lock();
@@ -2301,6 +2320,7 @@ static void shrink_submounts(struct mount *mnt)
  * Note that this function differs from copy_from_user() in that it will oops
  * on bad values of `to', rather than returning a short copy.
  */
+/*! 2017. 6. 3 study -ing */
 static long exact_copy_from_user(void *to, const void __user * from,
 				 unsigned long n)
 {
@@ -2311,7 +2331,9 @@ static long exact_copy_from_user(void *to, const void __user * from,
 	if (!access_ok(VERIFY_READ, from, n))
 		return n;
 
+	/*! n(사이즈)만큼 from 에서 user로 복사  */
 	while (n) {
+		/*! f를 c에 복사. 정상 복사면 0. 에러면 값을 가짐.  */
 		if (__get_user(c, f)) {
 			memset(t, 0, n);
 			break;
@@ -2323,6 +2345,7 @@ static long exact_copy_from_user(void *to, const void __user * from,
 	return n;
 }
 
+/*! 2017. 6. 3 study -ing */
 int copy_mount_options(const void __user * data, unsigned long *where)
 {
 	int i;
@@ -2345,6 +2368,7 @@ int copy_mount_options(const void __user * data, unsigned long *where)
 	if (size > PAGE_SIZE)
 		size = PAGE_SIZE;
 
+	/*! page에 data를 size만큼 복사. 복사 성공 시 0 리턴  */
 	i = size - exact_copy_from_user((void *)page, data, size);
 	if (!i) {
 		free_page(page);
@@ -2355,7 +2379,7 @@ int copy_mount_options(const void __user * data, unsigned long *where)
 	*where = page;
 	return 0;
 }
-
+/*! 2017. 6. 3 study -ing */
 int copy_mount_string(const void __user *data, char **where)
 {
 	char *tmp;
@@ -2458,7 +2482,7 @@ dput_out:
 	path_put(&path);
 	return retval;
 }
-
+/*! 2017. 6. 3 study -ing */
 static void free_mnt_ns(struct mnt_namespace *ns)
 {
 	proc_free_inum(ns->proc_inum);
@@ -2503,7 +2527,7 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns)
 	new_ns->user_ns = get_user_ns(user_ns);
 	return new_ns;
 }
-
+/*! 2017. 6. 3 study -ing */
 struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 		struct user_namespace *user_ns, struct fs_struct *new_fs)
 {
@@ -2627,6 +2651,7 @@ struct dentry *mount_subtree(struct vfsmount *mnt, const char *name)
 }
 EXPORT_SYMBOL(mount_subtree);
 
+/*! 2017. 6. 3 study -ing */
 SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 		char __user *, type, unsigned long, flags, void __user *, data)
 {
@@ -2636,6 +2661,7 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 	char *kernel_dev;
 	unsigned long data_page;
 
+	/*! kernel_type에 type 문자열을 넣어준다.  */
 	ret = copy_mount_string(type, &kernel_type);
 	if (ret < 0)
 		goto out_type;
@@ -2653,6 +2679,8 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 	ret = copy_mount_options(data, &data_page);
 	if (ret < 0)
 		goto out_data;
+
+	/*! 2017. 6. 3 study end */
 
 	ret = do_mount(kernel_dev, kernel_dir->name, kernel_type, flags,
 		(void *) data_page);
@@ -2887,7 +2915,7 @@ void __init mnt_init(void)
 	/*! 2017. 2.04 study start */
 	init_mount_tree();
 }
-
+/*! 2017. 6. 3 study -ing */
 void put_mnt_ns(struct mnt_namespace *ns)
 {
 	if (!atomic_dec_and_test(&ns->count))

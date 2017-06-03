@@ -205,6 +205,7 @@ static inline void validate_process_creds(void)
  * Get a reference on the specified set of new credentials.  The caller must
  * release the reference.
  */
+/*! 2017. 6. 3 study -ing */
 static inline struct cred *get_new_cred(struct cred *cred)
 {
 	atomic_inc(&cred->usage);
@@ -224,10 +225,13 @@ static inline struct cred *get_new_cred(struct cred *cred)
  * accidental alteration of a set of credentials that should be considered
  * immutable.
  */
+/*! 2017. 6. 3 study -ing */
 static inline const struct cred *get_cred(const struct cred *cred)
 {
 	struct cred *nonconst_cred = (struct cred *) cred;
+	/*! Do Nothing  */
 	validate_creds(cred);
+	/*! nonconst_cred->usage++ 후 nonconst_cred 그대로 리턴 */
 	return get_new_cred(nonconst_cred);
 }
 
@@ -347,6 +351,7 @@ extern struct user_namespace init_user_ns;
 #ifdef CONFIG_USER_NS
 #define current_user_ns()	(current_cred_xxx(user_ns))
 #else
+/*! 2017. 6. 3 study -ing */
 #define current_user_ns()	(&init_user_ns)
 #endif
 

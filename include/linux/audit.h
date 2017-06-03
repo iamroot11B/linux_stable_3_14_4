@@ -318,10 +318,12 @@ static inline int audit_dummy_context(void)
 {
 	return 1;
 }
+/*! 2017. 6. 3 study -ing */
 static inline struct filename *audit_reusename(const __user char *name)
 {
 	return NULL;
 }
+/*! 2017. 6. 3 study -ing */
 static inline void audit_getname(struct filename *name)
 { }
 static inline void audit_putname(struct filename *name)

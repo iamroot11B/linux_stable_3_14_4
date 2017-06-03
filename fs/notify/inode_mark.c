@@ -50,6 +50,7 @@ static void fsnotify_recalc_inode_mask_locked(struct inode *inode)
  * Recalculate the inode->i_fsnotify_mask, or the mask of all FS_* event types
  * any notifier is interested in hearing for this inode.
  */
+/*! 2017. 6. 3 study -ing */
 void fsnotify_recalc_inode_mask(struct inode *inode)
 {
 	spin_lock(&inode->i_lock);
@@ -128,6 +129,7 @@ void fsnotify_clear_inode_marks_by_group(struct fsnotify_group *group)
  * given a group and inode, find the mark associated with that combination.
  * if found take a reference to that mark and return it, else return NULL
  */
+/*! 2017. 6. 3 study -ing */
 static struct fsnotify_mark *fsnotify_find_inode_mark_locked(
 		struct fsnotify_group *group,
 		struct inode *inode)
@@ -136,6 +138,7 @@ static struct fsnotify_mark *fsnotify_find_inode_mark_locked(
 
 	assert_spin_locked(&inode->i_lock);
 
+	/*! inode->i_fsnotify_marks 리스트를 순회하면서  */
 	hlist_for_each_entry(mark, &inode->i_fsnotify_marks, i.i_list) {
 		if (mark->group == group) {
 			fsnotify_get_mark(mark);
@@ -149,6 +152,7 @@ static struct fsnotify_mark *fsnotify_find_inode_mark_locked(
  * given a group and inode, find the mark associated with that combination.
  * if found take a reference to that mark and return it, else return NULL
  */
+/*! 2017. 6. 3 study -ing */
 struct fsnotify_mark *fsnotify_find_inode_mark(struct fsnotify_group *group,
 					       struct inode *inode)
 {
@@ -165,6 +169,7 @@ struct fsnotify_mark *fsnotify_find_inode_mark(struct fsnotify_group *group,
  * If we are setting a mark mask on an inode mark we should pin the inode
  * in memory.
  */
+/*! 2017. 6. 3 study -ing */
 void fsnotify_set_inode_mark_mask_locked(struct fsnotify_mark *mark,
 					 __u32 mask)
 {
@@ -176,6 +181,11 @@ void fsnotify_set_inode_mark_mask_locked(struct fsnotify_mark *mark,
 	    mark->i.inode &&
 	    !(mark->flags & FSNOTIFY_MARK_FLAG_OBJECT_PINNED)) {
 		mark->flags |= FSNOTIFY_MARK_FLAG_OBJECT_PINNED;
+		/*!
+		 * inode->i_state이 I_FREEING|I_WILL_FREE이면,
+		 * mark->i.inode을 NULL로 바꿔서 리턴,
+		 * 아니면 i_count ++ 후 그대로 리턴
+		 */
 		inode = igrab(mark->i.inode);
 		/*
 		 * we shouldn't be able to get here if the inode wasn't

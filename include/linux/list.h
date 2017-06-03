@@ -656,7 +656,7 @@ static inline void __hlist_del(struct hlist_node *n)
 	if (next)
 		next->pprev = pprev;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void hlist_del(struct hlist_node *n)
 {
 	__hlist_del(n);
@@ -756,6 +756,7 @@ static inline void hlist_move_list(struct hlist_head *old,
  * @pos:	the type * to use as a loop cursor.
  * @member:	the name of the hlist_node within the struct.
  */
+/*! 2017. 6. 3 study -ing */
 #define hlist_for_each_entry_continue(pos, member)			\
 	for (pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member);\
 	     pos;							\

@@ -6,6 +6,7 @@
 
 typedef void (*task_work_func_t)(struct callback_head *);
 
+/*! 2017. 6. 3 study -ing */
 static inline void
 init_task_work(struct callback_head *twork, task_work_func_t func)
 {

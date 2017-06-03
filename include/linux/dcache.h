@@ -23,7 +23,7 @@ struct vfsmount;
  * (C) Copyright 1997 Thomas Schoebel-Theuer,
  * with heavy changes by Linus Torvalds
  */
-
+/*! 2017. 6. 3 study -ing */
 #define IS_ROOT(x) ((x) == (x)->d_parent)
 
 /* The hash is always the low bits of hash_len */

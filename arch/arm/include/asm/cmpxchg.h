@@ -134,7 +134,7 @@ extern void __bad_cmpxchg(volatile void *ptr, int size);
 /*
  * cmpxchg only support 32-bits operands on ARMv6.
  */
-
+/*! 2017. 6. 3 study -ing */
 static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
 				      unsigned long new, int size)
 {
@@ -186,7 +186,7 @@ static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
 
 	return oldval;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline unsigned long __cmpxchg_mb(volatile void *ptr, unsigned long old,
 					 unsigned long new, int size)
 {
@@ -198,7 +198,12 @@ static inline unsigned long __cmpxchg_mb(volatile void *ptr, unsigned long old,
 
 	return ret;
 }
-
+/*! 2017. 6. 3 study -ing */
+/*!
+ *  ptr 과 o가 같지 않으면, Do Nothing,
+ *  같으면 ptr 에 n을 대입.
+ *  최종적으로 ptr 리턴.
+ */
 #define cmpxchg(ptr,o,n)						\
 	((__typeof__(*(ptr)))__cmpxchg_mb((ptr),			\
 					  (unsigned long)(o),		\

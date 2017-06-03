@@ -378,7 +378,7 @@ error_put:
 	put_cred(new);
 	return ret;
 }
-
+/*! 2017. 6. 3 study -ing */
 static bool cred_cap_issubset(const struct cred *set, const struct cred *subset)
 {
 	const struct user_namespace *set_ns = set->user_ns;
@@ -418,6 +418,7 @@ static bool cred_cap_issubset(const struct cred *set, const struct cred *subset)
  * Always returns 0 thus allowing this function to be tail-called at the end
  * of, say, sys_setgid().
  */
+/*! 2017. 6. 3 study -ing */
 int commit_creds(struct cred *new)
 {
 	struct task_struct *task = current;
@@ -450,6 +451,7 @@ int commit_creds(struct cred *new)
 	}
 
 	/* alter the thread keyring */
+	/*! Do Nothing  */
 	if (!uid_eq(new->fsuid, old->fsuid))
 		key_fsuid_changed(task);
 	if (!gid_eq(new->fsgid, old->fsgid))
@@ -469,12 +471,14 @@ int commit_creds(struct cred *new)
 	alter_cred_subscribers(old, -2);
 
 	/* send notifications */
+	/*! Do Nothing */
 	if (!uid_eq(new->uid,   old->uid)  ||
 	    !uid_eq(new->euid,  old->euid) ||
 	    !uid_eq(new->suid,  old->suid) ||
 	    !uid_eq(new->fsuid, old->fsuid))
 		proc_id_connector(task, PROC_EVENT_UID);
 
+	/*! Do Nothing */
 	if (!gid_eq(new->gid,   old->gid)  ||
 	    !gid_eq(new->egid,  old->egid) ||
 	    !gid_eq(new->sgid,  old->sgid) ||

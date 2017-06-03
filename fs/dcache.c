@@ -2651,10 +2651,13 @@ EXPORT_SYMBOL(d_move);
  * Returns the ancestor dentry of p2 which is a child of p1, if p1 is
  * an ancestor of p2, else NULL.
  */
+/*! 2017. 6. 3 study -ing */
 struct dentry *d_ancestor(struct dentry *p1, struct dentry *p2)
 {
 	struct dentry *p;
 
+	/*! parent가 자기자신이면 root  */
+	/*! p2부터 거슬러 올라가며 p1의 바로 하위의 dentry를 찾는다.  */
 	for (p = p2; !IS_ROOT(p); p = p->d_parent) {
 		if (p->d_parent == p1)
 			return p;
@@ -3299,7 +3302,7 @@ out:
  * Returns 0 otherwise.
  * Caller must ensure that "new_dentry" is pinned before calling is_subdir()
  */
-
+/*! 2017. 6. 3 study -ing */
 int is_subdir(struct dentry *new_dentry, struct dentry *old_dentry)
 {
 	int result;

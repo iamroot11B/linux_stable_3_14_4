@@ -1771,8 +1771,10 @@ void __init proc_caches_init(void)
 /*
  * Check constraints on flags passed to the unshare system call.
  */
+/*! 2017. 6. 3 study -ing */
 static int check_unshare_flags(unsigned long unshare_flags)
 {
+	/*! 정상적인 flag 여부 체크  */
 	if (unshare_flags & ~(CLONE_THREAD|CLONE_FS|CLONE_NEWNS|CLONE_SIGHAND|
 				CLONE_VM|CLONE_FILES|CLONE_SYSVSEM|
 				CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWNET|
@@ -1795,6 +1797,7 @@ static int check_unshare_flags(unsigned long unshare_flags)
 /*
  * Unshare the filesystem structure if it is being shared
  */
+/*! 2017. 6. 3 study -ing */
 static int unshare_fs(unsigned long unshare_flags, struct fs_struct **new_fsp)
 {
 	struct fs_struct *fs = current->fs;
@@ -1816,6 +1819,7 @@ static int unshare_fs(unsigned long unshare_flags, struct fs_struct **new_fsp)
 /*
  * Unshare file descriptor table if it is being shared
  */
+/*! 2017. 6. 3 study -ing */
 static int unshare_fd(unsigned long unshare_flags, struct files_struct **new_fdp)
 {
 	struct files_struct *fd = current->files;
@@ -1839,6 +1843,7 @@ static int unshare_fd(unsigned long unshare_flags, struct files_struct **new_fdp
  * constructed. Here we are modifying the current, active,
  * task_struct.
  */
+/*! 2017. 6. 3 study -ing */
 SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
 {
 	struct fs_struct *fs, *new_fs = NULL;
@@ -1879,12 +1884,16 @@ SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
 	 */
 	if (unshare_flags & (CLONE_NEWIPC|CLONE_SYSVSEM))
 		do_sysvsem = 1;
+
+	/*! new_fs 에 current->fs를 copy  */
 	err = unshare_fs(unshare_flags, &new_fs);
 	if (err)
 		goto bad_unshare_out;
+	/*! new_fs 에 current->files를 copy  */
 	err = unshare_fd(unshare_flags, &new_fd);
 	if (err)
 		goto bad_unshare_cleanup_fs;
+	/*! unshare_flags에 CLONE_NEWUSER이 set 되어있으면 리턴.  */
 	err = unshare_userns(unshare_flags, &new_cred);
 	if (err)
 		goto bad_unshare_cleanup_fd;

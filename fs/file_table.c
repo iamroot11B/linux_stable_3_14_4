@@ -297,6 +297,7 @@ void flush_delayed_fput(void)
 
 static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
 
+/*! 2017. 6. 3 study -ing */
 void fput(struct file *file)
 {
 	if (atomic_long_dec_and_test(&file->f_count)) {
@@ -345,11 +346,11 @@ void put_filp(struct file *file)
 	}
 }
 
-/*! 2016.12.03 study 
+/*! 2016.12.03 study
  * 참고 : http://onestep.tistory.com/65
  */
 void __init files_init(unsigned long mempages)
-{ 
+{
 	unsigned long n;
 
 	filp_cachep = kmem_cache_create("filp", sizeof(struct file), 0,
@@ -357,8 +358,8 @@ void __init files_init(unsigned long mempages)
 
 	/*
 	 * One file with associated inode and dcache is very roughly 1K.
-	 * Per default don't use more than 10% of our memory for files. 
-	 */ 
+	 * Per default don't use more than 10% of our memory for files.
+	 */
 
 	n = (mempages * (PAGE_SIZE / 1024)) / 10;
     /*!
@@ -371,4 +372,4 @@ void __init files_init(unsigned long mempages)
      * nr_files 에 percpu count 설정
      */
 	percpu_counter_init(&nr_files, 0);
-} 
+}

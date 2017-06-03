@@ -50,6 +50,7 @@ struct dnotify_mark {
  * it calls the fsnotify function so it can update the set of all events relevant
  * to this inode.
  */
+/*! 2017. 6. 3 study -ing */
 static void dnotify_recalc_inode_mask(struct fsnotify_mark *fsn_mark)
 {
 	__u32 new_mask, old_mask;
@@ -147,6 +148,7 @@ static struct fsnotify_ops dnotify_fsnotify_ops = {
  * dnotify_struct.  If that was the last dnotify_struct also remove the
  * fsnotify_mark.
  */
+/*! 2017. 6. 3 study -ing */
 void dnotify_flush(struct file *filp, fl_owner_t id)
 {
 	struct fsnotify_mark *fsn_mark;

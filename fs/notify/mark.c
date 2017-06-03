@@ -195,7 +195,7 @@ void fsnotify_destroy_mark(struct fsnotify_mark *mark,
 	fsnotify_destroy_mark_locked(mark, group);
 	mutex_unlock(&group->mark_mutex);
 }
-
+/*! 2017. 6. 3 study -ing */
 void fsnotify_set_mark_mask_locked(struct fsnotify_mark *mark, __u32 mask)
 {
 	assert_spin_locked(&mark->lock);

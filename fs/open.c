@@ -843,7 +843,7 @@ struct file *dentry_open(const struct path *path, int flags,
 				fput(f);
 				f = ERR_PTR(error);
 			}
-		} else { 
+		} else {
 			put_filp(f);
 			f = ERR_PTR(error);
 		}
@@ -1034,6 +1034,7 @@ SYSCALL_DEFINE2(creat, const char __user *, pathname, umode_t, mode)
  * "id" is the POSIX thread ID. We use the
  * files pointer for this..
  */
+/*! 2017. 6. 3 study -ing */
 int filp_close(struct file *filp, fl_owner_t id)
 {
 	int retval = 0;

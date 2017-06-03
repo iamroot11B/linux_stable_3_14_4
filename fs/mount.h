@@ -65,7 +65,7 @@ static inline struct mount *real_mount(struct vfsmount *mnt)
 {
 	return container_of(mnt, struct mount, mnt);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int mnt_has_parent(struct mount *mnt)
 {
 	return mnt != mnt->mnt_parent;

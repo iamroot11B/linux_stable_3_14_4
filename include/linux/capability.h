@@ -48,7 +48,7 @@ extern const kernel_cap_t __cap_init_eff_set;
 /*
  * Internal kernel functions only
  */
-
+/*! 2017. 6. 3 study -ing */
 #define CAP_FOR_EACH_U32(__capi)  \
 	for (__capi = 0; __capi < _KERNEL_CAPABILITY_U32S; ++__capi)
 
@@ -93,8 +93,9 @@ extern const kernel_cap_t __cap_init_eff_set;
 
 #define cap_raise(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] |= CAP_TO_MASK(flag))
 #define cap_lower(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] &= ~CAP_TO_MASK(flag))
+	/*! 2017. 6. 3 study -ing */
 #define cap_raised(c, flag) ((c).cap[CAP_TO_INDEX(flag)] & CAP_TO_MASK(flag))
-
+/*! 2017. 6. 3 study -ing */
 #define CAP_BOP_ALL(c, a, b, OP)                                    \
 do {                                                                \
 	unsigned __capi;                                            \
@@ -126,7 +127,7 @@ static inline kernel_cap_t cap_intersect(const kernel_cap_t a,
 	CAP_BOP_ALL(dest, a, b, &);
 	return dest;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline kernel_cap_t cap_drop(const kernel_cap_t a,
 				    const kernel_cap_t drop)
 {
@@ -141,7 +142,7 @@ static inline kernel_cap_t cap_invert(const kernel_cap_t c)
 	CAP_UOP_ALL(dest, c, ~);
 	return dest;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int cap_isclear(const kernel_cap_t a)
 {
 	unsigned __capi;
@@ -159,10 +160,15 @@ static inline int cap_isclear(const kernel_cap_t a)
  * return 0 if ANY of the capabilities in "a" are not in "set"
  *	cap_issubset(1111, 0101) will return 0
  */
+/*! 2017. 6. 3 study -ing */
 static inline int cap_issubset(const kernel_cap_t a, const kernel_cap_t set)
 {
 	kernel_cap_t dest;
+	/*! set을 ~ 연산 후 a 와 & 한 결과 */
 	dest = cap_drop(a, set);
+
+	/*! dest가 모두 0인지 확인 */
+	/*! ex) (0101, 1111) -> 리턴 1  */
 	return cap_isclear(dest);
 }
 

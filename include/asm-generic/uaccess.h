@@ -286,7 +286,7 @@ __strncpy_from_user(char *dst, const char __user *src, long count)
 	return (tmp - dst);
 }
 #endif
-
+/*! 2017. 6. 3 study -ing */
 static inline long
 strncpy_from_user(char *dst, const char __user *src, long count)
 {
@@ -300,6 +300,7 @@ strncpy_from_user(char *dst, const char __user *src, long count)
  *
  * Return 0 on exception, a value greater than N if too long
  */
+/*! 2017. 6. 3 study -ing */
 #ifndef __strnlen_user
 #define __strnlen_user(s, n) (strnlen((s), (n)) + 1)
 #endif
@@ -309,8 +310,10 @@ strncpy_from_user(char *dst, const char __user *src, long count)
  * its returned count. Callers should check for a returned value
  * greater than N as an indication the string is too long.
  */
+/*! 2017. 6. 3 study -ing */
 static inline long strnlen_user(const char __user *src, long n)
 {
+	/*! 정상적인 range에 있어서 access 가능한지 확인  */
 	if (!access_ok(VERIFY_READ, src, 1))
 		return 0;
 	return __strnlen_user(src, n);

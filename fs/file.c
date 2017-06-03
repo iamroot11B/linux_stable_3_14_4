@@ -27,12 +27,14 @@ int sysctl_nr_open __read_mostly = 1024*1024;
 int sysctl_nr_open_min = BITS_PER_LONG;
 int sysctl_nr_open_max = 1024 * 1024; /* raised later */
 
+/*! 2017. 6. 3 study -ing */
 static void *alloc_fdmem(size_t size)
 {
 	/*
 	 * Very large allocations can stress page reclaim, so fall back to
 	 * vmalloc() if the allocation size will be considered "large" by the VM.
 	 */
+	/*! 사이즈가 일정 이하(우리는 32K)면 kmalloc, 일정 이상이면 vmalloc */
 	if (size <= (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)) {
 		void *data = kmalloc(size, GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY);
 		if (data != NULL)
@@ -41,11 +43,13 @@ static void *alloc_fdmem(size_t size)
 	return vmalloc(size);
 }
 
+/*! 2017. 6. 3 study -ing */
 static void free_fdmem(void *ptr)
 {
 	is_vmalloc_addr(ptr) ? vfree(ptr) : kfree(ptr);
 }
 
+/*! 2017. 6. 3 study -ing */
 static void __free_fdtable(struct fdtable *fdt)
 {
 	free_fdmem(fdt->fd);
@@ -81,6 +85,7 @@ static void copy_fdtable(struct fdtable *nfdt, struct fdtable *ofdt)
 	memset((char *)(nfdt->close_on_exec) + cpy, 0, set);
 }
 
+/*! 2017. 6. 3 study -ing */
 static struct fdtable * alloc_fdtable(unsigned int nr)
 {
 	struct fdtable *fdt;
@@ -218,17 +223,18 @@ static inline void __set_open_fd(int fd, struct fdtable *fdt)
 {
 	__set_bit(fd, fdt->open_fds);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void __clear_open_fd(int fd, struct fdtable *fdt)
 {
 	__clear_bit(fd, fdt->open_fds);
 }
 
+/*! 2017. 6. 3 study -ing */
 static int count_open_files(struct fdtable *fdt)
 {
 	int size = fdt->max_fds;
 	int i;
-
+	/*!  fdt->open_fds[i]의 마지막을 찾아서 index 리턴  */
 	/* Find the last open fd */
 	for (i = size / BITS_PER_LONG; i > 0; ) {
 		if (fdt->open_fds[--i])
@@ -243,6 +249,7 @@ static int count_open_files(struct fdtable *fdt)
  * passed in files structure.
  * errorp will be valid only when the returned files_struct is NULL.
  */
+/*! 2017. 6. 3 study -ing */
 struct files_struct *dup_fd(struct files_struct *oldf, int *errorp)
 {
 	struct files_struct *newf;
@@ -308,6 +315,7 @@ struct files_struct *dup_fd(struct files_struct *oldf, int *errorp)
 	memcpy(new_fdt->close_on_exec, old_fdt->close_on_exec, open_files / 8);
 
 	for (i = open_files; i != 0; i--) {
+		/*! *old_fds++ -> old_fdt->fd[0~max]  */
 		struct file *f = *old_fds++;
 		if (f) {
 			get_file(f);
@@ -320,6 +328,7 @@ struct files_struct *dup_fd(struct files_struct *oldf, int *errorp)
 			 */
 			__clear_open_fd(open_files - i, new_fdt);
 		}
+		/*! new_fdt->fd[0~max] 에 f 대입 */
 		rcu_assign_pointer(*new_fds++, f);
 	}
 	spin_unlock(&oldf->file_lock);
@@ -347,7 +356,7 @@ out_release:
 out:
 	return NULL;
 }
-
+/*! 2017. 6. 3 study -ing */
 static struct fdtable *close_files(struct files_struct * files)
 {
 	/*
@@ -392,7 +401,7 @@ struct files_struct *get_files_struct(struct task_struct *task)
 
 	return files;
 }
-
+/*! 2017. 6. 3 study -ing */
 void put_files_struct(struct files_struct *files)
 {
 	if (atomic_dec_and_test(&files->count)) {

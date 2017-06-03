@@ -65,9 +65,11 @@ struct dentry;
 
 extern void __init files_defer_init(void);
 
+/*! 2017. 6. 3 study -ing */
 #define rcu_dereference_check_fdtable(files, fdtfd) \
 	rcu_dereference_check((fdtfd), lockdep_is_held(&(files)->file_lock))
 
+/*! 2017. 6. 3 study -ing */
 #define files_fdtable(files) \
 	rcu_dereference_check_fdtable((files), (files)->fdt)
 

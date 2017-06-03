@@ -45,11 +45,11 @@ static inline void put_uts_ns(struct uts_namespace *ns)
 static inline void get_uts_ns(struct uts_namespace *ns)
 {
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void put_uts_ns(struct uts_namespace *ns)
 {
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline struct uts_namespace *copy_utsname(unsigned long flags,
 	struct user_namespace *user_ns, struct uts_namespace *old_ns)
 {

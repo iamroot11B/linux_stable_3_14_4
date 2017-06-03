@@ -1943,6 +1943,7 @@ static inline int security_capset(struct cred *new,
 	return cap_capset(new, old, effective, inheritable, permitted);
 }
 
+/*! 2017. 6. 3 study -ing */
 static inline int security_capable(const struct cred *cred,
 				   struct user_namespace *ns, int cap)
 {

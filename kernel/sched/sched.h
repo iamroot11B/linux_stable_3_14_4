@@ -675,6 +675,7 @@ DECLARE_PER_CPU(struct rq, runqueues);
 #define this_rq()		(&__get_cpu_var(runqueues))
 /*! 2017. 4.30 study -ing */
 #define task_rq(p)		cpu_rq(task_cpu(p))
+/*! 2017. 6. 3 study -ing */
 #define cpu_curr(cpu)		(cpu_rq(cpu)->curr)
 #define raw_rq()		(&__raw_get_cpu_var(runqueues))
 

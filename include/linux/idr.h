@@ -110,6 +110,7 @@ static inline void idr_preload_end(void)
  * This function can be called under rcu_read_lock(), given that the leaf
  * pointers lifetimes are correctly managed.
  */
+/*! 2017. 6. 3 study -ing */
 static inline void *idr_find(struct idr *idr, int id)
 {
 	struct idr_layer *hint = rcu_dereference_raw(idr->hint);

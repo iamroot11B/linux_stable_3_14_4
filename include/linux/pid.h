@@ -131,6 +131,7 @@ extern void disable_pid_allocation(struct pid_namespace *ns);
  * 	is expected to be non-NULL. If @pid is NULL, caller should handle
  * 	the resulting NULL pid-ns.
  */
+/*! 2017. 6. 3 study -ing */
 static inline struct pid_namespace *ns_of_pid(struct pid *pid)
 {
 	struct pid_namespace *ns = NULL;

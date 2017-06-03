@@ -103,7 +103,7 @@ do {								\
 # define raw_spin_lock_init(lock)				\
 	do { *(lock) = __RAW_SPIN_LOCK_UNLOCKED(lock); } while (0)
 #endif
-
+/*! 2017. 6. 3 study -ing */
 #define raw_spin_is_locked(lock)	arch_spin_is_locked(&(lock)->raw_lock)
 
 #ifdef CONFIG_GENERIC_LOCKBREAK
@@ -243,6 +243,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #define raw_spin_lock_irq(lock)		_raw_spin_lock_irq(lock)
 /*! 2017. 3.18 study -ing */
 #define raw_spin_lock_bh(lock)		_raw_spin_lock_bh(lock)
+/*! 2017. 6. 3 study -ing */
 #define raw_spin_unlock(lock)		_raw_spin_unlock(lock)
 #define raw_spin_unlock_irq(lock)	_raw_spin_unlock_irq(lock)
 
@@ -347,7 +348,7 @@ do {								\
 do {									\
 	raw_spin_lock_irqsave_nested(spinlock_check(lock), flags, subclass); \
 } while (0)
-
+/*! 2017. 6. 3 study -ing */
 static inline void spin_unlock(spinlock_t *lock)
 {
 	raw_spin_unlock(&lock->rlock);
@@ -388,7 +389,7 @@ static inline void spin_unlock_wait(spinlock_t *lock)
 {
 	raw_spin_unlock_wait(&lock->rlock);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline int spin_is_locked(spinlock_t *lock)
 {
 	return raw_spin_is_locked(&lock->rlock);

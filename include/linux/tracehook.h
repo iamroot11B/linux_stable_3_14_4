@@ -163,8 +163,10 @@ static inline void tracehook_signal_handler(int sig, siginfo_t *info,
  * it will enter the kernel and call tracehook_notify_resume() soon.
  * If it's blocked, it will not be woken.
  */
+/*! 2017. 6. 3 study -ing */
 static inline void set_notify_resume(struct task_struct *task)
 {
+	/*! TIF_NOTIFY_RESUME Not defined.  */
 #ifdef TIF_NOTIFY_RESUME
 	if (!test_and_set_tsk_thread_flag(task, TIF_NOTIFY_RESUME))
 		kick_process(task);

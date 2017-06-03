@@ -377,6 +377,7 @@ bool has_capability_noaudit(struct task_struct *t, int cap)
  * This sets PF_SUPERPRIV on the task if the capability is available on the
  * assumption that it's about to be used.
  */
+/*! 2017. 6. 3 study -ing */
 bool ns_capable(struct user_namespace *ns, int cap)
 {
 	if (unlikely(!cap_valid(cap))) {
@@ -385,6 +386,7 @@ bool ns_capable(struct user_namespace *ns, int cap)
 	}
 
 	if (security_capable(current_cred(), ns, cap) == 0) {
+		/*! sercurity capable 하면 PF_SUPERPRIV flags 추가. */
 		current->flags |= PF_SUPERPRIV;
 		return true;
 	}

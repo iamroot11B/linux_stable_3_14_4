@@ -73,6 +73,7 @@ int cap_netlink_send(struct sock *sk, struct sk_buff *skb)
  * cap_has_capability() returns 0 when a task has a capability, but the
  * kernel's capable() and has_capability() returns 1 for this case.
  */
+/*! 2017. 6. 3 study -ing */
 int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
 		int cap, int audit)
 {
@@ -91,7 +92,7 @@ int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
 		if (ns == &init_user_ns)
 			return -EPERM;
 
-		/* 
+		/*
 		 * The owner of the user namespace in the parent of the
 		 * user namespace has all caps.
 		 */

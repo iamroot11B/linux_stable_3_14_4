@@ -144,6 +144,7 @@ static inline struct ipc_namespace *get_ipc_ns(struct ipc_namespace *ns)
 
 extern void put_ipc_ns(struct ipc_namespace *ns);
 #else
+/*! 2017. 6. 3 study -ing */
 static inline struct ipc_namespace *copy_ipcs(unsigned long flags,
 	struct user_namespace *user_ns, struct ipc_namespace *ns)
 {
@@ -157,7 +158,7 @@ static inline struct ipc_namespace *get_ipc_ns(struct ipc_namespace *ns)
 {
 	return ns;
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline void put_ipc_ns(struct ipc_namespace *ns)
 {
 }

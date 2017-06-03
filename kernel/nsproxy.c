@@ -40,7 +40,7 @@ struct nsproxy init_nsproxy = {
 	.net_ns			= &init_net,
 #endif
 };
-
+/*! 2017. 6. 3 study -ing */
 static inline struct nsproxy *create_nsproxy(void)
 {
 	struct nsproxy *nsproxy;
@@ -56,6 +56,7 @@ static inline struct nsproxy *create_nsproxy(void)
  * Return the newly created nsproxy.  Do not attach this to the task,
  * leave it to the caller to do proper locking and attach it to task.
  */
+/*! 2017. 6. 3 study -ing */
 static struct nsproxy *create_new_namespaces(unsigned long flags,
 	struct task_struct *tsk, struct user_namespace *user_ns,
 	struct fs_struct *new_fs)
@@ -73,25 +74,28 @@ static struct nsproxy *create_new_namespaces(unsigned long flags,
 		goto out_ns;
 	}
 
+	/*! 우리는 tsk->nsproxy->uts_ns가 그대로 리턴  */
 	new_nsp->uts_ns = copy_utsname(flags, user_ns, tsk->nsproxy->uts_ns);
 	if (IS_ERR(new_nsp->uts_ns)) {
 		err = PTR_ERR(new_nsp->uts_ns);
 		goto out_uts;
 	}
 
+	/*! 우리는 tsk->nsproxy->ipc_ns가 그대로 리턴  */
 	new_nsp->ipc_ns = copy_ipcs(flags, user_ns, tsk->nsproxy->ipc_ns);
 	if (IS_ERR(new_nsp->ipc_ns)) {
 		err = PTR_ERR(new_nsp->ipc_ns);
 		goto out_ipc;
 	}
 
+	/*! 우리는 tsk->nsproxy->pid_ns_for_children가 그대로 리턴  */
 	new_nsp->pid_ns_for_children =
 		copy_pid_ns(flags, user_ns, tsk->nsproxy->pid_ns_for_children);
 	if (IS_ERR(new_nsp->pid_ns_for_children)) {
 		err = PTR_ERR(new_nsp->pid_ns_for_children);
 		goto out_pid;
 	}
-
+	/*! 우리는 tsk->nsproxy->net_ns가 그대로 리턴  */
 	new_nsp->net_ns = copy_net_ns(flags, user_ns, tsk->nsproxy->net_ns);
 	if (IS_ERR(new_nsp->net_ns)) {
 		err = PTR_ERR(new_nsp->net_ns);
@@ -144,7 +148,7 @@ int copy_namespaces(unsigned long flags, struct task_struct *tsk)
 	 * it along with CLONE_NEWIPC.
 	 */
 	if ((flags & (CLONE_NEWIPC | CLONE_SYSVSEM)) ==
-		(CLONE_NEWIPC | CLONE_SYSVSEM)) 
+		(CLONE_NEWIPC | CLONE_SYSVSEM))
 		return -EINVAL;
 
 	new_ns = create_new_namespaces(flags, tsk, user_ns, tsk->fs);
@@ -155,6 +159,7 @@ int copy_namespaces(unsigned long flags, struct task_struct *tsk)
 	return 0;
 }
 
+/*! 2017. 6. 3 study -ing */
 void free_nsproxy(struct nsproxy *ns)
 {
 	if (ns->mnt_ns)
@@ -165,6 +170,7 @@ void free_nsproxy(struct nsproxy *ns)
 		put_ipc_ns(ns->ipc_ns);
 	if (ns->pid_ns_for_children)
 		put_pid_ns(ns->pid_ns_for_children);
+	/*! Do nothing  */
 	put_net(ns->net_ns);
 	kmem_cache_free(nsproxy_cachep, ns);
 }
@@ -173,6 +179,7 @@ void free_nsproxy(struct nsproxy *ns)
  * Called from unshare. Unshare all the namespaces part of nsproxy.
  * On success, returns the new nsproxy.
  */
+/*! 2017. 6. 3 study -ing */
 int unshare_nsproxy_namespaces(unsigned long unshare_flags,
 	struct nsproxy **new_nsp, struct cred *new_cred, struct fs_struct *new_fs)
 {
@@ -198,6 +205,7 @@ out:
 	return err;
 }
 
+/*! 2017. 6. 3 study -ing */
 void switch_task_namespaces(struct task_struct *p, struct nsproxy *new)
 {
 	struct nsproxy *ns;

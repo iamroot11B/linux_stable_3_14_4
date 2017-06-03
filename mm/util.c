@@ -90,6 +90,7 @@ EXPORT_SYMBOL(kmemdup);
  *
  * Returns an ERR_PTR() on failure.
  */
+/*! 2017. 6. 3 study -ing */
 void *memdup_user(const void __user *src, size_t len)
 {
 	void *p;
@@ -208,6 +209,7 @@ EXPORT_SYMBOL(kzfree);
  * @s: The string to duplicate
  * @n: Maximum number of bytes to copy, including the trailing NUL.
  */
+/*! 2017. 6. 3 study -ing */
 char *strndup_user(const char __user *s, long n)
 {
 	char *p;

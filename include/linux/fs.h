@@ -824,12 +824,14 @@ struct file_handle {
 	unsigned char f_handle[0];
 };
 
+/*! 2017. 6. 3 study -ing */
 static inline struct file *get_file(struct file *f)
 {
 	atomic_long_inc(&f->f_count);
 	return f;
 }
 #define fput_atomic(x)	atomic_long_add_unless(&(x)->f_count, -1, 1)
+/*! 2017. 6. 3 study -ing */
 #define file_count(x)	atomic_long_read(&(x)->f_count)
 
 #ifdef CONFIG_DEBUG_WRITECOUNT
@@ -2110,7 +2112,9 @@ extern struct kmem_cache *names_cachep;
 
 extern void final_putname(struct filename *name);
 
+/*! 2017. 6. 3 study -ing */
 #define __getname()		kmem_cache_alloc(names_cachep, GFP_KERNEL)
+/*! 2017. 6. 3 study -ing */
 #define __putname(name)		kmem_cache_free(names_cachep, (void *)(name))
 #ifndef CONFIG_AUDITSYSCALL
 #define putname(name)		final_putname(name)
@@ -2302,7 +2306,7 @@ static inline bool execute_ok(struct inode *inode)
 {
 	return (inode->i_mode & S_IXUGO) || S_ISDIR(inode->i_mode);
 }
-
+/*! 2017. 6. 3 study -ing */
 static inline struct inode *file_inode(struct file *f)
 {
 	return f->f_inode;

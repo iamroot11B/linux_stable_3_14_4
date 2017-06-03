@@ -1562,6 +1562,7 @@ void monotonic_to_bootbased(struct timespec *ts)
 }
 EXPORT_SYMBOL_GPL(monotonic_to_bootbased);
 
+/*! 2017. 6. 3 study -ing */
 unsigned long get_seconds(void)
 {
 	struct timekeeper *tk = &timekeeper;

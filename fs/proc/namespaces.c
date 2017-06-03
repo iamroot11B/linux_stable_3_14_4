@@ -291,12 +291,13 @@ out_invalid:
 	fput(file);
 	return ERR_PTR(-EINVAL);
 }
-
+/*! 2017. 6. 3 study -ing */
 struct proc_ns *get_proc_ns(struct inode *inode)
 {
 	return &PROC_I(inode)->ns;
 }
 
+/*! 2017. 6. 3 study -ing */
 bool proc_ns_inode(struct inode *inode)
 {
 	return inode->i_fop == &ns_file_operations;
