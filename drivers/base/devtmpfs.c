@@ -373,7 +373,7 @@ static int handle(const char *name, umode_t mode, kuid_t uid, kgid_t gid,
 		return handle_remove(name, dev);
 }
 
-\static int devtmpfsd(void *p)
+static int devtmpfsd(void *p)
 {
 	char options[] = "mode=0755";
 	int *err = p;
