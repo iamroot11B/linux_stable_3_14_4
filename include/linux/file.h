@@ -33,6 +33,7 @@ struct fd {
 #define FDPUT_FPUT       1
 #define FDPUT_POS_UNLOCK 2
 
+/*! 2017. 6.17 study -ing */
 static inline void fdput(struct fd fd)
 {
 	if (fd.flags & FDPUT_FPUT)
@@ -55,6 +56,7 @@ static inline struct fd fdget(unsigned int fd)
 	return __to_fd(__fdget(fd));
 }
 
+/*! 2017. 6.17 study -ing */
 static inline struct fd fdget_raw(unsigned int fd)
 {
 	return __to_fd(__fdget_raw(fd));

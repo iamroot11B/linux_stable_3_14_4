@@ -179,6 +179,7 @@ extern void mutex_unlock(struct mutex *lock);
 extern int atomic_dec_and_mutex_lock(atomic_t *cnt, struct mutex *lock);
 
 #ifndef arch_mutex_cpu_relax
+/*! 2017. 6.17 study -ing */
 # define arch_mutex_cpu_relax() cpu_relax()
 #endif
 

@@ -76,6 +76,7 @@ extern void __init files_defer_init(void);
 /*
  * The caller must ensure that fd table isn't shared or hold rcu or file lock
  */
+/*! 2017. 6.17 study -ing */
 static inline struct file *__fcheck_files(struct files_struct *files, unsigned int fd)
 {
 	struct fdtable *fdt = rcu_dereference_raw(files->fdt);
@@ -85,6 +86,7 @@ static inline struct file *__fcheck_files(struct files_struct *files, unsigned i
 	return NULL;
 }
 
+/*! 2017. 6.17 study -ing */
 static inline struct file *fcheck_files(struct files_struct *files, unsigned int fd)
 {
 	rcu_lockdep_assert(rcu_read_lock_held() ||

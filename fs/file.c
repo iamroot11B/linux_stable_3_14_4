@@ -654,6 +654,7 @@ void do_close_on_exec(struct files_struct *files)
 	spin_unlock(&files->file_lock);
 }
 
+/*! 2017. 6.17 study -ing */
 static struct file *__fget(unsigned int fd, fmode_t mask)
 {
 	struct files_struct *files = current->files;
@@ -700,6 +701,7 @@ EXPORT_SYMBOL(fget_raw);
  * The fput_needed flag returned by fget_light should be passed to the
  * corresponding fput_light.
  */
+/*! 2017. 6.17 study -ing */
 static unsigned long __fget_light(unsigned int fd, fmode_t mask)
 {
 	struct files_struct *files = current->files;
@@ -723,6 +725,7 @@ unsigned long __fdget(unsigned int fd)
 }
 EXPORT_SYMBOL(__fdget);
 
+/*! 2017. 6.17 study -ing */
 unsigned long __fdget_raw(unsigned int fd)
 {
 	return __fget_light(fd, 0);

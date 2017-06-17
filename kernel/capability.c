@@ -448,10 +448,12 @@ EXPORT_SYMBOL(capable);
  * current user namespace.
  *
  */
+/*! 2017. 6.17 study -ing */
 bool inode_capable(const struct inode *inode, int cap)
 {
 	struct user_namespace *ns = current_user_ns();
 
+	/*! 우리는 kuid_has_mapping()이 항상 true */
 	return ns_capable(ns, cap) && kuid_has_mapping(ns, inode->i_uid);
 }
 EXPORT_SYMBOL(inode_capable);

@@ -12,6 +12,7 @@ static inline int devcgroup_inode_permission(struct inode *inode, int mask)
 	return __devcgroup_inode_permission(inode, mask);
 }
 #else
+/*! 2017. 6.17 study -ing */
 static inline int devcgroup_inode_permission(struct inode *inode, int mask)
 { return 0; }
 static inline int devcgroup_inode_mknod(int mode, dev_t dev)

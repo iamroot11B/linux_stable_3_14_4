@@ -133,6 +133,8 @@ static void groups_sort(struct group_info *group_info)
 }
 
 /* a simple bsearch */
+/*! 2017. 6.17 study -ing */
+/*! group_info에서 grp를 찾는다. */
 int groups_search(const struct group_info *group_info, kgid_t grp)
 {
 	unsigned int left, right;
@@ -257,12 +259,15 @@ SYSCALL_DEFINE2(setgroups, int, gidsetsize, gid_t __user *, grouplist)
 /*
  * Check whether we're fsgid/egid or in the supplemental group..
  */
+/*! 2017. 6.17 study -ing */
+/*! grp가 current의 group에 있거나 같으면 1, 아니면 0 */
 int in_group_p(kgid_t grp)
 {
 	const struct cred *cred = current_cred();
 	int retval = 1;
 
 	if (!gid_eq(grp, cred->fsgid))
+		/*! grp를 group_info에서 찾고 있으면 1, 아니면 0 */
 		retval = groups_search(cred->group_info, grp);
 	return retval;
 }

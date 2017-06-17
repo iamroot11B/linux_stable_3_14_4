@@ -427,11 +427,13 @@ static inline void d_set_type(struct dentry *dentry, unsigned type)
 	spin_unlock(&dentry->d_lock);
 }
 
+/*! 2017. 6.17 study -ing */
 static inline unsigned __d_entry_type(const struct dentry *dentry)
 {
 	return dentry->d_flags & DCACHE_ENTRY_TYPE;
 }
 
+/*! 2017. 6.17 study -ing */
 static inline bool d_is_directory(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_DIRECTORY_TYPE;

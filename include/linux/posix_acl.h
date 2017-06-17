@@ -51,6 +51,7 @@ struct posix_acl {
 	struct posix_acl_entry	a_entries[0];
 };
 
+/*! 2017. 6.17 study -ing */
 #define FOREACH_ACL_ENTRY(pa, acl, pe) \
 	for(pa=(acl)->a_entries, pe=pa+(acl)->a_count; pa<pe; pa++)
 
@@ -58,6 +59,7 @@ struct posix_acl {
 /*
  * Duplicate an ACL handle.
  */
+/*! 2017. 6.17 study -ing */
 static inline struct posix_acl *
 posix_acl_dup(struct posix_acl *acl)
 {
@@ -69,6 +71,7 @@ posix_acl_dup(struct posix_acl *acl)
 /*
  * Free an ACL handle.
  */
+/*! 2017. 6.17 study -ing */
 static inline void
 posix_acl_release(struct posix_acl *acl)
 {

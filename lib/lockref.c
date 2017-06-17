@@ -16,6 +16,7 @@
  * Note that the "cmpxchg()" reloads the "old" value for the
  * failure case.
  */
+/*! 2017. 6.17 study -ing */
 #define CMPXCHG_LOOP(CODE, SUCCESS) do {					\
 	struct lockref old;							\
 	BUILD_BUG_ON(sizeof(old) != 8);						\
@@ -158,6 +159,7 @@ EXPORT_SYMBOL(lockref_mark_dead);
  * @lockref: pointer to lockref structure
  * Return: 1 if count updated successfully or 0 if lockref was dead
  */
+/*! 2017. 6.17 study -ing */
 int lockref_get_not_dead(struct lockref *lockref)
 {
 	int retval;

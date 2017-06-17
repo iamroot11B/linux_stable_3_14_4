@@ -71,6 +71,7 @@ extern int set_groups(struct cred *, struct group_info *);
 extern int groups_search(const struct group_info *, kgid_t);
 
 /* access the groups "array" with this macro */
+/*! 2017. 6.17 study -ing */
 #define GROUP_AT(gi, i) \
 	((gi)->blocks[(i) / NGROUPS_PER_BLOCK][(i) % NGROUPS_PER_BLOCK])
 
@@ -262,6 +263,7 @@ static inline void put_cred(const struct cred *_cred)
  * Access the subjective credentials of the current task.  RCU-safe,
  * since nobody else can modify it.
  */
+/*! 2017. 6.17 study -ing */
 #define current_cred() \
 	rcu_dereference_protected(current->cred, 1)
 
@@ -330,6 +332,7 @@ static inline void put_cred(const struct cred *_cred)
 #define task_uid(task)		(task_cred_xxx((task), uid))
 #define task_euid(task)		(task_cred_xxx((task), euid))
 
+/*! 2017. 6.17 study -ing */
 #define current_cred_xxx(xxx)			\
 ({						\
 	current_cred()->xxx;			\
@@ -341,6 +344,7 @@ static inline void put_cred(const struct cred *_cred)
 #define current_egid()		(current_cred_xxx(egid))
 #define current_suid()		(current_cred_xxx(suid))
 #define current_sgid()		(current_cred_xxx(sgid))
+/*! 2017. 6.17 study -ing */
 #define current_fsuid() 	(current_cred_xxx(fsuid))
 #define current_fsgid() 	(current_cred_xxx(fsgid))
 #define current_cap()		(current_cred_xxx(cap_effective))

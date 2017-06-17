@@ -588,6 +588,7 @@ static void free_vfsmnt(struct mount *mnt)
 }
 
 /* call under rcu_read_lock */
+/*! 2017. 6.17 study -ing */
 bool legitimize_mnt(struct vfsmount *bastard, unsigned seq)
 {
 	struct mount *mnt;
@@ -2411,6 +2412,7 @@ int copy_mount_string(const void __user *data, char **where)
  * Therefore, if this magic number is present, it carries no information
  * and must be discarded.
  */
+/*! 2017. 6.17 study -ing */
 long do_mount(const char *dev_name, const char *dir_name,
 		const char *type_page, unsigned long flags, void *data_page)
 {
@@ -2681,6 +2683,7 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 		goto out_data;
 
 	/*! 2017. 6. 3 study end */
+	/*! 2017. 6.17 study start */
 
 	ret = do_mount(kernel_dev, kernel_dir->name, kernel_type, flags,
 		(void *) data_page);

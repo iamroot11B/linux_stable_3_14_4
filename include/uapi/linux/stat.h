@@ -17,6 +17,7 @@
 #define S_ISVTX  0001000
 
 #define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
+/*! 2017. 6.17 study -ing */
 #define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
 /*! 2017. 6. 3 study -ing */
 #define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)

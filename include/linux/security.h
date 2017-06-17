@@ -2178,6 +2178,7 @@ static inline int security_inode_follow_link(struct dentry *dentry,
 	return 0;
 }
 
+/*! 2017. 6.17 study -ing */
 static inline int security_inode_permission(struct inode *inode, int mask)
 {
 	return 0;

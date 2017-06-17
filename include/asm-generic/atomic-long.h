@@ -251,6 +251,7 @@ static inline long atomic_long_add_unless(atomic_long_t *l, long a, long u)
 	return (long)atomic_add_unless(v, a, u);
 }
 
+/*! 2017. 6.17 study -ing */
 #define atomic_long_inc_not_zero(l) atomic_inc_not_zero((atomic_t *)(l))
 
 #define atomic_long_cmpxchg(l, old, new) \

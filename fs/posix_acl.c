@@ -21,6 +21,7 @@
 #include <linux/export.h>
 #include <linux/user_namespace.h>
 
+/*! 2017. 6.17 study -ing */
 struct posix_acl **acl_by_type(struct inode *inode, int type)
 {
 	switch (type) {
@@ -34,6 +35,7 @@ struct posix_acl **acl_by_type(struct inode *inode, int type)
 }
 EXPORT_SYMBOL(acl_by_type);
 
+/*! 2017. 6.17 study -ing */
 struct posix_acl *get_cached_acl(struct inode *inode, int type)
 {
 	struct posix_acl **p = acl_by_type(inode, type);
@@ -49,12 +51,14 @@ struct posix_acl *get_cached_acl(struct inode *inode, int type)
 }
 EXPORT_SYMBOL(get_cached_acl);
 
+/*! 2017. 6.17 study -ing */
 struct posix_acl *get_cached_acl_rcu(struct inode *inode, int type)
 {
 	return rcu_dereference(*acl_by_type(inode, type));
 }
 EXPORT_SYMBOL(get_cached_acl_rcu);
 
+/*! 2017. 6.17 study -ing */
 void set_cached_acl(struct inode *inode, int type, struct posix_acl *acl)
 {
 	struct posix_acl **p = acl_by_type(inode, type);
@@ -96,6 +100,7 @@ void forget_all_cached_acls(struct inode *inode)
 }
 EXPORT_SYMBOL(forget_all_cached_acls);
 
+/*! 2017. 6.17 study -ing */
 struct posix_acl *get_acl(struct inode *inode, int type)
 {
 	struct posix_acl *acl;
@@ -302,6 +307,11 @@ EXPORT_SYMBOL(posix_acl_from_mode);
  * Return 0 if current is granted want access to the inode
  * by the acl. Returns -E... otherwise.
  */
+/*! 2017. 6.17 study -ing */
+/*!
+ * Access Control List 을 설명하는 페이지.
+ * http://www.potatogim.net/wiki/%EC%A0%91%EA%B7%BC_%EC%A0%9C%EC%96%B4_%EB%AA%A9%EB%A1%9D
+ */
 int
 posix_acl_permission(struct inode *inode, const struct posix_acl *acl, int want)
 {
@@ -310,42 +320,45 @@ posix_acl_permission(struct inode *inode, const struct posix_acl *acl, int want)
 
 	want &= MAY_READ | MAY_WRITE | MAY_EXEC | MAY_NOT_BLOCK;
 
+	/*! for(pa=(acl)->a_entries, pe=pa+(acl)->a_count; pa<pe; pa++) */
 	FOREACH_ACL_ENTRY(pa, acl, pe) {
-                switch(pa->e_tag) {
-                        case ACL_USER_OBJ:
+		switch(pa->e_tag) {
+			case ACL_USER_OBJ:
 				/* (May have been checked already) */
 				if (uid_eq(inode->i_uid, current_fsuid()))
-                                        goto check_perm;
-                                break;
-                        case ACL_USER:
-				if (uid_eq(pa->e_uid, current_fsuid()))
-                                        goto mask;
+					goto check_perm;
 				break;
-                        case ACL_GROUP_OBJ:
-                                if (in_group_p(inode->i_gid)) {
+			case ACL_USER:
+				if (uid_eq(pa->e_uid, current_fsuid()))
+					goto mask;
+				break;
+			case ACL_GROUP_OBJ:
+				/*! 파일이 current의 group이거나 하위인지 확인 */
+				if (in_group_p(inode->i_gid)) {
 					found = 1;
 					if ((pa->e_perm & want) == want)
 						goto mask;
-                                }
+				}
 				break;
-                        case ACL_GROUP:
+			case ACL_GROUP:
+				/*! entry가 current의 group이거나 하위인지 확인 */
 				if (in_group_p(pa->e_gid)) {
 					found = 1;
 					if ((pa->e_perm & want) == want)
 						goto mask;
-                                }
-                                break;
-                        case ACL_MASK:
-                                break;
-                        case ACL_OTHER:
+				}
+				break;
+			case ACL_MASK:
+				break;
+			case ACL_OTHER:
 				if (found)
 					return -EACCES;
 				else
 					goto check_perm;
 			default:
 				return -EIO;
-                }
-        }
+		}
+	}
 	return -EIO;
 
 mask:

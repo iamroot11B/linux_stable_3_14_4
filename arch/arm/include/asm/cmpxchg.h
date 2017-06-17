@@ -230,6 +230,7 @@ static inline unsigned long __cmpxchg_local(volatile void *ptr,
 	return ret;
 }
 
+/*! 2017. 6.17 study -ing */
 static inline unsigned long long __cmpxchg64(unsigned long long *ptr,
 					     unsigned long long old,
 					     unsigned long long new)
@@ -277,6 +278,7 @@ static inline unsigned long long __cmpxchg64_mb(unsigned long long *ptr,
 					(unsigned long long)(o),	\
 					(unsigned long long)(n)))
 
+/*! 2017. 6.17 study -ing */
 #define cmpxchg64_relaxed(ptr, o, n)					\
 	((__typeof__(*(ptr)))__cmpxchg64((ptr),				\
 					(unsigned long long)(o),	\

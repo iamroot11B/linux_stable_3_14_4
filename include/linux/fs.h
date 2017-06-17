@@ -1663,6 +1663,7 @@ struct super_operations {
  * i_flags updated.  Hence, i_flags no longer inherit the superblock mount
  * flags, so these have to be checked separately. -- rmk@arm.uk.linux.org
  */
+/*! 2017. 6.17 study -ing */
 #define __IS_FLG(inode, flg)	((inode)->i_sb->s_flags & (flg))
 
 #define IS_RDONLY(inode)	((inode)->i_sb->s_flags & MS_RDONLY)
@@ -1676,7 +1677,9 @@ struct super_operations {
 
 #define IS_NOQUOTA(inode)	((inode)->i_flags & S_NOQUOTA)
 #define IS_APPEND(inode)	((inode)->i_flags & S_APPEND)
+/*! 2017. 6.17 study -ing */
 #define IS_IMMUTABLE(inode)	((inode)->i_flags & S_IMMUTABLE)
+/*! 2017. 6.17 study -ing */
 #define IS_POSIXACL(inode)	__IS_FLG(inode, MS_POSIXACL)
 
 #define IS_DEADDIR(inode)	((inode)->i_flags & S_DEAD)

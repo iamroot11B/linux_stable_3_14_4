@@ -254,6 +254,7 @@ void putname(struct filename *name)
 }
 #endif
 
+/*! 2017. 6.17 study -ing */
 static int check_acl(struct inode *inode, int mask)
 {
 #ifdef CONFIG_FS_POSIX_ACL
@@ -261,21 +262,21 @@ static int check_acl(struct inode *inode, int mask)
 
 	if (mask & MAY_NOT_BLOCK) {
 		acl = get_cached_acl_rcu(inode, ACL_TYPE_ACCESS);
-	        if (!acl)
-	                return -EAGAIN;
+		if (!acl)
+			return -EAGAIN;
 		/* no ->get_acl() calls in RCU mode... */
 		if (acl == ACL_NOT_CACHED)
 			return -ECHILD;
-	        return posix_acl_permission(inode, acl, mask & ~MAY_NOT_BLOCK);
+		return posix_acl_permission(inode, acl, mask & ~MAY_NOT_BLOCK);
 	}
 
 	acl = get_acl(inode, ACL_TYPE_ACCESS);
 	if (IS_ERR(acl))
 		return PTR_ERR(acl);
 	if (acl) {
-	        int error = posix_acl_permission(inode, acl, mask);
-	        posix_acl_release(acl);
-	        return error;
+		int error = posix_acl_permission(inode, acl, mask);
+		posix_acl_release(acl);
+		return error;
 	}
 #endif
 
@@ -285,25 +286,44 @@ static int check_acl(struct inode *inode, int mask)
 /*
  * This does the basic permission checking
  */
+/*! 2017. 6.17 study -ing */
 static int acl_permission_check(struct inode *inode, int mask)
 {
 	unsigned int mode = inode->i_mode;
 
+	/*!
+	 * current의 fsuid가 확인하려는 file의 uid와 같은지 확인
+	 * 같으면, User 부분만 추려냄.
+	 * 참고) S_IRWXU, S_IRWXG, S_IRWXO를 보면
+	 * Mode 비트가 3비트씩 User/Group/Other 순서임
+	 */
 	if (likely(uid_eq(current_fsuid(), inode->i_uid)))
 		mode >>= 6;
 	else {
+		/*! ACL이 있고, Group에 권한이 있는 경우
+		 * ACL로 User,Group,Other 별 권한을 확인함
+		 */
 		if (IS_POSIXACL(inode) && (mode & S_IRWXG)) {
 			int error = check_acl(inode, mask);
 			if (error != -EAGAIN)
 				return error;
 		}
 
+		/*! Group만 확인함 */
 		if (in_group_p(inode->i_gid))
 			mode >>= 3;
 	}
 
 	/*
 	 * If the DACs are ok we don't need any capability check.
+	 */
+	/*!
+	 * 1) mode >>= 6 : User 권한 확인
+	 *
+	 * 2) ACL로 권한 확인 : 위의 check_acl()
+	 *
+	 * 3) mode >>= 3 : Group 권한 확인
+	 * 4) 나머지 : User 권한 확인
 	 */
 	if ((mask & ~mode & (MAY_READ | MAY_WRITE | MAY_EXEC)) == 0)
 		return 0;
@@ -324,6 +344,7 @@ static int acl_permission_check(struct inode *inode, int mask)
  * request cannot be satisfied (eg. requires blocking or too much complexity).
  * It would then be called again in ref-walk mode.
  */
+/*! 2017. 6.17 study -ing */
 int generic_permission(struct inode *inode, int mask)
 {
 	int ret;
@@ -331,6 +352,7 @@ int generic_permission(struct inode *inode, int mask)
 	/*
 	 * Do the basic permission checks.
 	 */
+	/*! 0 이면 Permitted */
 	ret = acl_permission_check(inode, mask);
 	if (ret != -EACCES)
 		return ret;
@@ -370,6 +392,7 @@ int generic_permission(struct inode *inode, int mask)
  * flag in inode->i_opflags, that says "this has not special
  * permission function, use the fast case".
  */
+/*! 2017. 6.17 study -ing */
 static inline int do_inode_permission(struct inode *inode, int mask)
 {
 	if (unlikely(!(inode->i_opflags & IOP_FASTPERM))) {
@@ -396,6 +419,7 @@ static inline int do_inode_permission(struct inode *inode, int mask)
  * This does not check for a read-only file system.  You probably want
  * inode_permission().
  */
+/*! 2017. 6.17 study -ing */
 int __inode_permission(struct inode *inode, int mask)
 {
 	int retval;
@@ -412,10 +436,12 @@ int __inode_permission(struct inode *inode, int mask)
 	if (retval)
 		return retval;
 
+	/*! 항상 return 0 */
 	retval = devcgroup_inode_permission(inode, mask);
 	if (retval)
 		return retval;
 
+	/*! 항상 return 0 */
 	return security_inode_permission(inode, mask);
 }
 
@@ -427,12 +453,18 @@ int __inode_permission(struct inode *inode, int mask)
  *
  * Separate out file-system wide checks from inode-specific permission checks.
  */
+/*! 2017. 6.17 study -ing */
 static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
 {
+	/*! Write 권한 확인이 요청 되었으면 */
 	if (unlikely(mask & MAY_WRITE)) {
 		umode_t mode = inode->i_mode;
 
 		/* Nobody gets write access to a read-only fs. */
+		/*!
+		 * sub-system이 ReadOnly로 Mount되었는고, REG DIR LNK 중 하나이면 에러
+		 * REG: 일반 파일, DIR: 폴더, LNK: 링크
+		 */
 		if ((sb->s_flags & MS_RDONLY) &&
 		    (S_ISREG(mode) || S_ISDIR(mode) || S_ISLNK(mode)))
 			return -EROFS;
@@ -451,10 +483,12 @@ static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
  *
  * When checking for MAY_APPEND, MAY_WRITE must also be set in @mask.
  */
+/*! 2017. 6.17 study -ing */
 int inode_permission(struct inode *inode, int mask)
 {
 	int retval;
 
+	/*! sb_permission은 MAY_WRITE만 검사함 */
 	retval = sb_permission(inode->i_sb, inode, mask);
 	if (retval)
 		return retval;
@@ -511,6 +545,7 @@ EXPORT_SYMBOL(path_put);
  * for ref-walk mode.  @dentry must be a path found by a do_lookup call on
  * @nd or NULL.  Must be called from rcu-walk context.
  */
+/*! 2017. 6.17 study -ing */
 static int unlazy_walk(struct nameidata *nd, struct dentry *dentry)
 {
 	struct fs_struct *fs = current->fs;
@@ -646,6 +681,7 @@ static int complete_walk(struct nameidata *nd)
 	return status;
 }
 
+/*! 2017. 6.17 study -ing */
 static __always_inline void set_root(struct nameidata *nd)
 {
 	if (!nd->root.mnt)
@@ -654,6 +690,7 @@ static __always_inline void set_root(struct nameidata *nd)
 
 static int link_path_walk(const char *, struct nameidata *);
 
+/*! 2017. 6.17 study -ing */
 static __always_inline void set_root_rcu(struct nameidata *nd)
 {
 	if (!nd->root.mnt) {
@@ -1474,6 +1511,7 @@ static int lookup_slow(struct nameidata *nd, struct path *path)
 	return 0;
 }
 
+/*! 2017. 6.17 study -ing */
 static inline int may_lookup(struct nameidata *nd)
 {
 	if (nd->flags & LOOKUP_RCU) {
@@ -1668,6 +1706,7 @@ EXPORT_SYMBOL(full_name_hash);
  * Calculate the length and hash of the path component, and
  * return the length of the component;
  */
+/*! 2017. 6.17 study later */
 static inline unsigned long hash_name(const char *name, unsigned int *hashp)
 {
 	unsigned long a, b, adata, bdata, mask, hash, len;
@@ -1733,6 +1772,7 @@ static inline unsigned long hash_name(const char *name, unsigned int *hashp)
  * Returns 0 and nd will have valid dentry and mnt on success.
  * Returns error and drops reference to input namei data on failure.
  */
+/*! 2017. 6.17 study -ing */
 static int link_path_walk(const char *name, struct nameidata *nd)
 {
 	struct path next;
@@ -1778,6 +1818,8 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 			}
 		}
 
+		/*! 2017. 6.17 study end */
+
 		nd->last = this;
 		nd->last_type = type;
 
@@ -1813,6 +1855,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 	return err;
 }
 
+/*! 2017. 6.17 study -ing */
 static int path_init(int dfd, const char *name, unsigned int flags,
 		     struct nameidata *nd, struct file **fp)
 {
@@ -1913,6 +1956,7 @@ static inline int lookup_last(struct nameidata *nd, struct path *path)
 }
 
 /* Returns 0 and nd will be valid on success; Retuns error, otherwise. */
+/*! 2017. 6.17 study -ing */
 static int path_lookupat(int dfd, const char *name,
 				unsigned int flags, struct nameidata *nd)
 {
@@ -1979,6 +2023,7 @@ static int path_lookupat(int dfd, const char *name,
 	return err;
 }
 
+/*! 2017. 6.17 study -ing */
 static int filename_lookup(int dfd, struct filename *name,
 				unsigned int flags, struct nameidata *nd)
 {
@@ -1994,6 +2039,7 @@ static int filename_lookup(int dfd, struct filename *name,
 	return retval;
 }
 
+/*! 2017. 6.17 study -ing */
 static int do_path_lookup(int dfd, const char *name,
 				unsigned int flags, struct nameidata *nd)
 {
@@ -2025,6 +2071,7 @@ struct dentry *kern_path_locked(const char *name, struct path *path)
 	return d;
 }
 
+/*! 2017. 6.17 study -ing */
 int kern_path(const char *name, unsigned int flags, struct path *path)
 {
 	struct nameidata nd;
