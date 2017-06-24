@@ -94,6 +94,7 @@ static inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
 /*
  * Return true if the lock is held.
  */
+/*! 2017. 6.24 study -ing */
 static inline int bit_spin_is_locked(int bitnum, unsigned long *addr)
 {
 #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
