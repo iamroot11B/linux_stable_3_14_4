@@ -428,6 +428,7 @@ EXPORT_SYMBOL(file_ns_capable);
  * This sets PF_SUPERPRIV on the task if the capability is available on the
  * assumption that it's about to be used.
  */
+/*! 2017. 6.24 study -ing */
 bool capable(int cap)
 {
 	return ns_capable(&init_user_ns, cap);

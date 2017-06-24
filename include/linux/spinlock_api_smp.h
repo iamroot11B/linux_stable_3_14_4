@@ -148,6 +148,7 @@ static inline void __raw_spin_lock_bh(raw_spinlock_t *lock)
 	LOCK_CONTENDED(lock, do_raw_spin_trylock, do_raw_spin_lock);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline void __raw_spin_lock(raw_spinlock_t *lock)
 {
 	preempt_disable();

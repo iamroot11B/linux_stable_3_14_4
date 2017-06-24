@@ -78,6 +78,7 @@ do {									\
 })
 
 #define read_barrier_depends()		do { } while(0)
+/*! 2017. 6.24 study -ing */
 #define smp_read_barrier_depends()	do { } while(0)
 /*! 2016.10.15 study -ing */
 #define set_mb(var, value)	do { var = value; smp_mb(); } while (0)

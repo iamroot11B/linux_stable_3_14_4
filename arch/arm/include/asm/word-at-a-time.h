@@ -63,6 +63,7 @@ static inline unsigned long find_zero(unsigned long mask)
  * and the next page not being mapped, take the exception and
  * return zeroes in the non-existing part.
  */
+/*! 2017. 6.24 study -ing */
 static inline unsigned long load_unaligned_zeropad(const void *addr)
 {
 	unsigned long ret, offset;

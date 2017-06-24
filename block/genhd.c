@@ -1352,6 +1352,7 @@ void set_disk_ro(struct gendisk *disk, int flag)
 
 EXPORT_SYMBOL(set_disk_ro);
 
+/*! 2017. 6.24 study -ing */
 int bdev_read_only(struct block_device *bdev)
 {
 	if (!bdev)

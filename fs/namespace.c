@@ -86,6 +86,7 @@ static inline struct hlist_head *m_hash(struct vfsmount *mnt, struct dentry *den
 	return &mount_hashtable[tmp & m_hash_mask];
 }
 
+/*! 2017. 6.24 study -ing */
 static inline struct hlist_head *mp_hash(struct dentry *dentry)
 {
 	unsigned long tmp = ((unsigned long)dentry / L1_CACHE_BYTES);
@@ -270,6 +271,7 @@ out_free_cache:
  * mnt_want/drop_write() will _keep_ the filesystem
  * r/w.
  */
+/*! 2017. 6.24 study -ing */
 int __mnt_is_readonly(struct vfsmount *mnt)
 {
 	if (mnt->mnt_flags & MNT_READONLY)
@@ -298,6 +300,7 @@ static inline void mnt_dec_writers(struct mount *mnt)
 #endif
 }
 
+/*! 2017. 6.24 study -ing */
 static unsigned int mnt_get_writers(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
@@ -491,6 +494,7 @@ void mnt_drop_write_file(struct file *file)
 }
 EXPORT_SYMBOL(mnt_drop_write_file);
 
+/*! 2017. 6.24 study -ing */
 static int mnt_make_readonly(struct mount *mnt)
 {
 	int ret = 0;
@@ -533,6 +537,7 @@ static int mnt_make_readonly(struct mount *mnt)
 	return ret;
 }
 
+/*! 2017. 6.24 study -ing */
 static void __mnt_unmake_readonly(struct mount *mnt)
 {
 	lock_mount_hash();
@@ -540,6 +545,7 @@ static void __mnt_unmake_readonly(struct mount *mnt)
 	unlock_mount_hash();
 }
 
+/*! 2017. 6.24 study -ing */
 int sb_prepare_remount_readonly(struct super_block *sb)
 {
 	struct mount *mnt;
@@ -662,6 +668,7 @@ out:
  *
  * lookup_mnt takes a reference to the found vfsmount.
  */
+/*! 2017. 6.24 study -ing */
 struct vfsmount *lookup_mnt(struct path *path)
 {
 	struct mount *child_mnt;
@@ -678,6 +685,7 @@ struct vfsmount *lookup_mnt(struct path *path)
 	return m;
 }
 
+/*! 2017. 6.24 study -ing */
 static struct mountpoint *new_mountpoint(struct dentry *dentry)
 {
 	struct hlist_head *chain = mp_hash(dentry);
@@ -722,6 +730,7 @@ static void put_mountpoint(struct mountpoint *mp)
 	}
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int check_mnt(struct mount *mnt)
 {
 	return mnt->mnt_ns == current->nsproxy->mnt_ns;
@@ -1395,6 +1404,7 @@ static int do_umount(struct mount *mnt, int flags)
 /*
  * Is the caller allowed to modify his namespace?
  */
+/*! 2017. 6.24 study -ing */
 static inline bool may_mount(void)
 {
 	return ns_capable(current->nsproxy->mnt_ns->user_ns, CAP_SYS_ADMIN);
@@ -1677,6 +1687,7 @@ static int invent_group_ids(struct mount *mnt, bool recurse)
  * Must be called without spinlocks held, since this function can sleep
  * in allocations.
  */
+/*! 2017. 6.24 study later */
 static int attach_recursive_mnt(struct mount *source_mnt,
 			struct mount *dest_mnt,
 			struct mountpoint *dest_mp,
@@ -1731,6 +1742,7 @@ static int attach_recursive_mnt(struct mount *source_mnt,
 	return err;
 }
 
+/*! 2017. 6.24 study -ing */
 static struct mountpoint *lock_mount(struct path *path)
 {
 	struct vfsmount *mnt;
@@ -1768,6 +1780,7 @@ static void unlock_mount(struct mountpoint *where)
 	mutex_unlock(&dentry->d_inode->i_mutex);
 }
 
+/*! 2017. 6.24 study -ing */
 static int graft_tree(struct mount *mnt, struct mount *p, struct mountpoint *mp)
 {
 	if (mnt->mnt.mnt_sb->s_flags & MS_NOUSER)
@@ -1908,6 +1921,7 @@ out:
 	return err;
 }
 
+/*! 2017. 6.24 study -ing */
 static int change_mount_flags(struct vfsmount *mnt, int ms_flags)
 {
 	int error = 0;
@@ -1933,6 +1947,7 @@ static int change_mount_flags(struct vfsmount *mnt, int ms_flags)
  * If you've mounted a non-root directory somewhere and want to do remount
  * on it - tough luck.
  */
+/*! 2017. 6.24 study -ing */
 static int do_remount(struct path *path, int flags, int mnt_flags,
 		      void *data)
 {
@@ -1946,6 +1961,7 @@ static int do_remount(struct path *path, int flags, int mnt_flags,
 	if (path->dentry != path->mnt->mnt_root)
 		return -EINVAL;
 
+	/*! return 0 */
 	err = security_sb_remount(sb, data);
 	if (err)
 		return err;
@@ -2074,6 +2090,7 @@ static struct vfsmount *fs_set_subtype(struct vfsmount *mnt, const char *fstype)
 /*
  * add a mount into a namespace's mount tree
  */
+/*! 2017. 6.24 study -ing */
 static int do_add_mount(struct mount *newmnt, struct path *path, int mnt_flags)
 {
 	struct mountpoint *mp;
@@ -2163,6 +2180,7 @@ static int do_new_mount(struct path *path, const char *fstype, int flags,
 	return err;
 }
 
+/*! 2017. 6.24 study -ing */
 int finish_automount(struct vfsmount *m, struct path *path)
 {
 	struct mount *mnt = real_mount(m);
@@ -2437,6 +2455,7 @@ long do_mount(const char *dev_name, const char *dir_name,
 	if (retval)
 		return retval;
 
+	/*! return 0 */
 	retval = security_sb_mount(dev_name, &path,
 				   type_page, flags, data_page);
 	if (!retval && !may_mount())

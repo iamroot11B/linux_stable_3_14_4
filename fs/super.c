@@ -687,6 +687,7 @@ rescan:
  *
  *	Alters the mount options of a mounted file system.
  */
+/*! 2017. 6.24 study -ing */
 int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
 {
 	int retval;
@@ -701,6 +702,7 @@ int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
 #endif
 
 	if (flags & MS_RDONLY)
+		/*! Do nothing */
 		acct_auto_close(sb);
 	shrink_dcache_sb(sb);
 
@@ -718,6 +720,8 @@ int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
 				return retval;
 		}
 	}
+
+	/*! 2017. 6.24 study end */
 
 	sync_filesystem(sb);
 

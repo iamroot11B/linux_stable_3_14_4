@@ -14,8 +14,11 @@
 #define S_IFIFO  0010000
 #define S_ISUID  0004000
 #define S_ISGID  0002000
+/*! 2017. 6.24 study -ing */
+/*! sticky bit */
 #define S_ISVTX  0001000
 
+/*! 2017. 6.24 study -ing */
 #define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
 /*! 2017. 6.17 study -ing */
 #define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)

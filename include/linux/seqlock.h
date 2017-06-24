@@ -170,10 +170,12 @@ static inline unsigned read_seqcount_begin(const seqcount_t *s)
  * read_seqcount_retry() instead of stabilizing at the beginning of the
  * critical section.
  */
+/*! 2017. 6.24 study -ing */
 static inline unsigned raw_seqcount_begin(const seqcount_t *s)
 {
 	unsigned ret = ACCESS_ONCE(s->sequence);
 
+	/*! Do nothing */
 	seqcount_lockdep_reader_access(s);
 	smp_rmb();
 	return ret & ~1;
@@ -381,11 +383,13 @@ write_sequnlock_irqrestore(seqlock_t *sl, unsigned long flags)
  * but doesn't update the sequence number. Acts like a normal spin_lock/unlock.
  * Don't need preempt_disable() because that is in the spin_lock already.
  */
+/*! 2017. 6.24 study -ing */
 static inline void read_seqlock_excl(seqlock_t *sl)
 {
 	spin_lock(&sl->lock);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline void read_sequnlock_excl(seqlock_t *sl)
 {
 	spin_unlock(&sl->lock);
@@ -401,6 +405,7 @@ static inline void read_sequnlock_excl(seqlock_t *sl)
  * whether to be a reader (even) or writer (odd).
  * N.B. seq must be initialized to an even number to begin with.
  */
+/*! 2017. 6.24 study -ing */
 static inline void read_seqbegin_or_lock(seqlock_t *lock, int *seq)
 {
 	if (!(*seq & 1))	/* Even */
@@ -409,11 +414,13 @@ static inline void read_seqbegin_or_lock(seqlock_t *lock, int *seq)
 		read_seqlock_excl(lock);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int need_seqretry(seqlock_t *lock, int seq)
 {
 	return !(seq & 1) && read_seqretry(lock, seq);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline void done_seqretry(seqlock_t *lock, int seq)
 {
 	if (seq & 1)

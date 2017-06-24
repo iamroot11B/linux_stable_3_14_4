@@ -621,6 +621,7 @@ drop_root_mnt:
 	return -ECHILD;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int d_revalidate(struct dentry *dentry, unsigned int flags)
 {
 	return dentry->d_op->d_revalidate(dentry, flags);
@@ -636,6 +637,7 @@ static inline int d_revalidate(struct dentry *dentry, unsigned int flags)
  * success, -error on failure.  In case of failure caller does not
  * need to drop nd->path.
  */
+/*! 2017. 6.24 study -ing */
 static int complete_walk(struct nameidata *nd)
 {
 	struct dentry *dentry = nd->path.dentry;
@@ -705,6 +707,7 @@ static __always_inline void set_root_rcu(struct nameidata *nd)
 	}
 }
 
+/*! 2017. 6.24 study -ing */
 static void path_put_conditional(struct path *path, struct nameidata *nd)
 {
 	dput(path->dentry);
@@ -712,6 +715,7 @@ static void path_put_conditional(struct path *path, struct nameidata *nd)
 		mntput(path->mnt);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline void path_to_nameidata(const struct path *path,
 					struct nameidata *nd)
 {
@@ -737,6 +741,7 @@ void nd_jump_link(struct nameidata *nd, struct path *path)
 	nd->flags |= LOOKUP_JUMPED;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline void put_link(struct nameidata *nd, struct path *link, void *cookie)
 {
 	struct inode *inode = link->dentry->d_inode;
@@ -764,6 +769,7 @@ int sysctl_protected_hardlinks __read_mostly = 0;
  *
  * Returns 0 if following the symlink is allowed, -ve on error.
  */
+/*! 2017. 6.24 study -ing */
 static inline int may_follow_link(struct path *link, struct nameidata *nd)
 {
 	const struct inode *inode;
@@ -861,6 +867,7 @@ static int may_linkat(struct path *link)
 	return -EPERM;
 }
 
+/*! 2017. 6.24 study -ing */
 static __always_inline int
 follow_link(struct path *link, struct nameidata *nd, void **p)
 {
@@ -883,6 +890,7 @@ follow_link(struct path *link, struct nameidata *nd, void **p)
 	touch_atime(link);
 	nd_set_link(nd, NULL);
 
+	/*! security_inode_follow_link : return 0 */
 	error = security_inode_follow_link(link->dentry, nd);
 	if (error)
 		goto out_put_nd_path;
@@ -923,6 +931,7 @@ out_put_nd_path:
 	return error;
 }
 
+/*! 2017. 6.24 study -ing */
 static int follow_up_rcu(struct path *path)
 {
 	struct mount *mnt = real_mount(path->mnt);
@@ -948,6 +957,7 @@ static int follow_up_rcu(struct path *path)
  * Return 1 if we went up a level and 0 if we were already at the
  * root.
  */
+/*! 2017. 6.24 study -ing */
 int follow_up(struct path *path)
 {
 	struct mount *mnt = real_mount(path->mnt);
@@ -975,6 +985,7 @@ int follow_up(struct path *path)
  * - return -EISDIR to tell follow_managed() to stop and return the path we
  *   were called with.
  */
+/*! 2017. 6.24 study -ing */
 static int follow_automount(struct path *path, unsigned flags,
 			    bool *need_mntput)
 {
@@ -1055,6 +1066,7 @@ static int follow_automount(struct path *path, unsigned flags,
  *
  * Serialization is taken care of in namespace.c
  */
+/*! 2017. 6.24 study -ing */
 static int follow_managed(struct path *path, unsigned flags)
 {
 	struct vfsmount *mnt = path->mnt; /* held by caller, must be left alone */
@@ -1131,6 +1143,7 @@ int follow_down_one(struct path *path)
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline bool managed_dentry_might_block(struct dentry *dentry)
 {
 	return (dentry->d_flags & DCACHE_MANAGE_TRANSIT &&
@@ -1141,6 +1154,7 @@ static inline bool managed_dentry_might_block(struct dentry *dentry)
  * Try to skip to top of mountpoint pile in rcuwalk mode.  Fail if
  * we meet a managed dentry that would need blocking.
  */
+/*! 2017. 6.24 study -ing */
 static bool __follow_mount_rcu(struct nameidata *nd, struct path *path,
 			       struct inode **inode)
 {
@@ -1173,6 +1187,7 @@ static bool __follow_mount_rcu(struct nameidata *nd, struct path *path,
 	return read_seqretry(&mount_lock, nd->m_seq);
 }
 
+/*! 2017. 6.24 study -ing */
 static int follow_dotdot_rcu(struct nameidata *nd)
 {
 	set_root_rcu(nd);
@@ -1272,6 +1287,7 @@ int follow_down(struct path *path)
 /*
  * Skip to top of mountpoint pile in refwalk mode for follow_dotdot()
  */
+/*! 2017. 6.24 study -ing */
 static void follow_mount(struct path *path)
 {
 	while (d_mountpoint(path->dentry)) {
@@ -1285,6 +1301,7 @@ static void follow_mount(struct path *path)
 	}
 }
 
+/*! 2017. 6.24 study -ing */
 static void follow_dotdot(struct nameidata *nd)
 {
 	set_root(nd);
@@ -1316,6 +1333,7 @@ static void follow_dotdot(struct nameidata *nd)
  *
  * dir->d_inode->i_mutex must be held
  */
+/*! 2017. 6.24 study -ing */
 static struct dentry *lookup_dcache(struct qstr *name, struct dentry *dir,
 				    unsigned int flags, bool *need_lookup)
 {
@@ -1355,6 +1373,7 @@ static struct dentry *lookup_dcache(struct qstr *name, struct dentry *dir,
  *
  * dir->d_inode->i_mutex must be held
  */
+/*! 2017. 6.24 study -ing */
 static struct dentry *lookup_real(struct inode *dir, struct dentry *dentry,
 				  unsigned int flags)
 {
@@ -1374,6 +1393,7 @@ static struct dentry *lookup_real(struct inode *dir, struct dentry *dentry,
 	return dentry;
 }
 
+/*! 2017. 6.24 study -ing */
 static struct dentry *__lookup_hash(struct qstr *name,
 		struct dentry *base, unsigned int flags)
 {
@@ -1392,6 +1412,7 @@ static struct dentry *__lookup_hash(struct qstr *name,
  *  small and for now I'd prefer to have fast path as straight as possible.
  *  It _is_ time-critical.
  */
+/*! 2017. 6.24 study -ing */
 static int lookup_fast(struct nameidata *nd,
 		       struct path *path, struct inode **inode)
 {
@@ -1486,6 +1507,7 @@ need_lookup:
 }
 
 /* Fast lookup failed, do it the slow way */
+/*! 2017. 6.24 study -ing */
 static int lookup_slow(struct nameidata *nd, struct path *path)
 {
 	struct dentry *dentry, *parent;
@@ -1524,6 +1546,7 @@ static inline int may_lookup(struct nameidata *nd)
 	return inode_permission(nd->inode, MAY_EXEC);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int handle_dots(struct nameidata *nd, int type)
 {
 	if (type == LAST_DOTDOT) {
@@ -1536,6 +1559,7 @@ static inline int handle_dots(struct nameidata *nd, int type)
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static void terminate_walk(struct nameidata *nd)
 {
 	if (!(nd->flags & LOOKUP_RCU)) {
@@ -1554,11 +1578,13 @@ static void terminate_walk(struct nameidata *nd)
  * so we keep a cache of "no, this doesn't need follow_link"
  * for the common case.
  */
+/*! 2017. 6.24 study -ing */
 static inline int should_follow_link(struct dentry *dentry, int follow)
 {
 	return unlikely(d_is_symlink(dentry)) ? follow : 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int walk_component(struct nameidata *nd, struct path *path,
 		int follow)
 {
@@ -1614,6 +1640,7 @@ out_err:
  * Without that kind of total limit, nasty chains of consecutive
  * symlinks can cause almost arbitrarily long lookups.
  */
+/*! 2017. 6.24 study -ing */
 static inline int nested_symlink(struct path *path, struct nameidata *nd)
 {
 	int res;
@@ -1819,6 +1846,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 		}
 
 		/*! 2017. 6.17 study end */
+		/*! 2017. 6.24 study start */
 
 		nd->last = this;
 		nd->last_type = type;
@@ -1946,6 +1974,7 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int lookup_last(struct nameidata *nd, struct path *path)
 {
 	if (nd->last_type == LAST_NORM && nd->last.name[nd->last.len])
@@ -2035,6 +2064,7 @@ static int filename_lookup(int dfd, struct filename *name,
 						flags | LOOKUP_REVAL, nd);
 
 	if (likely(!retval))
+		/*! Do nothing */
 		audit_inode(name, nd->path.dentry, flags & LOOKUP_PARENT);
 	return retval;
 }

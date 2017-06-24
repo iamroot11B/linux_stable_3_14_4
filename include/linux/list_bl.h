@@ -42,12 +42,14 @@ struct hlist_bl_node {
 #define INIT_HLIST_BL_HEAD(ptr) \
 	((ptr)->first = NULL)
 
+/*! 2017. 6.24 study -ing */
 static inline void INIT_HLIST_BL_NODE(struct hlist_bl_node *h)
 {
 	h->next = NULL;
 	h->pprev = NULL;
 }
 
+/*! 2017. 6.24 study -ing */
 #define hlist_bl_entry(ptr, type, member) container_of(ptr,type,member)
 
 /*! 2017. 3.04 study -ing */
@@ -131,6 +133,7 @@ static inline void hlist_bl_unlock(struct hlist_bl_head *b)
 	__bit_spin_unlock(0, (unsigned long *)b);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline bool hlist_bl_is_locked(struct hlist_bl_head *b)
 {
 	return bit_spin_is_locked(0, (unsigned long *)b);

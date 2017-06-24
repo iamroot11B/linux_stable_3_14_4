@@ -630,6 +630,7 @@ static inline void list_splice_tail_init(struct list_head *list,
 #define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
 /*! 2017. 5.20 study -ing */
 #define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
+/*! 2017. 6.24 study -ing */
 static inline void INIT_HLIST_NODE(struct hlist_node *h)
 {
 	h->next = NULL;

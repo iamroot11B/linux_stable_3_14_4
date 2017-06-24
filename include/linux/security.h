@@ -2018,6 +2018,7 @@ static inline int security_sb_copy_data(char *orig, char *copy)
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int security_sb_remount(struct super_block *sb, void *data)
 {
 	return 0;
@@ -2039,6 +2040,7 @@ static inline int security_sb_statfs(struct dentry *dentry)
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int security_sb_mount(const char *dev_name, struct path *path,
 				    const char *type, unsigned long flags,
 				    void *data)
@@ -2172,6 +2174,7 @@ static inline int security_inode_readlink(struct dentry *dentry)
 	return 0;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int security_inode_follow_link(struct dentry *dentry,
 					      struct nameidata *nd)
 {

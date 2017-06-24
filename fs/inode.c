@@ -1531,6 +1531,7 @@ static int update_time(struct inode *inode, struct timespec *time, int flags)
  *	This function automatically handles read only file systems and media,
  *	as well as the "noatime" flag and inode specific "noatime" markers.
  */
+/*! 2017. 6.24 study later */
 void touch_atime(const struct path *path)
 {
 	struct vfsmount *mnt = path->mnt;

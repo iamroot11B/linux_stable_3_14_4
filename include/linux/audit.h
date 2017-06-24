@@ -336,6 +336,7 @@ static inline void __audit_inode_child(const struct inode *parent,
 					const struct dentry *dentry,
 					const unsigned char type)
 { }
+/*! 2017. 6.24 study -ing */
 static inline void audit_inode(struct filename *name,
 				const struct dentry *dentry,
 				unsigned int parent)

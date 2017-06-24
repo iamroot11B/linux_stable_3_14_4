@@ -335,6 +335,7 @@ do {									\
 # define this_cpu_add(pcp, val)		__pcpu_size_call(this_cpu_add_, (pcp), (val))
 #endif
 
+/*! 2017. 6.24 study -ing */
 #ifndef this_cpu_sub
 # define this_cpu_sub(pcp, val)		this_cpu_add((pcp), -(typeof(pcp))(val))
 #endif

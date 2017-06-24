@@ -53,6 +53,7 @@ struct qstr {
 };
 
 #define QSTR_INIT(n,l) { { { .len = l } }, .name = n }
+/*! 2017. 6.24 study -ing */
 #define hashlen_hash(hashlen) ((u32) (hashlen))
 #define hashlen_len(hashlen)  ((u32)((hashlen) >> 32))
 
@@ -377,11 +378,13 @@ static inline int d_unhashed(const struct dentry *dentry)
 	return hlist_bl_unhashed(&dentry->d_hash);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int d_unlinked(const struct dentry *dentry)
 {
 	return d_unhashed(dentry) && !IS_ROOT(dentry);
 }
 
+/*! 2017. 6.24 study -ing */
 static inline int cant_mount(const struct dentry *dentry)
 {
 	return (dentry->d_flags & DCACHE_CANT_MOUNT);
@@ -401,6 +404,7 @@ static inline bool d_managed(const struct dentry *dentry)
 	return dentry->d_flags & DCACHE_MANAGED_DENTRY;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline bool d_mountpoint(const struct dentry *dentry)
 {
 	return dentry->d_flags & DCACHE_MOUNTED;
@@ -444,6 +448,7 @@ static inline bool d_is_autodir(const struct dentry *dentry)
 	return __d_entry_type(dentry) == DCACHE_AUTODIR_TYPE;
 }
 
+/*! 2017. 6.24 study -ing */
 static inline bool d_is_symlink(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_SYMLINK_TYPE;

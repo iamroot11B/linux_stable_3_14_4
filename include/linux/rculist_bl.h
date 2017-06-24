@@ -17,8 +17,10 @@ static inline void hlist_bl_set_first_rcu(struct hlist_bl_head *h,
 		(struct hlist_bl_node *)((unsigned long)n | LIST_BL_LOCKMASK));
 }
 
+/*! 2017. 6.24 study -ing */
 static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
 {
+	/*! hlist_bl_is_locked : 항상 1, LIST_BL_LOCKMASK: 항상 0 */
 	return (struct hlist_bl_node *)
 		((unsigned long)rcu_dereference_check(h->first, hlist_bl_is_locked(h)) & ~LIST_BL_LOCKMASK);
 }
@@ -119,6 +121,7 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
  * @member:	the name of the hlist_bl_node within the struct.
  *
  */
+/*! 2017. 6.24 study -ing */
 #define hlist_bl_for_each_entry_rcu(tpos, pos, head, member)		\
 	for (pos = hlist_bl_first_rcu(head);				\
 		pos &&							\

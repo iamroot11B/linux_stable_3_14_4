@@ -1682,6 +1682,7 @@ struct super_operations {
 /*! 2017. 6.17 study -ing */
 #define IS_POSIXACL(inode)	__IS_FLG(inode, MS_POSIXACL)
 
+/*! 2017. 6.24 study -ing */
 #define IS_DEADDIR(inode)	((inode)->i_flags & S_DEAD)
 #define IS_NOCMTIME(inode)	((inode)->i_flags & S_NOCMTIME)
 #define IS_SWAPFILE(inode)	((inode)->i_flags & S_SWAPFILE)

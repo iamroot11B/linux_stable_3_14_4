@@ -176,13 +176,16 @@ int proc_nr_dentry(ctl_table *table, int write, void __user *buffer,
  * In contrast, 'ct' and 'tcount' can be from a pathname, and do
  * need the careful unaligned handling.
  */
+/*! 2017. 6.24 study -ing */
 static inline int dentry_string_cmp(const unsigned char *cs, const unsigned char *ct, unsigned tcount)
 {
 	unsigned long a,b,mask;
 
+	/*! tcount가 sizeof(unsigned long)보다 크거나 같으면 1:1비교*/
 	for (;;) {
 		a = *(unsigned long *)cs;
 		b = load_unaligned_zeropad(ct);
+		/*! tcount가 sizeof(unsigned long)보다 작을 때, for문 밖 아래로 */
 		if (tcount < sizeof(unsigned long))
 			break;
 		if (unlikely(a != b))
@@ -193,6 +196,7 @@ static inline int dentry_string_cmp(const unsigned char *cs, const unsigned char
 		if (!tcount)
 			return 0;
 	}
+	/*! tcount가 sizeof(unsigned long)보다 작을 때, mask 씌워서 tcount만큼만 비교 */
 	mask = bytemask_from_count(tcount);
 	return unlikely(!!((a ^ b) & mask));
 }
@@ -213,6 +217,7 @@ static inline int dentry_string_cmp(const unsigned char *cs, const unsigned char
 
 #endif
 
+/*! 2017. 6.24 study -ing */
 static inline int dentry_cmp(const struct dentry *dentry, const unsigned char *ct, unsigned tcount)
 {
 	const unsigned char *cs;
@@ -233,6 +238,7 @@ static inline int dentry_cmp(const struct dentry *dentry, const unsigned char *c
 	 * be no NUL in the ct/tcount data)
 	 */
 	cs = ACCESS_ONCE(dentry->d_name.name);
+	/*! Do nothing */
 	smp_read_barrier_depends();
 	return dentry_string_cmp(cs, ct, tcount);
 }
@@ -346,6 +352,7 @@ static void dentry_unlink_inode(struct dentry * dentry)
  * These helper functions make sure we always follow the
  * rules. d_lock must be held by the caller.
  */
+/*! 2017. 6.24 study -ing */
 #define D_FLAG_VERIFY(dentry,x) WARN_ON_ONCE(((dentry)->d_flags & (DCACHE_LRU_LIST | DCACHE_SHRINK_LIST)) != (x))
 /*! 2017. 3.04 study -ing */
 static void d_lru_add(struct dentry *dentry)
@@ -374,6 +381,7 @@ static void d_shrink_del(struct dentry *dentry)
 	this_cpu_dec(nr_dentry_unused);
 }
 
+/*! 2017. 6.24 study -ing */
 static void d_shrink_add(struct dentry *dentry, struct list_head *list)
 {
 	D_FLAG_VERIFY(dentry, 0);
@@ -396,6 +404,7 @@ static void d_lru_isolate(struct dentry *dentry)
 	list_del_init(&dentry->d_lru);
 }
 
+/*! 2017. 6.24 study -ing */
 static void d_lru_shrink_move(struct dentry *dentry, struct list_head *list)
 {
 	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
@@ -637,6 +646,7 @@ EXPORT_SYMBOL(dput);
  * no dcache lock.
  */
 
+/*! 2017. 6.24 study -ing */
 int d_invalidate(struct dentry * dentry)
 {
 	/*
@@ -842,6 +852,7 @@ EXPORT_SYMBOL(d_prune_aliases);
  *
  * This may fail if locks cannot be acquired no problem, just try again.
  */
+/*! 2017. 6.24 study -ing */
 static struct dentry * try_prune_one_dentry(struct dentry *dentry)
 	__releases(dentry->d_lock)
 {
@@ -873,6 +884,7 @@ static struct dentry * try_prune_one_dentry(struct dentry *dentry)
 	return NULL;
 }
 
+/*! 2017. 6.24 study -ing */
 static void shrink_dentry_list(struct list_head *list)
 {
 	struct dentry *dentry;
@@ -1014,6 +1026,7 @@ long prune_dcache_sb(struct super_block *sb, unsigned long nr_to_scan,
 	return freed;
 }
 
+/*! 2017. 6.24 study -ing */
 static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
 						spinlock_t *lru_lock, void *arg)
 {
@@ -1042,6 +1055,7 @@ static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
  * Shrink the dcache for the specified super block. This is used to free
  * the dcache before unmounting a file system.
  */
+/*! 2017. 6.24 study -ing */
 void shrink_dcache_sb(struct super_block *sb)
 {
 	long freed;
@@ -1081,6 +1095,8 @@ enum d_walk_ret {
  *
  * The @enter() and @finish() callbacks are called with d_lock held.
  */
+/*! 2017. 6.24 study -ing */
+/*! 2017. 6.24 : enter = select_collect */
 static void d_walk(struct dentry *parent, void *data,
 		   enum d_walk_ret (*enter)(void *, struct dentry *),
 		   void (*finish)(void *))
@@ -1227,6 +1243,7 @@ EXPORT_SYMBOL(have_submounts);
  * Only one of check_submounts_and_drop() and d_set_mounted() must succeed.  For
  * this reason take rename_lock and d_lock on dentry and ancestors.
  */
+/*! 2017. 6.24 study -ing */
 int d_set_mounted(struct dentry *dentry)
 {
 	struct dentry *p;
@@ -1273,6 +1290,7 @@ struct select_data {
 	int found;
 };
 
+/*! 2017. 6.24 study -ing */
 static enum d_walk_ret select_collect(void *_data, struct dentry *dentry)
 {
 	struct select_data *data = _data;
@@ -1319,6 +1337,7 @@ out:
  *
  * Prune the dcache to remove unused children of the parent dentry.
  */
+/*! 2017. 6.24 study -ing */
 void shrink_dcache_parent(struct dentry *parent)
 {
 	for (;;) {
@@ -1498,6 +1517,7 @@ EXPORT_SYMBOL(check_submounts_and_drop);
  * copied and the copy passed in may be reused after this call.
  */
 
+/*! 2017. 6.24 study -ing */
 struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 {
 	struct dentry *dentry;
@@ -1563,6 +1583,7 @@ struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
  * available. On a success the dentry is returned. The name passed in is
  * copied and the copy passed in may be reused after this call.
  */
+/*! 2017. 6.24 study -ing */
 struct dentry *d_alloc(struct dentry * parent, const struct qstr *name)
 {
 	struct dentry *dentry = __d_alloc(parent->d_sb, name);
@@ -1608,6 +1629,7 @@ struct dentry *d_alloc_name(struct dentry *parent, const char *name)
 }
 EXPORT_SYMBOL(d_alloc_name);
 
+/*! 2017. 6.24 study -ing */
 void d_set_d_op(struct dentry *dentry, const struct dentry_operations *op)
 {
 	WARN_ON_ONCE(dentry->d_op);
@@ -2073,6 +2095,7 @@ enum slow_d_compare {
 	D_COMP_SEQRETRY,
 };
 
+/*! 2017. 6.24 study -ing */
 static noinline enum slow_d_compare slow_dentry_cmp(
 		const struct dentry *parent,
 		struct dentry *dentry,
@@ -2120,6 +2143,7 @@ static noinline enum slow_d_compare slow_dentry_cmp(
  * NOTE! The caller *has* to check the resulting dentry against the sequence
  * number we've returned before using any of the resulting dentry state!
  */
+/*! 2017. 6.24 study -ing */
 struct dentry *__d_lookup_rcu(const struct dentry *parent,
 				const struct qstr *name,
 				unsigned *seqp)
@@ -2208,15 +2232,16 @@ seqretry:
  * dentry is returned. The caller must use dput to free the entry when it has
  * finished using it. %NULL is returned if the dentry does not exist.
  */
+/*! 2017. 6.24 study -ing */
 struct dentry *d_lookup(const struct dentry *parent, const struct qstr *name)
 {
 	struct dentry *dentry;
 	unsigned seq;
 
-        do {
-                seq = read_seqbegin(&rename_lock);
-                dentry = __d_lookup(parent, name);
-                if (dentry)
+	do {
+		seq = read_seqbegin(&rename_lock);
+		dentry = __d_lookup(parent, name);
+		if (dentry)
 			break;
 	} while (read_seqretry(&rename_lock, seq));
 	return dentry;
@@ -2238,6 +2263,7 @@ EXPORT_SYMBOL(d_lookup);
  *
  * __d_lookup callers must be commented.
  */
+/*! 2017. 6.24 study -ing */
 struct dentry *__d_lookup(const struct dentry *parent, const struct qstr *name)
 {
 	unsigned int len = name->len;
