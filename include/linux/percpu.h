@@ -27,6 +27,7 @@
  * Must be an lvalue. Since @var must be a simple identifier,
  * we force a syntax error here if it isn't.
  */
+/*! 2017. 7.15 study -ing */
 #define get_cpu_var(var) (*({				\
 	preempt_disable();				\
 	&__get_cpu_var(var); }))
@@ -35,6 +36,7 @@
  * The weird & is necessary because sparse considers (void)(var) to be
  * a direct dereference of percpu variable (var).
  */
+/*! 2017. 7.15 study -ing */
 #define put_cpu_var(var) do {				\
 	(void)&(var);					\
 	preempt_enable();				\

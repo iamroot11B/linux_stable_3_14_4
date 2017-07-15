@@ -93,6 +93,7 @@ void __init call_function_init(void)
  * previous function call. For multi-cpu calls its even more interesting
  * as we'll have to ensure no other cpu is observing our csd.
  */
+/*! 2017. 7.15 study -ing */
 static void csd_lock_wait(struct call_single_data *csd)
 {
 	while (csd->flags & CSD_FLAG_LOCK)
@@ -129,6 +130,7 @@ static void csd_unlock(struct call_single_data *csd)
  * for execution on the given CPU. data must already have
  * ->func, ->info, and ->flags set.
  */
+/*! 2017. 7.15 study -ing */
 static void generic_exec_single(int cpu, struct call_single_data *csd, int wait)
 {
 	if (wait)
@@ -191,6 +193,7 @@ static DEFINE_PER_CPU_SHARED_ALIGNED(struct call_single_data, csd_data);
  *
  * Returns 0 on success, else a negative status code.
  */
+/*! 2017. 7.15 study -ing */
 int smp_call_function_single(int cpu, smp_call_func_t func, void *info,
 			     int wait)
 {
@@ -576,6 +579,7 @@ EXPORT_SYMBOL(on_each_cpu);
  * exception is that it may be used during early boot while
  * early_boot_irqs_disabled is set.
  */
+/*! 2017. 7.15 study -ing */
 void on_each_cpu_mask(const struct cpumask *mask, smp_call_func_t func,
 			void *info, bool wait)
 {
@@ -619,6 +623,7 @@ EXPORT_SYMBOL(on_each_cpu_mask);
  * You must not call this function with disabled interrupts or
  * from a hardware interrupt handler or from a bottom half handler.
  */
+/*! 2017. 7.15 study -ing */
 void on_each_cpu_cond(bool (*cond_func)(int cpu, void *info),
 			smp_call_func_t func, void *info, bool wait,
 			gfp_t gfp_flags)

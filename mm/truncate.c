@@ -115,6 +115,7 @@ truncate_complete_page(struct address_space *mapping, struct page *page)
  *
  * Returns non-zero if the page was successfully invalidated.
  */
+/*! 2017. 7.15 study -ing */
 static int
 invalidate_complete_page(struct address_space *mapping, struct page *page)
 {
@@ -123,6 +124,7 @@ invalidate_complete_page(struct address_space *mapping, struct page *page)
 	if (page->mapping != mapping)
 		return 0;
 
+	/*! 2017. 7.15 study end */
 	if (page_has_private(page) && !try_to_release_page(page, 0))
 		return 0;
 
@@ -164,11 +166,14 @@ EXPORT_SYMBOL(generic_error_remove_page);
  *
  * Returns 1 if the page is successfully invalidated, otherwise 0.
  */
+/*! 2017. 7.15 study -ing */
 int invalidate_inode_page(struct page *page)
 {
 	struct address_space *mapping = page_mapping(page);
 	if (!mapping)
 		return 0;
+	/*! page-flags.h : PAGEFLAG(Dirty, dirty) */
+	/*! page-flags.h : TESTPAGEFLAG(Writeback, writeback) */
 	if (PageDirty(page) || PageWriteback(page))
 		return 0;
 	if (page_mapped(page))
@@ -375,6 +380,7 @@ EXPORT_SYMBOL(truncate_inode_pages);
  * invalidate pages which are dirty, locked, under writeback or mapped into
  * pagetables.
  */
+/*! 2017. 7.15 study -ing */
 unsigned long invalidate_mapping_pages(struct address_space *mapping,
 		pgoff_t start, pgoff_t end)
 {

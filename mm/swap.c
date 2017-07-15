@@ -500,6 +500,7 @@ static void activate_page_drain(int cpu)
 		pagevec_lru_move_fn(pvec, __activate_page, NULL);
 }
 
+/*! 2017. 7.15 study -ing */
 static bool need_activate_page_drain(int cpu)
 {
 	return pagevec_count(&per_cpu(activate_page_pvecs, cpu)) != 0;
@@ -775,6 +776,7 @@ void lru_add_drain(void)
 	put_cpu();
 }
 
+/*! 2017. 7.15 study -ing */
 static void lru_add_drain_per_cpu(struct work_struct *dummy)
 {
 	lru_add_drain();
@@ -782,6 +784,7 @@ static void lru_add_drain_per_cpu(struct work_struct *dummy)
 
 static DEFINE_PER_CPU(struct work_struct, lru_add_drain_work);
 
+/*! 2017. 7.15 study -ing */
 void lru_add_drain_all(void)
 {
 	static DEFINE_MUTEX(lock);

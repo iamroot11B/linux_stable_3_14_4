@@ -183,6 +183,7 @@ static inline void kick_all_cpus_sync(void) {  }
 # define smp_processor_id() raw_smp_processor_id()
 #endif
 
+/*! 2017. 7.15 study -ing */
 #define get_cpu()		({ preempt_disable(); smp_processor_id(); })
 /*! 2017. 2.11 study -ing */
 #define put_cpu()		preempt_enable()

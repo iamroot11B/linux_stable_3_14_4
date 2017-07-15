@@ -97,6 +97,7 @@ static void bdi_wakeup_thread(struct backing_dev_info *bdi)
 	spin_unlock_bh(&bdi->wb_lock);
 }
 
+/*! 2017. 7.15 study -ing */
 static void bdi_queue_work(struct backing_dev_info *bdi,
 			   struct wb_writeback_work *work)
 {
@@ -930,6 +931,7 @@ get_next_work_item(struct backing_dev_info *bdi)
  * Add in the number of potentially dirty inodes, because each inode
  * write can dirty pagecache in the underlying blockdev.
  */
+/*! 2017. 7.15 study -ing */
 static unsigned long get_nr_dirty_pages(void)
 {
 	return global_page_state(NR_FILE_DIRTY) +
@@ -1233,6 +1235,7 @@ out_unlock_inode:
 }
 EXPORT_SYMBOL(__mark_inode_dirty);
 
+/*! 2017. 7.15 study -ing */
 static void wait_sb_inodes(struct super_block *sb)
 {
 	struct inode *inode, *old_inode = NULL;
@@ -1246,7 +1249,7 @@ static void wait_sb_inodes(struct super_block *sb)
 	spin_lock(&inode_sb_list_lock);
 
 	/*
-	 * Data integrity sync. Must wait for all pages under writeback,
+!	 * Data integrity sync. Must wait for all pages under writeback,
 	 * because there may have been pages dirtied before our sync
 	 * call, but which had writeout started before we write it out.
 	 * In which case, the inode may not be on the dirty list, but
@@ -1296,6 +1299,7 @@ static void wait_sb_inodes(struct super_block *sb)
  * on how many (if any) will be written, and this function does not wait
  * for IO completion of submitted IO.
  */
+/*! 2017. 7.15 study -ing */
 void writeback_inodes_sb_nr(struct super_block *sb,
 			    unsigned long nr,
 			    enum wb_reason reason)
@@ -1327,6 +1331,7 @@ EXPORT_SYMBOL(writeback_inodes_sb_nr);
  * on how many (if any) will be written, and this function does not wait
  * for IO completion of submitted IO.
  */
+/*! 2017. 7.15 study -ing */
 void writeback_inodes_sb(struct super_block *sb, enum wb_reason reason)
 {
 	return writeback_inodes_sb_nr(sb, get_nr_dirty_pages(), reason);
@@ -1379,6 +1384,7 @@ EXPORT_SYMBOL(try_to_writeback_inodes_sb);
  * This function writes and waits on any dirty inode belonging to this
  * super_block.
  */
+/*! 2017. 7.15 study -ing */
 void sync_inodes_sb(struct super_block *sb)
 {
 	DECLARE_COMPLETION_ONSTACK(done);

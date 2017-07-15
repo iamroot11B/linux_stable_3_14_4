@@ -722,6 +722,7 @@ int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
 	}
 
 	/*! 2017. 6.24 study end */
+	/*! 2017. 7.15 study start */
 
 	sync_filesystem(sb);
 

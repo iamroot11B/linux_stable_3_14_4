@@ -27,6 +27,7 @@
  * wait == 1 case since in that case write_inode() functions do
  * sync_dirty_buffer() and thus effectively write one block at a time.
  */
+/*! 2017. 7.15 study -ing */
 static int __sync_filesystem(struct super_block *sb, int wait)
 {
 	if (wait)
@@ -44,6 +45,7 @@ static int __sync_filesystem(struct super_block *sb, int wait)
  * superblock.  Filesystem data as well as the underlying block
  * device.  Takes the superblock lock.
  */
+/*! 2017. 7.15 study -ing */
 int sync_filesystem(struct super_block *sb)
 {
 	int ret;

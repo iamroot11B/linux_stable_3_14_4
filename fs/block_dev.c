@@ -92,6 +92,7 @@ void kill_bdev(struct block_device *bdev)
 EXPORT_SYMBOL(kill_bdev);
 
 /* Invalidate clean unused buffers and pagecache. */
+/*! 2017. 7.15 study -ing */
 void invalidate_bdev(struct block_device *bdev)
 {
 	struct address_space *mapping = bdev->bd_inode->i_mapping;
@@ -175,6 +176,7 @@ blkdev_direct_IO(int rw, struct kiocb *iocb, const struct iovec *iov,
 				    nr_segs, blkdev_get_block, NULL, NULL, 0);
 }
 
+/*! 2017. 7.15 study -ing */
 int __sync_blockdev(struct block_device *bdev, int wait)
 {
 	if (!bdev)

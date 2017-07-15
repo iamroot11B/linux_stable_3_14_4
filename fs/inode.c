@@ -76,6 +76,7 @@ static DEFINE_PER_CPU(unsigned long, nr_unused);
 
 static struct kmem_cache *inode_cachep __read_mostly;
 
+/*! 2017. 7.15 study -ing */
 static long get_nr_inodes(void)
 {
 	int i;
@@ -85,6 +86,7 @@ static long get_nr_inodes(void)
 	return sum < 0 ? 0 : sum;
 }
 
+/*! 2017. 7.15 study -ing */
 static inline long get_nr_inodes_unused(void)
 {
 	int i;
@@ -94,6 +96,7 @@ static inline long get_nr_inodes_unused(void)
 	return sum < 0 ? 0 : sum;
 }
 
+/*! 2017. 7.15 study -ing */
 long get_nr_dirty_inodes(void)
 {
 	/* not actually dirty inodes, but a wild approximation */

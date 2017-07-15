@@ -214,6 +214,7 @@ static int filemap_check_errors(struct address_space *mapping)
  * these two operations is that if a dirty page/buffer is encountered, it must
  * be waited upon, and not just skipped over.
  */
+/*! 2017. 7.15 study -ing */
 int __filemap_fdatawrite_range(struct address_space *mapping, loff_t start,
 				loff_t end, int sync_mode)
 {
@@ -232,6 +233,7 @@ int __filemap_fdatawrite_range(struct address_space *mapping, loff_t start,
 	return ret;
 }
 
+/*! 2017. 7.15 study -ing */
 static inline int __filemap_fdatawrite(struct address_space *mapping,
 	int sync_mode)
 {
@@ -258,6 +260,7 @@ EXPORT_SYMBOL(filemap_fdatawrite_range);
  * This is a mostly non-blocking flush.  Not suitable for data-integrity
  * purposes - I/O may not be started against all dirty pages.
  */
+/*! 2017. 7.15 study -ing */
 int filemap_flush(struct address_space *mapping)
 {
 	return __filemap_fdatawrite(mapping, WB_SYNC_NONE);
@@ -335,6 +338,7 @@ int filemap_fdatawait(struct address_space *mapping)
 }
 EXPORT_SYMBOL(filemap_fdatawait);
 
+/*! 2017. 7.15 study -ing */
 int filemap_write_and_wait(struct address_space *mapping)
 {
 	int err = 0;

@@ -1200,6 +1200,7 @@ EXPORT_SYMBOL(mark_buffer_dirty);
  * in preparation for freeing it (sometimes, rarely, buffers are removed from
  * a page but it ends up not being freed, and buffers may later be reattached).
  */
+/*! 2017. 7.15 study -ing */
 void __brelse(struct buffer_head * buf)
 {
 	if (atomic_read(&buf->b_count)) {
@@ -1437,6 +1438,7 @@ EXPORT_SYMBOL(__bread);
  * This doesn't race because it runs in each cpu either in irq
  * or with preempt disabled.
  */
+/*! 2017. 7.15 study -ing */
 static void invalidate_bh_lru(void *arg)
 {
 	struct bh_lru *b = &get_cpu_var(bh_lrus);
@@ -1449,6 +1451,7 @@ static void invalidate_bh_lru(void *arg)
 	put_cpu_var(bh_lrus);
 }
 
+/*! 2017. 7.15 study -ing */
 static bool has_bh_in_lru(int cpu, void *dummy)
 {
 	struct bh_lru *b = per_cpu_ptr(&bh_lrus, cpu);
@@ -1462,6 +1465,7 @@ static bool has_bh_in_lru(int cpu, void *dummy)
 	return 0;
 }
 
+/*! 2017. 7.15 study -ing */
 void invalidate_bh_lrus(void)
 {
 	on_each_cpu_cond(has_bh_in_lru, invalidate_bh_lru, NULL, 1, GFP_KERNEL);

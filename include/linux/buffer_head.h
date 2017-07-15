@@ -278,12 +278,14 @@ static inline void get_bh(struct buffer_head *bh)
         atomic_inc(&bh->b_count);
 }
 
+/*! 2017. 7.15 study -ing */
 static inline void put_bh(struct buffer_head *bh)
 {
         smp_mb__before_atomic_dec();
         atomic_dec(&bh->b_count);
 }
 
+/*! 2017. 7.15 study -ing */
 static inline void brelse(struct buffer_head *bh)
 {
 	if (bh)

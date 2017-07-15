@@ -130,6 +130,7 @@
 	DECLARE_PER_CPU_SECTION(type, name, PER_CPU_SHARED_ALIGNED_SECTION) \
 	____cacheline_aligned_in_smp
 
+/*! 2017. 7.15 study -ing */
 #define DEFINE_PER_CPU_SHARED_ALIGNED(type, name)			\
 	DEFINE_PER_CPU_SECTION(type, name, PER_CPU_SHARED_ALIGNED_SECTION) \
 	____cacheline_aligned_in_smp
