@@ -1249,7 +1249,7 @@ static void wait_sb_inodes(struct super_block *sb)
 	spin_lock(&inode_sb_list_lock);
 
 	/*
-!	 * Data integrity sync. Must wait for all pages under writeback,
+	 * Data integrity sync. Must wait for all pages under writeback,
 	 * because there may have been pages dirtied before our sync
 	 * call, but which had writeout started before we write it out.
 	 * In which case, the inode may not be on the dirty list, but
