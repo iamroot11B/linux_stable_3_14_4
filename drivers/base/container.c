@@ -34,6 +34,7 @@ struct bus_type container_subsys = {
 	.offline = container_offline,
 };
 
+/*! 2017. 8.12 study -ing */
 void __init container_dev_init(void)
 {
 	int ret;

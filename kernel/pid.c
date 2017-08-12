@@ -233,7 +233,7 @@ int next_pidmap(struct pid_namespace *pid_ns, unsigned int last)
 	}
 	return -1;
 }
-
+/*! 2017. 8.12 study -ing */
 void put_pid(struct pid *pid)
 {
 	struct pid_namespace *ns;
@@ -428,7 +428,7 @@ void transfer_pid(struct task_struct *old, struct task_struct *new,
 	new->pids[type].pid = old->pids[type].pid;
 	hlist_replace_rcu(&old->pids[type].node, &new->pids[type].node);
 }
-
+/*! 2017. 8.12 study -ing */
 struct task_struct *pid_task(struct pid *pid, enum pid_type type)
 {
 	struct task_struct *result = NULL;
@@ -446,6 +446,7 @@ EXPORT_SYMBOL(pid_task);
 /*
  * Must be called under rcu_read_lock().
  */
+/*! 2017. 8.12 study -ing */
 struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns)
 {
 	rcu_lockdep_assert(rcu_read_lock_held(),
@@ -494,7 +495,7 @@ struct pid *find_get_pid(pid_t nr)
 	return pid;
 }
 EXPORT_SYMBOL_GPL(find_get_pid);
-
+/*! 2017. 8.12 study -ing */
 pid_t pid_nr_ns(struct pid *pid, struct pid_namespace *ns)
 {
 	struct upid *upid;
@@ -514,7 +515,7 @@ pid_t pid_vnr(struct pid *pid)
 	return pid_nr_ns(pid, task_active_pid_ns(current));
 }
 EXPORT_SYMBOL_GPL(pid_vnr);
-
+/*! 2017. 8.12 study -ing */
 pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
 			struct pid_namespace *ns)
 {
@@ -533,7 +534,7 @@ pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
 	return nr;
 }
 EXPORT_SYMBOL(__task_pid_nr_ns);
-
+/*! 2017. 8.12 study -ing */
 pid_t task_tgid_nr_ns(struct task_struct *tsk, struct pid_namespace *ns)
 {
 	return pid_nr_ns(task_tgid(tsk), ns);

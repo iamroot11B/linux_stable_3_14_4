@@ -12,6 +12,7 @@
 
 /*! 2017. 3.25 study -ing */
 #define __mutex_fastpath_lock(count, fail_fn)		fail_fn(count)
+/*! 2017. 8.12 study -ing */
 #define __mutex_fastpath_lock_retval(count)		(-1)
 /*! 2016-06-04 study -ing */
 #define __mutex_fastpath_unlock(count, fail_fn)		fail_fn(count)

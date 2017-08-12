@@ -20,7 +20,7 @@ void do_schedule_next_timer(struct siginfo *info);
 #ifndef HAVE_ARCH_COPY_SIGINFO
 
 #include <linux/string.h>
-
+/*! 2017. 8.12 study -ing */
 static inline void copy_siginfo(struct siginfo *to, struct siginfo *from)
 {
 	if (from->si_code < 0)

@@ -211,7 +211,7 @@ int next_signal(struct sigpending *pending, sigset_t *mask)
 
 	return sig;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void print_dropped_signal(int sig)
 {
 	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 10);
@@ -271,6 +271,7 @@ bool task_set_jobctl_pending(struct task_struct *task, unsigned int mask)
  * CONTEXT:
  * Must be called with @task->sighand->siglock held.
  */
+/*! 2017. 8.12 study -ing */
 void task_clear_jobctl_trapping(struct task_struct *task)
 {
 	if (unlikely(task->jobctl & JOBCTL_TRAPPING)) {
@@ -294,6 +295,7 @@ void task_clear_jobctl_trapping(struct task_struct *task)
  * CONTEXT:
  * Must be called with @task->sighand->siglock held.
  */
+/*! 2017. 8.12 study -ing */
 void task_clear_jobctl_pending(struct task_struct *task, unsigned int mask)
 {
 	BUG_ON(mask & ~JOBCTL_PENDING_MASK);
@@ -354,6 +356,7 @@ static bool task_participate_group_stop(struct task_struct *task)
  * - this may be called without locks if and only if t == current, otherwise an
  *   appropriate lock must be held to stop the target task from exiting
  */
+/*! 2017. 8.12 study -ing */
 static struct sigqueue *
 __sigqueue_alloc(int sig, struct task_struct *t, gfp_t flags, int override_rlimit)
 {
@@ -388,7 +391,7 @@ __sigqueue_alloc(int sig, struct task_struct *t, gfp_t flags, int override_rlimi
 
 	return q;
 }
-
+/*! 2017. 8.12 study -ing */
 static void __sigqueue_free(struct sigqueue *q)
 {
 	if (q->flags & SIGQUEUE_PREALLOC)
@@ -397,7 +400,7 @@ static void __sigqueue_free(struct sigqueue *q)
 	free_uid(q->user);
 	kmem_cache_free(sigqueue_cachep, q);
 }
-
+/*! 2017. 8.12 study -ing */
 void flush_sigqueue(struct sigpending *queue)
 {
 	struct sigqueue *q;
@@ -413,13 +416,14 @@ void flush_sigqueue(struct sigpending *queue)
 /*
  * Flush all pending signals for a task.
  */
+/*! 2017. 8.12 study -ing */
 void __flush_signals(struct task_struct *t)
 {
 	clear_tsk_thread_flag(t, TIF_SIGPENDING);
 	flush_sigqueue(&t->pending);
 	flush_sigqueue(&t->signal->shared_pending);
 }
-
+/*! 2017. 8.12 study -ing */
 void flush_signals(struct task_struct *t)
 {
 	unsigned long flags;
@@ -462,7 +466,7 @@ void flush_itimer_signals(void)
 	__flush_itimer_signals(&tsk->signal->shared_pending);
 	spin_unlock_irqrestore(&tsk->sighand->siglock, flags);
 }
-
+/*! 2017. 8.12 study -ing */
 void ignore_signals(struct task_struct *t)
 {
 	int i;
@@ -684,6 +688,7 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
  * No need to set need_resched since signal event passing
  * goes through ->blocked
  */
+/*! 2017. 8.12 study -ing */
 void signal_wake_up_state(struct task_struct *t, unsigned int state)
 {
 	set_tsk_thread_flag(t, TIF_SIGPENDING);
@@ -748,7 +753,7 @@ static int rm_from_queue(unsigned long mask, struct sigpending *s)
 	}
 	return 1;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int is_si_special(const struct siginfo *info)
 {
 	return info <= SEND_SIG_FORCED;
@@ -855,6 +860,7 @@ static void ptrace_trap_notify(struct task_struct *t)
  * Returns true if the signal should be actually delivered, otherwise
  * it should be dropped.
  */
+/*! 2017. 8.12 study -ing */
 static bool prepare_signal(int sig, struct task_struct *p, bool force)
 {
 	struct signal_struct *signal = p->signal;
@@ -928,6 +934,7 @@ static bool prepare_signal(int sig, struct task_struct *p, bool force)
  * as soon as they're available, so putting the signal on the shared queue
  * will be equivalent to sending it to one such thread.
  */
+/*! 2017. 8.12 study -ing */
 static inline int wants_signal(int sig, struct task_struct *p)
 {
 	if (sigismember(&p->blocked, sig))
@@ -940,7 +947,7 @@ static inline int wants_signal(int sig, struct task_struct *p)
 		return 0;
 	return task_curr(p) || !signal_pending(p);
 }
-
+/*! 2017. 8.12 study -ing */
 static void complete_signal(int sig, struct task_struct *p, int group)
 {
 	struct signal_struct *signal = p->signal;
@@ -1016,7 +1023,7 @@ static void complete_signal(int sig, struct task_struct *p, int group)
 	signal_wake_up(t, sig == SIGKILL);
 	return;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int legacy_queue(struct sigpending *signals, int sig)
 {
 	return (sig < SIGRTMIN) && sigismember(&signals->signal, sig);
@@ -1037,12 +1044,13 @@ static inline void userns_fixup_signal_uid(struct siginfo *info, struct task_str
 	rcu_read_unlock();
 }
 #else
+/*! 2017. 8.12 study -ing */
 static inline void userns_fixup_signal_uid(struct siginfo *info, struct task_struct *t)
 {
 	return;
 }
 #endif
-
+/*! 2017. 8.12 study -ing */
 static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 			int group, int from_ancestor_ns)
 {
@@ -1117,6 +1125,7 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 			break;
 		}
 
+		/*! Do nothing  */
 		userns_fixup_signal_uid(&q->info, t);
 
 	} else if (!is_si_special(info)) {
@@ -1146,12 +1155,13 @@ ret:
 	trace_signal_generate(sig, info, t, group, result);
 	return ret;
 }
-
+/*! 2017. 8.12 study -ing */
 static int send_signal(int sig, struct siginfo *info, struct task_struct *t,
 			int group)
 {
 	int from_ancestor_ns = 0;
 
+	/*! CONFIG_PID_NS Not defined.  */
 #ifdef CONFIG_PID_NS
 	from_ancestor_ns = si_fromuser(info) &&
 			   !task_pid_nr_ns(current, task_active_pid_ns(t));
@@ -1204,7 +1214,7 @@ specific_send_sig_info(int sig, struct siginfo *info, struct task_struct *t)
 {
 	return send_signal(sig, info, t, 0);
 }
-
+/*! 2017. 8.12 study -ing */
 int do_send_sig_info(int sig, struct siginfo *info, struct task_struct *p,
 			bool group)
 {
@@ -1279,7 +1289,7 @@ int zap_other_threads(struct task_struct *p)
 
 	return count;
 }
-
+/*! 2017. 8.12 study -ing */
 struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 					   unsigned long *flags)
 {
@@ -1471,7 +1481,7 @@ static int kill_something_info(int sig, struct siginfo *info, pid_t pid)
 /*
  * These are for backward compatibility with the rest of the kernel source.
  */
-
+/*! 2017. 8.12 study -ing */
 int send_sig_info(int sig, struct siginfo *info, struct task_struct *p)
 {
 	/*
@@ -1486,7 +1496,7 @@ int send_sig_info(int sig, struct siginfo *info, struct task_struct *p)
 
 #define __si_special(priv) \
 	((priv) ? SEND_SIG_PRIV : SEND_SIG_NOINFO)
-
+/*! 2017. 8.12 study -ing */
 int
 send_sig(int sig, struct task_struct *p, int priv)
 {

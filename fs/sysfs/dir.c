@@ -36,7 +36,7 @@ static char *sysfs_pathname(struct kernfs_node *kn, char *path)
 	strlcat(path, kn->name, PATH_MAX);
 	return path;
 }
-
+/*! 2017. 8.12 study -ing */
 void sysfs_warn_dup(struct kernfs_node *parent, const char *name)
 {
 	char *path;

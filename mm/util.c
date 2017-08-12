@@ -233,7 +233,7 @@ char *strndup_user(const char __user *s, long n)
 	return p;
 }
 EXPORT_SYMBOL(strndup_user);
-
+/*! 2017. 8.12 study -ing */
 void __vma_link_list(struct mm_struct *mm, struct vm_area_struct *vma,
 		struct vm_area_struct *prev, struct rb_node *rb_parent)
 {

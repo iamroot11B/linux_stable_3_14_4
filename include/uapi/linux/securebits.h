@@ -5,6 +5,7 @@
    whether the setting is on or off. The other bit specify whether the
    setting is locked or not. A setting which is locked cannot be
    changed from user-level. */
+/*! 2017. 8.12 study -ing */
 #define issecure_mask(X)	(1 << (X))
 
 #define SECUREBITS_DEFAULT 0x00000000

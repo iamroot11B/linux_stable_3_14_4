@@ -12,7 +12,7 @@ void  change_floppy(char *fmt, ...);
 void  mount_block_root(char *name, int flags);
 void  mount_root(void);
 extern int root_mountflags;
-
+/*! 2017. 8.12 study -ing */
 static inline int create_dev(char *name, dev_t dev)
 {
 	sys_unlink(name);
@@ -49,8 +49,9 @@ int __init rd_load_disk(int n);
 int __init rd_load_image(char *from);
 
 #else
-
+/*! 2017. 8.12 study -ing */
 static inline int rd_load_disk(int n) { return 0; }
+/*! 2017. 8.12 study -ing */
 static inline int rd_load_image(char *from) { return 0; }
 
 #endif
@@ -70,7 +71,7 @@ static inline int initrd_load(void) { return 0; }
 void md_run_setup(void);
 
 #else
-
+/*! 2017. 8.12 study -ing */
 static inline void md_run_setup(void) {}
 
 #endif

@@ -2368,6 +2368,7 @@ unsigned long nr_iowait_cpu(int cpu)
  * sched_exec - execve() is a valuable balancing opportunity, because at
  * this point the task has the smallest effective memory and cache footprint.
  */
+/*! 2017. 8.12 study -ing */
 void sched_exec(void)
 {
 	struct task_struct *p = current;
@@ -2816,6 +2817,7 @@ asmlinkage void __sched schedule_user(void)
  *
  * Returns with preemption disabled. Note: preempt_count must be 1
  */
+/*! 2017. 8.12 study -ing */
 void __sched schedule_preempt_disabled(void)
 {
 	sched_preempt_enable_no_resched();
@@ -2884,7 +2886,7 @@ asmlinkage void __sched preempt_schedule_irq(void)
 
 	exception_exit(prev_state);
 }
-
+/*! 2017. 8.12 study -ing */
 int default_wake_function(wait_queue_t *curr, unsigned mode, int wake_flags,
 			  void *key)
 {
@@ -4282,6 +4284,7 @@ EXPORT_SYMBOL_GPL(yield_to);
  * This task is about to go to sleep on IO. Increment rq->nr_iowait so
  * that process accounting knows that this is a task in IO wait state.
  */
+/*! 2017. 8.12 study -ing */
 void __sched io_schedule(void)
 {
 	struct rq *rq = raw_rq();
@@ -4486,7 +4489,7 @@ void show_state_filter(unsigned long state_filter)
 	if (!state_filter)
 		debug_show_all_locks();
 }
-
+/*! 2017. 8.12 study -ing */
 void init_idle_bootup_task(struct task_struct *idle)
 {
 	idle->sched_class = &idle_sched_class;

@@ -505,7 +505,7 @@ static inline int mm_alloc_pgd(struct mm_struct *mm)
 		return -ENOMEM;
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void mm_free_pgd(struct mm_struct *mm)
 {
 	pgd_free(mm, mm->pgd);
@@ -517,8 +517,9 @@ static inline void mm_free_pgd(struct mm_struct *mm)
 #endif /* CONFIG_MMU */
 
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
-
+/*! 2017. 8.12 study -ing */
 #define allocate_mm()	(kmem_cache_alloc(mm_cachep, GFP_KERNEL))
+/*! 2017. 8.12 study -ing */
 #define free_mm(mm)	(kmem_cache_free(mm_cachep, (mm)))
 
 static unsigned long default_dump_filter = MMF_DUMP_FILTER_DEFAULT;
@@ -568,7 +569,7 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
 	free_mm(mm);
 	return NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 static void check_mm(struct mm_struct *mm)
 {
 	int i;
@@ -589,6 +590,7 @@ static void check_mm(struct mm_struct *mm)
 /*
  * Allocate and initialize an mm_struct.
  */
+/*! 2017. 8.12 study -ing */
 struct mm_struct *mm_alloc(void)
 {
 	struct mm_struct *mm;
@@ -607,6 +609,7 @@ struct mm_struct *mm_alloc(void)
  * is dropped: either by a lazy thread or by
  * mmput. Free the page directory and the mm.
  */
+/*! 2017. 8.12 study -ing */
 void __mmdrop(struct mm_struct *mm)
 {
 	BUG_ON(mm == &init_mm);
@@ -1961,7 +1964,7 @@ bad_unshare_out:
  *	We don't want to expose copy_files internals to
  *	the exec layer of the kernel.
  */
-
+/*! 2017. 8.12 study -ing */
 int unshare_files(struct files_struct **displaced)
 {
 	struct task_struct *task = current;

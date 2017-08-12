@@ -4,7 +4,7 @@
  *  Copyright (C) 1991, 1992  Linus Torvalds
  */
 
-#include <linux/slab.h> 
+#include <linux/slab.h>
 #include <linux/stat.h>
 #include <linux/fcntl.h>
 #include <linux/file.h>
@@ -35,7 +35,7 @@ const struct file_operations generic_ro_fops = {
 };
 
 EXPORT_SYMBOL(generic_ro_fops);
-
+/*! 2017. 8.12 study -ing */
 static inline int unsigned_offsets(struct file *file)
 {
 	return file->f_mode & FMODE_UNSIGNED_OFFSET;
@@ -337,6 +337,7 @@ out_putf:
  * them to something that fits in "int" so that others
  * won't have to do range checks all the time.
  */
+/*! 2017. 8.12 study -ing */
 int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t count)
 {
 	struct inode *inode;
@@ -370,7 +371,7 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
 		return retval;
 	return count > MAX_RW_COUNT ? MAX_RW_COUNT : count;
 }
-
+/*! 2017. 8.12 study -ing */
 ssize_t do_sync_read(struct file *filp, char __user *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov = { .iov_base = buf, .iov_len = len };
@@ -389,7 +390,7 @@ ssize_t do_sync_read(struct file *filp, char __user *buf, size_t len, loff_t *pp
 }
 
 EXPORT_SYMBOL(do_sync_read);
-
+/*! 2017. 8.12 study -ing */
 ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 {
 	ssize_t ret;
@@ -410,6 +411,7 @@ ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 			ret = do_sync_read(file, buf, count, pos);
 		if (ret > 0) {
 			fsnotify_access(file);
+			/*! Do nothing  */
 			add_rchar(current, ret);
 		}
 		inc_syscr(current);
@@ -572,7 +574,7 @@ SYSCALL_DEFINE4(pwrite64, unsigned int, fd, const char __user *, buf,
 	f = fdget(fd);
 	if (f.file) {
 		ret = -ESPIPE;
-		if (f.file->f_mode & FMODE_PWRITE)  
+		if (f.file->f_mode & FMODE_PWRITE)
 			ret = vfs_write(f.file, buf, count, &pos);
 		fdput(f);
 	}

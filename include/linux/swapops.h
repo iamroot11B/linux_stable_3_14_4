@@ -16,8 +16,10 @@
  *
  * swp_entry_t's are *never* stored anywhere in their arch-dependent format.
  */
+/*! 2017. 8.12 study -ing */
 #define SWP_TYPE_SHIFT(e)	((sizeof(e.val) * 8) - \
 			(MAX_SWAPFILES_SHIFT + RADIX_TREE_EXCEPTIONAL_SHIFT))
+/*! 2017. 8.12 study -ing */
 #define SWP_OFFSET_MASK(e)	((1UL << SWP_TYPE_SHIFT(e)) - 1)
 
 /*
@@ -36,6 +38,7 @@ static inline swp_entry_t swp_entry(unsigned long type, pgoff_t offset)
  * Extract the `type' field from a swp_entry_t.  The swp_entry_t is in
  * arch-independent format
  */
+/*! 2017. 8.12 study -ing */
 static inline unsigned swp_type(swp_entry_t entry)
 {
 	return (entry.val >> SWP_TYPE_SHIFT(entry));
@@ -45,6 +48,7 @@ static inline unsigned swp_type(swp_entry_t entry)
  * Extract the `offset' field from a swp_entry_t.  The swp_entry_t is in
  * arch-independent format
  */
+/*! 2017. 8.12 study -ing */
 static inline pgoff_t swp_offset(swp_entry_t entry)
 {
 	return entry.val & SWP_OFFSET_MASK(entry);

@@ -234,6 +234,7 @@ EXPORT_SYMBOL_GPL(async_schedule_domain);
  *
  * This function waits until all asynchronous function calls have been done.
  */
+/*! 2017. 8.12 study -ing */
 void async_synchronize_full(void)
 {
 	async_synchronize_full_domain(NULL);
@@ -265,6 +266,7 @@ EXPORT_SYMBOL_GPL(async_unregister_domain);
  * This function waits until all asynchronous function calls for the
  * synchronization domain specified by @domain have been done.
  */
+/*! 2017. 8.12 study -ing */
 void async_synchronize_full_domain(struct async_domain *domain)
 {
 	async_synchronize_cookie_domain(ASYNC_COOKIE_MAX, domain);
@@ -280,6 +282,7 @@ EXPORT_SYMBOL_GPL(async_synchronize_full_domain);
  * synchronization domain specified by @domain submitted prior to @cookie
  * have been done.
  */
+/*! 2017. 8.12 study -ing */
 void async_synchronize_cookie_domain(async_cookie_t cookie, struct async_domain *domain)
 {
 	ktime_t uninitialized_var(starttime), delta, endtime;
@@ -320,6 +323,7 @@ EXPORT_SYMBOL_GPL(async_synchronize_cookie);
  *
  * Returns %true if %current is an async worker task.
  */
+/*! 2017. 8.12 study -ing */
 bool current_is_async(void)
 {
 	struct worker *worker = current_wq_worker();

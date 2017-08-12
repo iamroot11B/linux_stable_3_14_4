@@ -34,6 +34,7 @@ extern char modprobe_path[]; /* for sysctl */
  * usually useless though. */
 extern __printf(2, 3)
 int __request_module(bool wait, const char *name, ...);
+/*! 2017. 8.12 study -ing */
 #define request_module(mod...) __request_module(true, mod)
 #define request_module_nowait(mod...) __request_module(false, mod)
 #define try_then_request_module(x, mod...) \
@@ -94,7 +95,7 @@ static inline int usermodehelper_disable(void)
 {
 	return __usermodehelper_disable(UMH_DISABLED);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void usermodehelper_enable(void)
 {
 	__usermodehelper_set_disable_depth(UMH_ENABLED);

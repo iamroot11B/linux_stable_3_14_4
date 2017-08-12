@@ -60,11 +60,13 @@ extern int __put_user_bad(void);
  * Note that this is actually 0x1,0000,0000
  */
 #define KERNEL_DS	0x00000000
+/*! 2017. 8.12 study -ing */
 #define get_ds()	(KERNEL_DS)
 
 #ifdef CONFIG_MMU
 
 #define USER_DS		TASK_SIZE
+/*! 2017. 8.12 study -ing */
 #define get_fs()	(current_thread_info()->addr_limit)
 
 static inline void set_fs(mm_segment_t fs)
@@ -211,7 +213,7 @@ extern int __put_user_8(void *, unsigned long long);
 #define __addr_ok(addr)		((void)(addr),1)
 #define __range_ok(addr,size)	((void)(addr),0)
 #define get_fs()		(KERNEL_DS)
-
+/*! 2017. 8.12 study -ing */
 static inline void set_fs(mm_segment_t fs)
 {
 }

@@ -40,7 +40,7 @@ void add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t *wait)
 	spin_unlock_irqrestore(&q->lock, flags);
 }
 EXPORT_SYMBOL(add_wait_queue_exclusive);
-
+/*! 2017. 8.12 study -ing */
 void remove_wait_queue(wait_queue_head_t *q, wait_queue_t *wait)
 {
 	unsigned long flags;
@@ -205,7 +205,7 @@ prepare_to_wait_exclusive(wait_queue_head_t *q, wait_queue_t *wait, int state)
 	spin_unlock_irqrestore(&q->lock, flags);
 }
 EXPORT_SYMBOL(prepare_to_wait_exclusive);
-
+/*! 2017. 8.12 study -ing */
 long prepare_to_wait_event(wait_queue_head_t *q, wait_queue_t *wait, int state)
 {
 	unsigned long flags;
@@ -301,7 +301,7 @@ void abort_exclusive_wait(wait_queue_head_t *q, wait_queue_t *wait,
 	spin_unlock_irqrestore(&q->lock, flags);
 }
 EXPORT_SYMBOL(abort_exclusive_wait);
-
+/*! 2017. 8.12 study -ing */
 int autoremove_wake_function(wait_queue_t *wait, unsigned mode, int sync, void *key)
 {
 	int ret = default_wake_function(wait, mode, sync, key);

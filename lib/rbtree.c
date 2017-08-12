@@ -48,7 +48,7 @@ static inline void rb_set_black(struct rb_node *rb)
 {
 	rb->__rb_parent_color |= RB_BLACK;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline struct rb_node *rb_red_parent(struct rb_node *red)
 {
 	return (struct rb_node *)red->__rb_parent_color;
@@ -68,7 +68,7 @@ __rb_rotate_set_parents(struct rb_node *old, struct rb_node *new,
 	rb_set_parent_color(old, new, color);
 	__rb_change_child(old, new, parent, root);
 }
-
+/*! 2017. 8.12 study -ing */
 static __always_inline void
 __rb_insert(struct rb_node *node, struct rb_root *root,
 	    void (*augment_rotate)(struct rb_node *old, struct rb_node *new))
@@ -405,6 +405,7 @@ EXPORT_SYMBOL(rb_erase);
  * case, but this time with user-defined callbacks.
  */
 
+/*! 2017. 8.12 study -ing */
 void __rb_insert_augmented(struct rb_node *node, struct rb_root *root,
 	void (*augment_rotate)(struct rb_node *old, struct rb_node *new))
 {
@@ -453,7 +454,7 @@ struct rb_node *rb_next(const struct rb_node *node)
 	 * as we can.
 	 */
 	if (node->rb_right) {
-		node = node->rb_right; 
+		node = node->rb_right;
 		while (node->rb_left)
 			node=node->rb_left;
 		return (struct rb_node *)node;
@@ -485,7 +486,7 @@ struct rb_node *rb_prev(const struct rb_node *node)
 	 * as we can.
 	 */
 	if (node->rb_left) {
-		node = node->rb_left; 
+		node = node->rb_left;
 		while (node->rb_right)
 			node=node->rb_right;
 		return (struct rb_node *)node;

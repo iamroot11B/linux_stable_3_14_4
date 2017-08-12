@@ -19,7 +19,7 @@ extern s32 vm_committed_as_batch;
 #endif
 
 unsigned long vm_memory_committed(void);
-
+/*! 2017. 8.12 study -ing */
 static inline void vm_acct_memory(long pages)
 {
 	__percpu_counter_add(&vm_committed_as, pages, vm_committed_as_batch);

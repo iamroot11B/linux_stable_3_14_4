@@ -57,6 +57,7 @@ static void disk_release_events(struct gendisk *disk);
  * RETURNS:
  * Pointer to the found partition on success, NULL if not found.
  */
+/*! 2017. 8.12 study -ing */
 struct hd_struct *disk_get_part(struct gendisk *disk, int partno)
 {
 	struct hd_struct *part = NULL;
@@ -91,6 +92,7 @@ EXPORT_SYMBOL_GPL(disk_get_part);
  * CONTEXT:
  * Don't care.
  */
+/*! 2017. 8.12 study -ing */
 void disk_part_iter_init(struct disk_part_iter *piter, struct gendisk *disk,
 			  unsigned int flags)
 {
@@ -124,6 +126,7 @@ EXPORT_SYMBOL_GPL(disk_part_iter_init);
  * CONTEXT:
  * Don't care.
  */
+/*! 2017. 8.12 study -ing */
 struct hd_struct *disk_part_iter_next(struct disk_part_iter *piter)
 {
 	struct disk_part_tbl *ptbl;
@@ -184,6 +187,7 @@ EXPORT_SYMBOL_GPL(disk_part_iter_next);
  * CONTEXT:
  * Don't care.
  */
+/*! 2017. 8.12 study -ing */
 void disk_part_iter_exit(struct disk_part_iter *piter)
 {
 	disk_put_part(piter->part);
@@ -735,6 +739,7 @@ EXPORT_SYMBOL(bdget_disk);
  * filesystem can't be mounted and thus to give the victim some idea of what
  * went wrong
  */
+/*! 2017. 8.12 study -ing */
 void __init printk_all_partitions(void)
 {
 	struct class_dev_iter iter;
@@ -1206,7 +1211,7 @@ static int __init proc_genhd_init(void)
 }
 module_init(proc_genhd_init);
 #endif /* CONFIG_PROC_FS */
-
+/*! 2017. 8.12 study -ing */
 dev_t blk_lookup_devt(const char *name, int partno)
 {
 	dev_t devt = MKDEV(0, 0);

@@ -6,7 +6,7 @@
  *
  *				Alan Cox <Alan.Cox@linux.org>
  */
- 
+
 #ifndef _LINUX_NOTIFIER_H
 #define _LINUX_NOTIFIER_H
 #include <linux/errno.h>
@@ -80,6 +80,7 @@ struct srcu_notifier_head {
 		spin_lock_init(&(name)->lock);	\
 		(name)->head = NULL;		\
 	} while (0)
+/*! 2017. 8.12 study -ing */
 #define BLOCKING_INIT_NOTIFIER_HEAD(name) do {	\
 		init_rwsem(&(name)->rwsem);	\
 		(name)->head = NULL;		\
@@ -183,12 +184,12 @@ static inline int notifier_to_errno(int ret)
 
 /*
  *	Declared notifiers so far. I can imagine quite a few more chains
- *	over time (eg laptop power reset chains, reboot chain (to clean 
+ *	over time (eg laptop power reset chains, reboot chain (to clean
  *	device units up), device [un]mount chain, module load/unload chain,
- *	low memory chain, screenblank chain (for plug in modular screenblankers) 
+ *	low memory chain, screenblank chain (for plug in modular screenblankers)
  *	VC switch chains (for loadable kernel svgalib VC switch helpers) etc...
  */
- 
+
 /* CPU notfiers are defined in include/linux/cpu.h. */
 
 /* netdevice notifiers are defined in include/linux/netdevice.h */

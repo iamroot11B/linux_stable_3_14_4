@@ -115,7 +115,7 @@ static void __init handle_initrd(void)
 		printk(!error ? "okay\n" : "failed\n");
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 int __init initrd_load(void)
 {
 	if (mount_initrd) {
@@ -126,6 +126,7 @@ int __init initrd_load(void)
 		 * in that case the ram disk is just set up here, and gets
 		 * mounted in the normal path.
 		 */
+		/*! rd_load_image = 0  */
 		if (rd_load_image("/initrd.image") && ROOT_DEV != Root_RAM0) {
 			sys_unlink("/initrd.image");
 			handle_initrd();

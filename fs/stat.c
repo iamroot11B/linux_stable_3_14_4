@@ -17,7 +17,7 @@
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
-
+/*! 2017. 8.12 study -ing */
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
 	stat->dev = inode->i_sb->s_dev;
@@ -49,6 +49,7 @@ EXPORT_SYMBOL(generic_fillattr);
  * no attributes to any user.  Any other code probably wants
  * vfs_getattr.
  */
+/*! 2017. 8.12 study -ing */
 int vfs_getattr_nosec(struct path *path, struct kstat *stat)
 {
 	struct inode *inode = path->dentry->d_inode;
@@ -61,7 +62,7 @@ int vfs_getattr_nosec(struct path *path, struct kstat *stat)
 }
 
 EXPORT_SYMBOL(vfs_getattr_nosec);
-
+/*! 2017. 8.12 study -ing */
 int vfs_getattr(struct path *path, struct kstat *stat)
 {
 	int retval;
@@ -141,7 +142,7 @@ static int cp_old_stat(struct kstat *stat, struct __old_kernel_stat __user * sta
 {
 	static int warncount = 5;
 	struct __old_kernel_stat tmp;
-	
+
 	if (warncount > 0) {
 		warncount--;
 		printk(KERN_WARNING "VFS: Warning: %s using old stat() call. Recompile your binary.\n",
@@ -166,7 +167,7 @@ static int cp_old_stat(struct kstat *stat, struct __old_kernel_stat __user * sta
 #if BITS_PER_LONG == 32
 	if (stat->size > MAX_NON_LFS)
 		return -EOVERFLOW;
-#endif	
+#endif
 	tmp.st_size = stat->size;
 	tmp.st_atime = stat->atime.tv_sec;
 	tmp.st_mtime = stat->mtime.tv_sec;

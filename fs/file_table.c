@@ -40,7 +40,7 @@ struct files_stat_struct files_stat = {
 static struct kmem_cache *filp_cachep __read_mostly;
 
 static struct percpu_counter nr_files __cacheline_aligned_in_smp;
-
+/*! 2017. 8.12 study -ing */
 static void file_free_rcu(struct rcu_head *head)
 {
 	struct file *f = container_of(head, struct file, f_u.fu_rcuhead);
@@ -48,10 +48,11 @@ static void file_free_rcu(struct rcu_head *head)
 	put_cred(f->f_cred);
 	kmem_cache_free(filp_cachep, f);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void file_free(struct file *f)
 {
 	percpu_counter_dec(&nr_files);
+	/*! Do nothing  */
 	file_check_state(f);
 	call_rcu(&f->f_u.fu_rcuhead, file_free_rcu);
 }
@@ -59,6 +60,7 @@ static inline void file_free(struct file *f)
 /*
  * Return the total number of open files in the system
  */
+/*! 2017. 8.12 study -ing */
 static long get_nr_files(void)
 {
 	return percpu_counter_read_positive(&nr_files);
@@ -101,6 +103,7 @@ int proc_nr_files(ctl_table *table, int write,
  * done, you will imbalance int the mount's writer count
  * and a warning at __fput() time.
  */
+/*! 2017. 8.12 study -ing */
 struct file *get_empty_filp(void)
 {
 	const struct cred *cred = current_cred();
@@ -203,6 +206,7 @@ EXPORT_SYMBOL(alloc_file);
  * to write to @file, along with access to write through
  * its vfsmount.
  */
+/*! 2017. 8.12 study -ing */
 static void drop_file_write_access(struct file *file)
 {
 	struct vfsmount *mnt = file->f_path.mnt;
@@ -216,11 +220,13 @@ static void drop_file_write_access(struct file *file)
 	if (file_check_writeable(file) != 0)
 		return;
 	__mnt_drop_write(mnt);
+	/*! Do nothing  */
 	file_release_write(file);
 }
 
 /* the real guts of fput() - releasing the last reference to file
  */
+/*! 2017. 8.12 study -ing */
 static void __fput(struct file *file)
 {
 	struct dentry *dentry = file->f_path.dentry;
@@ -241,9 +247,11 @@ static void __fput(struct file *file)
 		if (file->f_op->fasync)
 			file->f_op->fasync(-1, file, 0);
 	}
+	/*! Do nothing  */
 	ima_file_free(file);
 	if (file->f_op->release)
 		file->f_op->release(inode, file);
+	/*! Do nothing  */
 	security_file_free(file);
 	if (unlikely(S_ISCHR(inode->i_mode) && inode->i_cdev != NULL &&
 		     !(file->f_mode & FMODE_PATH))) {
@@ -263,6 +271,7 @@ static void __fput(struct file *file)
 	mntput(mnt);
 }
 
+/*! 2017. 8.12 study -ing */
 static LLIST_HEAD(delayed_fput_list);
 static void delayed_fput(struct work_struct *unused)
 {
@@ -290,6 +299,7 @@ static void ____fput(struct callback_head *work)
  * held and never call that from a thread that might need to do
  * some work on any kind of umount.
  */
+/*! 2017. 8.12 study -ing */
 void flush_delayed_fput(void)
 {
 	delayed_fput(NULL);
@@ -337,7 +347,7 @@ void __fput_sync(struct file *file)
 }
 
 EXPORT_SYMBOL(fput);
-
+/*! 2017. 8.12 study -ing */
 void put_filp(struct file *file)
 {
 	if (atomic_long_dec_and_test(&file->f_count)) {

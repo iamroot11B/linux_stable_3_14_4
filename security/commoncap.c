@@ -42,6 +42,7 @@
  *
  * Warn if that happens, once per boot.
  */
+/*! 2017. 8.12 study -ing */
 static void warn_setuid_and_fcaps_mixed(const char *fname)
 {
 	static int warned;
@@ -279,6 +280,7 @@ int cap_capset(struct cred *new,
 /*
  * Clear proposed capability sets for execve().
  */
+/*! 2017. 8.12 study -ing */
 static inline void bprm_clear_caps(struct linux_binprm *bprm)
 {
 	cap_clear(bprm->cred->cap_permitted);
@@ -296,6 +298,7 @@ static inline void bprm_clear_caps(struct linux_binprm *bprm)
  * Returns 0 if granted; +ve if granted, but inode_killpriv() is required; and
  * -ve to deny the change.
  */
+/*! 2017. 8.12 study -ing */
 int cap_inode_need_killpriv(struct dentry *dentry)
 {
 	struct inode *inode = dentry->d_inode;
@@ -318,6 +321,7 @@ int cap_inode_need_killpriv(struct dentry *dentry)
  *
  * Returns 0 if successful, -ve on error.
  */
+/*! 2017. 8.12 study -ing */
 int cap_inode_killpriv(struct dentry *dentry)
 {
 	struct inode *inode = dentry->d_inode;
@@ -332,6 +336,7 @@ int cap_inode_killpriv(struct dentry *dentry)
  * Calculate the new process capability sets from the capability sets attached
  * to a file.
  */
+/*! 2017. 8.12 study -ing */
 static inline int bprm_caps_from_vfs_caps(struct cpu_vfs_cap_data *caps,
 					  struct linux_binprm *bprm,
 					  bool *effective,
@@ -374,6 +379,7 @@ static inline int bprm_caps_from_vfs_caps(struct cpu_vfs_cap_data *caps,
 /*
  * Extract the on-exec-apply capability sets for an executable file.
  */
+/*! 2017. 8.12 study -ing */
 int get_vfs_caps_from_disk(const struct dentry *dentry, struct cpu_vfs_cap_data *cpu_caps)
 {
 	struct inode *inode = dentry->d_inode;
@@ -430,6 +436,7 @@ int get_vfs_caps_from_disk(const struct dentry *dentry, struct cpu_vfs_cap_data 
  * its xattrs and, if present, apply them to the proposed credentials being
  * constructed by execve().
  */
+/*! 2017. 8.12 study -ing */
 static int get_file_caps(struct linux_binprm *bprm, bool *effective, bool *has_cap)
 {
 	struct dentry *dentry;
@@ -477,6 +484,7 @@ out:
  * constructed by execve().  The proposed creds in @bprm->cred is altered,
  * which won't take effect immediately.  Returns 0 if successful, -ve on error.
  */
+/*! 2017. 8.12 study -ing */
 int cap_bprm_set_creds(struct linux_binprm *bprm)
 {
 	const struct cred *old = current_cred();
@@ -957,6 +965,7 @@ error:
  * Determine whether the allocation of a new virtual mapping by the current
  * task is permitted, returning 0 if permission is granted, -ve if not.
  */
+/*! 2017. 8.12 study -ing */
 int cap_vm_enough_memory(struct mm_struct *mm, long pages)
 {
 	int cap_sys_admin = 0;

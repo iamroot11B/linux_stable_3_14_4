@@ -71,6 +71,7 @@ static struct file_system_type dev_fs_type = {
 };
 
 #ifdef CONFIG_BLOCK
+/*! 2017. 8.12 study -ing */
 static inline int is_blockdev(struct device *dev)
 {
 	return dev->class == &block_class;
@@ -146,7 +147,7 @@ int devtmpfs_delete_node(struct device *dev)
 	kfree(tmp);
 	return req.err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int dev_mkdir(const char *name, umode_t mode)
 {
 	struct dentry *dentry;
@@ -164,7 +165,7 @@ static int dev_mkdir(const char *name, umode_t mode)
 	done_path_create(&path, dentry);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int create_path(const char *nodepath)
 {
 	char *path;
@@ -191,7 +192,7 @@ static int create_path(const char *nodepath)
 	kfree(path);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int handle_create(const char *nodename, umode_t mode, kuid_t uid,
 			 kgid_t gid, struct device *dev)
 {
@@ -225,7 +226,7 @@ static int handle_create(const char *nodename, umode_t mode, kuid_t uid,
 	done_path_create(&path, dentry);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int dev_rmdir(const char *name)
 {
 	struct path parent;
@@ -248,7 +249,7 @@ static int dev_rmdir(const char *name)
 	path_put(&parent);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int delete_path(const char *nodepath)
 {
 	const char *path;
@@ -273,7 +274,7 @@ static int delete_path(const char *nodepath)
 	kfree(path);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static int dev_mynode(struct device *dev, struct inode *inode, struct kstat *stat)
 {
 	/* did we create it */
@@ -294,7 +295,7 @@ static int dev_mynode(struct device *dev, struct inode *inode, struct kstat *sta
 	/* ours */
 	return 1;
 }
-
+/*! 2017. 8.12 study -ing */
 static int handle_remove(const char *nodename, struct device *dev)
 {
 	struct path parent;
@@ -344,6 +345,7 @@ static int handle_remove(const char *nodename, struct device *dev)
  * If configured, or requested by the commandline, devtmpfs will be
  * auto-mounted after the kernel mounted the root filesystem.
  */
+/*! 2017. 8.12 study -ing */
 int devtmpfs_mount(const char *mntdir)
 {
 	int err;
@@ -363,7 +365,7 @@ int devtmpfs_mount(const char *mntdir)
 }
 
 static DECLARE_COMPLETION(setup_done);
-
+/*! 2017. 8.12 study -ing */
 static int handle(const char *name, umode_t mode, kuid_t uid, kgid_t gid,
 		  struct device *dev)
 {
@@ -385,7 +387,9 @@ static int devtmpfsd(void *p)
 	*err = sys_mount("devtmpfs", "/", "devtmpfs", MS_SILENT, options);
 	if (*err)
 		goto out;
+	/*! sys_chdir는 fs/open.c 의 "SYSCALL_DEFINE1(chdir" 을 참조 */
 	sys_chdir("/.."); /* will traverse into overmounted root */
+	/*! sys_chdir는 fs/open.c 의 "SYSCALL_DEFINE1(chroot" 을 참조  */
 	sys_chroot(".");
 	complete(&setup_done);
 	while (1) {

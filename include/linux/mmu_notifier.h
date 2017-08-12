@@ -329,7 +329,7 @@ static inline void mmu_notifier_invalidate_range_end(struct mm_struct *mm,
 static inline void mmu_notifier_mm_init(struct mm_struct *mm)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void mmu_notifier_mm_destroy(struct mm_struct *mm)
 {
 }

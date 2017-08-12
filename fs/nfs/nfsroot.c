@@ -153,7 +153,7 @@ static int __init nfs_root_setup(char *line)
 }
 
 __setup("nfsroot=", nfs_root_setup);
-
+/*! 2017. 8.12 study -ing */
 static int __init root_nfs_copy(char *dest, const char *src,
 				     const size_t destlen)
 {
@@ -161,7 +161,7 @@ static int __init root_nfs_copy(char *dest, const char *src,
 		return -1;
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int __init root_nfs_cat(char *dest, const char *src,
 			       const size_t destlen)
 {
@@ -182,6 +182,7 @@ static int __init root_nfs_cat(char *dest, const char *src,
  *
  * Copy the export path into @exppath.
  */
+/*! 2017. 8.12 study -ing */
 static int __init root_nfs_parse_options(char *incoming, char *exppath,
 					 const size_t exppathlen)
 {
@@ -214,6 +215,7 @@ static int __init root_nfs_parse_options(char *incoming, char *exppath,
  *
  *  Returns zero if successful; otherwise -1 is returned.
  */
+/*! 2017. 8.12 study -ing */
 static int __init root_nfs_data(char *cmdline)
 {
 	char mand_options[sizeof("nolock,addr=") + INET_ADDRSTRLEN + 1];
@@ -292,6 +294,7 @@ out_devnametoolong:
  * Returns zero and sets @root_device and @root_data if successful,
  * otherwise -1 is returned.
  */
+/*! 2017. 8.12 study -ing */
 int __init nfs_root_data(char **root_device, char **root_data)
 {
 	servaddr = root_server_addr;

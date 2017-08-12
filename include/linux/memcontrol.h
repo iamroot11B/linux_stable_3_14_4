@@ -264,7 +264,7 @@ static inline void mem_cgroup_cancel_charge_swapin(struct mem_cgroup *memcg)
 static inline void mem_cgroup_uncharge_start(void)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void mem_cgroup_uncharge_end(void)
 {
 }
@@ -272,7 +272,7 @@ static inline void mem_cgroup_uncharge_end(void)
 static inline void mem_cgroup_uncharge_page(struct page *page)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void mem_cgroup_uncharge_cache_page(struct page *page)
 {
 }

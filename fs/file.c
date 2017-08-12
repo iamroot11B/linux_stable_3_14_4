@@ -413,7 +413,7 @@ void put_files_struct(struct files_struct *files)
 		kmem_cache_free(files_cachep, files);
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 void reset_files_struct(struct files_struct *files)
 {
 	struct task_struct *tsk = current;

@@ -141,7 +141,7 @@ static void default_idle(void)
 		cpu_do_idle();
 	local_irq_enable();
 }
-
+/*! 2017. 8.12 study -ing */
 void arch_cpu_idle_prepare(void)
 {
 	local_fiq_enable();
@@ -161,6 +161,7 @@ void arch_cpu_idle_exit(void)
 }
 
 #ifdef CONFIG_HOTPLUG_CPU
+/*! 2017. 8.12 study -ing */
 void arch_cpu_idle_dead(void)
 {
 	cpu_die();

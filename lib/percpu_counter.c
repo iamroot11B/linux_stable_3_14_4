@@ -97,6 +97,7 @@ EXPORT_SYMBOL(__percpu_counter_add);
  * Add up all the per-cpu counts, return the result.  This is a more accurate
  * but much slower version of percpu_counter_read_positive()
  */
+/*! 2017. 8.12 study -ing */
 s64 __percpu_counter_sum(struct percpu_counter *fbc)
 {
 	s64 ret;

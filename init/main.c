@@ -94,6 +94,7 @@ extern void init_IRQ(void);
 extern void fork_init(unsigned long);
 extern void radix_tree_init(void);
 #ifndef CONFIG_DEBUG_RODATA
+/*! 2017. 8.12 study -ing */
 static inline void mark_rodata_ro(void) { }
 #endif
 
@@ -834,6 +835,7 @@ asmlinkage void __init start_kernel(void)
 }
 
 /* Call all constructor functions linked into the kernel. */
+/*! 2017. 8.12 study -ing */
 static void __init do_ctors(void)
 {
 #ifdef CONFIG_CONSTRUCTORS
@@ -927,7 +929,7 @@ static char *initcall_level_names[] __initdata = {
 	"device",
 	"late",
 };
-
+/*! 2017. 8.12 study -ing */
 static void __init do_initcall_level(int level)
 {
 	extern const struct kernel_param __start___param[], __stop___param[];
@@ -943,7 +945,7 @@ static void __init do_initcall_level(int level)
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
 		do_one_initcall(*fn);
 }
-
+/*! 2017. 8.12 study -ing */
 static void __init do_initcalls(void)
 {
 	int level;
@@ -967,6 +969,7 @@ static void __init do_basic_setup(void)
 	shmem_init();
 	driver_init();
 	init_irq_proc();
+	/*! Do nothing  */
 	do_ctors();
 	usermodehelper_enable();
 	do_initcalls();
@@ -991,11 +994,12 @@ static void __init do_pre_smp_initcalls(void)
  * exec'd.  If such modules are on either initrd or rootfs, they will be
  * loaded before control is passed to userland.
  */
+/*! 2017. 8.12 study -ing */
 void __init load_default_modules(void)
 {
 	load_default_elevator_module();
 }
-
+/*! 2017. 8.12 study -ing */
 static int run_init_process(const char *init_filename)
 {
 	argv_init[0] = init_filename;
@@ -1003,7 +1007,7 @@ static int run_init_process(const char *init_filename)
 		(const char __user *const __user *)argv_init,
 		(const char __user *const __user *)envp_init);
 }
-
+/*! 2017. 8.12 study -ing */
 static int try_to_run_init_process(const char *init_filename)
 {
 	int ret;
@@ -1029,8 +1033,10 @@ static int __ref kernel_init(void *unused)
 	/* need to finish all async __init code before freeing the memory */
 	async_synchronize_full();
 	free_initmem();
+	/*! Do nothing.  */
 	mark_rodata_ro();
 	system_state = SYSTEM_RUNNING;
+	/*! Do nothing  */
 	numa_default_policy();
 
 	flush_delayed_fput();

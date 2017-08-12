@@ -78,7 +78,7 @@ bool elv_rq_merge_ok(struct request *rq, struct bio *bio)
 	return 1;
 }
 EXPORT_SYMBOL(elv_rq_merge_ok);
-
+/*! 2017. 8.12 study -ing */
 static struct elevator_type *elevator_find(const char *name)
 {
 	struct elevator_type *e;
@@ -133,6 +133,7 @@ static int __init elevator_setup(char *str)
 __setup("elevator=", elevator_setup);
 
 /* called during boot to load the elevator chosen by the elevator param */
+/*! 2017. 8.12 study -ing */
 void __init load_default_elevator_module(void)
 {
 	struct elevator_type *e;

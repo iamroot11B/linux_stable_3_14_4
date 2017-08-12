@@ -55,7 +55,7 @@ static int kernfs_name_compare(unsigned int hash, const char *name,
 		return ns - kn->ns;
 	return strcmp(name, kn->name);
 }
-
+/*! 2017. 8.12 study -ing */
 static int kernfs_sd_compare(const struct kernfs_node *left,
 			     const struct kernfs_node *right)
 {
@@ -75,6 +75,7 @@ static int kernfs_sd_compare(const struct kernfs_node *left,
  *	RETURNS:
  *	0 on susccess -EEXIST on failure.
  */
+/*! 2017. 8.12 study -ing */
 static int kernfs_link_sibling(struct kernfs_node *kn)
 {
 	struct rb_node **node = &kn->parent->dir.children.rb_node;
@@ -374,7 +375,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
 	kfree(dup_name);
 	return NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
 				    const char *name, umode_t mode,
 				    unsigned flags)
@@ -430,6 +431,7 @@ void kernfs_addrm_start(struct kernfs_addrm_cxt *acxt)
  *	0 on success, -EEXIST if entry with the given name already
  *	exists.
  */
+/*! 2017. 8.12 study -ing */
 int kernfs_add_one(struct kernfs_addrm_cxt *acxt, struct kernfs_node *kn)
 {
 	struct kernfs_node *parent = kn->parent;

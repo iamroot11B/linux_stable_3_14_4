@@ -76,6 +76,7 @@ static inline void fsnotify_d_move(struct dentry *dentry)
 /*
  * fsnotify_link_count - inode's link count changed
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_link_count(struct inode *inode)
 {
 	fsnotify(inode, FS_ATTRIB, inode, FSNOTIFY_EVENT_INODE, NULL, 0);
@@ -159,6 +160,7 @@ static inline void fsnotify_inoderemove(struct inode *inode)
 /*
  * fsnotify_create - 'name' was linked in
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_create(struct inode *inode, struct dentry *dentry)
 {
 	audit_inode_child(inode, dentry, AUDIT_TYPE_CHILD_CREATE);
@@ -182,6 +184,7 @@ static inline void fsnotify_link(struct inode *dir, struct inode *inode, struct 
 /*
  * fsnotify_mkdir - directory 'name' was created
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_mkdir(struct inode *inode, struct dentry *dentry)
 {
 	__u32 mask = (FS_CREATE | FS_ISDIR);
@@ -195,6 +198,7 @@ static inline void fsnotify_mkdir(struct inode *inode, struct dentry *dentry)
 /*
  * fsnotify_access - file was read
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_access(struct file *file)
 {
 	struct path *path = &file->f_path;
@@ -231,6 +235,7 @@ static inline void fsnotify_modify(struct file *file)
 /*
  * fsnotify_open - file was opened
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_open(struct file *file)
 {
 	struct path *path = &file->f_path;
@@ -247,6 +252,7 @@ static inline void fsnotify_open(struct file *file)
 /*
  * fsnotify_close - file was closed
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_close(struct file *file)
 {
 	struct path *path = &file->f_path;
@@ -282,6 +288,7 @@ static inline void fsnotify_xattr(struct dentry *dentry)
  * fsnotify_change - notify_change event.  file was modified and/or metadata
  * was changed.
  */
+/*! 2017. 8.12 study -ing */
 static inline void fsnotify_change(struct dentry *dentry, unsigned int ia_valid)
 {
 	struct inode *inode = dentry->d_inode;

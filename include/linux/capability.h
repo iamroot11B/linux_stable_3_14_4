@@ -88,7 +88,7 @@ extern const kernel_cap_t __cap_init_eff_set;
 				    CAP_FS_MASK_B1 } })
 
 #endif /* _KERNEL_CAPABILITY_U32S != 2 */
-
+/*! 2017. 8.12 study -ing */
 # define cap_clear(c)         do { (c) = __cap_empty_set; } while (0)
 
 #define cap_raise(c, flag)  ((c).cap[CAP_TO_INDEX(flag)] |= CAP_TO_MASK(flag))
@@ -111,7 +111,7 @@ do {                                                                \
 		c.cap[__capi] = OP a.cap[__capi];                   \
 	}                                                           \
 } while (0)
-
+/*! 2017. 8.12 study -ing */
 static inline kernel_cap_t cap_combine(const kernel_cap_t a,
 				       const kernel_cap_t b)
 {
@@ -119,7 +119,7 @@ static inline kernel_cap_t cap_combine(const kernel_cap_t a,
 	CAP_BOP_ALL(dest, a, b, |);
 	return dest;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline kernel_cap_t cap_intersect(const kernel_cap_t a,
 					 const kernel_cap_t b)
 {

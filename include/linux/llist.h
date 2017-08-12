@@ -85,6 +85,7 @@ static inline void init_llist_head(struct llist_head *list)
  * @type:	the type of the struct this is embedded in.
  * @member:	the name of the llist_node within the struct.
  */
+/*! 2017. 8.12 study -ing */
 #define llist_entry(ptr, type, member)		\
 	container_of(ptr, type, member)
 
@@ -160,7 +161,7 @@ static inline bool llist_empty(const struct llist_head *head)
 {
 	return ACCESS_ONCE(head->first) == NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline struct llist_node *llist_next(struct llist_node *node)
 {
 	return node->next;

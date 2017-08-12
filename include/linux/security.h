@@ -1976,12 +1976,12 @@ static inline int security_settime(const struct timespec *ts,
 {
 	return cap_settime(ts, tz);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_vm_enough_memory_mm(struct mm_struct *mm, long pages)
 {
 	return cap_vm_enough_memory(mm, pages);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_bprm_set_creds(struct linux_binprm *bprm)
 {
 	return cap_bprm_set_creds(bprm);
@@ -2113,7 +2113,7 @@ static inline int security_old_inode_init_security(struct inode *inode,
 {
 	return -EOPNOTSUPP;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_create(struct inode *dir,
 					 struct dentry *dentry,
 					 umode_t mode)
@@ -2127,7 +2127,7 @@ static inline int security_inode_link(struct dentry *old_dentry,
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_unlink(struct inode *dir,
 					 struct dentry *dentry)
 {
@@ -2140,20 +2140,20 @@ static inline int security_inode_symlink(struct inode *dir,
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_mkdir(struct inode *dir,
 					struct dentry *dentry,
 					int mode)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_rmdir(struct inode *dir,
 					struct dentry *dentry)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_mknod(struct inode *dir,
 					struct dentry *dentry,
 					int mode, dev_t dev)
@@ -2186,13 +2186,13 @@ static inline int security_inode_permission(struct inode *inode, int mask)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_setattr(struct dentry *dentry,
 					  struct iattr *attr)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_getattr(struct vfsmount *mnt,
 					  struct dentry *dentry)
 {
@@ -2225,12 +2225,12 @@ static inline int security_inode_removexattr(struct dentry *dentry,
 {
 	return cap_inode_removexattr(dentry, name);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_need_killpriv(struct dentry *dentry)
 {
 	return cap_inode_need_killpriv(dentry);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_inode_killpriv(struct dentry *dentry)
 {
 	return cap_inode_killpriv(dentry);
@@ -2255,17 +2255,17 @@ static inline void security_inode_getsecid(const struct inode *inode, u32 *secid
 {
 	*secid = 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_file_permission(struct file *file, int mask)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_file_alloc(struct file *file)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void security_file_free(struct file *file)
 { }
 
@@ -2320,7 +2320,7 @@ static inline int security_file_receive(struct file *file)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_file_open(struct file *file,
 				     const struct cred *cred)
 {
@@ -2344,7 +2344,7 @@ static inline int security_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 /*! 2017. 5.20 study -ing */
 static inline void security_cred_free(struct cred *cred)
 { }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_prepare_creds(struct cred *new,
 					 const struct cred *old,
 					 gfp_t gfp)
@@ -2367,7 +2367,7 @@ static inline int security_kernel_create_files_as(struct cred *cred,
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_kernel_module_request(char *kmod_name)
 {
 	return 0;
@@ -2983,13 +2983,13 @@ static inline int security_path_rmdir(struct path *dir, struct dentry *dentry)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_path_mknod(struct path *dir, struct dentry *dentry,
 				      umode_t mode, unsigned int dev)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int security_path_truncate(struct path *path)
 {
 	return 0;

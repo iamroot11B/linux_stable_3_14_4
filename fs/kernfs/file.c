@@ -812,6 +812,7 @@ const struct file_operations kernfs_file_fops = {
  *
  * Returns the created node on success, ERR_PTR() value on error.
  */
+/*! 2017. 8.12 study -ing */
 struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
 					 const char *name,
 					 umode_t mode, loff_t size,

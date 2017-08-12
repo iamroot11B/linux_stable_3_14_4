@@ -228,6 +228,7 @@ SYSCALL_DEFINE1(adjtimex, struct timex __user *, txc_p)
  * Return the current time truncated to the time granularity supported by
  * the fs.
  */
+/*! 2017. 8.12 study -ing */
 struct timespec current_fs_time(struct super_block *sb)
 {
 	struct timespec now = current_kernel_time();
@@ -285,6 +286,7 @@ EXPORT_SYMBOL(jiffies_to_usecs);
  * current_kernel_time() or CURRENT_TIME, not with do_gettimeofday() because
  * it doesn't handle the better resolution of the latter.
  */
+/*! 2017. 8.12 study -ing */
 struct timespec timespec_trunc(struct timespec t, unsigned gran)
 {
 	/*

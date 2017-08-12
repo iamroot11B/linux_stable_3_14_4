@@ -47,7 +47,7 @@ static inline void percpu_counter_add(struct percpu_counter *fbc, s64 amount)
 {
 	__percpu_counter_add(fbc, amount, percpu_counter_batch);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline s64 percpu_counter_sum_positive(struct percpu_counter *fbc)
 {
 	s64 ret = __percpu_counter_sum(fbc);
@@ -69,6 +69,7 @@ static inline s64 percpu_counter_read(struct percpu_counter *fbc)
  * number for some counter which should never be negative.
  *
  */
+/*! 2017. 8.12 study -ing */
 static inline s64 percpu_counter_read_positive(struct percpu_counter *fbc)
 {
 	s64 ret = fbc->count;
@@ -159,12 +160,12 @@ static inline int percpu_counter_initialized(struct percpu_counter *fbc)
 }
 
 #endif	/* CONFIG_SMP */
-
+/*! 2017. 8.12 study -ing */
 static inline void percpu_counter_inc(struct percpu_counter *fbc)
 {
 	percpu_counter_add(fbc, 1);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void percpu_counter_dec(struct percpu_counter *fbc)
 {
 	percpu_counter_add(fbc, -1);

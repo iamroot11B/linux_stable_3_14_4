@@ -25,6 +25,7 @@
  * 0 means callbacks will be suppressed.
  * 1 means go ahead and do it.
  */
+/*! 2017. 8.12 study -ing */
 int ___ratelimit(struct ratelimit_state *rs, const char *func)
 {
 	unsigned long flags;

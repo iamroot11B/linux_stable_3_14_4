@@ -85,7 +85,7 @@ static inline int frontswap_load(struct page *page)
 		ret = __frontswap_load(page);
 	return ret;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void frontswap_invalidate_page(unsigned type, pgoff_t offset)
 {
 	if (frontswap_enabled)

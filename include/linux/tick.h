@@ -147,7 +147,7 @@ static inline int tick_nohz_tick_stopped(void)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void tick_nohz_idle_enter(void) { }
 static inline void tick_nohz_idle_exit(void) { }
 

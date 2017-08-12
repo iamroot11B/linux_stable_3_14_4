@@ -96,6 +96,7 @@ extern int firmware_init(void);
 #ifdef CONFIG_SYS_HYPERVISOR
 extern int hypervisor_init(void);
 #else
+/*! 2017. 8.12 study -ing */
 static inline int hypervisor_init(void) { return 0; }
 #endif
 extern int platform_bus_init(void);

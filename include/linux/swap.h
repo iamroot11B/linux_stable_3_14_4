@@ -363,6 +363,7 @@ static inline int mem_cgroup_swappiness(struct mem_cgroup *mem)
 #ifdef CONFIG_MEMCG_SWAP
 extern void mem_cgroup_uncharge_swap(swp_entry_t ent);
 #else
+/*! 2017. 8.12 study -ing */
 static inline void mem_cgroup_uncharge_swap(swp_entry_t ent)
 {
 }
@@ -440,6 +441,8 @@ struct backing_dev_info;
 extern void
 mem_cgroup_uncharge_swapcache(struct page *page, swp_entry_t ent, bool swapout);
 #else
+/*! 2017. 8.12 study -ing */
+
 static inline void
 mem_cgroup_uncharge_swapcache(struct page *page, swp_entry_t ent, bool swapout)
 {

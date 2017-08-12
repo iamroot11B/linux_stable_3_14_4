@@ -303,6 +303,7 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
  * kobject to the system, you must call kobject_rename() in order to
  * change the name of the kobject.
  */
+/*! 2017. 8.12 study -ing */
 int kobject_set_name(struct kobject *kobj, const char *fmt, ...)
 {
 	va_list vargs;
@@ -774,6 +775,7 @@ EXPORT_SYMBOL_GPL(kobject_create_and_add);
  * kset_init - initialize a kset for use
  * @k: kset
  */
+/*! 2017. 8.12 study -ing */
 void kset_init(struct kset *k)
 {
 	kobject_init_internal(&k->kobj);
@@ -816,6 +818,7 @@ EXPORT_SYMBOL_GPL(kobj_sysfs_ops);
  * kset_register - initialize and add a kset.
  * @k: kset.
  */
+/*! 2017. 8.12 study -ing */
 int kset_register(struct kset *k)
 {
 	int err;
@@ -835,6 +838,7 @@ int kset_register(struct kset *k)
  * kset_unregister - remove a kset.
  * @k: kset.
  */
+/*! 2017. 8.12 study -ing */
 void kset_unregister(struct kset *k)
 {
 	if (!k)
@@ -898,6 +902,7 @@ static struct kobj_type kset_ktype = {
  *
  * If the kset was not able to be created, NULL will be returned.
  */
+/*! 2017. 8.12 study -ing */
 static struct kset *kset_create(const char *name,
 				const struct kset_uevent_ops *uevent_ops,
 				struct kobject *parent_kobj)
@@ -941,6 +946,7 @@ static struct kset *kset_create(const char *name,
  *
  * If the kset was not able to be created, NULL will be returned.
  */
+/*! 2017. 8.12 study -ing */
 struct kset *kset_create_and_add(const char *name,
 				 const struct kset_uevent_ops *uevent_ops,
 				 struct kobject *parent_kobj)

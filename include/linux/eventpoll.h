@@ -23,6 +23,7 @@ struct file;
 #ifdef CONFIG_EPOLL
 
 /* Used to initialize the epoll bits inside the "struct file" */
+/*! 2017. 8.12 study -ing */
 static inline void eventpoll_init_file(struct file *file)
 {
 	INIT_LIST_HEAD(&file->f_ep_links);
@@ -39,6 +40,7 @@ void eventpoll_release_file(struct file *file);
  * correctly files that are closed without being removed from the eventpoll
  * interface.
  */
+/*! 2017. 8.12 study -ing */
 static inline void eventpoll_release(struct file *file)
 {
 

@@ -117,9 +117,10 @@ static inline int atomic_sub_return(int i, atomic_t *v)
 
 	return result;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int atomic_cmpxchg(atomic_t *ptr, int old, int new)
 {
+	/*! ptr->counter 값이 old와 같은 경우에만 new 값을 기록한다. */
 	int oldval;
 	unsigned long res;
 

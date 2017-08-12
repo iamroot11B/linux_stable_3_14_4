@@ -33,7 +33,7 @@
 #include <linux/compat.h>
 
 #include "internal.h"
-
+/*! 2017. 8.12 study -ing */
 int do_truncate(struct dentry *dentry, loff_t length, unsigned int time_attrs,
 	struct file *filp)
 {
@@ -377,7 +377,7 @@ SYSCALL_DEFINE2(access, const char __user *, filename, int, mode)
 {
 	return sys_faccessat(AT_FDCWD, filename, mode);
 }
-
+/*! 2017. 8.12 study later */
 SYSCALL_DEFINE1(chdir, const char __user *, filename)
 {
 	struct path path;
@@ -428,7 +428,7 @@ out_putf:
 out:
 	return error;
 }
-
+/*! 2017. 8.12 study later */
 SYSCALL_DEFINE1(chroot, const char __user *, filename)
 {
 	struct path path;
@@ -638,6 +638,7 @@ out:
  * upon __fput().  This should probably never
  * be called outside of __dentry_open().
  */
+/*! 2017. 8.12 study -ing */
 static inline int __get_file_write_access(struct inode *inode,
 					  struct vfsmount *mnt)
 {
@@ -660,7 +661,7 @@ static inline int __get_file_write_access(struct inode *inode,
 	}
 	return error;
 }
-
+/*! 2017. 8.12 study -ing */
 int open_check_o_direct(struct file *f)
 {
 	/* NB: we're sure to have correct a_ops only after f_op->open */
@@ -673,7 +674,7 @@ int open_check_o_direct(struct file *f)
 	}
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int do_dentry_open(struct file *f,
 			  int (*open)(struct inode *, struct file *),
 			  const struct cred *cred)
@@ -714,7 +715,7 @@ static int do_dentry_open(struct file *f,
 		error = -ENODEV;
 		goto cleanup_all;
 	}
-
+	/*! security_file_open = return 0  */
 	error = security_file_open(f, cred);
 	if (error)
 		goto cleanup_all;
@@ -783,6 +784,7 @@ cleanup_file:
  *
  * Returns zero on success or -errno if the open failed.
  */
+/*! 2017. 8.12 study -ing */
 int finish_open(struct file *file, struct dentry *dentry,
 		int (*open)(struct inode *, struct file *),
 		int *opened)

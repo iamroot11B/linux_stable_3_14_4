@@ -337,7 +337,7 @@ kernfs_find_and_get(struct kernfs_node *kn, const char *name)
 {
 	return kernfs_find_and_get_ns(kn, name, NULL);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline struct kernfs_node *
 kernfs_create_dir(struct kernfs_node *parent, const char *name, umode_t mode,
 		  void *priv)

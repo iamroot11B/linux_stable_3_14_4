@@ -47,7 +47,7 @@ do { \
 	preempt_count_inc(); \
 	barrier(); \
 } while (0)
-
+/*! 2017. 8.12 study -ing */
 #define sched_preempt_enable_no_resched() \
 do { \
 	barrier(); \

@@ -290,6 +290,7 @@ LIST_HEAD(all_lock_classes);
 #define CLASSHASH_BITS		(MAX_LOCKDEP_KEYS_BITS - 1)
 #define CLASSHASH_SIZE		(1UL << CLASSHASH_BITS)
 #define __classhashfn(key)	hash_long((unsigned long)key, CLASSHASH_BITS)
+/*! 2017. 8.12 study -ing */
 #define classhashentry(key)	(classhash_table + __classhashfn((key)))
 
 static struct list_head classhash_table[CLASSHASH_SIZE];
@@ -646,6 +647,7 @@ static int count_matching_names(struct lock_class *new_class)
  * yet. Otherwise we look it up. We cache the result in the lock object
  * itself, so actual lookup of the hash should be once per lock object.
  */
+/*! 2017. 8.12 study -ing */
 static inline struct lock_class *
 look_up_lock_class(struct lockdep_map *lock, unsigned int subclass)
 {
@@ -3269,7 +3271,7 @@ static int check_unlock(struct task_struct *curr, struct lockdep_map *lock,
 
 	return 1;
 }
-
+/*! 2017. 8.12 study -ing */
 static int match_held_lock(struct held_lock *hlock, struct lockdep_map *lock)
 {
 	if (hlock->instance == lock)
@@ -3517,7 +3519,7 @@ __lock_release(struct lockdep_map *lock, int nested, unsigned long ip)
 
 	check_chain_key(curr);
 }
-
+/*! 2017. 8.12 study -ing */
 static int __lock_is_held(struct lockdep_map *lock)
 {
 	struct task_struct *curr = current;
@@ -3639,7 +3641,7 @@ void lock_release(struct lockdep_map *lock, int nested,
 	raw_local_irq_restore(flags);
 }
 EXPORT_SYMBOL_GPL(lock_release);
-
+/*! 2017. 8.12 study -ing */
 int lock_is_held(struct lockdep_map *lock)
 {
 	unsigned long flags;

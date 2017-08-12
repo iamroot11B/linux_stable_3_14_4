@@ -93,6 +93,7 @@ static inline int cleancache_get_page(struct page *page)
 		ret = __cleancache_get_page(page);
 	return ret;
 }
+/*! 2017. 8.12 study -ing */
 
 static inline void cleancache_put_page(struct page *page)
 {
@@ -100,6 +101,7 @@ static inline void cleancache_put_page(struct page *page)
 		__cleancache_put_page(page);
 }
 
+/*! 2017. 8.12 study -ing */
 static inline void cleancache_invalidate_page(struct address_space *mapping,
 					struct page *page)
 {

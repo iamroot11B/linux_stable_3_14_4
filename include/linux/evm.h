@@ -57,7 +57,7 @@ static inline int evm_inode_setattr(struct dentry *dentry, struct iattr *attr)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void evm_inode_post_setattr(struct dentry *dentry, int ia_valid)
 {
 	return;

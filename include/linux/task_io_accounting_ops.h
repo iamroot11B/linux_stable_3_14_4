@@ -73,7 +73,7 @@ static inline unsigned long task_io_get_oublock(const struct task_struct *p)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void task_io_account_cancelled_write(size_t bytes)
 {
 }

@@ -112,6 +112,8 @@
  * sure the page is locked and that nobody else uses it - or that usage
  * is safe.  The caller must hold the mapping's tree_lock.
  */
+/*! 2017. 8.12 study -ing */
+
 void __delete_from_page_cache(struct page *page)
 {
 	struct address_space *mapping = page->mapping;
@@ -123,8 +125,10 @@ void __delete_from_page_cache(struct page *page)
 	 * stale data around in the cleancache once our page is gone
 	 */
 	if (PageUptodate(page) && PageMappedToDisk(page))
+		/*! Do nothing  */
 		cleancache_put_page(page);
 	else
+		/*! Do nothing  */
 		cleancache_invalidate_page(mapping, page);
 
 	radix_tree_delete(&mapping->page_tree, page->index);
@@ -2604,6 +2608,7 @@ EXPORT_SYMBOL(generic_file_aio_write);
  * this page (__GFP_IO), and whether the call may block (__GFP_WAIT & __GFP_FS).
  *
  */
+/*! 2017. 8.12 study -ing */
 int try_to_release_page(struct page *page, gfp_t gfp_mask)
 {
 	struct address_space * const mapping = page->mapping;

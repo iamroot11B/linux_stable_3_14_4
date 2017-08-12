@@ -17,14 +17,16 @@
  * needs to survive until the page is last deleted from the LRU, which
  * could be as far down as __page_cache_release.
  */
+/*! 2017. 8.12 study -ing */
 static inline int page_is_file_cache(struct page *page)
 {
 	return !PageSwapBacked(page);
 }
-
+/*! 2017. 8.12 study -ing */
 static __always_inline void add_page_to_lru_list(struct page *page,
 				struct lruvec *lruvec, enum lru_list lru)
 {
+	/*! hpage_nr_pages = 1  */
 	int nr_pages = hpage_nr_pages(page);
 	mem_cgroup_update_lru_size(lruvec, lru, nr_pages);
 	list_add(&page->lru, &lruvec->lists[lru]);

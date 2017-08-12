@@ -3,7 +3,7 @@
 
 /*
  * 	genhd.h Copyright (C) 1992 Drew Eckhardt
- *	Generic hard disk header file by  
+ *	Generic hard disk header file by
  * 		Drew Eckhardt
  *
  *		<drew@colorado.edu>
@@ -15,10 +15,11 @@
 #include <linux/slab.h>
 
 #ifdef CONFIG_BLOCK
-
+/*! 2017. 8.12 study -ing */
 #define dev_to_disk(device)	container_of((device), struct gendisk, part0.__dev)
 #define dev_to_part(device)	container_of((device), struct hd_struct, __dev)
 #define disk_to_dev(disk)	(&(disk)->part0.__dev)
+/*! 2017. 8.12 study -ing */
 #define part_to_dev(part)	(&((part)->__dev))
 
 extern struct device_type part_type;
@@ -261,7 +262,7 @@ static inline dev_t part_devt(struct hd_struct *part)
 }
 
 extern struct hd_struct *disk_get_part(struct gendisk *disk, int partno);
-
+/*! 2017. 8.12 study -ing */
 static inline void disk_put_part(struct hd_struct *part)
 {
 	if (likely(part))
@@ -441,7 +442,7 @@ extern void rand_initialize_disk(struct gendisk *disk);
 static inline sector_t get_start_sect(struct block_device *bdev)
 {
 	return bdev->bd_part->start_sect;
-}
+}/*! 2017. 8.12 study -ing */
 static inline sector_t get_capacity(struct gendisk *disk)
 {
 	return disk->part0.nr_sects;
@@ -496,7 +497,7 @@ struct bsd_disklabel {
 	__s16	d_type;			/* drive type */
 	__s16	d_subtype;		/* controller/d_type specific */
 	char	d_typename[16];		/* type name, e.g. "eagle" */
-	char	d_packname[16];			/* pack identifier */ 
+	char	d_packname[16];			/* pack identifier */
 	__u32	d_secsize;		/* # of bytes per sector */
 	__u32	d_nsectors;		/* # of data sectors per track */
 	__u32	d_ntracks;		/* # of tracks per cylinder */

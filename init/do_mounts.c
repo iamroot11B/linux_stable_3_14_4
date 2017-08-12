@@ -206,6 +206,7 @@ done:
  *	bangs.
  */
 
+/*! 2017. 8.12 study -ing */
 dev_t name_to_dev_t(char *name)
 {
 	char s[32];
@@ -328,7 +329,7 @@ static int __init root_delay_setup(char *str)
 __setup("rootflags=", root_data_setup);
 __setup("rootfstype=", fs_names_setup);
 __setup("rootdelay=", root_delay_setup);
-
+/*! 2017. 8.12 study -ing */
 static void __init get_fs_names(char *page)
 {
 	char *s = page;
@@ -355,7 +356,7 @@ static void __init get_fs_names(char *page)
 	}
 	*s = '\0';
 }
-
+/*! 2017. 8.12 study -ing */
 static int __init do_mount_root(char *name, char *fs, int flags, void *data)
 {
 	struct super_block *s;
@@ -373,7 +374,7 @@ static int __init do_mount_root(char *name, char *fs, int flags, void *data)
 	       MAJOR(ROOT_DEV), MINOR(ROOT_DEV));
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 void __init mount_block_root(char *name, int flags)
 {
 	struct page *page = alloc_page(GFP_KERNEL |
@@ -438,7 +439,7 @@ out:
 #define NFSROOT_TIMEOUT_MIN	5
 #define NFSROOT_TIMEOUT_MAX	30
 #define NFSROOT_RETRY_MAX	5
-
+/*! 2017. 8.12 study -ing */
 static int __init mount_nfs_root(void)
 {
 	char *root_dev, *root_data;
@@ -502,7 +503,7 @@ void __init change_floppy(char *fmt, ...)
 	}
 }
 #endif
-
+/*! 2017. 8.12 study -ing */
 void __init mount_root(void)
 {
 #ifdef CONFIG_ROOT_NFS
@@ -514,6 +515,7 @@ void __init mount_root(void)
 		ROOT_DEV = Root_FD0;
 	}
 #endif
+	/*! CONFIG_BLK_DEV_FD Not defined.  */
 #ifdef CONFIG_BLK_DEV_FD
 	if (MAJOR(ROOT_DEV) == FLOPPY_MAJOR) {
 		/* rd_doload is 2 for a dual initrd/ramload setup */
@@ -535,6 +537,7 @@ void __init mount_root(void)
 /*
  * Prepare the namespace - decide what/where to mount, load ramdisks, etc.
  */
+/*! 2017. 8.12 study -ing */
 void __init prepare_namespace(void)
 {
 	int is_floppy;
@@ -553,7 +556,7 @@ void __init prepare_namespace(void)
 	 * for the touchpad of a laptop to initialize.
 	 */
 	wait_for_device_probe();
-
+	/*! Do nothing  */
 	md_run_setup();
 
 	if (saved_root_name[0]) {

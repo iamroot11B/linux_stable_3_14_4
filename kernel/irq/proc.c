@@ -306,7 +306,7 @@ void register_handler_proc(unsigned int irq, struct irqaction *action)
 #undef MAX_NAMELEN
 
 #define MAX_NAMELEN 10
-
+/*! 2017. 8.12 study -ing */
 void register_irq_proc(unsigned int irq, struct irq_desc *desc)
 {
 	char name [MAX_NAMELEN];
@@ -368,7 +368,7 @@ void unregister_handler_proc(unsigned int irq, struct irqaction *action)
 {
 	proc_remove(action->dir);
 }
-
+/*! 2017. 8.12 study -ing */
 static void register_default_affinity_proc(void)
 {
 #ifdef CONFIG_SMP
@@ -376,7 +376,7 @@ static void register_default_affinity_proc(void)
 		    &default_affinity_proc_fops);
 #endif
 }
-
+/*! 2017. 8.12 study -ing */
 void init_irq_proc(void)
 {
 	unsigned int irq;

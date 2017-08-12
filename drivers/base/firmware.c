@@ -17,7 +17,7 @@
 
 struct kobject *firmware_kobj;
 EXPORT_SYMBOL_GPL(firmware_kobj);
-
+/*! 2017. 8.12 study -ing */
 int __init firmware_init(void)
 {
 	firmware_kobj = kobject_create_and_add("firmware", NULL);

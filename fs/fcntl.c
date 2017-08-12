@@ -78,7 +78,7 @@ static int setfl(int fd, struct file * filp, unsigned long arg)
  out:
 	return error;
 }
-
+/*! 2017. 8.12 study -ing */
 static void f_modown(struct file *filp, struct pid *pid, enum pid_type type,
                      int force)
 {
@@ -129,7 +129,7 @@ int f_setown(struct file *filp, unsigned long arg, int force)
 	return result;
 }
 EXPORT_SYMBOL(f_setown);
-
+/*! 2017. 8.12 study -ing */
 void f_delown(struct file *filp)
 {
 	f_modown(filp, NULL, PIDTYPE_PID, 1);
@@ -346,7 +346,7 @@ static int check_fcntl_cmd(unsigned cmd)
 }
 
 SYSCALL_DEFINE3(fcntl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
-{	
+{
 	struct fd f = fdget_raw(fd);
 	long err = -EBADF;
 
@@ -371,7 +371,7 @@ out:
 #if BITS_PER_LONG == 32
 SYSCALL_DEFINE3(fcntl64, unsigned int, fd, unsigned int, cmd,
 		unsigned long, arg)
-{	
+{
 	struct fd f = fdget_raw(fd);
 	long err = -EBADF;
 
@@ -386,7 +386,7 @@ SYSCALL_DEFINE3(fcntl64, unsigned int, fd, unsigned int, cmd,
 	err = security_file_fcntl(f.file, cmd, arg);
 	if (err)
 		goto out1;
-	
+
 	switch (cmd) {
 		case F_GETLK64:
 			err = fcntl_getlk64(f.file, (struct flock64 __user *) arg);
@@ -451,8 +451,8 @@ static void send_sigio_to_task(struct task_struct *p,
 		siginfo_t si;
 		default:
 			/* Queue a rt signal with the appropriate fd as its
-			   value.  We use SI_SIGIO as the source, not 
-			   SI_KERNEL, since kernel signals always get 
+			   value.  We use SI_SIGIO as the source, not
+			   SI_KERNEL, since kernel signals always get
 			   delivered even if we can't queue.  Failure to
 			   queue in this case _should_ be reported; we fall
 			   back to SIGIO in that case. --sct */
@@ -482,7 +482,7 @@ void send_sigio(struct fown_struct *fown, int fd, int band)
 	enum pid_type type;
 	struct pid *pid;
 	int group = 1;
-	
+
 	read_lock(&fown->lock);
 
 	type = fown->pid_type;
@@ -494,7 +494,7 @@ void send_sigio(struct fown_struct *fown, int fd, int band)
 	pid = fown->pid;
 	if (!pid)
 		goto out_unlock_fown;
-	
+
 	read_lock(&tasklist_lock);
 	do_each_pid_task(pid, type, p) {
 		send_sigio_to_task(p, fown, fd, band, group);
@@ -518,7 +518,7 @@ int send_sigurg(struct fown_struct *fown)
 	struct pid *pid;
 	int group = 1;
 	int ret = 0;
-	
+
 	read_lock(&fown->lock);
 
 	type = fown->pid_type;
@@ -532,7 +532,7 @@ int send_sigurg(struct fown_struct *fown)
 		goto out_unlock_fown;
 
 	ret = 1;
-	
+
 	read_lock(&tasklist_lock);
 	do_each_pid_task(pid, type, p) {
 		send_sigurg_to_task(p, fown, group);
@@ -561,6 +561,7 @@ static void fasync_free_rcu(struct rcu_head *head)
  * match the state "is the filp on a fasync list".
  *
  */
+/*! 2017. 8.12 study -ing */
 int fasync_remove_entry(struct file *filp, struct fasync_struct **fapp)
 {
 	struct fasync_struct *fa, **fp;
@@ -586,7 +587,7 @@ int fasync_remove_entry(struct file *filp, struct fasync_struct **fapp)
 	spin_unlock(&filp->f_lock);
 	return result;
 }
-
+/*! 2017. 8.12 study -ing */
 struct fasync_struct *fasync_alloc(void)
 {
 	return kmem_cache_alloc(fasync_cache, GFP_KERNEL);
@@ -597,6 +598,7 @@ struct fasync_struct *fasync_alloc(void)
  * entries that actually got inserted on the fasync list
  * need to be released by rcu - see fasync_remove_entry.
  */
+/*! 2017. 8.12 study -ing */
 void fasync_free(struct fasync_struct *new)
 {
 	kmem_cache_free(fasync_cache, new);
@@ -609,6 +611,7 @@ void fasync_free(struct fasync_struct *new)
  * NOTE! It is very important that the FASYNC flag always
  * match the state "is the filp on a fasync list".
  */
+/*! 2017. 8.12 study -ing */
 struct fasync_struct *fasync_insert_entry(int fd, struct file *filp, struct fasync_struct **fapp, struct fasync_struct *new)
 {
         struct fasync_struct *fa, **fp;
@@ -643,6 +646,7 @@ out:
  * Add a fasync entry. Return negative on error, positive if
  * added, and zero if did nothing but change an existing one.
  */
+/*! 2017. 8.12 study -ing */
 static int fasync_add_entry(int fd, struct file *filp, struct fasync_struct **fapp)
 {
 	struct fasync_struct *new;
@@ -672,6 +676,7 @@ static int fasync_add_entry(int fd, struct file *filp, struct fasync_struct **fa
  * lease code. It returns negative on error, 0 if it did no changes
  * and positive if it added/deleted the entry.
  */
+/*! 2017. 8.12 study -ing */
 int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fapp)
 {
 	if (!on)

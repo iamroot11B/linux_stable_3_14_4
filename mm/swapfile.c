@@ -178,17 +178,18 @@ static void discard_swap_cluster(struct swap_info_struct *si,
 #define SWAPFILE_CLUSTER	256
 #define LATENCY_LIMIT		256
 
+/*! 2017. 8.12 study -ing */
 static inline void cluster_set_flag(struct swap_cluster_info *info,
 	unsigned int flag)
 {
 	info->flags = flag;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline unsigned int cluster_count(struct swap_cluster_info *info)
 {
 	return info->data;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void cluster_set_count(struct swap_cluster_info *info,
 				     unsigned int c)
 {
@@ -201,18 +202,18 @@ static inline void cluster_set_count_flag(struct swap_cluster_info *info,
 	info->flags = f;
 	info->data = c;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline unsigned int cluster_next(struct swap_cluster_info *info)
 {
 	return info->data;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void cluster_set_next(struct swap_cluster_info *info,
 				    unsigned int n)
 {
 	info->data = n;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void cluster_set_next_flag(struct swap_cluster_info *info,
 					 unsigned int n, unsigned int f)
 {
@@ -224,7 +225,7 @@ static inline bool cluster_is_free(struct swap_cluster_info *info)
 {
 	return info->flags & CLUSTER_FLAG_FREE;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline bool cluster_is_null(struct swap_cluster_info *info)
 {
 	return info->flags & CLUSTER_FLAG_NEXT_NULL;
@@ -237,6 +238,7 @@ static inline void cluster_set_null(struct swap_cluster_info *info)
 }
 
 /* Add a cluster to discard list and schedule it to do discard */
+/*! 2017. 8.12 study -ing */
 static void swap_cluster_schedule_discard(struct swap_info_struct *si,
 		unsigned int idx)
 {
@@ -352,6 +354,7 @@ static void inc_cluster_info_page(struct swap_info_struct *p,
  * counter becomes 0, which means no page in the cluster is in using, we can
  * optionally discard the cluster and add it to free cluster list.
  */
+/*! 2017. 8.12 study -ing */
 static void dec_cluster_info_page(struct swap_info_struct *p,
 	struct swap_cluster_info *cluster_info, unsigned long page_nr)
 {
@@ -730,6 +733,7 @@ swp_entry_t get_swap_page_of_type(int type)
 	return (swp_entry_t) {0};
 }
 
+/*! 2017. 8.12 study -ing */
 static struct swap_info_struct *swap_info_get(swp_entry_t entry)
 {
 	struct swap_info_struct *p;
@@ -773,6 +777,7 @@ out:
  * swap_info_struct.lock can't protect us if there are multiple swap types
  * active, so we use atomic_cmpxchg.
  */
+/*! 2017. 8.12 study -ing */
 static void set_highest_priority_index(int type)
 {
 	int old_hp_index, new_hp_index;
@@ -787,6 +792,7 @@ static void set_highest_priority_index(int type)
 		old_hp_index, new_hp_index) != old_hp_index);
 }
 
+/*! 2017. 8.12 study -ing */
 static unsigned char swap_entry_free(struct swap_info_struct *p,
 				     swp_entry_t entry, unsigned char usage)
 {
@@ -818,6 +824,7 @@ static unsigned char swap_entry_free(struct swap_info_struct *p,
 	}
 
 	if (!count)
+		/*! Do Nothing  */
 		mem_cgroup_uncharge_swap(entry);
 
 	usage = count | has_cache;
@@ -833,6 +840,7 @@ static unsigned char swap_entry_free(struct swap_info_struct *p,
 		set_highest_priority_index(p->type);
 		atomic_long_inc(&nr_swap_pages);
 		p->inuse_pages--;
+		/*! Do nothing  */
 		frontswap_invalidate_page(p->type, offset);
 		if (p->flags & SWP_BLKDEV) {
 			struct gendisk *disk = p->bdev->bd_disk;
@@ -863,6 +871,7 @@ void swap_free(swp_entry_t entry)
 /*
  * Called after dropping swapcache to decrease refcnt to swap entries.
  */
+/*! 2017. 8.12 study -ing */
 void swapcache_free(swp_entry_t entry, struct page *page)
 {
 	struct swap_info_struct *p;
@@ -2853,6 +2862,7 @@ outer:
  * borrow from the continuation and report whether it still holds more.
  * Called while __swap_duplicate() or swap_entry_free() holds swap_lock.
  */
+/*! 2017. 8.12 study -ing */
 static bool swap_count_continued(struct swap_info_struct *si,
 				 pgoff_t offset, unsigned char count)
 {

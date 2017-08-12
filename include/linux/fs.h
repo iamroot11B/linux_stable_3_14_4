@@ -687,6 +687,7 @@ static inline loff_t i_size_read(const struct inode *inode)
  * (normally i_mutex), otherwise on 32bit/SMP an update of i_size_seqcount
  * can be lost, resulting in subsequent i_size_read() calls spinning forever.
  */
+/*! 2017. 8.12 study -ing */
 static inline void i_size_write(struct inode *inode, loff_t i_size)
 {
 #if BITS_PER_LONG==32 && defined(CONFIG_SMP)
@@ -867,10 +868,14 @@ static inline int file_check_writeable(struct file *f)
 	return -EINVAL;
 }
 #else /* !CONFIG_DEBUG_WRITECOUNT */
+/*! 2017. 8.12 study -ing */
 static inline void file_take_write(struct file *filp) {}
+/*! 2017. 8.12 study -ing */
 static inline void file_release_write(struct file *filp) {}
 static inline void file_reset_write(struct file *filp) {}
+/*! 2017. 8.12 study -ing */
 static inline void file_check_state(struct file *filp) {}
+/*! 2017. 8.12 study -ing */
 static inline int file_check_writeable(struct file *filp)
 {
 	return 0;
@@ -1352,6 +1357,7 @@ int __sb_start_write(struct super_block *sb, int level, bool wait);
  * Decrement number of writers to the filesystem. Wake up possible waiters
  * wanting to freeze the filesystem.
  */
+/*! 2017. 8.12 study -ing */
 static inline void sb_end_write(struct super_block *sb)
 {
 	__sb_end_write(sb, SB_FREEZE_WRITE);
@@ -1400,6 +1406,7 @@ static inline void sb_end_intwrite(struct super_block *sb)
  *   -> i_mutex			(write path, truncate, directory ops, ...)
  *   -> s_umount		(freeze_super, thaw_super)
  */
+/*! 2017. 8.12 study -ing */
 static inline void sb_start_write(struct super_block *sb)
 {
 	__sb_start_write(sb, SB_FREEZE_WRITE, true);
@@ -1671,6 +1678,7 @@ struct super_operations {
 					((inode)->i_flags & S_SYNC))
 #define IS_DIRSYNC(inode)	(__IS_FLG(inode, MS_SYNCHRONOUS|MS_DIRSYNC) || \
 					((inode)->i_flags & (S_SYNC|S_DIRSYNC)))
+/*! 2017. 8.12 study -ing */
 #define IS_MANDLOCK(inode)	__IS_FLG(inode, MS_MANDLOCK)
 #define IS_NOATIME(inode)	__IS_FLG(inode, MS_RDONLY|MS_NOATIME)
 #define IS_I_VERSION(inode)	__IS_FLG(inode, MS_I_VERSION)
@@ -1762,6 +1770,7 @@ struct super_operations {
 #define I_DIRTY (I_DIRTY_SYNC | I_DIRTY_DATASYNC | I_DIRTY_PAGES)
 
 extern void __mark_inode_dirty(struct inode *, int);
+/*! 2017. 8.12 study -ing */
 static inline void mark_inode_dirty(struct inode *inode)
 {
 	__mark_inode_dirty(inode, I_DIRTY);
@@ -1882,6 +1891,7 @@ extern struct dentry *mount_pseudo(struct file_system_type *, char *,
 /* Alas, no aliases. Too much hassle with bringing module.h everywhere */
 #define fops_get(fops) \
 	(((fops) && try_module_get((fops)->owner) ? (fops) : NULL))
+/*! 2017. 8.12 study -ing */
 #define fops_put(fops) \
 	do { if (fops) module_put((fops)->owner); } while(0)
 /*
@@ -1939,7 +1949,7 @@ extern int locks_mandatory_area(int, struct inode *, struct file *, loff_t, size
  * Candidates for mandatory locking have the setgid bit set
  * but no group execute bit -  an otherwise meaningless combination.
  */
-
+/*! 2017. 8.12 study -ing */
 static inline int __mandatory_lock(struct inode *ino)
 {
 	return (ino->i_mode & (S_ISGID | S_IXGRP)) == S_ISGID;
@@ -1949,12 +1959,12 @@ static inline int __mandatory_lock(struct inode *ino)
  * ... and these candidates should be on MS_MANDLOCK mounted fs,
  * otherwise these will be advisory locks
  */
-
+/*! 2017. 8.12 study -ing */
 static inline int mandatory_lock(struct inode *ino)
 {
 	return IS_MANDLOCK(ino) && __mandatory_lock(ino);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int locks_verify_locked(struct inode *inode)
 {
 	if (mandatory_lock(inode))
@@ -1975,21 +1985,21 @@ static inline int locks_verify_truncate(struct inode *inode,
 		);
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int break_lease(struct inode *inode, unsigned int mode)
 {
 	if (inode->i_flock)
 		return __break_lease(inode, mode, FL_LEASE);
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int break_deleg(struct inode *inode, unsigned int mode)
 {
 	if (inode->i_flock)
 		return __break_lease(inode, mode, FL_DELEG);
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int try_break_deleg(struct inode *inode, struct inode **delegated_inode)
 {
 	int ret;
@@ -2121,6 +2131,7 @@ extern void final_putname(struct filename *name);
 /*! 2017. 6. 3 study -ing */
 #define __putname(name)		kmem_cache_free(names_cachep, (void *)(name))
 #ifndef CONFIG_AUDITSYSCALL
+/*! 2017. 8.12 study -ing */
 #define putname(name)		final_putname(name)
 #else
 extern void putname(struct filename *name);
@@ -2353,19 +2364,23 @@ static inline void file_end_write(struct file *file)
  * use {get,deny}_write_access() - these functions check the sign and refuse
  * to do the change if sign is wrong.
  */
+/*! 2017. 8.12 study -ing */
 static inline int get_write_access(struct inode *inode)
 {
 	return atomic_inc_unless_negative(&inode->i_writecount) ? 0 : -ETXTBSY;
 }
+/*! 2017. 8.12 study -ing */
 static inline int deny_write_access(struct file *file)
 {
 	struct inode *inode = file_inode(file);
 	return atomic_dec_unless_positive(&inode->i_writecount) ? 0 : -ETXTBSY;
 }
+/*! 2017. 8.12 study -ing */
 static inline void put_write_access(struct inode * inode)
 {
 	atomic_dec(&inode->i_writecount);
 }
+/*! 2017. 8.12 study -ing */
 static inline void allow_write_access(struct file *file)
 {
 	if (file)
@@ -2387,10 +2402,12 @@ static inline void i_readcount_inc(struct inode *inode)
 	atomic_inc(&inode->i_readcount);
 }
 #else
+/*! 2017. 8.12 study -ing */
 static inline void i_readcount_dec(struct inode *inode)
 {
 	return;
 }
+/*! 2017. 8.12 study -ing */
 static inline void i_readcount_inc(struct inode *inode)
 {
 	return;
@@ -2573,7 +2590,7 @@ void inode_dio_wait(struct inode *inode);
 void inode_dio_done(struct inode *inode);
 
 extern const struct file_operations generic_ro_fops;
-
+/*! 2017. 8.12 study -ing */
 #define special_file(m) (S_ISCHR(m)||S_ISBLK(m)||S_ISFIFO(m)||S_ISSOCK(m))
 
 extern int vfs_readlink(struct dentry *, char __user *, int, const char *);

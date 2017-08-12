@@ -460,7 +460,7 @@ void rotate_reclaimable_page(struct page *page)
 		local_irq_restore(flags);
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 static void update_page_reclaim_stat(struct lruvec *lruvec,
 				     int file, int rotated)
 {
@@ -668,6 +668,7 @@ void add_page_to_unevictable_list(struct page *page)
  * be write it out by flusher threads as this is much more effective
  * than the single-page writeout from reclaim.
  */
+/*! 2017. 8.12 study -ing */
 static void lru_deactivate_fn(struct page *page, struct lruvec *lruvec,
 			      void *arg)
 {
@@ -752,6 +753,7 @@ void lru_add_drain_cpu(int cpu)
  * for example if its invalidation fails due to the page being dirty
  * or under writeback.
  */
+/*! 2017. 8.12 study -ing */
 void deactivate_page(struct page *page)
 {
 	/*

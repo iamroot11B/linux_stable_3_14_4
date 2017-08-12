@@ -26,6 +26,7 @@ void __check_vmalloc_seq(struct mm_struct *mm);
 #ifdef CONFIG_CPU_HAS_ASID
 
 void check_and_switch_context(struct mm_struct *mm, struct task_struct *tsk);
+/*! 2017. 8.12 study -ing */
 #define init_new_context(tsk,mm)	({ atomic64_set(&mm->context.id, 0); 0; })
 
 #ifdef CONFIG_ARM_ERRATA_798181
@@ -88,7 +89,7 @@ static inline void finish_arch_post_lock_switch(void)
 #define init_new_context(tsk,mm)	0
 
 #endif	/* CONFIG_CPU_HAS_ASID */
-
+/*! 2017. 8.12 study -ing */
 #define destroy_context(mm)		do { } while(0)
 #define activate_mm(prev,next)		switch_mm(prev, next, NULL)
 

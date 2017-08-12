@@ -37,7 +37,7 @@ void lg_local_unlock(struct lglock *lg)
 	preempt_enable();
 }
 EXPORT_SYMBOL(lg_local_unlock);
-
+/*! 2017. 8.12 study -ing */
 void lg_local_lock_cpu(struct lglock *lg, int cpu)
 {
 	arch_spinlock_t *lock;
@@ -48,7 +48,7 @@ void lg_local_lock_cpu(struct lglock *lg, int cpu)
 	arch_spin_lock(lock);
 }
 EXPORT_SYMBOL(lg_local_lock_cpu);
-
+/*! 2017. 8.12 study -ing */
 void lg_local_unlock_cpu(struct lglock *lg, int cpu)
 {
 	arch_spinlock_t *lock;

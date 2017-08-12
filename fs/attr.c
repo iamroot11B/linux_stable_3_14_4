@@ -28,6 +28,7 @@
  * Should be called as the first thing in ->setattr implementations,
  * possibly after taking additional locks.
  */
+/*! 2017. 8.12 study -ing */
 int inode_change_ok(const struct inode *inode, struct iattr *attr)
 {
 	unsigned int ia_valid = attr->ia_valid;
@@ -96,6 +97,7 @@ EXPORT_SYMBOL(inode_change_ok);
  * permissions to allow truncate (inode_newsize_ok does NOT check these
  * conditions).
  */
+/*! 2017. 8.12 study -ing */
 int inode_newsize_ok(const struct inode *inode, loff_t offset)
 {
 	if (inode->i_size < offset) {
@@ -139,6 +141,7 @@ EXPORT_SYMBOL(inode_newsize_ok);
  * that for "simple" filesystems, the struct inode is the inode storage.
  * The caller is free to mark the inode dirty afterwards if needed.
  */
+/*! 2017. 8.12 study -ing */
 void setattr_copy(struct inode *inode, const struct iattr *attr)
 {
 	unsigned int ia_valid = attr->ia_valid;
@@ -187,6 +190,7 @@ EXPORT_SYMBOL(setattr_copy);
  * the file open for write, as there can be no conflicting delegation in
  * that case.
  */
+/*! 2017. 8.12 study -ing */
 int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
 {
 	struct inode *inode = dentry->d_inode;
@@ -269,7 +273,9 @@ int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **de
 
 	if (!error) {
 		fsnotify_change(dentry, ia_valid);
+		/*! Do nothing  */
 		ima_inode_post_setattr(dentry);
+		/*! Do nothing  */
 		evm_inode_post_setattr(dentry, ia_valid);
 	}
 

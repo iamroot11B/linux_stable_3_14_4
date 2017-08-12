@@ -43,7 +43,7 @@ static inline unsigned pagevec_count(struct pagevec *pvec)
 {
 	return pvec->nr;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline unsigned pagevec_space(struct pagevec *pvec)
 {
 	return PAGEVEC_SIZE - pvec->nr;
@@ -52,6 +52,7 @@ static inline unsigned pagevec_space(struct pagevec *pvec)
 /*
  * Add a page to a pagevec.  Returns the number of slots still available.
  */
+/*! 2017. 8.12 study -ing */
 static inline unsigned pagevec_add(struct pagevec *pvec, struct page *page)
 {
 	pvec->pages[pvec->nr++] = page;

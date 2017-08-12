@@ -5834,7 +5834,7 @@ early_param("kernelcore", cmdline_parse_kernelcore);
 early_param("movablecore", cmdline_parse_movablecore);
 
 #endif /* CONFIG_HAVE_MEMBLOCK_NODE_MAP */
-
+/*! 2017. 8.12 study -ing */
 void adjust_managed_page_count(struct page *page, long count)
 {
 	spin_lock(&managed_page_count_lock);
@@ -5847,7 +5847,7 @@ void adjust_managed_page_count(struct page *page, long count)
 	spin_unlock(&managed_page_count_lock);
 }
 EXPORT_SYMBOL(adjust_managed_page_count);
-
+/*! 2017. 8.12 study -ing */
 unsigned long free_reserved_area(void *start, void *end, int poison, char *s)
 {
 	void *pos;

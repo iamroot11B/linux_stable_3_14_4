@@ -66,6 +66,7 @@ void do_invalidatepage(struct page *page, unsigned int offset,
  * out all the buffers on a page without actually doing it through
  * the VM. Can you say "ext3 is horribly ugly"? Tought you could.
  */
+/*! 2017. 8.12 study -ing */
 void cancel_dirty_page(struct page *page, unsigned int account_size)
 {
 	if (TestClearPageDirty(page)) {
@@ -75,6 +76,7 @@ void cancel_dirty_page(struct page *page, unsigned int account_size)
 			dec_bdi_stat(mapping->backing_dev_info,
 					BDI_RECLAIMABLE);
 			if (account_size)
+                /*! Do nothing */
 				task_io_account_cancelled_write(account_size);
 		}
 	}
@@ -125,6 +127,7 @@ invalidate_complete_page(struct address_space *mapping, struct page *page)
 		return 0;
 
 	/*! 2017. 7.15 study end */
+    /*! 2017. 8.12 study start */
 	if (page_has_private(page) && !try_to_release_page(page, 0))
 		return 0;
 
@@ -424,6 +427,7 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
 			count += ret;
 		}
 		pagevec_release(&pvec);
+		/*! Do nothing  */
 		mem_cgroup_uncharge_end();
 		cond_resched();
 		index++;
@@ -588,6 +592,7 @@ EXPORT_SYMBOL_GPL(invalidate_inode_pages2);
  * situations such as writepage being called for a page that has already
  * had its underlying blocks deallocated.
  */
+/*! 2017. 8.12 study -ing */
 void truncate_pagecache(struct inode *inode, loff_t newsize)
 {
 	struct address_space *mapping = inode->i_mapping;
@@ -620,6 +625,7 @@ EXPORT_SYMBOL(truncate_pagecache);
  * Must be called with inode_mutex held and before all filesystem specific
  * block truncation has been performed.
  */
+/*! 2017. 8.12 study -ing */
 void truncate_setsize(struct inode *inode, loff_t newsize)
 {
 	i_size_write(inode, newsize);

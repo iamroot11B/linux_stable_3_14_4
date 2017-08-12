@@ -134,8 +134,10 @@ static inline void delayacct_tsk_init(struct task_struct *tsk)
 /*! 2017. 5.20 study -ing */
 static inline void delayacct_tsk_free(struct task_struct *tsk)
 {}
+/*! 2017. 8.12 study -ing */
 static inline void delayacct_blkio_start(void)
 {}
+/*! 2017. 8.12 study -ing */
 static inline void delayacct_blkio_end(void)
 {}
 static inline int delayacct_add_tsk(struct taskstats *d,

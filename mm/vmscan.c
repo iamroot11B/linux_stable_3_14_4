@@ -523,6 +523,7 @@ static pageout_t pageout(struct page *page, struct address_space *mapping,
  * Same as remove_mapping, but if the page is removed from the mapping, it
  * gets returned with a refcount of 0.
  */
+/*! 2017. 8.12 study -ing */
 static int __remove_mapping(struct address_space *mapping, struct page *page)
 {
 	BUG_ON(!PageLocked(page));
@@ -593,6 +594,7 @@ cannot_free:
  * successfully detached, return 1.  Assumes the caller has a single ref on
  * this page.
  */
+/*! 2017. 8.12 study -ing */
 int remove_mapping(struct address_space *mapping, struct page *page)
 {
 	if (__remove_mapping(mapping, page)) {

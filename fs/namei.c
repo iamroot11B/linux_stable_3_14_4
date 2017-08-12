@@ -220,6 +220,7 @@ getname(const char __user * filename)
  * The "getname_kernel()" interface doesn't do pathnames longer
  * than EMBEDDED_NAME_MAX. Deal with it - you're a kernel user.
  */
+/*! 2017. 8.12 study -ing */
 struct filename *
 getname_kernel(const char * filename)
 {
@@ -2079,6 +2080,7 @@ static int do_path_lookup(int dfd, const char *name,
 }
 
 /* does lookup, returns the object with parent locked */
+/*! 2017. 8.12 study -ing */
 struct dentry *kern_path_locked(const char *name, struct path *path)
 {
 	struct nameidata nd;
@@ -2445,6 +2447,7 @@ EXPORT_SYMBOL(kern_path_mountpoint);
  * It's inline, so penalty for filesystems that don't use sticky bit is
  * minimal.
  */
+/*! 2017. 8.12 study -ing */
 static inline int check_sticky(struct inode *dir, struct inode *inode)
 {
 	kuid_t fsuid = current_fsuid();
@@ -2477,6 +2480,7 @@ static inline int check_sticky(struct inode *dir, struct inode *inode)
  * 10. We don't allow removal of NFS sillyrenamed files; it's handled by
  *     nfs_async_unlink().
  */
+/*! 2017. 8.12 study -ing */
 static int may_delete(struct inode *dir, struct dentry *victim, bool isdir)
 {
 	struct inode *inode = victim->d_inode;
@@ -2520,6 +2524,7 @@ static int may_delete(struct inode *dir, struct dentry *victim, bool isdir)
  *  3. We should have write and exec permissions on dir
  *  4. We can't do it if dir is immutable (done in permission())
  */
+/*! 2017. 8.12 study -ing */
 static inline int may_create(struct inode *dir, struct dentry *child)
 {
 	audit_inode_child(dir, child, AUDIT_TYPE_CHILD_CREATE);
@@ -2571,7 +2576,7 @@ void unlock_rename(struct dentry *p1, struct dentry *p2)
 		mutex_unlock(&p1->d_inode->i_sb->s_vfs_rename_mutex);
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 int vfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 		bool want_excl)
 {
@@ -2591,7 +2596,7 @@ int vfs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 		fsnotify_create(dir, dentry);
 	return error;
 }
-
+/*! 2017. 8.12 study -ing */
 static int may_open(struct path *path, int acc_mode, int flag)
 {
 	struct dentry *dentry = path->dentry;
@@ -2643,7 +2648,7 @@ static int may_open(struct path *path, int acc_mode, int flag)
 
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int handle_truncate(struct file *filp)
 {
 	struct path *path = &filp->f_path;
@@ -2871,6 +2876,7 @@ looked_up:
  * FILE_CREATE will be set in @*opened if the dentry was created and will be
  * cleared otherwise prior to returning.
  */
+/*! 2017. 8.12 study -ing */
 static int lookup_open(struct nameidata *nd, struct path *path,
 			struct file *file,
 			const struct open_flags *op,
@@ -2942,6 +2948,7 @@ out_dput:
 /*
  * Handle the last step of open()
  */
+/*! 2017. 8.12 study -ing */
 static int do_last(struct nameidata *nd, struct path *path,
 		   struct file *file, const struct open_flags *op,
 		   int *opened, struct filename *name)
@@ -3172,7 +3179,7 @@ stale_open:
 	retried = true;
 	goto retry_lookup;
 }
-
+/*! 2017. 8.12 study -ing */
 static int do_tmpfile(int dfd, struct filename *pathname,
 		struct nameidata *nd, int flags,
 		const struct open_flags *op,
@@ -3233,7 +3240,7 @@ out:
 	path_put(&nd->path);
 	return error;
 }
-
+/*! 2017. 8.12 study -ing */
 static struct file *path_openat(int dfd, struct filename *pathname,
 		struct nameidata *nd, const struct open_flags *op, int flags)
 {
@@ -3304,7 +3311,7 @@ out:
 	}
 	return file;
 }
-
+/*! 2017. 8.12 study -ing */
 struct file *do_filp_open(int dfd, struct filename *pathname,
 		const struct open_flags *op)
 {
@@ -3341,7 +3348,7 @@ struct file *do_file_open_root(struct dentry *dentry, struct vfsmount *mnt,
 		file = path_openat(-1, &filename, &nd, op, flags | LOOKUP_REVAL);
 	return file;
 }
-
+/*! 2017. 8.12 study -ing */
 struct dentry *kern_path_create(int dfd, const char *pathname,
 				struct path *path, unsigned int lookup_flags)
 {
@@ -3412,7 +3419,7 @@ out:
 	return dentry;
 }
 EXPORT_SYMBOL(kern_path_create);
-
+/*! 2017. 8.12 study -ing */
 void done_path_create(struct path *path, struct dentry *dentry)
 {
 	dput(dentry);
@@ -3434,7 +3441,7 @@ struct dentry *user_path_create(int dfd, const char __user *pathname,
 	return res;
 }
 EXPORT_SYMBOL(user_path_create);
-
+/*! 2017. 8.12 study -ing */
 int vfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
 {
 	int error = may_create(dir, dentry);
@@ -3448,10 +3455,12 @@ int vfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
 	if (!dir->i_op->mknod)
 		return -EPERM;
 
+	/*! Do nothing  */
 	error = devcgroup_inode_mknod(mode, dev);
 	if (error)
 		return error;
 
+	/*! Do nothing  */
 	error = security_inode_mknod(dir, dentry, mode, dev);
 	if (error)
 		return error;
@@ -3525,7 +3534,7 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
 {
 	return sys_mknodat(AT_FDCWD, filename, mode, dev);
 }
-
+/*! 2017. 8.12 study -ing */
 int vfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
 {
 	int error = may_create(dir, dentry);
@@ -3538,6 +3547,7 @@ int vfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
 		return -EPERM;
 
 	mode &= (S_IRWXUGO|S_ISVTX);
+	/*! Do nothing  */
 	error = security_inode_mkdir(dir, dentry, mode);
 	if (error)
 		return error;
@@ -3604,7 +3614,7 @@ void dentry_unhash(struct dentry *dentry)
 		__d_drop(dentry);
 	spin_unlock(&dentry->d_lock);
 }
-
+/*! 2017. 8.12 study -ing */
 int vfs_rmdir(struct inode *dir, struct dentry *dentry)
 {
 	int error = may_delete(dir, dentry, 1);
@@ -3722,6 +3732,7 @@ SYSCALL_DEFINE1(rmdir, const char __user *, pathname)
  * be appropriate for callers that expect the underlying filesystem not
  * to be NFS exported.
  */
+/*! 2017. 8.12 study -ing */
 int vfs_unlink(struct inode *dir, struct dentry *dentry, struct inode **delegated_inode)
 {
 	struct inode *target = dentry->d_inode;

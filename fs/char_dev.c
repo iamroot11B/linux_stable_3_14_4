@@ -353,7 +353,7 @@ static struct kobject *cdev_get(struct cdev *p)
 		module_put(owner);
 	return kobj;
 }
-
+/*! 2017. 8.12 study -ing */
 void cdev_put(struct cdev *p)
 {
 	if (p) {

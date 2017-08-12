@@ -331,6 +331,7 @@ static inline int ep_cmp_ffd(struct epoll_filefd *p1,
 }
 
 /* Tells us if the item is currently linked */
+/*! 2017. 8.12 study -ing */
 static inline int ep_is_linked(struct list_head *p)
 {
 	return !list_empty(p);
@@ -512,7 +513,7 @@ static void ep_poll_safewake(wait_queue_head_t *wq)
 
 	put_cpu();
 }
-
+/*! 2017. 8.12 study -ing */
 static void ep_remove_wait_queue(struct eppoll_entry *pwq)
 {
 	wait_queue_head_t *whead;
@@ -530,6 +531,7 @@ static void ep_remove_wait_queue(struct eppoll_entry *pwq)
  * descriptor.  Must be called with "mtx" held (or "epmutex" if called from
  * ep_free).
  */
+/*! 2017. 8.12 study -ing */
 static void ep_unregister_pollwait(struct eventpoll *ep, struct epitem *epi)
 {
 	struct list_head *lsthead = &epi->pwqlist;
@@ -689,6 +691,7 @@ static void epi_rcu_free(struct rcu_head *head)
  * Removes a "struct epitem" from the eventpoll RB tree and deallocates
  * all the associated resources. Must be called with "mtx" held.
  */
+/*! 2017. 8.12 study -ing */
 static int ep_remove(struct eventpoll *ep, struct epitem *epi)
 {
 	unsigned long flags;
@@ -907,6 +910,7 @@ static const struct file_operations eventpoll_fops = {
  * interface. We need to have this facility to cleanup correctly files that are
  * closed without being removed from the eventpoll interface.
  */
+/*! 2017. 8.12 study -ing */
 void eventpoll_release_file(struct file *file)
 {
 	struct eventpoll *ep;

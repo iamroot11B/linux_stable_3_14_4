@@ -24,6 +24,7 @@
  * Initialise a struct file's readahead state.  Assumes that the caller has
  * memset *ra to zero.
  */
+/*! 2017. 8.12 study -ing */
 void
 file_ra_state_init(struct file_ra_state *ra, struct address_space *mapping)
 {

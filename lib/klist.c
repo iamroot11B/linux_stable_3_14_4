@@ -284,6 +284,7 @@ EXPORT_SYMBOL_GPL(klist_node_attached);
  * Similar to klist_iter_init(), but starts the action off with @n,
  * instead of with the list head.
  */
+/*! 2017. 8.12 study -ing */
 void klist_iter_init_node(struct klist *k, struct klist_iter *i,
 			  struct klist_node *n)
 {
@@ -315,6 +316,7 @@ EXPORT_SYMBOL_GPL(klist_iter_init);
  * refcount of the current node. Necessary in case iteration exited before
  * the end of the list was reached, and always good form.
  */
+/*! 2017. 8.12 study -ing */
 void klist_iter_exit(struct klist_iter *i)
 {
 	if (i->i_cur) {
@@ -324,6 +326,7 @@ void klist_iter_exit(struct klist_iter *i)
 }
 EXPORT_SYMBOL_GPL(klist_iter_exit);
 
+/*! 2017. 8.12 study -ing */
 static struct klist_node *to_klist_node(struct list_head *n)
 {
 	return container_of(n, struct klist_node, n_node);
@@ -337,6 +340,7 @@ static struct klist_node *to_klist_node(struct list_head *n)
  * node, if there was one. Grab the next node, increment its reference
  * count, drop the lock, and return that next node.
  */
+/*! 2017. 8.12 study -ing */
 struct klist_node *klist_next(struct klist_iter *i)
 {
 	void (*put)(struct klist_node *) = i->i_klist->put;

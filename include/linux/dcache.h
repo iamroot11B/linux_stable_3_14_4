@@ -389,7 +389,7 @@ static inline int cant_mount(const struct dentry *dentry)
 {
 	return (dentry->d_flags & DCACHE_CANT_MOUNT);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void dont_mount(struct dentry *dentry)
 {
 	spin_lock(&dentry->d_lock);
@@ -442,7 +442,7 @@ static inline bool d_is_directory(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_DIRECTORY_TYPE;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline bool d_is_autodir(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_AUTODIR_TYPE;
@@ -458,12 +458,12 @@ static inline bool d_is_file(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_FILE_TYPE;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline bool d_is_negative(const struct dentry *dentry)
 {
 	return __d_entry_type(dentry) == DCACHE_MISS_TYPE;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline bool d_is_positive(const struct dentry *dentry)
 {
 	return !d_is_negative(dentry);

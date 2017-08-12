@@ -276,7 +276,6 @@ static inline void audit_mq_getsetattr(mqd_t mqdes, struct mq_attr *mqstat)
 	if (unlikely(!audit_dummy_context()))
 		__audit_mq_getsetattr(mqdes, mqstat);
 }
-
 static inline int audit_log_bprm_fcaps(struct linux_binprm *bprm,
 				       const struct cred *new,
 				       const struct cred *old)
@@ -344,6 +343,7 @@ static inline void audit_inode(struct filename *name,
 static inline void audit_inode_parent_hidden(struct filename *name,
 				const struct dentry *dentry)
 { }
+/*! 2017. 8.12 study -ing */
 static inline void audit_inode_child(const struct inode *parent,
 				     const struct dentry *dentry,
 				     const unsigned char type)
@@ -372,6 +372,7 @@ static inline void audit_ipc_obj(struct kern_ipc_perm *ipcp)
 static inline void audit_ipc_set_perm(unsigned long qbytes, uid_t uid,
 					gid_t gid, umode_t mode)
 { }
+/*! 2017. 8.12 study -ing */
 static inline void audit_bprm(struct linux_binprm *bprm)
 { }
 static inline int audit_socketcall(int nargs, unsigned long *args)
@@ -395,6 +396,7 @@ static inline void audit_mq_notify(mqd_t mqdes,
 { }
 static inline void audit_mq_getsetattr(mqd_t mqdes, struct mq_attr *mqstat)
 { }
+/*! 2017. 8.12 study -ing */
 static inline int audit_log_bprm_fcaps(struct linux_binprm *bprm,
 				       const struct cred *new,
 				       const struct cred *old)

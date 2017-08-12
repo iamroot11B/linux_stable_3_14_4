@@ -1138,6 +1138,7 @@ out:
  * This is an internal function, please use sb_end_{write,pagefault,intwrite}
  * instead.
  */
+/*! 2017. 8.12 study -ing */
 void __sb_end_write(struct super_block *sb, int level)
 {
 	percpu_counter_dec(&sb->s_writers.counter[level-1]);
@@ -1182,6 +1183,7 @@ static void acquire_freeze_lock(struct super_block *sb, int level, bool trylock,
  * This is an internal function, please use sb_start_{write,pagefault,intwrite}
  * instead.
  */
+/*! 2017. 8.12 study -ing */
 int __sb_start_write(struct super_block *sb, int level, bool wait)
 {
 retry:
@@ -1192,6 +1194,7 @@ retry:
 			   sb->s_writers.frozen < level);
 	}
 
+	/*! CONFIG_LOCKDEP Not defined.  */
 #ifdef CONFIG_LOCKDEP
 	acquire_freeze_lock(sb, level, !wait, _RET_IP_);
 #endif

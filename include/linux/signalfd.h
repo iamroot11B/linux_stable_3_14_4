@@ -15,6 +15,7 @@
 /*
  * Deliver the signal to listening signalfd.
  */
+/*! 2017. 8.12 study -ing */
 static inline void signalfd_notify(struct task_struct *tsk, int sig)
 {
 	if (unlikely(waitqueue_active(&tsk->sighand->signalfd_wqh)))

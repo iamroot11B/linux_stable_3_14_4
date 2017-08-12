@@ -25,7 +25,7 @@ typedef struct {
 typedef struct {
 	gid_t val;
 } kgid_t;
-
+/*! 2017. 8.12 study -ing */
 #define KUIDT_INIT(value) (kuid_t){ value }
 #define KGIDT_INIT(value) (kgid_t){ value }
 
@@ -130,7 +130,7 @@ static inline bool kgid_has_mapping(struct user_namespace *ns, kgid_t gid)
 }
 
 #else
-
+/*! 2017. 8.12 study -ing */
 static inline kuid_t make_kuid(struct user_namespace *from, uid_t uid)
 {
 	return KUIDT_INIT(uid);
@@ -140,7 +140,7 @@ static inline kgid_t make_kgid(struct user_namespace *from, gid_t gid)
 {
 	return KGIDT_INIT(gid);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline uid_t from_kuid(struct user_namespace *to, kuid_t kuid)
 {
 	return __kuid_val(kuid);
@@ -150,7 +150,7 @@ static inline gid_t from_kgid(struct user_namespace *to, kgid_t kgid)
 {
 	return __kgid_val(kgid);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline uid_t from_kuid_munged(struct user_namespace *to, kuid_t kuid)
 {
 	uid_t uid = from_kuid(to, kuid);
@@ -172,7 +172,7 @@ static inline bool kuid_has_mapping(struct user_namespace *ns, kuid_t uid)
 {
 	return true;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline bool kgid_has_mapping(struct user_namespace *ns, kgid_t gid)
 {
 	return true;

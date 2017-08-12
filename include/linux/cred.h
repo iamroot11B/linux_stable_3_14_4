@@ -46,6 +46,7 @@ struct group_info {
  * If the caller is accessing a task's credentials, they must hold the RCU read
  * lock when reading.
  */
+/*! 2017. 8.12 study -ing */
 static inline struct group_info *get_group_info(struct group_info *gi)
 {
 	atomic_inc(&gi->usage);
@@ -194,6 +195,7 @@ static inline void validate_creds(const struct cred *cred)
 static inline void validate_creds_for_do_exit(struct task_struct *tsk)
 {
 }
+/*! 2017. 8.12 study -ing */
 static inline void validate_process_creds(void)
 {
 }
@@ -340,6 +342,7 @@ static inline void put_cred(const struct cred *_cred)
 
 #define current_uid()		(current_cred_xxx(uid))
 #define current_gid()		(current_cred_xxx(gid))
+/*! 2017. 8.12 study -ing */
 #define current_euid()		(current_cred_xxx(euid))
 #define current_egid()		(current_cred_xxx(egid))
 #define current_suid()		(current_cred_xxx(suid))

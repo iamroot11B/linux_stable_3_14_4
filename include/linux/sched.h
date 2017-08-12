@@ -236,6 +236,7 @@ extern char ___assert_task_state[1 - 2*!!(
 
 #define task_is_traced(task)	((task->state & __TASK_TRACED) != 0)
 #define task_is_stopped(task)	((task->state & __TASK_STOPPED) != 0)
+/*! 2017. 8.12 study -ing */
 #define task_is_stopped_or_traced(task)	\
 			((task->state & (__TASK_STOPPED | __TASK_TRACED)) != 0)
 /*! 2016.10.15 study -ing */
@@ -1624,6 +1625,7 @@ static inline pid_t task_numa_group_id(struct task_struct *p)
 static inline void set_numabalancing_state(bool enabled)
 {
 }
+/*! 2017. 8.12 study -ing */
 static inline void task_numa_free(struct task_struct *p)
 {
 }
@@ -1677,7 +1679,7 @@ static inline pid_t task_pid_nr(struct task_struct *tsk)
 {
 	return tsk->pid;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline pid_t task_pid_nr_ns(struct task_struct *tsk,
 					struct pid_namespace *ns)
 {
@@ -2170,6 +2172,7 @@ extern struct task_struct *find_task_by_pid_ns(pid_t nr,
 
 /* per-UID process charging. */
 extern struct user_struct * alloc_uid(kuid_t);
+/*! 2017. 8.12 study -ing */
 static inline struct user_struct *get_uid(struct user_struct *u)
 {
 	atomic_inc(&u->__count);
@@ -2297,6 +2300,7 @@ extern struct mm_struct * mm_alloc(void);
 
 /* mmdrop drops the mm and the page tables */
 extern void __mmdrop(struct mm_struct *);
+/*! 2017. 8.12 study -ing */
 static inline void mmdrop(struct mm_struct * mm)
 {
 	if (unlikely(atomic_dec_and_test(&mm->mm_count)))
@@ -2368,7 +2372,7 @@ extern bool current_is_single_threaded(void);
  */
 #define do_each_thread(g, t) \
 	for (g = t = &init_task ; (g = t = next_task(g)) != &init_task ; ) do
-
+/*! 2017. 8.12 study -ing */
 #define while_each_thread(g, t) \
 	while ((t = next_thread(t)) != g)
 
@@ -2408,13 +2412,13 @@ bool same_thread_group(struct task_struct *p1, struct task_struct *p2)
 {
 	return p1->signal == p2->signal;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline struct task_struct *next_thread(const struct task_struct *p)
 {
 	return list_entry_rcu(p->thread_group.next,
 			      struct task_struct, thread_group);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int thread_group_empty(struct task_struct *p)
 {
 	return list_empty(&p->thread_group);
@@ -2446,7 +2450,7 @@ static inline void task_unlock(struct task_struct *p)
 
 extern struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 							unsigned long *flags);
-
+/*! 2017. 8.12 study -ing */
 static inline struct sighand_struct *lock_task_sighand(struct task_struct *tsk,
 						       unsigned long *flags)
 {
@@ -2456,7 +2460,7 @@ static inline struct sighand_struct *lock_task_sighand(struct task_struct *tsk,
 	(void)__cond_lock(&tsk->sighand->siglock, ret);
 	return ret;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void unlock_task_sighand(struct task_struct *tsk,
 						unsigned long *flags)
 {
@@ -2561,7 +2565,7 @@ static inline void set_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	set_ti_thread_flag(task_thread_info(tsk), flag);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void clear_tsk_thread_flag(struct task_struct *tsk, int flag)
 {
 	clear_ti_thread_flag(task_thread_info(tsk), flag);
@@ -2781,6 +2785,7 @@ static inline bool __must_check current_clr_polling_and_test(void)
 #else
 /*! 2017. 3.18 study -ing */
 static inline int tsk_is_polling(struct task_struct *p) { return 0; }
+/*! 2017. 8.12 study -ing */
 static inline void __current_set_polling(void) { }
 static inline void __current_clr_polling(void) { }
 
@@ -2836,6 +2841,7 @@ extern void recalc_sigpending(void);
 
 extern void signal_wake_up_state(struct task_struct *t, unsigned int state);
 
+/*! 2017. 8.12 study -ing */
 static inline void signal_wake_up(struct task_struct *t, bool resume)
 {
 	signal_wake_up_state(t, resume ? TASK_WAKEKILL : 0);
@@ -2907,6 +2913,7 @@ static inline void inc_syscw(struct task_struct *tsk)
 	tsk->ioac.syscw++;
 }
 #else
+/*! 2017. 8.12 study -ing */
 static inline void add_rchar(struct task_struct *tsk, ssize_t amt)
 {
 }
@@ -2914,7 +2921,7 @@ static inline void add_rchar(struct task_struct *tsk, ssize_t amt)
 static inline void add_wchar(struct task_struct *tsk, ssize_t amt)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void inc_syscr(struct task_struct *tsk)
 {
 }
@@ -2943,7 +2950,7 @@ static inline void mm_init_owner(struct mm_struct *mm, struct task_struct *p)
 {
 }
 #endif /* CONFIG_MM_OWNER */
-
+/*! 2017. 8.12 study -ing */
 static inline unsigned long task_rlimit(const struct task_struct *tsk,
 		unsigned int limit)
 {
@@ -2955,7 +2962,7 @@ static inline unsigned long task_rlimit_max(const struct task_struct *tsk,
 {
 	return ACCESS_ONCE(tsk->signal->rlim[limit].rlim_max);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline unsigned long rlimit(unsigned int limit)
 {
 	return task_rlimit(current, limit);

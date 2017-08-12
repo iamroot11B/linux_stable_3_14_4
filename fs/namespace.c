@@ -281,7 +281,7 @@ int __mnt_is_readonly(struct vfsmount *mnt)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(__mnt_is_readonly);
-
+/*! 2017. 8.12 study -ing */
 static inline void mnt_inc_writers(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
@@ -290,7 +290,7 @@ static inline void mnt_inc_writers(struct mount *mnt)
 	mnt->mnt_writers++;
 #endif
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void mnt_dec_writers(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
@@ -316,7 +316,7 @@ static unsigned int mnt_get_writers(struct mount *mnt)
 	return mnt->mnt_writers;
 #endif
 }
-
+/*! 2017. 8.12 study -ing */
 static int mnt_is_readonly(struct vfsmount *mnt)
 {
 	if (mnt->mnt_sb->s_readonly_remount)
@@ -342,6 +342,7 @@ static int mnt_is_readonly(struct vfsmount *mnt)
  * frozen. When the write operation is finished, __mnt_drop_write() must be
  * called. This is effectively a refcount.
  */
+/*! 2017. 8.12 study -ing */
 int __mnt_want_write(struct vfsmount *m)
 {
 	struct mount *mnt = real_mount(m);
@@ -381,6 +382,7 @@ int __mnt_want_write(struct vfsmount *m)
  * is not frozen) before returning success.  When the write operation is
  * finished, mnt_drop_write() must be called.  This is effectively a refcount.
  */
+/*! 2017. 8.12 study -ing */
 int mnt_want_write(struct vfsmount *m)
 {
 	int ret;
@@ -461,6 +463,7 @@ EXPORT_SYMBOL_GPL(mnt_want_write_file);
  * performing writes to it.  Must be matched with
  * __mnt_want_write() call above.
  */
+/*! 2017. 8.12 study -ing */
 void __mnt_drop_write(struct vfsmount *mnt)
 {
 	preempt_disable();
@@ -476,6 +479,7 @@ void __mnt_drop_write(struct vfsmount *mnt)
  * also allows filesystem to be frozen again.  Must be matched with
  * mnt_want_write() call above.
  */
+/*! 2017. 8.12 study -ing */
 void mnt_drop_write(struct vfsmount *mnt)
 {
 	__mnt_drop_write(mnt);
@@ -739,6 +743,7 @@ static inline int check_mnt(struct mount *mnt)
 /*
  * vfsmount lock must be held for write
  */
+/*! 2017. 8.12 study -ing */
 static void touch_mnt_namespace(struct mnt_namespace *ns)
 {
 	if (ns) {
@@ -1483,7 +1488,7 @@ static bool is_mnt_ns_file(struct dentry *dentry)
 
 	return true;
 }
-
+/*! 2017. 8.12 study -ing */
 static bool mnt_ns_loop(struct dentry *dentry)
 {
 	/* Could bind mounting the mount namespace inode cause a
@@ -1596,7 +1601,7 @@ int iterate_mounts(int (*f)(struct vfsmount *, void *), void *arg,
 	}
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static void cleanup_group_ids(struct mount *mnt, struct mount *end)
 {
 	struct mount *p;
@@ -1606,7 +1611,7 @@ static void cleanup_group_ids(struct mount *mnt, struct mount *end)
 			mnt_release_group_id(p);
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 static int invent_group_ids(struct mount *mnt, bool recurse)
 {
 	struct mount *p;
@@ -1796,7 +1801,7 @@ static int graft_tree(struct mount *mnt, struct mount *p, struct mountpoint *mp)
 /*
  * Sanity check the flags to change_mnt_propagation.
  */
-
+/*! 2017. 8.12 study -ing */
 static int flags_to_propagation_type(int flags)
 {
 	int type = flags & ~(MS_REC | MS_SILENT);
@@ -1813,6 +1818,7 @@ static int flags_to_propagation_type(int flags)
 /*
  * recursively change the type of the mountpoint.
  */
+/*! 2017. 8.12 study -ing */
 static int do_change_type(struct path *path, int flag)
 {
 	struct mount *m;
@@ -1844,7 +1850,7 @@ static int do_change_type(struct path *path, int flag)
 	namespace_unlock();
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static bool has_locked_children(struct mount *mnt, struct dentry *dentry)
 {
 	struct mount *child;
@@ -1861,6 +1867,7 @@ static bool has_locked_children(struct mount *mnt, struct dentry *dentry)
 /*
  * do loopback mount.
  */
+/*! 2017. 8.12 study -ing */
 static int do_loopback(struct path *path, const char *old_name,
 				int recurse)
 {
@@ -1993,7 +2000,7 @@ static inline int tree_contains_unbindable(struct mount *mnt)
 	}
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int do_move_mount(struct path *path, const char *old_name)
 {
 	struct path old_path, parent_path;
@@ -2063,7 +2070,7 @@ out:
 	path_put(&old_path);
 	return err;
 }
-
+/*! 2017. 8.12 study -ing */
 static struct vfsmount *fs_set_subtype(struct vfsmount *mnt, const char *fstype)
 {
 	int err;
@@ -2136,6 +2143,7 @@ unlock:
  * create a new mount for userspace and request it to be added into the
  * namespace's tree
  */
+/*! 2017. 8.12 study -ing */
 static int do_new_mount(struct path *path, const char *fstype, int flags,
 			int mnt_flags, const char *name, void *data)
 {

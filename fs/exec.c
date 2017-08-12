@@ -164,6 +164,7 @@ out:
  * for oom_badness()->get_mm_rss(). Once exec succeeds or fails, we
  * change the counter back via acct_arg_size(0).
  */
+/*! 2017. 8.12 study -ing */
 static void acct_arg_size(struct linux_binprm *bprm, unsigned long pages)
 {
 	struct mm_struct *mm = current->mm;
@@ -232,7 +233,7 @@ static void put_arg_page(struct page *page)
 static void free_arg_page(struct linux_binprm *bprm, int i)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static void free_arg_pages(struct linux_binprm *bprm)
 {
 }
@@ -242,7 +243,7 @@ static void flush_arg_page(struct linux_binprm *bprm, unsigned long pos,
 {
 	flush_cache_page(bprm->vma, pos, page_to_pfn(page));
 }
-
+/*! 2017. 8.12 study -ing */
 static int __bprm_mm_init(struct linux_binprm *bprm)
 {
 	int err;
@@ -355,6 +356,7 @@ static bool valid_arg_len(struct linux_binprm *bprm, long len)
  * flags, permissions, and offset, so we use temporary values.  We'll update
  * them later in setup_arg_pages().
  */
+/*! 2017. 8.12 study -ing */
 static int bprm_mm_init(struct linux_binprm *bprm)
 {
 	int err;
@@ -420,6 +422,7 @@ static const char __user *get_user_arg_ptr(struct user_arg_ptr argv, int nr)
 /*
  * count() counts the number of strings in array ARGV.
  */
+/*! 2017. 8.12 study -ing */
 static int count(struct user_arg_ptr argv, int max)
 {
 	int i = 0;
@@ -542,6 +545,7 @@ out:
 /*
  * Like copy_strings, but get argv and its values from kernel memory.
  */
+/*! 2017. 8.12 study -ing */
 int copy_strings_kernel(int argc, const char *const *__argv,
 			struct linux_binprm *bprm)
 {
@@ -747,7 +751,7 @@ out_unlock:
 EXPORT_SYMBOL(setup_arg_pages);
 
 #endif /* CONFIG_MMU */
-
+/*! 2017. 8.12 study -ing */
 static struct file *do_open_exec(struct filename *name)
 {
 	struct file *file;
@@ -790,7 +794,7 @@ struct file *open_exec(const char *name)
 	return do_open_exec(&tmp);
 }
 EXPORT_SYMBOL(open_exec);
-
+/*! 2017. 8.12 study -ing */
 int kernel_read(struct file *file, loff_t offset,
 		char *addr, unsigned long count)
 {
@@ -802,6 +806,7 @@ int kernel_read(struct file *file, loff_t offset,
 	set_fs(get_ds());
 	/* The cast to a user pointer is valid due to the set_fs() */
 	result = vfs_read(file, (void __user *)addr, count, &pos);
+	/*! Do nothing  */
 	set_fs(old_fs);
 	return result;
 }
@@ -1040,13 +1045,14 @@ EXPORT_SYMBOL_GPL(get_task_comm);
  * These functions flushes out all traces of the currently running executable
  * so that a new one can be started
  */
-
+/*! 2017. 8.12 study -ing */
 void set_task_comm(struct task_struct *tsk, char *buf)
 {
 	task_lock(tsk);
 	trace_task_rename(tsk, buf);
 	strlcpy(tsk->comm, buf, sizeof(tsk->comm));
 	task_unlock(tsk);
+	/*! Do nothing  */
 	perf_event_comm(tsk);
 }
 
@@ -1154,6 +1160,7 @@ EXPORT_SYMBOL(setup_new_exec);
  * Or, if exec fails before, free_bprm() should release ->cred and
  * and unlock.
  */
+/*! 2017. 8.12 study -ing */
 int prepare_bprm_creds(struct linux_binprm *bprm)
 {
 	if (mutex_lock_interruptible(&current->signal->cred_guard_mutex))
@@ -1166,9 +1173,10 @@ int prepare_bprm_creds(struct linux_binprm *bprm)
 	mutex_unlock(&current->signal->cred_guard_mutex);
 	return -ENOMEM;
 }
-
+/*! 2017. 8.12 study -ing */
 static void free_bprm(struct linux_binprm *bprm)
 {
+	/*! Do nothing  */
 	free_arg_pages(bprm);
 	if (bprm->cred) {
 		mutex_unlock(&current->signal->cred_guard_mutex);
@@ -1229,6 +1237,7 @@ EXPORT_SYMBOL(install_exec_creds);
  * - the caller must hold ->cred_guard_mutex to protect against
  *   PTRACE_ATTACH
  */
+/*! 2017. 8.12 study -ing */
 static void check_unsafe_exec(struct linux_binprm *bprm)
 {
 	struct task_struct *p = current, *t;
@@ -1271,6 +1280,7 @@ static void check_unsafe_exec(struct linux_binprm *bprm)
  *
  * This may be called multiple times for binary chains (scripts for example).
  */
+/*! 2017. 8.12 study -ing */
 int prepare_binprm(struct linux_binprm *bprm)
 {
 	struct inode *inode = file_inode(bprm->file);
@@ -1364,6 +1374,7 @@ EXPORT_SYMBOL(remove_arg_zero);
 /*
  * cycle the list of binary formats handler, until one recognizes the image
  */
+/*! 2017. 8.12 study later */
 int search_binary_handler(struct linux_binprm *bprm)
 {
 	bool need_retry = IS_ENABLED(CONFIG_MODULES);
@@ -1411,7 +1422,7 @@ int search_binary_handler(struct linux_binprm *bprm)
 	return retval;
 }
 EXPORT_SYMBOL(search_binary_handler);
-
+/*! 2017. 8.12 study -ing */
 static int exec_binprm(struct linux_binprm *bprm)
 {
 	pid_t old_pid, old_vpid;
@@ -1428,6 +1439,7 @@ static int exec_binprm(struct linux_binprm *bprm)
 		audit_bprm(bprm);
 		trace_sched_process_exec(current, old_pid, bprm);
 		ptrace_event(PTRACE_EVENT_EXEC, old_vpid);
+		/*! Do nothing  */
 		proc_exec_connector(current);
 	}
 
@@ -1437,6 +1449,7 @@ static int exec_binprm(struct linux_binprm *bprm)
 /*
  * sys_execve() executes a new program.
  */
+/*! 2017. 8.12 study -ing */
 static int do_execve_common(struct filename *filename,
 				struct user_arg_ptr argv,
 				struct user_arg_ptr envp)
@@ -1527,6 +1540,7 @@ static int do_execve_common(struct filename *filename,
 	/* execve succeeded */
 	current->fs->in_exec = 0;
 	current->in_execve = 0;
+	/*! Do nothing  */
 	acct_update_integrals(current);
 	task_numa_free(current);
 	free_bprm(bprm);
@@ -1555,7 +1569,7 @@ out_ret:
 	putname(filename);
 	return retval;
 }
-
+/*! 2017. 8.12 study -ing */
 int do_execve(struct filename *filename,
 	const char __user *const __user *__argv,
 	const char __user *const __user *__envp)

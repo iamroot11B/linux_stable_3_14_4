@@ -337,6 +337,7 @@ done:
  *
  * Should somehow figure out how to use a semaphore, not an atomic variable...
  */
+/*! 2017. 8.12 study -ing */
 int driver_probe_done(void)
 {
 	pr_debug("%s: probe_count = %d\n", __func__,
@@ -350,6 +351,7 @@ int driver_probe_done(void)
  * wait_for_device_probe
  * Wait for device probing to be completed.
  */
+/*! 2017. 8.12 study -ing */
 void wait_for_device_probe(void)
 {
 	/* wait for the known devices to complete their probing */

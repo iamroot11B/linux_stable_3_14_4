@@ -23,7 +23,7 @@
 #ifdef CONFIG_BLK_DEV_MD
 extern void md_autodetect_dev(dev_t dev);
 #endif
- 
+
 /*
  * disk_name() is used by partition check code and the genhd driver.
  * It formats the devicename of the indicated disk into
@@ -55,6 +55,7 @@ EXPORT_SYMBOL(bdevname);
  * have a struct block_device just about everywhere and use
  * bdevname() instead.
  */
+/*! 2017. 8.12 study -ing */
 const char *__bdevname(dev_t dev, char *buffer)
 {
 	scnprintf(buffer, BDEVNAME_SIZE, "unknown-block(%u,%u)",

@@ -47,7 +47,7 @@ int __ilog2_u64(u64 n)
  *  Determine whether some value is a power of two, where zero is
  * *not* considered a power of two.
  */
-
+/*! 2017. 8.12 study -ing */
 static inline __attribute__((const))
 bool is_power_of_2(unsigned long n)
 {

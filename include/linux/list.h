@@ -636,7 +636,7 @@ static inline void INIT_HLIST_NODE(struct hlist_node *h)
 	h->next = NULL;
 	h->pprev = NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int hlist_unhashed(const struct hlist_node *h)
 {
 	return !h->pprev;
@@ -724,7 +724,7 @@ static inline void hlist_move_list(struct hlist_head *old,
 		new->first->pprev = &new->first;
 	old->first = NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 #define hlist_entry(ptr, type, member) container_of(ptr,type,member)
 
 #define hlist_for_each(pos, head) \

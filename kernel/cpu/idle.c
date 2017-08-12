@@ -65,15 +65,18 @@ void __weak arch_cpu_idle(void)
 /*
  * Generic idle loop implementation
  */
+/*! 2017. 8.12 study -ing */
 static void cpu_idle_loop(void)
 {
 	while (1) {
+		/*! Do nothing  */
 		tick_nohz_idle_enter();
 
 		while (!need_resched()) {
 			check_pgt_cache();
 			rmb();
 
+			/*! 2017. 8.12 study end */
 			if (cpu_is_offline(smp_processor_id()))
 				arch_cpu_idle_dead();
 
@@ -120,7 +123,7 @@ static void cpu_idle_loop(void)
 		schedule_preempt_disabled();
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 void cpu_startup_entry(enum cpuhp_state state)
 {
 	/*
@@ -138,6 +141,7 @@ void cpu_startup_entry(enum cpuhp_state state)
 	 */
 	boot_init_stack_canary();
 #endif
+	/*! Do nothing  */
 	__current_set_polling();
 	arch_cpu_idle_prepare();
 	cpu_idle_loop();

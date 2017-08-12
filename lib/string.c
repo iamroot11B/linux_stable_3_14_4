@@ -219,6 +219,7 @@ EXPORT_SYMBOL(strncat);
  * @src: The string to append to it
  * @count: The size of the destination buffer.
  */
+/*! 2017. 8.12 study -ing */
 size_t strlcat(char *dest, const char *src, size_t count)
 {
 	size_t dsize = strlen(dest);
@@ -470,6 +471,7 @@ EXPORT_SYMBOL(strcspn);
  * @cs: The string to be searched
  * @ct: The characters to search for
  */
+/*! 2017. 8.12 study -ing */
 char *strpbrk(const char *cs, const char *ct)
 {
 	const char *sc1, *sc2;
@@ -497,6 +499,7 @@ EXPORT_SYMBOL(strpbrk);
  * of that name. In fact, it was stolen from glibc2 and de-fancy-fied.
  * Same semantics, slimmer shape. ;)
  */
+/*! 2017. 8.12 study -ing */
 char *strsep(char **s, const char *ct)
 {
 	char *sbegin = *s;

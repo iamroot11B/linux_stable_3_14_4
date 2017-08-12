@@ -135,7 +135,7 @@
 #define IS_POSIX(fl)	(fl->fl_flags & FL_POSIX)
 #define IS_FLOCK(fl)	(fl->fl_flags & FL_FLOCK)
 #define IS_LEASE(fl)	(fl->fl_flags & (FL_LEASE|FL_DELEG))
-
+/*! 2017. 8.12 study -ing */
 static bool lease_breaking(struct file_lock *fl)
 {
 	return fl->fl_flags & (FL_UNLOCK_PENDING | FL_DOWNGRADE_PENDING);
@@ -199,7 +199,7 @@ static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
 static DEFINE_SPINLOCK(blocked_lock_lock);
 
 static struct kmem_cache *filelock_cache __read_mostly;
-
+/*! 2017. 8.12 study -ing */
 static void locks_init_lock_heads(struct file_lock *fl)
 {
 	INIT_HLIST_NODE(&fl->fl_link);
@@ -208,6 +208,7 @@ static void locks_init_lock_heads(struct file_lock *fl)
 }
 
 /* Allocate an empty lock structure. */
+/*! 2017. 8.12 study -ing */
 struct file_lock *locks_alloc_lock(void)
 {
 	struct file_lock *fl = kmem_cache_zalloc(filelock_cache, GFP_KERNEL);
@@ -218,7 +219,7 @@ struct file_lock *locks_alloc_lock(void)
 	return fl;
 }
 EXPORT_SYMBOL_GPL(locks_alloc_lock);
-
+/*! 2017. 8.12 study -ing */
 void locks_release_private(struct file_lock *fl)
 {
 	if (fl->fl_ops) {
@@ -232,6 +233,7 @@ void locks_release_private(struct file_lock *fl)
 EXPORT_SYMBOL_GPL(locks_release_private);
 
 /* Free a lock which is not in use. */
+/*! 2017. 8.12 study -ing */
 void locks_free_lock(struct file_lock *fl)
 {
 	BUG_ON(waitqueue_active(&fl->fl_wait));
@@ -242,7 +244,7 @@ void locks_free_lock(struct file_lock *fl)
 	kmem_cache_free(filelock_cache, fl);
 }
 EXPORT_SYMBOL(locks_free_lock);
-
+/*! 2017. 8.12 study -ing */
 void locks_init_lock(struct file_lock *fl)
 {
 	memset(fl, 0, sizeof(struct file_lock));
@@ -250,7 +252,7 @@ void locks_init_lock(struct file_lock *fl)
 }
 
 EXPORT_SYMBOL(locks_init_lock);
-
+/*! 2017. 8.12 study -ing */
 static void locks_copy_private(struct file_lock *new, struct file_lock *fl)
 {
 	if (fl->fl_ops) {
@@ -265,6 +267,7 @@ static void locks_copy_private(struct file_lock *new, struct file_lock *fl)
 /*
  * Initialize a new lock from an existing file_lock structure.
  */
+/*! 2017. 8.12 study -ing */
 void __locks_copy_lock(struct file_lock *new, const struct file_lock *fl)
 {
 	new->fl_owner = fl->fl_owner;
@@ -329,7 +332,7 @@ static int flock_make_lock(struct file *filp, struct file_lock **lock,
 	*lock = fl;
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int assign_type(struct file_lock *fl, long type)
 {
 	switch (type) {
@@ -457,6 +460,7 @@ static const struct lock_manager_operations lease_manager_ops = {
 /*
  * Initialize a lease, use the default lock manager operations
  */
+/*! 2017. 8.12 study -ing */
 static int lease_init(struct file *filp, long type, struct file_lock *fl)
  {
 	if (assign_type(fl, type) != 0)
@@ -475,6 +479,7 @@ static int lease_init(struct file *filp, long type, struct file_lock *fl)
 }
 
 /* Allocate a file_lock initialised to this type of lease */
+/*! 2017. 8.12 study -ing */
 static struct file_lock *lease_alloc(struct file *filp, long type)
 {
 	struct file_lock *fl = locks_alloc_lock();
@@ -493,6 +498,7 @@ static struct file_lock *lease_alloc(struct file *filp, long type)
 
 /* Check if two locks overlap each other.
  */
+/*! 2017. 8.12 study -ing */
 static inline int locks_overlap(struct file_lock *fl1, struct file_lock *fl2)
 {
 	return ((fl1->fl_end >= fl2->fl_start) &&
@@ -502,6 +508,7 @@ static inline int locks_overlap(struct file_lock *fl1, struct file_lock *fl2)
 /*
  * Check whether two locks have the same owner.
  */
+/*! 2017. 8.12 study -ing */
 static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
 {
 	if (fl1->fl_lmops && fl1->fl_lmops->lm_compare_owner)
@@ -521,6 +528,7 @@ locks_insert_global_locks(struct file_lock *fl)
 }
 
 /* Must be called with the i_lock held! */
+/*! 2017. 8.12 study -ing */
 static inline void
 locks_delete_global_locks(struct file_lock *fl)
 {
@@ -543,13 +551,13 @@ posix_owner_key(struct file_lock *fl)
 		return fl->fl_lmops->lm_owner_key(fl);
 	return (unsigned long)fl->fl_owner;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void
 locks_insert_global_blocked(struct file_lock *waiter)
 {
 	hash_add(blocked_hash, &waiter->fl_link, posix_owner_key(waiter));
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void
 locks_delete_global_blocked(struct file_lock *waiter)
 {
@@ -561,13 +569,14 @@ locks_delete_global_blocked(struct file_lock *waiter)
  *
  * Must be called with blocked_lock_lock held.
  */
+/*! 2017. 8.12 study -ing */
 static void __locks_delete_block(struct file_lock *waiter)
 {
 	locks_delete_global_blocked(waiter);
 	list_del_init(&waiter->fl_block);
 	waiter->fl_next = NULL;
 }
-
+/*! 2017. 8.12 study -ing */
 static void locks_delete_block(struct file_lock *waiter)
 {
 	spin_lock(&blocked_lock_lock);
@@ -585,6 +594,7 @@ static void locks_delete_block(struct file_lock *waiter)
  * i_lock is also held on insertions we can avoid taking the blocked_lock_lock
  * in some cases when we see that the fl_block list is empty.
  */
+/*! 2017. 8.12 study -ing */
 static void __locks_insert_block(struct file_lock *blocker,
 					struct file_lock *waiter)
 {
@@ -596,6 +606,7 @@ static void __locks_insert_block(struct file_lock *blocker,
 }
 
 /* Must be called with i_lock held. */
+/*! 2017. 8.12 study -ing */
 static void locks_insert_block(struct file_lock *blocker,
 					struct file_lock *waiter)
 {
@@ -609,6 +620,7 @@ static void locks_insert_block(struct file_lock *blocker,
  *
  * Must be called with the inode->i_lock held!
  */
+/*! 2017. 8.12 study -ing */
 static void locks_wake_up_blocks(struct file_lock *blocker)
 {
 	/*
@@ -660,6 +672,7 @@ static void locks_insert_lock(struct file_lock **pos, struct file_lock *fl)
  *
  * Must be called with the i_lock held!
  */
+/*! 2017. 8.12 study -ing */
 static void locks_delete_lock(struct file_lock **thisfl_p)
 {
 	struct file_lock *fl = *thisfl_p;
@@ -681,6 +694,7 @@ static void locks_delete_lock(struct file_lock **thisfl_p)
 /* Determine if lock sys_fl blocks lock caller_fl. Common functionality
  * checks for shared/exclusive status of overlapping locks.
  */
+/*! 2017. 8.12 study -ing */
 static int locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
 {
 	if (sys_fl->fl_type == F_WRLCK)
@@ -693,6 +707,7 @@ static int locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
 /* Determine if lock sys_fl blocks lock caller_fl. POSIX specific
  * checking before calling the locks_conflict().
  */
+/*! 2017. 8.12 study -ing */
 static int posix_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
 {
 	/* POSIX locks owned by the same process do not conflict with
@@ -776,6 +791,7 @@ EXPORT_SYMBOL(posix_test_lock);
 #define MAX_DEADLK_ITERATIONS 10
 
 /* Find a lock that the owner of the given block_fl is blocking on. */
+/*! 2017. 8.12 study -ing */
 static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
 {
 	struct file_lock *fl;
@@ -788,6 +804,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
 }
 
 /* Must be called with the blocked_lock_lock held! */
+/*! 2017. 8.12 study -ing */
 static int posix_locks_deadlock(struct file_lock *caller_fl,
 				struct file_lock *block_fl)
 {
@@ -887,7 +904,7 @@ out:
 		locks_free_lock(new_fl);
 	return error;
 }
-
+/*! 2017. 8.12 study -ing */
 static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
 {
 	struct file_lock *fl;
@@ -1159,6 +1176,7 @@ EXPORT_SYMBOL(posix_lock_file_wait);
  * Searches the inode's list of locks to find any POSIX locks which conflict.
  * This function is called from locks_verify_locked() only.
  */
+/*! 2017. 8.12 study -ing */
 int locks_mandatory_locked(struct inode *inode)
 {
 	fl_owner_t owner = current->files;
@@ -1191,6 +1209,7 @@ int locks_mandatory_locked(struct inode *inode)
  * This function is called from rw_verify_area() and
  * locks_verify_truncate().
  */
+/*! 2017. 8.12 study -ing */
 int locks_mandatory_area(int read_write, struct inode *inode,
 			 struct file *filp, loff_t offset,
 			 size_t count)
@@ -1231,7 +1250,7 @@ int locks_mandatory_area(int read_write, struct inode *inode,
 }
 
 EXPORT_SYMBOL(locks_mandatory_area);
-
+/*! 2017. 8.12 study -ing */
 static void lease_clear_pending(struct file_lock *fl, int arg)
 {
 	switch (arg) {
@@ -1244,6 +1263,7 @@ static void lease_clear_pending(struct file_lock *fl, int arg)
 }
 
 /* We already had a lease on this file; just change its type */
+/*! 2017. 8.12 study -ing */
 int lease_modify(struct file_lock **before, int arg)
 {
 	struct file_lock *fl = *before;
@@ -1277,7 +1297,7 @@ static bool past_time(unsigned long then)
 		return false;
 	return time_after(jiffies, then);
 }
-
+/*! 2017. 8.12 study -ing */
 static void time_out_leases(struct inode *inode)
 {
 	struct file_lock **before;
@@ -1293,7 +1313,7 @@ static void time_out_leases(struct inode *inode)
 			before = &fl->fl_next;
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 static bool leases_conflict(struct file_lock *lease, struct file_lock *breaker)
 {
 	if ((breaker->fl_flags & FL_DELEG) && (lease->fl_flags & FL_LEASE))
@@ -1314,6 +1334,7 @@ static bool leases_conflict(struct file_lock *lease, struct file_lock *breaker)
  *	a call to open() or truncate().  This function can sleep unless you
  *	specified %O_NONBLOCK to your open().
  */
+/*! 2017. 8.12 study -ing */
 int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
 	int error = 0;
@@ -2212,6 +2233,7 @@ EXPORT_SYMBOL(locks_remove_posix);
 /*
  * This function is called on the last close of an open file.
  */
+/*! 2017. 8.12 study -ing */
 void locks_remove_flock(struct file *filp)
 {
 	struct inode * inode = file_inode(filp);

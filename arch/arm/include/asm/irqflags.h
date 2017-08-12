@@ -52,7 +52,7 @@ static inline void arch_local_irq_disable(void)
 		:
 		: "memory", "cc");
 }
-
+/*! 2017. 8.12 study -ing */
 #define local_fiq_enable()  __asm__("cpsie f	@ __stf" : : : "memory", "cc")
 #define local_fiq_disable() __asm__("cpsid f	@ __clf" : : : "memory", "cc")
 #else

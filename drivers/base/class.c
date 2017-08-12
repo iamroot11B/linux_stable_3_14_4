@@ -290,6 +290,7 @@ void class_destroy(struct class *cls)
  * otherwise if it is NULL, the iteration starts at the beginning of
  * the list.
  */
+/*! 2017. 8.12 study -ing */
 void class_dev_iter_init(struct class_dev_iter *iter, struct class *class,
 			 struct device *start, const struct device_type *type)
 {
@@ -314,6 +315,7 @@ EXPORT_SYMBOL_GPL(class_dev_iter_init);
  * free to do whatever it wants to do with the device including
  * calling back into class code.
  */
+/*! 2017. 8.12 study -ing */
 struct device *class_dev_iter_next(struct class_dev_iter *iter)
 {
 	struct klist_node *knode;
@@ -337,6 +339,7 @@ EXPORT_SYMBOL_GPL(class_dev_iter_next);
  * Finish an iteration.  Always call this function after iteration is
  * complete whether the iteration ran till the end or not.
  */
+/*! 2017. 8.12 study -ing */
 void class_dev_iter_exit(struct class_dev_iter *iter)
 {
 	klist_iter_exit(&iter->ki);
@@ -580,7 +583,7 @@ void class_compat_remove_link(struct class_compat *cls, struct device *dev,
 	sysfs_remove_link(cls->kobj, dev_name(dev));
 }
 EXPORT_SYMBOL_GPL(class_compat_remove_link);
-
+/*! 2017. 8.12 study -ing */
 int __init classes_init(void)
 {
 	class_kset = kset_create_and_add("class", NULL, NULL);

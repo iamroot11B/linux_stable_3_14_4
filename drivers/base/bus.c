@@ -35,7 +35,7 @@ static struct kset *system_kset;
 
 static int __must_check bus_rescan_devices_helper(struct device *dev,
 						void *data);
-
+/*! 2017. 8.12 study -ing */
 static struct bus_type *bus_get(struct bus_type *bus)
 {
 	if (bus) {
@@ -124,7 +124,7 @@ static const struct sysfs_ops bus_sysfs_ops = {
 	.show	= bus_attr_show,
 	.store	= bus_attr_store,
 };
-
+/*! 2017. 8.12 study -ing */
 int bus_create_file(struct bus_type *bus, struct bus_attribute *attr)
 {
 	int error;
@@ -136,7 +136,7 @@ int bus_create_file(struct bus_type *bus, struct bus_attribute *attr)
 	return error;
 }
 EXPORT_SYMBOL_GPL(bus_create_file);
-
+/*! 2017. 8.12 study -ing */
 void bus_remove_file(struct bus_type *bus, struct bus_attribute *attr)
 {
 	if (bus_get(bus)) {
@@ -626,6 +626,7 @@ static BUS_ATTR(drivers_probe, S_IWUSR, NULL, store_drivers_probe);
 static BUS_ATTR(drivers_autoprobe, S_IWUSR | S_IRUGO,
 		show_drivers_autoprobe, store_drivers_autoprobe);
 
+/*! 2017. 8.12 study -ing */
 static int add_probe_files(struct bus_type *bus)
 {
 	int retval;
@@ -641,6 +642,7 @@ out:
 	return retval;
 }
 
+/*! 2017. 8.12 study -ing */
 static void remove_probe_files(struct bus_type *bus)
 {
 	bus_remove_file(bus, &bus_attr_drivers_autoprobe);
@@ -821,13 +823,14 @@ struct bus_type *find_bus(char *name)
 	return k ? to_bus(k) : NULL;
 }
 #endif  /*  0  */
-
+/*! 2017. 8.12 study -ing */
 static int bus_add_groups(struct bus_type *bus,
 			  const struct attribute_group **groups)
 {
 	return sysfs_create_groups(&bus->p->subsys.kobj, groups);
 }
 
+/*! 2017. 8.12 study -ing */
 static void bus_remove_groups(struct bus_type *bus,
 			      const struct attribute_group **groups)
 {
@@ -869,6 +872,7 @@ static BUS_ATTR(uevent, S_IWUSR, NULL, bus_uevent_store);
  * infrastructure, then register the children subsystems it has:
  * the devices and drivers that belong to the subsystem.
  */
+/*! 2017. 8.12 study -ing */
 int bus_register(struct bus_type *bus)
 {
 	int retval;
@@ -954,6 +958,7 @@ EXPORT_SYMBOL_GPL(bus_register);
  * Unregister the child subsystems and the bus itself.
  * Finally, we call bus_put() to release the refcount
  */
+/*! 2017. 8.12 study -ing */
 void bus_unregister(struct bus_type *bus)
 {
 	pr_debug("bus: '%s': unregistering\n", bus->name);
@@ -1167,7 +1172,7 @@ static void system_root_device_release(struct device *dev)
 {
 	kfree(dev);
 }
-
+/*! 2017. 8.12 study -ing */
 static int subsys_register(struct bus_type *subsys,
 			   const struct attribute_group **groups,
 			   struct kobject *parent_of_root)
@@ -1228,6 +1233,7 @@ err_dev:
  * directory itself and not some create fake root-device placed in
  * /sys/devices/system/<name>.
  */
+/*! 2017. 8.12 study -ing */
 int subsys_system_register(struct bus_type *subsys,
 			   const struct attribute_group **groups)
 {
@@ -1258,7 +1264,7 @@ int subsys_virtual_register(struct bus_type *subsys,
 	return subsys_register(subsys, groups, virtual_dir);
 }
 EXPORT_SYMBOL_GPL(subsys_virtual_register);
-
+/*! 2017. 8.12 study -ing */
 int __init buses_init(void)
 {
 	bus_kset = kset_create_and_add("bus", &bus_uevent_ops, NULL);

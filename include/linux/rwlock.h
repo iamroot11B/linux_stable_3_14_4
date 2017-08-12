@@ -95,12 +95,15 @@ do {								\
 
 #define read_lock_irq(lock)		_raw_read_lock_irq(lock)
 #define read_lock_bh(lock)		_raw_read_lock_bh(lock)
+/*! 2017. 8.12 study -ing */
 #define write_lock_irq(lock)		_raw_write_lock_irq(lock)
 /*! 2017. 3.25 study -ing */
 #define write_lock_bh(lock)		_raw_write_lock_bh(lock)
 #define read_unlock(lock)		_raw_read_unlock(lock)
+/*! 2017. 8.12 study -ing */
 #define write_unlock(lock)		_raw_write_unlock(lock)
 #define read_unlock_irq(lock)		_raw_read_unlock_irq(lock)
+/*! 2017. 8.12 study -ing */
 #define write_unlock_irq(lock)		_raw_write_unlock_irq(lock)
 
 #define read_unlock_irqrestore(lock, flags)			\

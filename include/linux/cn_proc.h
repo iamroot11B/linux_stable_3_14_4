@@ -31,7 +31,7 @@ void proc_exit_connector(struct task_struct *task);
 #else
 static inline void proc_fork_connector(struct task_struct *task)
 {}
-
+/*! 2017. 8.12 study -ing */
 static inline void proc_exec_connector(struct task_struct *task)
 {}
 /*! 2017. 6. 3 study -ing */

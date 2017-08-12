@@ -1577,7 +1577,7 @@ struct timespec __current_kernel_time(void)
 
 	return tk_xtime(tk);
 }
-
+/*! 2017. 8.12 study -ing */
 struct timespec current_kernel_time(void)
 {
 	struct timekeeper *tk = &timekeeper;

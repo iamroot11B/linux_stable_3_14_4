@@ -183,7 +183,7 @@ wait_queue_head_t *bit_waitqueue(void *, int);
 	__wake_up(x, TASK_INTERRUPTIBLE, 1, (void *) (m))
 #define wake_up_interruptible_sync_poll(x, m)				\
 	__wake_up_sync_key((x), TASK_INTERRUPTIBLE, 1, (void *) (m))
-
+/*! 2017. 8.12 study -ing */
 #define ___wait_cond_timeout(condition)					\
 ({									\
 	bool __cond = (condition);					\
@@ -191,11 +191,11 @@ wait_queue_head_t *bit_waitqueue(void *, int);
 		__ret = 1;						\
 	__cond || !__ret;						\
 })
-
+/*! 2017. 8.12 study -ing */
 #define ___wait_is_interruptible(state)					\
 	(!__builtin_constant_p(state) ||				\
 		state == TASK_INTERRUPTIBLE || state == TASK_KILLABLE)	\
-
+/*! 2017. 8.12 study -ing */
 #define ___wait_event(wq, condition, state, exclusive, ret, cmd)	\
 ({									\
 	__label__ __out;						\
@@ -229,7 +229,7 @@ wait_queue_head_t *bit_waitqueue(void *, int);
 	finish_wait(&wq, &__wait);					\
 __out:	__ret;								\
 })
-
+/*! 2017. 8.12 study -ing */
 #define __wait_event(wq, condition)					\
 	(void)___wait_event(wq, condition, TASK_UNINTERRUPTIBLE, 0, 0,	\
 			    schedule())
@@ -246,6 +246,7 @@ __out:	__ret;								\
  * wake_up() has to be called after changing any variable that could
  * change the result of the wait condition.
  */
+/*! 2017. 8.12 study -ing */
 #define wait_event(wq, condition)					\
 do {									\
 	if (condition)							\
@@ -307,7 +308,7 @@ do {									\
 		break;							\
 	__wait_event_cmd(wq, condition, cmd1, cmd2);			\
 } while (0)
-
+/*! 2017. 8.12 study -ing */
 #define __wait_event_interruptible(wq, condition)			\
 	___wait_event(wq, condition, TASK_INTERRUPTIBLE, 0, 0,		\
 		      schedule())
@@ -327,6 +328,7 @@ do {									\
  * The function will return -ERESTARTSYS if it was interrupted by a
  * signal and 0 if @condition evaluated to true.
  */
+/*! 2017. 8.12 study -ing */
 #define wait_event_interruptible(wq, condition)				\
 ({									\
 	int __ret = 0;							\
@@ -334,7 +336,7 @@ do {									\
 		__ret = __wait_event_interruptible(wq, condition);	\
 	__ret;								\
 })
-
+/*! 2017. 8.12 study -ing */
 #define __wait_event_interruptible_timeout(wq, condition, timeout)	\
 	___wait_event(wq, ___wait_cond_timeout(condition),		\
 		      TASK_INTERRUPTIBLE, 0, timeout,			\
@@ -358,6 +360,7 @@ do {									\
  * a signal, or the remaining jiffies (at least 1) if the @condition
  * evaluated to %true before the @timeout elapsed.
  */
+/*! 2017. 8.12 study -ing */
 #define wait_event_interruptible_timeout(wq, condition, timeout)	\
 ({									\
 	long __ret = timeout;						\

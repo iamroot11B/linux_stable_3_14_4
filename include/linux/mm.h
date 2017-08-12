@@ -1323,7 +1323,7 @@ static inline unsigned long get_mm_counter(struct mm_struct *mm, int member)
 #endif
 	return (unsigned long)val;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void add_mm_counter(struct mm_struct *mm, int member, long value)
 {
 	atomic_long_add(value, &mm->rss_stat.count[member]);
@@ -1652,7 +1652,7 @@ static inline void __free_reserved_page(struct page *page)
 	/*! __free_pages로 연결되며, 이후는 free_all_bootmem에서와 동일하다  */
 	__free_page(page);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void free_reserved_page(struct page *page)
 {
 	__free_reserved_page(page);
@@ -1671,6 +1671,7 @@ static inline void mark_page_reserved(struct page *page)
  * range [0, UCHAR_MAX].
  * Return pages freed into the buddy system.
  */
+/*! 2017. 8.12 study -ing */
 static inline unsigned long free_initmem_default(int poison)
 {
 	extern char __init_begin[], __init_end[];
@@ -1794,7 +1795,7 @@ struct vm_area_struct *vma_interval_tree_iter_next(struct vm_area_struct *node,
 #define vma_interval_tree_foreach(vma, root, start, last)		\
 	for (vma = vma_interval_tree_iter_first(root, start, last);	\
 	     vma; vma = vma_interval_tree_iter_next(vma, start, last))
-
+/*! 2017. 8.12 study -ing */
 static inline void vma_nonlinear_insert(struct vm_area_struct *vma,
 					struct list_head *list)
 {

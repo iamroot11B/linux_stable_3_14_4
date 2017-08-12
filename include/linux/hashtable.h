@@ -101,6 +101,7 @@ static inline bool __hash_empty(struct hlist_head *ht, unsigned int sz)
  * hash_del - remove an object from a hashtable
  * @node: &struct hlist_node of the object to remove
  */
+/*! 2017. 8.12 study -ing */
 static inline void hash_del(struct hlist_node *node)
 {
 	hlist_del_init(node);
@@ -161,6 +162,7 @@ static inline void hash_del_rcu(struct hlist_node *node)
  * @member: the name of the hlist_node within the struct
  * @key: the key of the objects to iterate over
  */
+/*! 2017. 8.12 study -ing */
 #define hash_for_each_possible(name, obj, member, key)			\
 	hlist_for_each_entry(obj, &name[hash_min(key, HASH_BITS(name))], member)
 

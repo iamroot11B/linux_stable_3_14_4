@@ -202,6 +202,7 @@ static const struct kernfs_ops sysfs_bin_kfops_mmap = {
 	.mmap		= sysfs_kf_bin_mmap,
 };
 
+/*! 2017. 8.12 study -ing */
 int sysfs_add_file_mode_ns(struct kernfs_node *parent,
 			   const struct attribute *attr, bool is_bin,
 			   umode_t mode, const void *ns)
@@ -261,7 +262,7 @@ int sysfs_add_file_mode_ns(struct kernfs_node *parent,
 	}
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 int sysfs_add_file(struct kernfs_node *parent, const struct attribute *attr,
 		   bool is_bin)
 {
@@ -412,6 +413,7 @@ EXPORT_SYMBOL_GPL(sysfs_remove_file_from_group);
  *	@kobj:	object.
  *	@attr:	attribute descriptor.
  */
+/*! 2017. 8.12 study -ing */
 int sysfs_create_bin_file(struct kobject *kobj,
 			  const struct bin_attribute *attr)
 {

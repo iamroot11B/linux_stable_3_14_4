@@ -399,6 +399,7 @@ void __iget(struct inode *inode)
 /*
  * get additional reference to inode; caller must already hold one.
  */
+/*! 2017. 8.12 study -ing */
 void ihold(struct inode *inode)
 {
 	WARN_ON(atomic_inc_return(&inode->i_count) < 2);
@@ -1588,6 +1589,7 @@ EXPORT_SYMBOL(touch_atime);
  *	if suid or (sgid and xgrp)
  *		remove privs
  */
+/*! 2017. 8.12 study -ing */
 int should_remove_suid(struct dentry *dentry)
 {
 	umode_t mode = dentry->d_inode->i_mode;
@@ -1858,6 +1860,7 @@ EXPORT_SYMBOL(inode_init_owner);
  * Return true if current either has CAP_FOWNER to the inode, or
  * owns the file.
  */
+/*! 2017. 8.12 study -ing */
 bool inode_owner_or_capable(const struct inode *inode)
 {
 	if (uid_eq(current_fsuid(), inode->i_uid))

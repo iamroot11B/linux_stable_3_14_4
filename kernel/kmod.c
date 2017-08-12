@@ -68,13 +68,13 @@ static DECLARE_RWSEM(umhelper_sem);
 	modprobe_path is set via /proc/sys.
 */
 char modprobe_path[KMOD_PATH_LEN] = "/sbin/modprobe";
-
+/*! 2017. 8.12 study -ing */
 static void free_modprobe_argv(struct subprocess_info *info)
 {
 	kfree(info->argv[3]); /* check call_modprobe() */
 	kfree(info->argv);
 }
-
+/*! 2017. 8.12 study -ing */
 static int call_modprobe(char *module_name, int wait)
 {
 	struct subprocess_info *info;
@@ -129,6 +129,7 @@ out:
  * If module auto-loading support is disabled then this function
  * becomes a no-operation.
  */
+/*! 2017. 8.12 study -ing */
 int __request_module(bool wait, const char *fmt, ...)
 {
 	va_list args;
@@ -156,6 +157,7 @@ int __request_module(bool wait, const char *fmt, ...)
 	if (ret >= MODULE_NAME_LEN)
 		return -ENAMETOOLONG;
 
+	/*! Do nothing. return 0  */
 	ret = security_kernel_module_request(module_name);
 	if (ret)
 		return ret;
@@ -166,7 +168,7 @@ int __request_module(bool wait, const char *fmt, ...)
 	 * would be to run the parents of this process, counting how many times
 	 * kmod was invoked.  That would mean accessing the internals of the
 	 * process tables to get the command line, proc_pid_cmdline is static
-	 * and it is not worth changing the proc code just to handle this case. 
+	 * and it is not worth changing the proc code just to handle this case.
 	 * KAO.
 	 *
 	 * "trace the ppid" is simple, but will fail if someone's
@@ -456,6 +458,7 @@ EXPORT_SYMBOL_GPL(usermodehelper_read_unlock);
  * Change the value of usermodehelper_disabled (under umhelper_sem locked for
  * writing) and wakeup tasks waiting for it to change.
  */
+/*! 2017. 8.12 study -ing */
 void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
 {
 	down_write(&umhelper_sem);

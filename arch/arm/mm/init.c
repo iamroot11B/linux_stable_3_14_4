@@ -55,7 +55,7 @@ static int __init early_initrd(char *p)
 	return 0;
 }
 early_param("initrd", early_initrd);
-/* 
+/*
  * 참고: http://egloos.zum.com/furmuwon/v/10646725
  *
  *  #define early_param(str, fn)  __setup_param(str, fn, fn, 1)
@@ -151,8 +151,8 @@ static void __init find_limits(unsigned long *min, unsigned long *max_low,
 	for_each_bank (i, mi)
 		if (mi->bank[i].highmem)
 				break;
-	/*! 
-	 * find highmem 
+	/*!
+	 * find highmem
 	 * @max_low  : end pfn of normal-mem (:low-mem)
 	 * @max_high : end pfn of high-mem(maybe, last bank has pfn)
 	 */
@@ -316,7 +316,7 @@ void __init arm_memblock_init(struct meminfo *mi,
 
 	/*!
 	 * memblock 구조체
-	 *  - 전체 메모리(memory) 앞으로 사용할 메모리(reserved)들의 집합 
+	 *  - 전체 메모리(memory) 앞으로 사용할 메모리(reserved)들의 집합
 	 */
 	for (i = 0; i < mi->nr_banks; i++)
 		memblock_add(mi->bank[i].start, mi->bank[i].size);
@@ -413,7 +413,7 @@ void __init bootmem_init(void)
 
 	find_limits(&min, &max_low, &max_high);
 	/*! Do:
-	 * @min      : get first pfn of phy-mem  
+	 * @min      : get first pfn of phy-mem
 	 * @max_low  : end pfn of nomal-mem (:low-mem)
 	 * @max_high : end pfn of high-mem(maybe, last bank has pfn)
 	 */
@@ -450,6 +450,7 @@ void __init bootmem_init(void)
  * Poison init memory with an undefined instruction (ARM) or a branch to an
  * undefined instruction (Thumb).
  */
+/*! 2017. 8.12 study -ing */
 static inline void poison_init_mem(void *s, size_t count)
 {
 	u32 *p = (u32 *)s;
@@ -721,7 +722,7 @@ void __init mem_init(void)
 		sysctl_overcommit_memory = OVERCOMMIT_ALWAYS;
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 void free_initmem(void)
 {
 #ifdef CONFIG_HAVE_TCM
@@ -732,6 +733,7 @@ void free_initmem(void)
 #endif
 
 	poison_init_mem(__init_begin, __init_end - __init_begin);
+	/*! machine_is_integrator = 0, machine_is_cintegrator = 0  */
 	if (!machine_is_integrator() && !machine_is_cintegrator())
 		free_initmem_default(-1);
 }

@@ -71,7 +71,7 @@ struct pid_link
 	struct hlist_node node;
 	struct pid *pid;
 };
-
+/*! 2017. 8.12 study -ing */
 static inline struct pid *get_pid(struct pid *pid)
 {
 	if (pid)

@@ -208,11 +208,12 @@ static inline int page_cache_add_speculative(struct page *page, int count)
 	return 1;
 }
 
+/*! 2017. 8.12 study -ing */
 static inline int page_freeze_refs(struct page *page, int count)
 {
 	return likely(atomic_cmpxchg(&page->_count, count, 0) == count);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void page_unfreeze_refs(struct page *page, int count)
 {
 	VM_BUG_ON_PAGE(page_count(page) != 0, page);

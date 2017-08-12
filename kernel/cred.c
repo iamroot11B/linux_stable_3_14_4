@@ -55,7 +55,7 @@ struct cred init_cred = {
 	.user_ns		= &init_user_ns,
 	.group_info		= &init_groups,
 };
-
+/*! 2017. 8.12 study -ing */
 static inline void set_cred_subscribers(struct cred *cred, int n)
 {
 #ifdef CONFIG_DEBUG_CREDENTIALS
@@ -239,12 +239,13 @@ error:
  *
  * Call commit_creds() or abort_creds() to clean up.
  */
+/*! 2017. 8.12 study -ing */
 struct cred *prepare_creds(void)
 {
 	struct task_struct *task = current;
 	const struct cred *old;
 	struct cred *new;
-
+/*! Do nothing  */
 	validate_process_creds();
 
 	new = kmem_cache_alloc(cred_jar, GFP_KERNEL);
@@ -288,6 +289,7 @@ EXPORT_SYMBOL(prepare_creds);
  * Prepare credentials for current to perform an execve()
  * - The caller must hold ->cred_guard_mutex
  */
+/*! 2017. 8.12 study -ing */
 struct cred *prepare_exec_creds(void)
 {
 	struct cred *new;
@@ -499,6 +501,7 @@ EXPORT_SYMBOL(commit_creds);
  * Discard a set of credentials that were under construction and unlock the
  * current task.
  */
+/*! 2017. 8.12 study -ing */
 void abort_creds(struct cred *new)
 {
 	kdebug("abort_creds(%p{%d,%d})", new,

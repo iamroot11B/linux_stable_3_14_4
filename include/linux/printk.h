@@ -45,7 +45,7 @@ static inline void console_silent(void)
 {
 	console_loglevel = 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void console_verbose(void)
 {
 	if (console_loglevel)

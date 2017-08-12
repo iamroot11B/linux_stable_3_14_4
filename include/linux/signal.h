@@ -36,6 +36,7 @@ struct sigpending {
 
 /* We don't use <linux/bitops.h> for these because there is no need to
    be atomic.  */
+/*! 2017. 8.12 study -ing */
 static inline void sigaddset(sigset_t *set, int _sig)
 {
 	unsigned long sig = _sig - 1;
@@ -86,7 +87,7 @@ static inline int sigisemptyset(sigset_t *set)
 		return 0;
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 #define sigmask(sig)	(1UL << ((sig) - 1))
 
 #ifndef __HAVE_ARCH_SIG_SETOPS
@@ -151,7 +152,7 @@ _SIG_SET_OP(signotset, _sig_not)
 
 #undef _SIG_SET_OP
 #undef _sig_not
-
+/*! 2017. 8.12 study -ing */
 static inline void sigemptyset(sigset_t *set)
 {
 	switch (_NSIG_WORDS) {
@@ -228,6 +229,7 @@ static inline void init_sigpending(struct sigpending *sig)
 extern void flush_sigqueue(struct sigpending *queue);
 
 /* Test if 'sig' is valid signal. Use this instead of testing _NSIG directly */
+/*! 2017. 8.12 study -ing */
 static inline int valid_signal(unsigned long sig)
 {
 	return sig <= _NSIG ? 1 : 0;
@@ -386,11 +388,13 @@ int unhandled_signal(struct task_struct *tsk, int sig);
 #define SIGEMT_MASK	0
 #endif
 
+/*! SIGRTMIN = 32  */
 #if SIGRTMIN > BITS_PER_LONG
 #define rt_sigmask(sig)	(1ULL << ((sig)-1))
 #else
 #define rt_sigmask(sig)	sigmask(sig)
 #endif
+/*! 2017. 8.12 study -ing */
 #define siginmask(sig, mask) (rt_sigmask(sig) & (mask))
 
 #define SIG_KERNEL_ONLY_MASK (\
@@ -414,17 +418,19 @@ int unhandled_signal(struct task_struct *tsk, int sig);
 
 #define sig_kernel_only(sig) \
 	(((sig) < SIGRTMIN) && siginmask(sig, SIG_KERNEL_ONLY_MASK))
+/*! 2017. 8.12 study -ing */
 #define sig_kernel_coredump(sig) \
 	(((sig) < SIGRTMIN) && siginmask(sig, SIG_KERNEL_COREDUMP_MASK))
 #define sig_kernel_ignore(sig) \
 	(((sig) < SIGRTMIN) && siginmask(sig, SIG_KERNEL_IGNORE_MASK))
+/*! 2017. 8.12 study -ing */
 #define sig_kernel_stop(sig) \
 	(((sig) < SIGRTMIN) && siginmask(sig, SIG_KERNEL_STOP_MASK))
 
 #define sig_user_defined(t, signr) \
 	(((t)->sighand->action[(signr)-1].sa.sa_handler != SIG_DFL) &&	\
 	 ((t)->sighand->action[(signr)-1].sa.sa_handler != SIG_IGN))
-
+/*! 2017. 8.12 study -ing */
 #define sig_fatal(t, signr) \
 	(!siginmask(signr, SIG_KERNEL_IGNORE_MASK|SIG_KERNEL_STOP_MASK) && \
 	 (t)->sighand->action[(signr)-1].sa.sa_handler == SIG_DFL)

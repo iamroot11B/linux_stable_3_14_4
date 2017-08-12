@@ -25,12 +25,12 @@ static inline int ima_bprm_check(struct linux_binprm *bprm)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline int ima_file_check(struct file *file, int mask)
 {
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void ima_file_free(struct file *file)
 {
 	return;
@@ -54,6 +54,7 @@ extern int ima_inode_setxattr(struct dentry *dentry, const char *xattr_name,
 		       const void *xattr_value, size_t xattr_value_len);
 extern int ima_inode_removexattr(struct dentry *dentry, const char *xattr_name);
 #else
+/*! 2017. 8.12 study -ing */
 static inline void ima_inode_post_setattr(struct dentry *dentry)
 {
 	return;

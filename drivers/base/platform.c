@@ -925,6 +925,7 @@ struct bus_type platform_bus_type = {
 };
 EXPORT_SYMBOL_GPL(platform_bus_type);
 
+/*! 2017. 8.12 study -ing */
 int __init platform_bus_init(void)
 {
 	int error;
@@ -1235,6 +1236,7 @@ int __init early_platform_driver_probe(char *class_str,
 /**
  * early_platform_cleanup - clean up early platform code
  */
+/*! 2017. 8.12 study -ing */
 void __init early_platform_cleanup(void)
 {
 	struct platform_device *pd, *pd2;
@@ -1246,4 +1248,3 @@ void __init early_platform_cleanup(void)
 		memset(&pd->dev.devres_head, 0, sizeof(pd->dev.devres_head));
 	}
 }
-

@@ -370,6 +370,7 @@ EXPORT_SYMBOL_GPL(cpu_is_hotpluggable);
 static DEFINE_PER_CPU(struct cpu, cpu_devices);
 #endif
 
+/*! 2017. 8.12 study -ing */
 static void __init cpu_dev_register_generic(void)
 {
 #ifdef CONFIG_GENERIC_CPU_DEVICES
@@ -382,10 +383,12 @@ static void __init cpu_dev_register_generic(void)
 #endif
 }
 
+/*! 2017. 8.12 study -ing */
 void __init cpu_dev_init(void)
 {
 	if (subsys_system_register(&cpu_subsys, cpu_root_attr_groups))
 		panic("Failed to register CPU subsystem");
 
+	/*! Do nothing  */
 	cpu_dev_register_generic();
 }

@@ -164,7 +164,7 @@ static int btrfs_ioctl_getflags(struct file *file, void __user *arg)
 		return -EFAULT;
 	return 0;
 }
-
+/*! 2017. 8.12 study -ing */
 static int check_flags(unsigned int flags)
 {
 	if (flags & ~(FS_IMMUTABLE_FL | FS_APPEND_FL | \

@@ -56,7 +56,7 @@ enum KTHREAD_BITS {
 /*! 2017. 5. 6 study -ing */
 #define __to_kthread(vfork)	\
 	container_of(vfork, struct kthread, exited)
-
+/*! 2017. 8.12 study -ing */
 static inline struct kthread *to_kthread(struct task_struct *k)
 {
 	return __to_kthread(k->vfork_done);
@@ -134,6 +134,7 @@ EXPORT_SYMBOL_GPL(kthread_freezable_should_stop);
  * The caller is responsible for ensuring the validity of @task when
  * calling this function.
  */
+/*! 2017. 8.12 study -ing */
 void *kthread_data(struct task_struct *task)
 {
 	return to_kthread(task)->data;
@@ -222,7 +223,7 @@ int tsk_fork_get_node(struct task_struct *tsk)
 #endif
 	return numa_node_id();
 }
-
+/*! 2017. 8.12 study -ing */
 static void create_kthread(struct kthread_create_info *create)
 {
 	int pid;
@@ -489,7 +490,7 @@ int kthread_stop(struct task_struct *k)
 	return ret;
 }
 EXPORT_SYMBOL(kthread_stop);
-
+/*! 2017. 8.12 study -ing */
 int kthreadd(void *unused)
 {
 	struct task_struct *tsk = current;

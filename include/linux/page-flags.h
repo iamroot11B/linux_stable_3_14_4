@@ -248,6 +248,7 @@ PAGEFLAG(Readahead, reclaim) TESTCLEARFLAG(Readahead, reclaim)
 PAGEFLAG_FALSE(HighMem)
 #endif
 
+/*! 2017. 8.12 study -ing */
 #ifdef CONFIG_SWAP
 PAGEFLAG(SwapCache, swapcache)
 #else

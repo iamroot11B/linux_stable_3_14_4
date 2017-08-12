@@ -65,7 +65,7 @@ static void unmap_region(struct mm_struct *mm,
  * MAP_SHARED	r: (no) no	r: (yes) yes	r: (no) yes	r: (no) yes
  *		w: (no) no	w: (no) no	w: (yes) yes	w: (no) no
  *		x: (no) no	x: (no) yes	x: (no) yes	x: (yes) yes
- *		
+ *
  * MAP_PRIVATE	r: (no) no	r: (yes) yes	r: (no) yes	r: (no) yes
  *		w: (no) no	w: (no) no	w: (copy) copy	w: (no) no
  *		x: (no) no	x: (no) yes	x: (no) yes	x: (yes) yes
@@ -75,7 +75,7 @@ pgprot_t protection_map[16] = {
 	__P000, __P001, __P010, __P011, __P100, __P101, __P110, __P111,
 	__S000, __S001, __S010, __S011, __S100, __S101, __S110, __S111
 };
-
+/*! 2017. 8.12 study -ing */
 pgprot_t vm_get_page_prot(unsigned long vm_flags)
 {
 	return __pgprot(pgprot_val(protection_map[vm_flags &
@@ -126,6 +126,7 @@ EXPORT_SYMBOL_GPL(vm_memory_committed);
  * Note this is a helper function intended to be used by LSMs which
  * wish to use this logic.
  */
+/*! 2017. 8.12 study -ing */
 int __vm_enough_memory(struct mm_struct *mm, long pages, int cap_sys_admin)
 {
 	unsigned long free, allowed, reserve;
@@ -438,7 +439,9 @@ void validate_mm(struct mm_struct *mm)
 	BUG_ON(bug);
 }
 #else
+/*! 2017. 8.12 study -ing */
 #define validate_mm_rb(root, ignore) do { } while (0)
+/*! 2017. 8.12 study -ing */
 #define validate_mm(mm) do { } while (0)
 #endif
 
@@ -450,6 +453,7 @@ RB_DECLARE_CALLBACKS(static, vma_gap_callbacks, struct vm_area_struct, vm_rb,
  * vma->vm_prev->vm_end values changed, without modifying the vma's position
  * in the rbtree.
  */
+/*! 2017. 8.12 study -ing */
 static void vma_gap_update(struct vm_area_struct *vma)
 {
 	/*
@@ -458,11 +462,12 @@ static void vma_gap_update(struct vm_area_struct *vma)
 	 */
 	vma_gap_callbacks_propagate(&vma->vm_rb, NULL);
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void vma_rb_insert(struct vm_area_struct *vma,
 				 struct rb_root *root)
 {
 	/* All rb_subtree_gap values must be consistent prior to insertion */
+	/*! Do nothing  */
 	validate_mm_rb(root, NULL);
 
 	rb_insert_augmented(&vma->vm_rb, root, &vma_gap_callbacks);
@@ -515,7 +520,7 @@ anon_vma_interval_tree_post_update_vma(struct vm_area_struct *vma)
 	list_for_each_entry(avc, &vma->anon_vma_chain, same_vma)
 		anon_vma_interval_tree_insert(avc, &avc->anon_vma->rb_root);
 }
-
+/*! 2017. 8.12 study -ing */
 static int find_vma_links(struct mm_struct *mm, unsigned long addr,
 		unsigned long end, struct vm_area_struct **pprev,
 		struct rb_node ***rb_link, struct rb_node **rb_parent)
@@ -577,7 +582,7 @@ static unsigned long count_vma_pages_range(struct mm_struct *mm,
 
 	return nr_pages;
 }
-
+/*! 2017. 8.12 study -ing */
 void __vma_link_rb(struct mm_struct *mm, struct vm_area_struct *vma,
 		struct rb_node **rb_link, struct rb_node *rb_parent)
 {
@@ -601,7 +606,7 @@ void __vma_link_rb(struct mm_struct *mm, struct vm_area_struct *vma,
 	vma_gap_update(vma);
 	vma_rb_insert(vma, &mm->mm_rb);
 }
-
+/*! 2017. 8.12 study -ing */
 static void __vma_link_file(struct vm_area_struct *vma)
 {
 	struct file *file;
@@ -623,7 +628,7 @@ static void __vma_link_file(struct vm_area_struct *vma)
 		flush_dcache_mmap_unlock(mapping);
 	}
 }
-
+/*! 2017. 8.12 study -ing */
 static void
 __vma_link(struct mm_struct *mm, struct vm_area_struct *vma,
 	struct vm_area_struct *prev, struct rb_node **rb_link,
@@ -632,7 +637,7 @@ __vma_link(struct mm_struct *mm, struct vm_area_struct *vma,
 	__vma_link_list(mm, vma, prev, rb_parent);
 	__vma_link_rb(mm, vma, rb_link, rb_parent);
 }
-
+/*! 2017. 8.12 study -ing */
 static void vma_link(struct mm_struct *mm, struct vm_area_struct *vma,
 			struct vm_area_struct *prev, struct rb_node **rb_link,
 			struct rb_node *rb_parent)
@@ -1894,7 +1899,7 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	info.align_mask = 0;
 	return vm_unmapped_area(&info);
 }
-#endif	
+#endif
 
 /*
  * This mmap-allocator allocates new areas top-down from below the
@@ -2742,6 +2747,7 @@ void exit_mmap(struct mm_struct *mm)
  * and into the inode's i_mmap tree.  If vm_file is non-NULL
  * then i_mmap_mutex is taken here.
  */
+/*! 2017. 8.12 study -ing */
 int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
 {
 	struct vm_area_struct *prev;

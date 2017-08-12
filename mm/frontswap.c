@@ -188,6 +188,7 @@ void __frontswap_init(unsigned type, unsigned long *map)
 }
 EXPORT_SYMBOL(__frontswap_init);
 
+/*! 2017. 8.12 study -ing */
 bool __frontswap_test(struct swap_info_struct *sis,
 				pgoff_t offset)
 {

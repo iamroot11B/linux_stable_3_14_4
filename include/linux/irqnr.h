@@ -7,7 +7,7 @@
 extern int nr_irqs;
 extern struct irq_desc *irq_to_desc(unsigned int irq);
 unsigned int irq_get_next_irq(unsigned int offset);
-
+/*! 2017. 8.12 study -ing */
 # define for_each_irq_desc(irq, desc)					\
 	for (irq = 0, desc = irq_to_desc(irq); irq < nr_irqs;		\
 	     irq++, desc = irq_to_desc(irq))				\

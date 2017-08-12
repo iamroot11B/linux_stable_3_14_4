@@ -233,7 +233,7 @@ vma_dup_policy(struct vm_area_struct *src, struct vm_area_struct *dst)
 static inline void numa_policy_init(void)
 {
 }
-
+/*! 2017. 8.12 study -ing */
 static inline void numa_default_policy(void)
 {
 }

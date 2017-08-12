@@ -26,6 +26,7 @@ void __init driver_init(void)
 	buses_init();
 	classes_init();
 	firmware_init();
+	/*! Do nothing  */
 	hypervisor_init();
 
 	/* These are also core pieces, but must come after the
@@ -33,6 +34,7 @@ void __init driver_init(void)
 	 */
 	platform_bus_init();
 	cpu_dev_init();
+	/*! Do nothing  */
 	memory_dev_init();
 	container_dev_init();
 }

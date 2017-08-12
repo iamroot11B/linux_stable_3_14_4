@@ -785,11 +785,13 @@ __mutex_lock_interruptible_slowpath(struct mutex *lock);
  *
  * This function is similar to (but not equivalent to) down_interruptible().
  */
+/*! 2017. 8.12 study -ing */
 int __sched mutex_lock_interruptible(struct mutex *lock)
 {
 	int ret;
 
 	might_sleep();
+	/*! __mutex_fastpath_lock_retval = -1  */
 	ret =  __mutex_fastpath_lock_retval(&lock->count);
 	if (likely(!ret)) {
 		mutex_set_owner(lock);
@@ -831,6 +833,7 @@ __mutex_lock_killable_slowpath(struct mutex *lock)
 				   NULL, _RET_IP_, NULL, 0);
 }
 
+/*! 2017. 8.12 study -ing */
 static noinline int __sched
 __mutex_lock_interruptible_slowpath(struct mutex *lock)
 {

@@ -4110,7 +4110,7 @@ again:
 	if (vma->vm_flags & VM_WRITE)
 		flags |= RING_BUFFER_WRITABLE;
 
-	rb = rb_alloc(nr_pages, 
+	rb = rb_alloc(nr_pages,
 		event->attr.watermark ? event->attr.wakeup_watermark : 0,
 		event->cpu, flags);
 
@@ -5038,7 +5038,6 @@ static void perf_event_comm_event(struct perf_comm_event *comm_event)
 		       comm_event,
 		       NULL);
 }
-
 void perf_event_comm(struct task_struct *task)
 {
 	struct perf_comm_event comm_event;
