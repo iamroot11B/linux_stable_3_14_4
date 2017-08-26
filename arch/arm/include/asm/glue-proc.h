@@ -254,6 +254,7 @@
 #define cpu_reset			__glue(CPU_NAME,_reset)
 #define cpu_do_idle			__glue(CPU_NAME,_do_idle)
 #define cpu_dcache_clean_area		__glue(CPU_NAME,_dcache_clean_area)
+/*! 2017. 8.26 study -ing */
 #define cpu_do_switch_mm		__glue(CPU_NAME,_switch_mm)
 #define cpu_set_pte_ext			__glue(CPU_NAME,_set_pte_ext)
 #define cpu_suspend_size		__glue(CPU_NAME,_suspend_size)

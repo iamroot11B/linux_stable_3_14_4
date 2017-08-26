@@ -83,7 +83,7 @@
 	.endm
 
 	.text
-
+/*! 2017. 8.26 study -ing */
 ENTRY(__copy_from_user)
 
 #include "copy_template.S"
@@ -101,4 +101,3 @@ ENDPROC(__copy_from_user)
 	ldr	r0, [sp], #4
 	copy_abort_end
 	.popsection
-

@@ -3767,6 +3767,7 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 
 #ifdef CONFIG_SMP
 /* Used instead of source_load when we know the type == 0 */
+/*! 2017. 8.26 study -ing */
 static unsigned long weighted_cpuload(const int cpu)
 {
 	return cpu_rq(cpu)->cfs.runnable_load_avg;
@@ -3779,6 +3780,7 @@ static unsigned long weighted_cpuload(const int cpu)
  * We want to under-estimate the load of migration sources, to
  * balance conservatively.
  */
+/*! 2017. 8.26 study -ing */
 static unsigned long source_load(int cpu, int type)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -3794,6 +3796,7 @@ static unsigned long source_load(int cpu, int type)
  * Return a high guess at the load of a migration-target cpu weighted
  * according to the scheduling class and "nice" value.
  */
+/*! 2017. 8.26 study -ing */
 static unsigned long target_load(int cpu, int type)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -3810,7 +3813,7 @@ static unsigned long power_of(int cpu)
 {
 	return cpu_rq(cpu)->cpu_power;
 }
-
+/*! 2017. 8.26 study -ing */
 static unsigned long cpu_avg_load_per_task(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -4657,7 +4660,7 @@ static bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preemp
  *
  * The adjacency matrix of the resulting graph is given by:
  *
- *             log_2 n     
+ *             log_2 n
  *   A_i,j = \Union     (i % 2^k == 0) && i / 2^(k+1) == j / 2^(k+1)  (6)
  *             k = 0
  *
@@ -4703,7 +4706,7 @@ static bool yield_to_task_fair(struct rq *rq, struct task_struct *p, bool preemp
  *
  * [XXX write more on how we solve this.. _after_ merging pjt's patches that
  *      rewrite all of this once again.]
- */ 
+ */
 
 static unsigned long __read_mostly max_load_balance_interval = HZ/10;
 
@@ -5158,6 +5161,7 @@ static unsigned long task_h_load(struct task_struct *p)
 			cfs_rq->runnable_load_avg + 1);
 }
 #else
+/*! 2017. 8.26 study -ing */
 static inline void update_blocked_averages(int cpu)
 {
 }
@@ -5205,6 +5209,7 @@ struct sd_lb_stats {
 	struct sg_lb_stats local_stat;	/* Statistics of the local group */
 };
 
+/*! 2017. 8.26 study -ing */
 static inline void init_sd_lb_stats(struct sd_lb_stats *sds)
 {
 	/*
@@ -5231,6 +5236,7 @@ static inline void init_sd_lb_stats(struct sd_lb_stats *sds)
  *
  * Return: The load index.
  */
+/*! 2017. 8.26 study -ing */
 static inline int get_sd_load_idx(struct sched_domain *sd,
 					enum cpu_idle_type idle)
 {
@@ -5396,7 +5402,7 @@ void update_group_power(struct sched_domain *sd, int cpu)
 		/*
 		 * !SD_OVERLAP domains can assume that child groups
 		 * span the current group.
-		 */ 
+		 */
 
 		group = child->groups;
 		do {
@@ -5417,6 +5423,7 @@ void update_group_power(struct sched_domain *sd, int cpu)
  *
  * See update_sd_pick_busiest() and check_asym_packing().
  */
+/*! 2017. 8.26 study -ing */
 static inline int
 fix_small_capacity(struct sched_domain *sd, struct sched_group *group)
 {
@@ -5463,7 +5470,7 @@ fix_small_capacity(struct sched_domain *sd, struct sched_group *group)
  * group imbalance and decide the groups need to be balanced again. A most
  * subtle and fragile situation.
  */
-
+/*! 2017. 8.26 study -ing */
 static inline int sg_imbalanced(struct sched_group *group)
 {
 	return group->sgp->imbalance;
@@ -5476,6 +5483,7 @@ static inline int sg_imbalanced(struct sched_group *group)
  * first dividing out the smt factor and computing the actual number of cores
  * and limit power unit capacity with that.
  */
+/*! 2017. 8.26 study -ing */
 static inline int sg_capacity(struct lb_env *env, struct sched_group *group)
 {
 	unsigned int capacity, smt, cpus;
@@ -5504,6 +5512,7 @@ static inline int sg_capacity(struct lb_env *env, struct sched_group *group)
  * @local_group: Does group contain this_cpu.
  * @sgs: variable to hold the statistics for this group.
  */
+/*! 2017. 8.26 study -ing */
 static inline void update_sg_lb_stats(struct lb_env *env,
 			struct sched_group *group, int load_idx,
 			int local_group, struct sg_lb_stats *sgs)
@@ -5562,6 +5571,7 @@ static inline void update_sg_lb_stats(struct lb_env *env,
  * Return: %true if @sg is a busier group than the previously selected
  * busiest group. %false otherwise.
  */
+/*! 2017. 8.26 study -ing */
 static bool update_sd_pick_busiest(struct lb_env *env,
 				   struct sd_lb_stats *sds,
 				   struct sched_group *sg,
@@ -5612,6 +5622,7 @@ static inline enum fbq_type fbq_classify_rq(struct rq *rq)
 	return all;
 }
 #else
+/*! 2017. 8.26 study -ing */
 static inline enum fbq_type fbq_classify_group(struct sg_lb_stats *sgs)
 {
 	return all;
@@ -5628,6 +5639,7 @@ static inline enum fbq_type fbq_classify_rq(struct rq *rq)
  * @env: The load balancing environment.
  * @sds: variable to hold the statistics for this sched_domain.
  */
+/*! 2017. 8.26 study -ing */
 static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sds)
 {
 	struct sched_domain *child = env->sd->child;
@@ -5713,6 +5725,7 @@ next_group:
  * @env: The load balancing environment.
  * @sds: Statistics of the sched_domain which is to be packed
  */
+/*! 2017. 8.26 study -ing */
 static int check_asym_packing(struct lb_env *env, struct sd_lb_stats *sds)
 {
 	int busiest_cpu;
@@ -5741,6 +5754,7 @@ static int check_asym_packing(struct lb_env *env, struct sd_lb_stats *sds)
  * @env: The load balancing environment.
  * @sds: Statistics of the sched_domain whose imbalance is to be calculated.
  */
+/*! 2017. 8.26 study -ing */
 static inline
 void fix_small_imbalance(struct lb_env *env, struct sd_lb_stats *sds)
 {
@@ -5812,6 +5826,7 @@ void fix_small_imbalance(struct lb_env *env, struct sd_lb_stats *sds)
  * @env: load balance environment
  * @sds: statistics of the sched_domain whose imbalance is to be calculated.
  */
+/*! 2017. 8.26 study -ing */
 static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *sds)
 {
 	unsigned long max_pull, load_above_capacity = ~0UL;
@@ -5898,6 +5913,7 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
  *		   return the least loaded group whose CPUs can be
  *		   put to idle by rebalancing its tasks onto our group.
  */
+/*! 2017. 8.26 study -ing */
 static struct sched_group *find_busiest_group(struct lb_env *env)
 {
 	struct sg_lb_stats *local, *busiest;
@@ -6083,6 +6099,7 @@ static int need_active_balance(struct lb_env *env)
 
 static int active_load_balance_cpu_stop(void *data);
 
+/*! 2017. 8.26 study -ing */
 static int should_we_balance(struct lb_env *env)
 {
 	struct sched_group *sg = env->sd->groups;
@@ -6121,6 +6138,7 @@ static int should_we_balance(struct lb_env *env)
  * Check this_cpu to ensure it is balanced within domain. Attempt to move
  * tasks if there is an imbalance.
  */
+/*! 2017. 8.26 study -ing */
 static int load_balance(int this_cpu, struct rq *this_rq,
 			struct sched_domain *sd, enum cpu_idle_type idle,
 			int *continue_balancing)
@@ -6151,7 +6169,7 @@ static int load_balance(int this_cpu, struct rq *this_rq,
 		env.dst_grpmask = NULL;
 
 	cpumask_copy(cpus, cpu_active_mask);
-
+	/*! Do nothing */
 	schedstat_inc(sd, lb_count[idle]);
 
 redo:
@@ -6161,6 +6179,7 @@ redo:
 	}
 
 	group = find_busiest_group(&env);
+	/*! 2017. 8.26 extra study end */
 	if (!group) {
 		schedstat_inc(sd, lb_nobusyg[idle]);
 		goto out_balanced;
@@ -6364,6 +6383,7 @@ out:
  * idle_balance is called by schedule() if this_cpu is about to become
  * idle. Attempts to pull tasks from other CPUs.
  */
+/*! 2017. 8.26 study -ing */
 void idle_balance(int this_cpu, struct rq *this_rq)
 {
 	struct sched_domain *sd;
@@ -6380,7 +6400,7 @@ void idle_balance(int this_cpu, struct rq *this_rq)
 	 * Drop the rq->lock, but keep IRQ/preempt disabled.
 	 */
 	raw_spin_unlock(&this_rq->lock);
-
+	/*! Do nothing */
 	update_blocked_averages(this_cpu);
 	rcu_read_lock();
 	for_each_domain(this_cpu, sd) {

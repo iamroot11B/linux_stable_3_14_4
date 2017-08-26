@@ -56,7 +56,7 @@ extern void debug_check_no_locks_held(void);
 static inline void debug_show_all_locks(void)
 {
 }
-
+/*! 2017. 8.26 study -ing */
 static inline void debug_show_held_locks(struct task_struct *task)
 {
 }

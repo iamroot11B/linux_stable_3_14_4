@@ -63,7 +63,7 @@ extern unsigned long __per_cpu_offset[NR_CPUS];
 	(*SHIFT_PERCPU_PTR(&(var), per_cpu_offset(cpu)))
 
 #ifndef __this_cpu_ptr
-/*! 2016.07.09 study -ing */	
+/*! 2016.07.09 study -ing */
 #define __this_cpu_ptr(ptr) SHIFT_PERCPU_PTR(ptr, __my_cpu_offset)
 #endif
 #ifdef CONFIG_DEBUG_PREEMPT
@@ -90,6 +90,7 @@ extern void setup_per_cpu_areas(void);
 #define per_cpu(var, cpu)	(*((void)(cpu), VERIFY_PERCPU_PTR(&(var))))
 #define __get_cpu_var(var)	(*VERIFY_PERCPU_PTR(&(var)))
 #define __raw_get_cpu_var(var)	(*VERIFY_PERCPU_PTR(&(var)))
+/*! 2017. 8.26 study -ing */
 #define this_cpu_ptr(ptr)	per_cpu_ptr(ptr, 0)
 /*! 2015.01.30 study -ing */
 #define __this_cpu_ptr(ptr)	this_cpu_ptr(ptr)

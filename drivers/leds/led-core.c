@@ -110,7 +110,7 @@ void led_stop_software_blink(struct led_classdev *led_cdev)
 	led_cdev->blink_delay_off = 0;
 }
 EXPORT_SYMBOL_GPL(led_stop_software_blink);
-
+/*! 2017. 8.26 study -ing */
 void led_set_brightness(struct led_classdev *led_cdev,
 			enum led_brightness brightness)
 {

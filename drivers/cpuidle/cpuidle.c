@@ -70,6 +70,7 @@ int cpuidle_play_dead(void)
  * @drv: cpuidle driver for this cpu
  * @next_state: index into drv->states of the state to enter
  */
+/*! 2017. 8.26 study -ing */
 int cpuidle_enter_state(struct cpuidle_device *dev, struct cpuidle_driver *drv,
 			int index)
 {
@@ -113,6 +114,7 @@ int cpuidle_enter_state(struct cpuidle_device *dev, struct cpuidle_driver *drv,
  * NOTE: no locks or semaphores should be used here
  * return non-zero on failure
  */
+/*! 2017. 8.26 study -ing */
 int cpuidle_idle_call(void)
 {
 	struct cpuidle_device *dev = __this_cpu_read(cpuidle_devices);

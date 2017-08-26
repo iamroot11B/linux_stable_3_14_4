@@ -678,7 +678,7 @@ DECLARE_PER_CPU(struct rq, runqueues);
 /*! 2017. 6. 3 study -ing */
 #define cpu_curr(cpu)		(cpu_rq(cpu)->curr)
 #define raw_rq()		(&__raw_get_cpu_var(runqueues))
-
+/*! 2017. 8.26 study -ing */
 static inline u64 rq_clock(struct rq *rq)
 {
 	return rq->clock;
@@ -696,7 +696,7 @@ extern int migrate_swap(struct task_struct *, struct task_struct *);
 #endif /* CONFIG_NUMA_BALANCING */
 
 #ifdef CONFIG_SMP
-
+/*! 2017. 8.26 study -ing */
 #define rcu_dereference_check_sched_domain(p) \
 	rcu_dereference_check((p), \
 			      lockdep_is_held(&sched_domains_mutex))
@@ -708,6 +708,7 @@ extern int migrate_swap(struct task_struct *, struct task_struct *);
  * The domain tree of any CPU may only be accessed from within
  * preempt-disabled sections.
  */
+/*! 2017. 8.26 study -ing */
 #define for_each_domain(cpu, __sd) \
 	for (__sd = rcu_dereference_check_sched_domain(cpu_rq(cpu)->sd); \
 			__sd; __sd = __sd->parent)
@@ -811,6 +812,7 @@ static inline struct cpumask *sched_group_mask(struct sched_group *sg)
  * group_first_cpu - Returns the first cpu in the cpumask of a sched_group.
  * @group: The group whose first cpu is to be returned.
  */
+/*! 2017. 8.26 study -ing */
 static inline unsigned int group_first_cpu(struct sched_group *group)
 {
 	return cpumask_first(sched_group_cpus(group));

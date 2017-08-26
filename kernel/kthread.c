@@ -149,11 +149,13 @@ void *kthread_data(struct task_struct *task)
  * inaccessible for any reason, %NULL is returned.  This function requires
  * that @task itself is safe to dereference.
  */
+/*! 2017. 8.26 study -ing */
 void *probe_kthread_data(struct task_struct *task)
 {
 	struct kthread *kthread = to_kthread(task);
 	void *data = NULL;
 
+	/*! __probe_kernel_read (maccess.c)   */
 	probe_kernel_read(&data, &kthread->data, sizeof(data));
 	return data;
 }

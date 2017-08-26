@@ -790,7 +790,7 @@ static void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 	sched_info_dequeued(rq, p);
 	p->sched_class->dequeue_task(rq, p, flags);
 }
-
+/*! 2017. 8.26 study -ing */
 void activate_task(struct rq *rq, struct task_struct *p, int flags)
 {
 	if (task_contributes_to_load(p))
@@ -798,7 +798,7 @@ void activate_task(struct rq *rq, struct task_struct *p, int flags)
 
 	enqueue_task(rq, p, flags);
 }
-
+/*! 2017. 8.26 study -ing */
 void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
 {
 	if (task_contributes_to_load(p))
@@ -1382,14 +1382,14 @@ int select_task_rq(struct task_struct *p, int cpu, int sd_flags, int wake_flags)
 
 	return cpu;
 }
-
+/*! 2017. 8.26 study -ing */
 static void update_avg(u64 *avg, u64 sample)
 {
 	s64 diff = sample - *avg;
 	*avg += diff >> 3;
 }
 #endif
-
+/*! 2017. 8.26 study -ing */
 static void
 ttwu_stat(struct task_struct *p, int cpu, int wake_flags)
 {
@@ -1429,7 +1429,7 @@ ttwu_stat(struct task_struct *p, int cpu, int wake_flags)
 
 #endif /* CONFIG_SCHEDSTATS */
 }
-
+/*! 2017. 8.26 study -ing */
 static void ttwu_activate(struct rq *rq, struct task_struct *p, int en_flags)
 {
 	activate_task(rq, p, en_flags);
@@ -1443,6 +1443,7 @@ static void ttwu_activate(struct rq *rq, struct task_struct *p, int en_flags)
 /*
  * Mark the task runnable and perform wakeup-preemption.
  */
+/*! 2017. 8.26 study -ing */
 static void
 ttwu_do_wakeup(struct rq *rq, struct task_struct *p, int wake_flags)
 {
@@ -1675,6 +1676,7 @@ out:
  * ensure that this_rq() is locked, @p is bound to this_rq() and not
  * the current task.
  */
+/*! 2017. 8.26 study -ing */
 static void try_to_wake_up_local(struct task_struct *p)
 {
 	struct rq *rq = task_rq(p);
@@ -1698,6 +1700,7 @@ static void try_to_wake_up_local(struct task_struct *p)
 		ttwu_activate(rq, p, ENQUEUE_WAKEUP);
 
 	ttwu_do_wakeup(rq, p, 0);
+	/*! Do nothing */
 	ttwu_stat(p, smp_processor_id(), 0);
 out:
 	raw_spin_unlock(&p->pi_lock);
@@ -2204,7 +2207,7 @@ static void finish_task_switch(struct rq *rq, struct task_struct *prev)
 }
 
 #ifdef CONFIG_SMP
-
+/*! 2017. 8.26 study -ing */
 /* assumes rq->lock is held */
 static inline void pre_schedule(struct rq *rq, struct task_struct *prev)
 {
@@ -2581,6 +2584,7 @@ EXPORT_SYMBOL(preempt_count_sub);
 /*
  * Print scheduling while atomic bug:
  */
+/*! 2017. 8.26 study -ing */
 static noinline void __schedule_bug(struct task_struct *prev)
 {
 	if (oops_in_progress)
@@ -2589,6 +2593,7 @@ static noinline void __schedule_bug(struct task_struct *prev)
 	printk(KERN_ERR "BUG: scheduling while atomic: %s/%d/0x%08x\n",
 		prev->comm, prev->pid, preempt_count());
 
+	/*! Do nothing */
 	debug_show_held_locks(prev);
 	print_modules();
 	if (irqs_disabled())
@@ -2600,6 +2605,7 @@ static noinline void __schedule_bug(struct task_struct *prev)
 /*
  * Various schedule()-time debugging checks and statistics:
  */
+/*! 2017. 8.26 study -ing */
 static inline void schedule_debug(struct task_struct *prev)
 {
 	/*
@@ -2609,10 +2615,11 @@ static inline void schedule_debug(struct task_struct *prev)
 	 */
 	if (unlikely(in_atomic_preempt_off() && prev->state != TASK_DEAD))
 		__schedule_bug(prev);
+	/*! Do nothing */
 	rcu_sleep_check();
 
 	profile_hit(SCHED_PROFILING, __builtin_return_address(0));
-
+	/*! Do nothing */
 	schedstat_inc(this_rq(), sched_count);
 }
 
@@ -2688,7 +2695,7 @@ pick_next_task(struct rq *rq)
  *          - return from syscall or exception to user-space
  *          - return from interrupt-handler to user-space
  */
-/*! 2016.10.15 study later */
+/*! 2017. 8.26 extra study start */
 static void __sched __schedule(void)
 {
 	struct task_struct *prev, *next;
@@ -2706,6 +2713,7 @@ need_resched:
 	schedule_debug(prev);
 
 	if (sched_feat(HRTICK))
+		/*! Do nothing */
 		hrtick_clear(rq);
 
 	/*
@@ -3169,6 +3177,7 @@ EXPORT_SYMBOL(task_nice);
  *
  * Return: 1 if the CPU is currently idle. 0 otherwise.
  */
+/*! 2017. 8.26 study -ing */
 int idle_cpu(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -3193,6 +3202,7 @@ int idle_cpu(int cpu)
  *
  * Return: The idle task for the cpu @cpu.
  */
+/*! 2017. 8.26 study -ing */
 struct task_struct *idle_task(int cpu)
 {
 	return cpu_rq(cpu)->idle;
@@ -4758,6 +4768,7 @@ static int migration_cpu_stop(void *data)
  * Ensures that the idle task is using init_mm right before its cpu goes
  * offline.
  */
+/*! 2017. 8.26 study -ing */
 void idle_task_exit(void)
 {
 	struct mm_struct *mm = current->active_mm;

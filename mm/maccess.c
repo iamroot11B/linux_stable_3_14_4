@@ -14,10 +14,11 @@
  * Safely read from address @src to the buffer at @dst.  If a kernel fault
  * happens, handle that and return -EFAULT.
  */
-
+/*! 2017. 8.26 study -ing */
 long __weak probe_kernel_read(void *dst, const void *src, size_t size)
     __attribute__((alias("__probe_kernel_read")));
 
+/*! 2017. 8.26 study -ing */
 long __probe_kernel_read(void *dst, const void *src, size_t size)
 {
 	long ret;

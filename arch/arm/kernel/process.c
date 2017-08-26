@@ -132,12 +132,13 @@ EXPORT_SYMBOL_GPL(arm_pm_restart);
  */
 
 void (*arm_pm_idle)(void);
-
+/*! 2017. 8.26 study -ing */
 static void default_idle(void)
 {
 	if (arm_pm_idle)
 		arm_pm_idle();
 	else
+		/*! cpu_v7_do_idle  */
 		cpu_do_idle();
 	local_irq_enable();
 }
@@ -146,7 +147,7 @@ void arch_cpu_idle_prepare(void)
 {
 	local_fiq_enable();
 }
-
+/*! 2017. 8.26 study -ing */
 void arch_cpu_idle_enter(void)
 {
 	ledtrig_cpu(CPU_LED_IDLE_START);
@@ -154,7 +155,7 @@ void arch_cpu_idle_enter(void)
 	wmb();
 #endif
 }
-
+/*! 2017. 8.26 study -ing */
 void arch_cpu_idle_exit(void)
 {
 	ledtrig_cpu(CPU_LED_IDLE_END);
@@ -171,6 +172,7 @@ void arch_cpu_idle_dead(void)
 /*
  * Called from the core idle loop.
  */
+/*! 2017. 8.26 study -ing */
 void arch_cpu_idle(void)
 {
 	if (cpuidle_idle_call())

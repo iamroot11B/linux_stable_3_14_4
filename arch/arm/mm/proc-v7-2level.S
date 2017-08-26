@@ -37,6 +37,7 @@
  *	It is assumed that:
  *	- we are not using split page tables
  */
+/*! 2017. 8.26 study -ing */
 ENTRY(cpu_v7_switch_mm)
 #ifdef CONFIG_MMU
 	mov	r2, #0

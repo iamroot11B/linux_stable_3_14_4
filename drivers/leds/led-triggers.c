@@ -238,7 +238,7 @@ void led_trigger_unregister(struct led_trigger *trig)
 EXPORT_SYMBOL_GPL(led_trigger_unregister);
 
 /* Simple LED Tigger Interface */
-
+/*! 2017. 8.26 study -ing */
 void led_trigger_event(struct led_trigger *trig,
 			enum led_brightness brightness)
 {

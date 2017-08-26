@@ -1012,6 +1012,7 @@ EXPORT_SYMBOL_GPL(rcu_force_quiescent_state);
  * Because preemptible RCU does not exist, we never have to check for
  * CPUs being in quiescent states.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_preempt_note_context_switch(int cpu)
 {
 }
@@ -1606,6 +1607,7 @@ int rcu_needs_cpu(int cpu, unsigned long *delta_jiffies)
  * Because we do not have RCU_FAST_NO_HZ, don't bother cleaning up
  * after it.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_cleanup_after_idle(int cpu)
 {
 }
@@ -1614,6 +1616,7 @@ static void rcu_cleanup_after_idle(int cpu)
  * Do the idle-entry grace-period work, which, because CONFIG_RCU_FAST_NO_HZ=n,
  * is nothing.
  */
+/*! Do nothing */
 static void rcu_prepare_for_idle(int cpu)
 {
 }
@@ -2441,7 +2444,7 @@ static bool rcu_nocb_need_deferred_wakeup(struct rcu_data *rdp)
 {
 	return false;
 }
-
+/*! 2017. 8.26 study -ing */
 static void do_nocb_deferred_wakeup(struct rcu_data *rdp)
 {
 }
@@ -2862,11 +2865,11 @@ static void rcu_sysidle_init_percpu_data(struct rcu_dynticks *rdtp)
 }
 
 #else /* #ifdef CONFIG_NO_HZ_FULL_SYSIDLE */
-
+/*! 2017. 8.26 study -ing */
 static void rcu_sysidle_enter(struct rcu_dynticks *rdtp, int irq)
 {
 }
-
+/*! 2017. 8.26 study -ing */
 static void rcu_sysidle_exit(struct rcu_dynticks *rdtp, int irq)
 {
 }

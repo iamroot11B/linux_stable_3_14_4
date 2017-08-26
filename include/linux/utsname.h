@@ -72,7 +72,7 @@ static inline struct new_utsname *utsname(void)
 {
 	return &current->nsproxy->uts_ns->name;
 }
-
+/*! 2017. 8.26 study -ing */
 static inline struct new_utsname *init_utsname(void)
 {
 	return &init_uts_ns.name;

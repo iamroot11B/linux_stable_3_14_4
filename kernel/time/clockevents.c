@@ -285,7 +285,7 @@ int clockevents_program_event(struct clock_event_device *dev, ktime_t expires,
 	delta = max(delta, (int64_t) dev->min_delta_ns);
 
 	clc = ((unsigned long long) delta * dev->mult) >> dev->shift;
-	
+
 	rc = dev->set_next_event((unsigned long) clc, dev);
 
 	return (rc && force) ? clockevents_program_min_delta(dev) : rc;
@@ -564,6 +564,7 @@ void clockevents_resume(void)
 /**
  * clockevents_notify - notification about relevant events
  */
+/*! 2017. 8.26 study -ing */
 void clockevents_notify(unsigned long reason, void *arg)
 {
 	struct clock_event_device *dev, *tmp;
@@ -581,6 +582,7 @@ void clockevents_notify(unsigned long reason, void *arg)
 
 	case CLOCK_EVT_NOTIFY_BROADCAST_ENTER:
 	case CLOCK_EVT_NOTIFY_BROADCAST_EXIT:
+		/*! Do nothing */
 		tick_broadcast_oneshot_control(reason);
 		break;
 

@@ -832,6 +832,11 @@ asmlinkage void __init start_kernel(void)
 
 	/* Do the rest non-__init'ed, we're now alive */
 	rest_init();
+
+	/*!
+	 * 2017. 8.26
+	 * I am Root 11B Study Done.
+	 */
 }
 
 /* Call all constructor functions linked into the kernel. */

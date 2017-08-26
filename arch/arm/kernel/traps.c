@@ -58,7 +58,7 @@ __setup("user_debug=", user_debug_setup);
 #endif
 
 static void dump_mem(const char *, const char *, unsigned long, unsigned long);
-
+/*! 2017. 8.26 study -ing */
 void dump_backtrace_entry(unsigned long where, unsigned long from, unsigned long frame)
 {
 #ifdef CONFIG_KALLSYMS
@@ -90,6 +90,7 @@ static int verify_stack(unsigned long sp)
 /*
  * Dump out the contents of some memory nicely...
  */
+/*! 2017. 8.26 study -ing */
 static void dump_mem(const char *lvl, const char *str, unsigned long bottom,
 		     unsigned long top)
 {
@@ -168,6 +169,7 @@ static void dump_instr(const char *lvl, struct pt_regs *regs)
 }
 
 #ifdef CONFIG_ARM_UNWIND
+/*! 2017. 8.26 study -ing */
 static inline void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 {
 	unwind_backtrace(regs, tsk);
@@ -208,7 +210,7 @@ static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 		c_backtrace(fp, mode);
 }
 #endif
-
+/*! 2017. 8.26 study -ing */
 void show_stack(struct task_struct *tsk, unsigned long *sp)
 {
 	dump_backtrace(NULL, tsk);

@@ -256,6 +256,7 @@ int cpumask_any_but(const struct cpumask *mask, unsigned int cpu);
  *
  * After the loop, cpu is >= nr_cpu_ids.
  */
+/*! 2017. 8.26 study -ing */
 #define for_each_cpu_and(cpu, mask, and)				\
 	for ((cpu) = -1;						\
 		(cpu) = cpumask_next_and((cpu), (mask), (and)),		\
@@ -318,6 +319,7 @@ static inline void cpumask_clear_cpu(int cpu, struct cpumask *dstp)
  *
  * test_and_set_bit wrapper for cpumasks.
  */
+/*! 2017. 8.26 study -ing */
 static inline int cpumask_test_and_set_cpu(int cpu, struct cpumask *cpumask)
 {
 	return test_and_set_bit(cpumask_check(cpu), cpumask_bits(cpumask));
@@ -332,6 +334,7 @@ static inline int cpumask_test_and_set_cpu(int cpu, struct cpumask *cpumask)
  *
  * test_and_clear_bit wrapper for cpumasks.
  */
+/*! 2017. 8.26 study -ing */
 static inline int cpumask_test_and_clear_cpu(int cpu, struct cpumask *cpumask)
 {
 	return test_and_clear_bit(cpumask_check(cpu), cpumask_bits(cpumask));

@@ -106,6 +106,7 @@ static inline u64 get_jiffies_64(void)
 /*! 2017. 3.18 study -ing */
 #define time_before(a,b)	time_after(b,a)
 
+/*! 2017. 8.26 study -ing */
 #define time_after_eq(a,b)	\
 	(typecheck(unsigned long, a) && \
 	 typecheck(unsigned long, b) && \

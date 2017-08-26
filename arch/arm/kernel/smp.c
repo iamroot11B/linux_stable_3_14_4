@@ -265,6 +265,7 @@ void __cpu_die(unsigned int cpu)
  * of the other hotplug-cpu capable cores, so presumably coming
  * out of idle fixes this.
  */
+/*! 2017. 8.26 study -ing */
 void __ref cpu_die(void)
 {
 	unsigned int cpu = smp_processor_id();
@@ -346,6 +347,7 @@ static void smp_store_cpu_info(unsigned int cpuid)
  * This is the secondary CPU boot entry.  We're using this CPUs
  * idle thread stack, but a set of temporary page tables.
  */
+/*! 2017. 8.26 study -ing */
 asmlinkage void secondary_start_kernel(void)
 {
 	struct mm_struct *mm = &init_mm;
@@ -357,6 +359,7 @@ asmlinkage void secondary_start_kernel(void)
 	 */
 	cpu_switch_mm(mm->pgd, mm);
 	local_flush_bp_all();
+	/*! Do nothing */
 	enter_lazy_tlb(mm, current);
 	local_flush_tlb_all();
 

@@ -168,7 +168,7 @@ void cpu_hotplug_enable(void)
 
 /* Need to know about CPUs going up/down? */
 /*! From cpu_notifier()
- * nb = page_alloc_cpu_notify_nb  
+ * nb = page_alloc_cpu_notify_nb
  */
 /*! 2016.10.15 study -ing */
 int __ref register_cpu_notifier(struct notifier_block *nb)
@@ -643,6 +643,7 @@ core_initcall(cpu_hotplug_pm_sync_init);
  * It must be called by the arch code on the new cpu, before the new cpu
  * enables interrupts and before the "boot" cpu returns from __cpu_up().
  */
+/*! 2017. 8.26 study -ing */
 void notify_cpu_starting(unsigned int cpu)
 {
 	unsigned long val = CPU_STARTING;
@@ -674,16 +675,16 @@ void notify_cpu_starting(unsigned int cpu)
 /*! cpu_bit_bitmap[33][1]
  *  const unsigned long cpu_bit_bitmap[BITS_PER_LONG+1][BITS_TO_LONGS(NR_CPUS)] = {
  *	  MASK_DECLARE_8(0) ~ MASK_DECLARE_8(24) 가 아래와 같이 확장된다.
- *	  [1][0] = (1UL << 0), 
- *	  [2][0] = (1UL << 1), 
- *	  [3][0] = (1UL << 2), 
- *	  [4][0] = (1UL << 3), 
- *	  [5][0] = (1UL << 4), 
- *	  [6][0] = (1UL << 5), 
- *	  [7][0] = (1UL << 6), 
+ *	  [1][0] = (1UL << 0),
+ *	  [2][0] = (1UL << 1),
+ *	  [3][0] = (1UL << 2),
+ *	  [4][0] = (1UL << 3),
+ *	  [5][0] = (1UL << 4),
+ *	  [6][0] = (1UL << 5),
+ *	  [7][0] = (1UL << 6),
  *	  [8][0] = (1UL << 7),
  *	  ...
- *	  [32][0] = (1UL << 31), 
+ *	  [32][0] = (1UL << 31),
  */
 
 const unsigned long cpu_bit_bitmap[BITS_PER_LONG+1][BITS_TO_LONGS(NR_CPUS)] = {
@@ -759,7 +760,7 @@ void set_cpu_present(unsigned int cpu, bool present)
 	else
 		cpumask_clear_cpu(cpu, to_cpumask(cpu_present_bits));
 }
-
+/*! 2017. 8.26 study -ing */
 void set_cpu_online(unsigned int cpu, bool online)
 {
 	if (online)

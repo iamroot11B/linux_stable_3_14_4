@@ -189,6 +189,7 @@ extern void copy_to_user_page(struct vm_area_struct *, struct page *,
 	    : : "r" (0));
 
 /* Invalidate I-cache inner shareable */
+/*! 2017. 8.26 study -ing */
 #define __flush_icache_all_v7_smp()					\
 	asm("mcr	p15, 0, %0, c7, c1, 0"				\
 	    : : "r" (0));
@@ -202,13 +203,14 @@ extern void copy_to_user_page(struct vm_area_struct *, struct page *,
 	defined(CONFIG_SMP_ON_UP)
 #define __flush_icache_preferred	__cpuc_flush_icache_all
 #elif __LINUX_ARM_ARCH__ >= 7 && defined(CONFIG_SMP)
+/*! 2017. 8.26 study -ing */
 #define __flush_icache_preferred	__flush_icache_all_v7_smp
 #elif __LINUX_ARM_ARCH__ == 6 && defined(CONFIG_ARM_ERRATA_411920)
 #define __flush_icache_preferred	__cpuc_flush_icache_all
 #else
 #define __flush_icache_preferred	__flush_icache_all_generic
 #endif
-
+/*! 2017. 8.26 study -ing */
 static inline void __flush_icache_all(void)
 {
 	__flush_icache_preferred();
@@ -218,6 +220,7 @@ static inline void __flush_icache_all(void)
 /*
  * Flush caches up to Level of Unification Inner Shareable
  */
+/*! 2017. 8.26 study -ing */
 #define flush_cache_louis()		__cpuc_flush_kern_louis()
 /*! 2016-04-02 study -ing */
 #define flush_cache_all()		__cpuc_flush_kern_all()

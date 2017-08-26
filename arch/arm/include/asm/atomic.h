@@ -256,6 +256,7 @@ static inline void atomic64_set(atomic64_t *v, long long i)
 	);
 }
 #else
+/*! 2017. 8.26 study -ing */
 static inline long long atomic64_read(const atomic64_t *v)
 {
 	long long result;
@@ -392,7 +393,7 @@ static inline long long atomic64_cmpxchg(atomic64_t *ptr, long long old,
 
 	return oldval;
 }
-
+/*! 2017. 8.26 study -ing */
 static inline long long atomic64_xchg(atomic64_t *ptr, long long new)
 {
 	long long result;

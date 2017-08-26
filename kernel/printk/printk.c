@@ -2875,6 +2875,7 @@ void __init dump_stack_set_arch_desc(const char *fmt, ...)
  * Arch-specific dump_stack() implementations can use this function to
  * print out the same debug information as the generic dump_stack().
  */
+/*! 2017. 8.26 study -ing */
 void dump_stack_print_info(const char *log_lvl)
 {
 	printk("%sCPU: %d PID: %d Comm: %.20s %s %s %.*s\n",

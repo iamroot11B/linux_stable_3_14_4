@@ -303,7 +303,7 @@ static void profile_discard_flip_buffers(void)
 	}
 	mutex_unlock(&profile_flip_mutex);
 }
-
+/*! 2017. 8.26 study -ing */
 static void do_profile_hits(int type, void *__pc, unsigned int nr_hits)
 {
 	unsigned long primary, secondary, flags, pc = (unsigned long)__pc;
@@ -423,7 +423,7 @@ static void do_profile_hits(int type, void *__pc, unsigned int nr_hits)
 	atomic_add(nr_hits, &prof_buffer[min(pc, prof_len - 1)]);
 }
 #endif /* !CONFIG_SMP */
-
+/*! 2017. 8.26 study -ing */
 void profile_hits(int type, void *__pc, unsigned int nr_hits)
 {
 	if (prof_on != type || !prof_buffer)

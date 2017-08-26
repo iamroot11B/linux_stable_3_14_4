@@ -231,6 +231,7 @@ static const struct tnt tnts[] = {
  *
  *	The string is overwritten by the next call to print_tainted().
  */
+/*! 2017. 8.26 study -ing */
 const char *print_tainted(void)
 {
 	static char buf[ARRAY_SIZE(tnts) + sizeof("Tainted: ")];

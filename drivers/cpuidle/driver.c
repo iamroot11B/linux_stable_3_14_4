@@ -30,6 +30,7 @@ static DEFINE_PER_CPU(struct cpuidle_driver *, cpuidle_drivers);
  * Returns a pointer to struct cpuidle_driver or NULL if no driver has been
  * registered for @cpu.
  */
+/*! 2017. 8.26 study -ing */
 static struct cpuidle_driver *__cpuidle_get_cpu_driver(int cpu)
 {
 	return per_cpu(cpuidle_drivers, cpu);
@@ -341,6 +342,7 @@ EXPORT_SYMBOL_GPL(cpuidle_get_driver);
  * Returns a struct cpuidle_driver pointer, or NULL if no driver is registered
  * for the CPU associated with @dev.
  */
+/*! 2017. 8.26 study -ing */
 struct cpuidle_driver *cpuidle_get_cpu_driver(struct cpuidle_device *dev)
 {
 	if (!dev)

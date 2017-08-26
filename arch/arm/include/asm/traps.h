@@ -28,12 +28,13 @@ static inline int __in_irqentry_text(unsigned long ptr)
 	       ptr < (unsigned long)&__irqentry_text_end;
 }
 #else
+/*! 2017. 8.26 study -ing */
 static inline int __in_irqentry_text(unsigned long ptr)
 {
 	return 0;
 }
 #endif
-
+/*! 2017. 8.26 study -ing */
 static inline int in_exception_text(unsigned long ptr)
 {
 	extern char __exception_text_start[];

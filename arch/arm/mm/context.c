@@ -85,6 +85,7 @@ void a15_erratum_get_cpumask(int this_cpu, struct mm_struct *mm,
  */
 #define cpu_set_reserved_ttbr0()
 #else
+/*! 2017. 8.26 study -ing */
 static void cpu_set_reserved_ttbr0(void)
 {
 	u32 ttb;
@@ -135,7 +136,7 @@ static int __init contextidr_notifier_init(void)
 }
 arch_initcall(contextidr_notifier_init);
 #endif
-
+/*! 2017. 8.26 study -ing */
 static void flush_context(unsigned int cpu)
 {
 	int i;
@@ -168,7 +169,7 @@ static void flush_context(unsigned int cpu)
 	if (icache_is_vivt_asid_tagged())
 		__flush_icache_all();
 }
-
+/*! 2017. 8.26 study -ing */
 static int is_reserved_asid(u64 asid)
 {
 	int cpu;
@@ -177,7 +178,7 @@ static int is_reserved_asid(u64 asid)
 			return 1;
 	return 0;
 }
-
+/*! 2017. 8.26 study -ing */
 static u64 new_context(struct mm_struct *mm, unsigned int cpu)
 {
 	static u32 cur_idx = 1;
@@ -216,7 +217,7 @@ static u64 new_context(struct mm_struct *mm, unsigned int cpu)
 
 	return asid;
 }
-
+/*! 2017. 8.26 study -ing */
 void check_and_switch_context(struct mm_struct *mm, struct task_struct *tsk)
 {
 	unsigned long flags;

@@ -108,7 +108,7 @@ ENTRY(v7_flush_dcache_louis)
 	ALT_UP(moveq	pc, lr)			@ LoUU is zero, so nothing to do
 	ldreq	r1, =0x410fc090                 @ ID of ARM Cortex A9 r0p?
 	biceq	r2, r2, #0x0000000f             @ clear minor revision number
-		/*! 직접 레지스터 셋팅 
+		/*! 직접 레지스터 셋팅
 		 * clidr[7<<21] = 001
 		 */
 	teqeq	r2, r1                          @ test for errata affected core and if so...
@@ -140,7 +140,7 @@ ENTRY(v7_flush_dcache_all)
 	/*! r0=clidr */
 	mrc	p15, 1, r0, c0, c0, 1		@ read clidr
 	/*! r3 = loc(clidr[26~24]) */
-	ands	r3, r0, #0x7000000		@ extract loc from clidr	
+	ands	r3, r0, #0x7000000		@ extract loc from clidr
 	mov	r3, r3, lsr #23			@ left align loc bit field
 	beq	finished			@ if loc is 0, then no need to clean
 	mov	r10, #0				@ start clean at cache level 0
@@ -160,7 +160,7 @@ flush_levels:
 	save_and_disable_irqs_notrace r9	@ make cssr&csidr read atomic
 #endif
 	mcr	p15, 2, r10, c0, c0, 0		@ select current cache level in cssr
-		/*! csselr = 0 
+		/*! csselr = 0
 		 * Cache Size Selection Register
 		 */
 	isb					@ isb to sych the new cssr&csidr
@@ -224,7 +224,7 @@ ENDPROC(v7_flush_dcache_all)
  *  unification in a single instruction.
  *
  */
-/*! 2016.10.29 study -ing */	
+/*! 2016.10.29 study -ing */
 ENTRY(v7_flush_kern_cache_all)
  ARM(	stmfd	sp!, {r4-r5, r7, r9-r11, lr}	)
  THUMB(	stmfd	sp!, {r4-r7, r9-r11, lr}	)
@@ -244,6 +244,7 @@ ENDPROC(v7_flush_kern_cache_all)
  *     Flush the data cache up to Level of Unification Inner Shareable.
  *     Invalidate the I-cache to the point of unification.
  */
+/*! 2017. 8.26 study -ing */
 ENTRY(v7_flush_kern_cache_louis)
  ARM(	stmfd	sp!, {r4-r5, r7, r9-r11, lr}	)
  THUMB(	stmfd	sp!, {r4-r7, r9-r11, lr}	)
@@ -329,7 +330,7 @@ ENTRY(v7_coherent_user_range)
 	/*! r3 = r2 - 1 (0x3f)*/
 	sub	r3, r2, #1
 	/*!
-	 * r1 = vectors + PAGE_SIZE * 2 
+	 * r1 = vectors + PAGE_SIZE * 2
 	 * r0 = 플러쉬할 주소
 	 * r12 =  r0를 캐쉬라인사이즈 얼라인 */
 	bic	r12, r0, r3
@@ -340,7 +341,7 @@ ENTRY(v7_coherent_user_range)
 /*!
  * USER() : ex_table에 예외처리 주소 등록
  * 해당 동작을 위해 __ex_table은 exception이 발생하는 주소와
- * exception 처리후 돌아갈 PC를 저장하고 나중에 fixup_exception()에 
+ * exception 처리후 돌아갈 PC를 저장하고 나중에 fixup_exception()에
  * 의해 리턴시 PC를 변경하는 용도로 사용된다.
  * 참고: http://www.iamroot.org/xe/Kernel_10_ARM/187023
  */

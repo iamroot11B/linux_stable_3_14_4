@@ -472,6 +472,7 @@ struct rcu_state {
 extern struct list_head rcu_struct_flavors;
 
 /* Sequence through rcu_state structures for each RCU flavor. */
+/*! 2017. 8.26 study -ing */
 #define for_each_rcu_flavor(rsp) \
 	list_for_each_entry((rsp), &rcu_struct_flavors, flavors)
 

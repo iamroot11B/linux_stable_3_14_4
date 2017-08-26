@@ -184,6 +184,7 @@ extern int tick_receive_broadcast(void);
 #if defined(CONFIG_GENERIC_CLOCKEVENTS_BROADCAST) && defined(CONFIG_TICK_ONESHOT)
 extern int tick_check_broadcast_expired(void);
 #else
+/*! 2017. 8.26 study -ing */
 static inline int tick_check_broadcast_expired(void) { return 0; }
 #endif
 

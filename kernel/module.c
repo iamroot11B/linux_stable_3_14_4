@@ -1004,7 +1004,7 @@ static inline int module_unload_init(struct module *mod)
 	return 0;
 }
 #endif /* CONFIG_MODULE_UNLOAD */
-
+/*! 2017. 8.26 study -ing */
 static size_t module_flags_taint(struct module *mod, char *buf)
 {
 	size_t l = 0;
@@ -1137,7 +1137,7 @@ static unsigned long maybe_relocated(unsigned long crc,
 static int check_version(Elf_Shdr *sechdrs,
 			 unsigned int versindex,
 			 const char *symname,
-			 struct module *mod, 
+			 struct module *mod,
 			 const unsigned long *crc,
 			 const struct module *crc_owner)
 {
@@ -1206,7 +1206,7 @@ static inline int same_magic(const char *amagic, const char *bmagic,
 static inline int check_version(Elf_Shdr *sechdrs,
 				unsigned int versindex,
 				const char *symname,
-				struct module *mod, 
+				struct module *mod,
 				const unsigned long *crc,
 				const struct module *crc_owner)
 {
@@ -3177,7 +3177,7 @@ out:
 
 static int unknown_module_param_cb(char *param, char *val, const char *modname)
 {
-	/* Check for magic 'dyndbg' arg */ 
+	/* Check for magic 'dyndbg' arg */
 	int ret = ddebug_dyndbg_module_param_cb(param, val, modname);
 	if (ret != 0)
 		pr_warn("%s: unknown parameter '%s' ignored\n", modname, param);
@@ -3590,7 +3590,7 @@ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
 	return 0;
 }
 #endif /* CONFIG_KALLSYMS */
-
+/*! 2017. 8.26 study -ing */
 static char *module_flags(struct module *mod, char *buf)
 {
 	int bx = 0;
@@ -3802,6 +3802,7 @@ struct module *__module_text_address(unsigned long addr)
 EXPORT_SYMBOL_GPL(__module_text_address);
 
 /* Don't grab lock, we're oopsing. */
+/*! 2017. 8.26 study -ing */
 void print_modules(void)
 {
 	struct module *mod;

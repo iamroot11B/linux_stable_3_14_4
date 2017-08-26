@@ -143,7 +143,7 @@ do { \
 #undef preempt_enable_no_resched_notrace
 #undef preempt_check_resched
 #endif
-
+/*! 2017. 8.26 study -ing */
 #define preempt_set_need_resched() \
 do { \
 	set_preempt_need_resched(); \

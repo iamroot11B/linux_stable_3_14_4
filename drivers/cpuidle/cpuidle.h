@@ -41,12 +41,13 @@ int cpuidle_enter_state_coupled(struct cpuidle_device *dev,
 int cpuidle_coupled_register_device(struct cpuidle_device *dev);
 void cpuidle_coupled_unregister_device(struct cpuidle_device *dev);
 #else
+/*! 2017. 8.26 study -ing */
 static inline bool cpuidle_state_is_coupled(struct cpuidle_device *dev,
 		struct cpuidle_driver *drv, int state)
 {
 	return false;
 }
-
+/*! 2017. 8.26 study -ing */
 static inline int cpuidle_enter_state_coupled(struct cpuidle_device *dev,
 		struct cpuidle_driver *drv, int next_state)
 {

@@ -38,7 +38,7 @@ static int __init cpu_idle_nopoll_setup(char *__unused)
 }
 __setup("hlt", cpu_idle_nopoll_setup);
 #endif
-
+/*! 2017. 8.26 study -ing */
 static inline int cpu_idle_poll(void)
 {
 	rcu_idle_enter();
@@ -77,6 +77,7 @@ static void cpu_idle_loop(void)
 			rmb();
 
 			/*! 2017. 8.12 study end */
+            /*! 2017. 8.26 study start */
 			if (cpu_is_offline(smp_processor_id()))
 				arch_cpu_idle_dead();
 
@@ -96,15 +97,18 @@ static void cpu_idle_loop(void)
 				cpu_idle_poll();
 			} else {
 				if (!current_clr_polling_and_test()) {
+					/*! Do nothing */
 					stop_critical_timings();
 					rcu_idle_enter();
 					arch_cpu_idle();
 					WARN_ON_ONCE(irqs_disabled());
 					rcu_idle_exit();
+					/*! Do nothing */
 					start_critical_timings();
 				} else {
 					local_irq_enable();
 				}
+				/*! Do nothing */
 				__current_set_polling();
 			}
 			arch_cpu_idle_exit();
@@ -119,6 +123,7 @@ static void cpu_idle_loop(void)
 		 * not have had an IPI to fold the state for us.
 		 */
 		preempt_set_need_resched();
+		/*! Do nothing */
 		tick_nohz_idle_exit();
 		schedule_preempt_disabled();
 	}

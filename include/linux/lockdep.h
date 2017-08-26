@@ -469,6 +469,7 @@ do {								\
 #ifdef CONFIG_TRACE_IRQFLAGS
 extern void print_irqtrace_events(struct task_struct *curr);
 #else
+/*! 2017. 8.26 study -ing */
 static inline void print_irqtrace_events(struct task_struct *curr)
 {
 }

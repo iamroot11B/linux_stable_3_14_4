@@ -112,7 +112,8 @@ extern void cpu_resume(void);
 #include <asm/memory.h>
 
 #ifdef CONFIG_MMU
-
+/*! 2017. 8.26 study -ing */
+/*! cpu_do_switch_mm -> cpu_v7_switch_mm(proc-v7-2level.S file) */
 #define cpu_switch_mm(pgd,mm) cpu_do_switch_mm(virt_to_phys(pgd),mm)
 
 #ifdef CONFIG_ARM_LPAE

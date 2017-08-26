@@ -190,6 +190,7 @@ static int rcu_gp_in_progress(struct rcu_state *rsp)
  * one since the start of the grace period, this just sets a flag.
  * The caller must have disabled preemption.
  */
+/*! 2017. 8.26 study -ing */
 void rcu_sched_qs(int cpu)
 {
 	struct rcu_data *rdp = &per_cpu(rcu_sched_data, cpu);
@@ -214,10 +215,12 @@ void rcu_bh_qs(int cpu)
  * and requires special handling for preemptible RCU.
  * The caller must have disabled preemption.
  */
+/*! 2017. 8.26 study -ing */
 void rcu_note_context_switch(int cpu)
 {
 	trace_rcu_utilization(TPS("Start context switch"));
 	rcu_sched_qs(cpu);
+	/*! Do nothing */
 	rcu_preempt_note_context_switch(cpu);
 	trace_rcu_utilization(TPS("End context switch"));
 }
@@ -368,6 +371,7 @@ static struct rcu_node *rcu_get_root(struct rcu_state *rsp)
  * we really have entered idle, and must do the appropriate accounting.
  * The caller must have disabled interrupts.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_eqs_enter_common(struct rcu_dynticks *rdtp, long long oldval,
 				bool user)
 {
@@ -387,8 +391,10 @@ static void rcu_eqs_enter_common(struct rcu_dynticks *rdtp, long long oldval,
 	}
 	for_each_rcu_flavor(rsp) {
 		rdp = this_cpu_ptr(rsp->rda);
+		/*! Do nothing */
 		do_nocb_deferred_wakeup(rdp);
 	}
+	/*! Do nothing */
 	rcu_prepare_for_idle(smp_processor_id());
 	/* CPUs seeing atomic_inc() must see prior RCU read-side crit sects */
 	smp_mb__before_atomic_inc();  /* See above. */
@@ -400,6 +406,7 @@ static void rcu_eqs_enter_common(struct rcu_dynticks *rdtp, long long oldval,
 	 * It is illegal to enter an extended quiescent state while
 	 * in an RCU read-side critical section.
 	 */
+	/*! Do nothing */
 	rcu_lockdep_assert(!lock_is_held(&rcu_lock_map),
 			   "Illegal idle entry in RCU read-side critical section.");
 	rcu_lockdep_assert(!lock_is_held(&rcu_bh_lock_map),
@@ -412,6 +419,7 @@ static void rcu_eqs_enter_common(struct rcu_dynticks *rdtp, long long oldval,
  * Enter an RCU extended quiescent state, which can be either the
  * idle loop or adaptive-tickless usermode execution.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_eqs_enter(bool user)
 {
 	long long oldval;
@@ -440,12 +448,14 @@ static void rcu_eqs_enter(bool user)
  * the possibility of usermode upcalls having messed up our count
  * of interrupt nesting level during the prior busy period.
  */
+/*! 2017. 8.26 study -ing */
 void rcu_idle_enter(void)
 {
 	unsigned long flags;
 
 	local_irq_save(flags);
 	rcu_eqs_enter(false);
+	/*! Do nothing */
 	rcu_sysidle_enter(this_cpu_ptr(&rcu_dynticks), 0);
 	local_irq_restore(flags);
 }
@@ -508,6 +518,7 @@ void rcu_irq_exit(void)
  * we really have exited idle, and must do the appropriate accounting.
  * The caller must have disabled interrupts.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_eqs_exit_common(struct rcu_dynticks *rdtp, long long oldval,
 			       int user)
 {
@@ -516,6 +527,7 @@ static void rcu_eqs_exit_common(struct rcu_dynticks *rdtp, long long oldval,
 	/* CPUs seeing atomic_inc() must see later RCU read-side crit sects */
 	smp_mb__after_atomic_inc();  /* See above. */
 	WARN_ON_ONCE(!(atomic_read(&rdtp->dynticks) & 0x1));
+	/*! Do nothing */
 	rcu_cleanup_after_idle(smp_processor_id());
 	trace_rcu_dyntick(TPS("End"), oldval, rdtp->dynticks_nesting);
 	if (!user && !is_idle_task(current)) {
@@ -535,6 +547,7 @@ static void rcu_eqs_exit_common(struct rcu_dynticks *rdtp, long long oldval,
  * Exit an RCU extended quiescent state, which can be either the
  * idle loop or adaptive-tickless usermode execution.
  */
+/*! 2017. 8.26 study -ing */
 static void rcu_eqs_exit(bool user)
 {
 	struct rcu_dynticks *rdtp;
@@ -562,12 +575,14 @@ static void rcu_eqs_exit(bool user)
  * of interrupt nesting level during the busy period that is just
  * now starting.
  */
+/*! 2017. 8.26 study -ing */
 void rcu_idle_exit(void)
 {
 	unsigned long flags;
 
 	local_irq_save(flags);
 	rcu_eqs_exit(false);
+	/*! Do nothing */
 	rcu_sysidle_exit(this_cpu_ptr(&rcu_dynticks), 0);
 	local_irq_restore(flags);
 }

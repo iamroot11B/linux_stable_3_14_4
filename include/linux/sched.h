@@ -2119,6 +2119,7 @@ extern struct task_struct *idle_task(int cpu);
  *
  * Return: 1 if @p is an idle task. 0 otherwise.
  */
+/*! 2017. 8.26 study -ing */
 static inline bool is_idle_task(const struct task_struct *p)
 {
 	return p->pid == 0;
@@ -2793,6 +2794,7 @@ static inline bool __must_check current_set_polling_and_test(void)
 {
 	return unlikely(tif_need_resched());
 }
+/*! 2017. 8.26 study -ing */
 static inline bool __must_check current_clr_polling_and_test(void)
 {
 	return unlikely(tif_need_resched());

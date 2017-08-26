@@ -842,6 +842,7 @@ static void wake_up_worker(struct worker_pool *pool)
  * CONTEXT:
  * spin_lock_irq(rq->lock)
  */
+/*! 2017. 8.26 study -ing */
 void wq_worker_waking_up(struct task_struct *task, int cpu)
 {
 	struct worker *worker = kthread_data(task);
@@ -867,6 +868,7 @@ void wq_worker_waking_up(struct task_struct *task, int cpu)
  * Return:
  * Worker task on @cpu to wake up, %NULL if none.
  */
+/*! 2017. 8.26 study -ing */
 struct task_struct *wq_worker_sleeping(struct task_struct *task, int cpu)
 {
 	struct worker *worker = kthread_data(task), *to_wakeup = NULL;
@@ -4621,6 +4623,7 @@ void set_worker_desc(const char *fmt, ...)
  * task_struct itself is accessible.  While safe, this function isn't
  * synchronized and may print out mixups or garbages of limited length.
  */
+/*! 2017. 8.26 study -ing */
 void print_worker_info(const char *log_lvl, struct task_struct *task)
 {
 	work_func_t *fn = NULL;
@@ -4644,6 +4647,7 @@ void print_worker_info(const char *log_lvl, struct task_struct *task)
 	 * Carefully copy the associated workqueue's workfn and name.  Keep
 	 * the original last '\0' in case the original contains garbage.
 	 */
+	/*! __probe_kernel_read (maccess.c)   */
 	probe_kernel_read(&fn, &worker->current_func, sizeof(fn));
 	probe_kernel_read(&pwq, &worker->current_pwq, sizeof(pwq));
 	probe_kernel_read(&wq, &pwq->wq, sizeof(wq));

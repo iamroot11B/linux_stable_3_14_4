@@ -404,7 +404,7 @@ int unwind_frame(struct stackframe *frame)
 
 	return URC_OK;
 }
-
+/*! 2017. 8.26 study -ing */
 void unwind_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 {
 	struct stackframe frame;

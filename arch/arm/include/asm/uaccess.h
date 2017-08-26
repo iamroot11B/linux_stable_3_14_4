@@ -68,10 +68,11 @@ extern int __put_user_bad(void);
 #define USER_DS		TASK_SIZE
 /*! 2017. 8.12 study -ing */
 #define get_fs()	(current_thread_info()->addr_limit)
-
+/*! 2017. 8.26 study -ing */
 static inline void set_fs(mm_segment_t fs)
 {
 	current_thread_info()->addr_limit = fs;
+	/*! Do nothing */
 	modify_domain(DOMAIN_KERNEL, fs ? DOMAIN_CLIENT : DOMAIN_MANAGER);
 }
 
@@ -458,6 +459,7 @@ static inline unsigned long __must_check copy_to_user(void __user *to, const voi
 }
 
 #define __copy_to_user_inatomic __copy_to_user
+/*! 2017. 8.26 study -ing */
 #define __copy_from_user_inatomic __copy_from_user
 
 static inline unsigned long __must_check clear_user(void __user *to, unsigned long n)

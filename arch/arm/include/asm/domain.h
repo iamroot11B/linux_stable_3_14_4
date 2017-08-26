@@ -79,6 +79,7 @@ static inline void set_domain(unsigned val)
 
 #else
 static inline void set_domain(unsigned val) { }
+/*! 2017. 8.26 study -ing */
 static inline void modify_domain(unsigned dom, unsigned type)	{ }
 #endif
 

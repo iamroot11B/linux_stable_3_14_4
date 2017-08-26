@@ -167,8 +167,8 @@
 #endif
 
 /*!
- *                            v7wbi_tlb_flags_smp   v7wbi_tlb_flags_up		
- * -------------------------------------------------------------------------                              
+ *                            v7wbi_tlb_flags_smp   v7wbi_tlb_flags_up
+ * -------------------------------------------------------------------------
  * TLB_WB           (1 << 31)           O               O
  * TLB_BARRIER      (1 << 28)           O               O
  * TLB_V7_UIS_PAGE  (1 << 20)           O               X
@@ -252,7 +252,7 @@ extern void __cpu_flush_kern_tlb_range(unsigned long, unsigned long);
 #endif
 /*!
  * arch/arm/kernel/setup.c 의
- * setup_processor 에서 초기화 
+ * setup_processor 에서 초기화
  */
 extern struct cpu_tlb_fns cpu_tlb;
 
@@ -587,6 +587,7 @@ static inline void __flush_tlb_kernel_page(unsigned long kaddr)
  * Branch predictor maintenance is paired with full TLB invalidation, so
  * there is no need for any barriers here.
  */
+/*! 2017. 8.26 study -ing */
 static inline void __local_flush_bp_all(void)
 {
 	const int zero = 0;
@@ -596,6 +597,7 @@ static inline void __local_flush_bp_all(void)
 		asm("mcr p15, 0, %0, c7, c5, 6" : : "r" (zero));
 }
 
+/*! 2017. 8.26 study -ing */
 static inline void local_flush_bp_all(void)
 {
 	const int zero = 0;
@@ -633,7 +635,7 @@ static inline void flush_pmd_entry(void *pmd)
 {
 	const unsigned int __tlb_flag = __cpu_tlb_flags;
 
-	/*! ARM11B 20150207 
+	/*! ARM11B 20150207
      * if (tlb_flag(TLB_DCLEAN))
      *   asm("mcr p15 , 0, %0 , c7, c10 , 1 @ flush_pmd" "r" (pmd) "cc");
      * if (tlb_flag(TLB_L2CLEAN_FR))
@@ -642,7 +644,7 @@ static inline void flush_pmd_entry(void *pmd)
 	tlb_op(TLB_DCLEAN, "c7, c10, 1	@ flush_pmd", pmd);
 	tlb_l2_op(TLB_L2CLEAN_FR, "c15, c9, 1  @ L2 flush_pmd", pmd);
 
-	/*! ARM11B 20150207 
+	/*! ARM11B 20150207
      * DSB명령을 통해서 ” write buffer에 있는 값을 다 내보내겠다” 라는 의미이다.
      * 이 동작을 하는 이유는 1) bootloader가 cache에 값을 기록했을수도 있고,
      * 2) cache가 off되어 있더라도, write buffer 상에 남아 있을 수 가 있어서 drain을 통해 write buffer를 내보내는 동작이다.

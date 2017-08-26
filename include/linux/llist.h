@@ -157,6 +157,7 @@ static inline void init_llist_head(struct llist_head *list)
  * test whether the list is empty without deleting something from the
  * list.
  */
+/*! 2017. 8.26 study -ing */
 static inline bool llist_empty(const struct llist_head *head)
 {
 	return ACCESS_ONCE(head->first) == NULL;

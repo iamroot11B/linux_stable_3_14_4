@@ -113,6 +113,7 @@ int ioremap_page(unsigned long virt, unsigned long phys,
 }
 EXPORT_SYMBOL(ioremap_page);
 
+/*! 2017. 8.26 study -ing */
 void __check_vmalloc_seq(struct mm_struct *mm)
 {
 	unsigned int seq;

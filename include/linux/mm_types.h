@@ -467,6 +467,7 @@ static inline void mm_init_cpumask(struct mm_struct *mm)
 }
 
 /* Future-safe accessor for struct mm_struct's cpu_vm_mask. */
+/*! 2017. 8.26 study -ing */
 static inline cpumask_t *mm_cpumask(struct mm_struct *mm)
 {
 	return mm->cpu_vm_mask_var;

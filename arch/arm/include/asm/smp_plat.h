@@ -46,6 +46,7 @@ static inline int tlb_ops_need_broadcast(void)
 #endif
 
 #if !defined(CONFIG_SMP) || __LINUX_ARM_ARCH__ >= 7
+/*! 2017. 8.26 study -ing */
 #define cache_ops_need_broadcast()	0
 #else
 static inline int cache_ops_need_broadcast(void)

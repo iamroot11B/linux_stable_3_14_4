@@ -51,7 +51,9 @@
  extern void stop_critical_timings(void);
  extern void start_critical_timings(void);
 #else
+/*! 2017. 8.26 study -ing */
 # define stop_critical_timings() do { } while (0)
+/*! 2017. 8.26 study -ing */
 # define start_critical_timings() do { } while (0)
 #endif
 

@@ -149,6 +149,7 @@ static inline int tick_nohz_tick_stopped(void)
 }
 /*! 2017. 8.12 study -ing */
 static inline void tick_nohz_idle_enter(void) { }
+/*! 2017. 8.26 study -ing */
 static inline void tick_nohz_idle_exit(void) { }
 
 static inline ktime_t tick_nohz_get_sleep_length(void)

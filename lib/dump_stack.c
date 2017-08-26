@@ -8,7 +8,7 @@
 #include <linux/sched.h>
 #include <linux/smp.h>
 #include <linux/atomic.h>
-
+/*! 2017. 8.26 study -ing */
 static void __dump_stack(void)
 {
 	dump_stack_print_info(KERN_DEFAULT);
@@ -22,7 +22,7 @@ static void __dump_stack(void)
  */
 #ifdef CONFIG_SMP
 static atomic_t dump_lock = ATOMIC_INIT(-1);
-
+/*! 2017. 8.26 study -ing */
 asmlinkage void dump_stack(void)
 {
 	int was_locked;

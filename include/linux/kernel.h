@@ -65,7 +65,7 @@
  * as wide as the result!), and we want to evaluate the macro
  * arguments just once each.
  */
-/*! ARM11B 20150124 
+/*! ARM11B 20150124
  * round_up - 올림연산
  * round_down - 내림연산
  */
@@ -105,6 +105,7 @@
  * to closest integer. Result is undefined for negative divisors and
  * for negative dividends if the divisor variable type is unsigned.
  */
+/*! 2017. 8.26 study -ing */
 #define DIV_ROUND_CLOSEST(x, divisor)(			\
 {							\
 	typeof(x) __x = x;				\
@@ -714,7 +715,7 @@ static inline int
 ftrace_vprintk(const char *fmt, va_list ap)
 {
 	return 0;
-}
+}/*! 2017. 8.26 study -ing */
 static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
 #endif /* CONFIG_TRACING */
 

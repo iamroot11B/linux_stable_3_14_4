@@ -15,6 +15,7 @@ extern unsigned int cacheid;
 #define cache_is_vipt()			cacheid_is(CACHEID_VIPT)
 #define cache_is_vipt_nonaliasing()	cacheid_is(CACHEID_VIPT_NONALIASING)
 #define cache_is_vipt_aliasing()	cacheid_is(CACHEID_VIPT_ALIASING)
+/*! 2017. 8.26 study -ing */
 #define icache_is_vivt_asid_tagged()	cacheid_is(CACHEID_ASID_TAGGED)
 #define icache_is_vipt_aliasing()	cacheid_is(CACHEID_VIPT_I_ALIASING)
 #define icache_is_pipt()		cacheid_is(CACHEID_PIPT)

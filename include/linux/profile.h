@@ -53,6 +53,7 @@ void profile_hits(int type, void *ip, unsigned int nr_hits);
 /*
  * Single profiler hit:
  */
+/*! 2017. 8.26 study -ing */
 static inline void profile_hit(int type, void *ip)
 {
 	/*
