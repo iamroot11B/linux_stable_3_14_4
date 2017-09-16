@@ -683,7 +683,7 @@ static inline u64 rq_clock(struct rq *rq)
 {
 	return rq->clock;
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline u64 rq_clock_task(struct rq *rq)
 {
 	return rq->clock_task;
@@ -985,9 +985,11 @@ static inline int task_running(struct rq *rq, struct task_struct *p)
 
 
 #ifndef prepare_arch_switch
+/*! 2017. 9.16 extra study -ing */
 # define prepare_arch_switch(next)	do { } while (0)
 #endif
 #ifndef finish_arch_switch
+/*! Do nothing */
 # define finish_arch_switch(prev)	do { } while (0)
 #endif
 #ifndef finish_arch_post_lock_switch
@@ -1006,7 +1008,7 @@ static inline void prepare_lock_switch(struct rq *rq, struct task_struct *next)
 	next->on_cpu = 1;
 #endif
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline void finish_lock_switch(struct rq *rq, struct task_struct *prev)
 {
 #ifdef CONFIG_SMP
@@ -1033,6 +1035,7 @@ static inline void finish_lock_switch(struct rq *rq, struct task_struct *prev)
 }
 
 #else /* __ARCH_WANT_UNLOCKED_CTXSW */
+/*! 2017. 9.16 extra study -ing */
 static inline void prepare_lock_switch(struct rq *rq, struct task_struct *next)
 {
 #ifdef CONFIG_SMP

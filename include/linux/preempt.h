@@ -124,6 +124,7 @@ do { \
 /*! 2016.07.16 study -ing */
 #define preempt_disable()			barrier()
 #define sched_preempt_enable_no_resched()	barrier()
+/*! 2017. 9.16 extra study -ing */
 #define preempt_enable_no_resched()		barrier()
 #define preempt_enable()			barrier()
 #define preempt_check_resched()			do { } while (0)

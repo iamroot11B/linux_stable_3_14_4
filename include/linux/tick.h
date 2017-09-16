@@ -196,6 +196,7 @@ static inline bool tick_nohz_full_cpu(int cpu) { return false; }
 static inline void __tick_nohz_full_check(void) { }
 static inline void tick_nohz_full_kick(void) { }
 static inline void tick_nohz_full_kick_all(void) { }
+/*! 2017. 9.16 extra study -ing */
 static inline void __tick_nohz_task_switch(struct task_struct *tsk) { }
 #endif
 
@@ -204,9 +205,10 @@ static inline void tick_nohz_full_check(void)
 	if (tick_nohz_full_enabled())
 		__tick_nohz_full_check();
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline void tick_nohz_task_switch(struct task_struct *tsk)
 {
+	/*! tick_nohz_full_enabled -> false return  */
 	if (tick_nohz_full_enabled())
 		__tick_nohz_task_switch(tsk);
 }

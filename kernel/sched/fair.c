@@ -383,7 +383,7 @@ find_matching_se(struct sched_entity **se, struct sched_entity **pse)
 }
 
 #else	/* !CONFIG_FAIR_GROUP_SCHED */
-
+/*! 2017. 9.16 extra study -ing */
 static inline struct task_struct *task_of(struct sched_entity *se)
 {
 	return container_of(se, struct task_struct, se);
@@ -403,7 +403,7 @@ static inline struct cfs_rq *task_cfs_rq(struct task_struct *p)
 {
 	return &task_rq(p)->cfs;
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline struct cfs_rq *cfs_rq_of(struct sched_entity *se)
 {
 	struct task_struct *p = task_of(se);
@@ -3574,7 +3574,7 @@ static inline int throttled_hierarchy(struct cfs_rq *cfs_rq)
 {
 	return 0;
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline int throttled_lb_pair(struct task_group *tg,
 				    int src_cpu, int dest_cpu)
 {
@@ -4746,6 +4746,7 @@ struct lb_env {
  * move_task - move a task from one runqueue to another runqueue.
  * Both runqueues must be locked.
  */
+/*! 2017. 9.16 extra study -ing */
 static void move_task(struct task_struct *p, struct lb_env *env)
 {
 	deactivate_task(env->src_rq, p, 0);
@@ -4757,6 +4758,7 @@ static void move_task(struct task_struct *p, struct lb_env *env)
 /*
  * Is this task likely cache-hot:
  */
+/*! 2017. 9.16 extra study -ing */
 static int
 task_hot(struct task_struct *p, u64 now, struct sched_domain *sd)
 {
@@ -4771,6 +4773,7 @@ task_hot(struct task_struct *p, u64 now, struct sched_domain *sd)
 	/*
 	 * Buddy candidates are cache hot:
 	 */
+	/*! sched_feat(CACHE_HOT_BUDDY) -> true  */
 	if (sched_feat(CACHE_HOT_BUDDY) && this_rq()->nr_running &&
 			(&p->se == cfs_rq_of(&p->se)->next ||
 			 &p->se == cfs_rq_of(&p->se)->last))
@@ -4845,12 +4848,13 @@ static bool migrate_degrades_locality(struct task_struct *p, struct lb_env *env)
 }
 
 #else
+/*! 2017. 9.16 extra study -ing */
 static inline bool migrate_improves_locality(struct task_struct *p,
 					     struct lb_env *env)
 {
 	return false;
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline bool migrate_degrades_locality(struct task_struct *p,
 					     struct lb_env *env)
 {
@@ -4861,6 +4865,7 @@ static inline bool migrate_degrades_locality(struct task_struct *p,
 /*
  * can_migrate_task - may task p from runqueue rq be migrated to this_cpu?
  */
+/*! 2017. 9.16 extra study -ing */
 static
 int can_migrate_task(struct task_struct *p, struct lb_env *env)
 {
@@ -4872,12 +4877,14 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	 * 3) running (obviously), or
 	 * 4) are cache-hot on their current CPU.
 	 */
+    /*! throttled_lb_pair - return 0  */
 	if (throttled_lb_pair(task_group(p), env->src_cpu, env->dst_cpu))
 		return 0;
 
 	if (!cpumask_test_cpu(env->dst_cpu, tsk_cpus_allowed(p))) {
 		int cpu;
 
+		/*! Do nothing */
 		schedstat_inc(p, se.statistics.nr_failed_migrations_affine);
 
 		env->flags |= LBF_SOME_PINNED;
@@ -4909,6 +4916,7 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	env->flags &= ~LBF_ALL_PINNED;
 
 	if (task_running(env->src_rq, p)) {
+		/*! Do nothing */
 		schedstat_inc(p, se.statistics.nr_failed_migrations_running);
 		return 0;
 	}
@@ -4921,8 +4929,10 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	 */
 	tsk_cache_hot = task_hot(p, rq_clock_task(env->src_rq), env->sd);
 	if (!tsk_cache_hot)
+		/*! migrate_degrades_locality -> false return */
 		tsk_cache_hot = migrate_degrades_locality(p, env);
 
+	/*! migrate_improves_locality -> false return  */
 	if (migrate_improves_locality(p, env)) {
 #ifdef CONFIG_SCHEDSTATS
 		if (tsk_cache_hot) {
@@ -4984,6 +4994,7 @@ static const unsigned int sched_nr_migrate_break = 32;
  *
  * Called with both runqueues locked.
  */
+/*! 2017. 9.16 extra study -ing */
 static int move_tasks(struct lb_env *env)
 {
 	struct list_head *tasks = &env->src_rq->cfs_tasks;
@@ -5051,6 +5062,7 @@ next:
 	 * so we can safely collect move_task() stats here rather than
 	 * inside move_task().
 	 */
+	/*! Do nothing */
 	schedstat_add(env->sd, lb_gained[env->idle], pulled);
 
 	return pulled;
@@ -5165,7 +5177,7 @@ static unsigned long task_h_load(struct task_struct *p)
 static inline void update_blocked_averages(int cpu)
 {
 }
-
+/*! 2017. 9.16 extra study -ing */
 static unsigned long task_h_load(struct task_struct *p)
 {
 	return p->se.avg.load_avg_contrib;
@@ -5627,7 +5639,7 @@ static inline enum fbq_type fbq_classify_group(struct sg_lb_stats *sgs)
 {
 	return all;
 }
-
+/*! 2017. 9.16 extra study -ing */
 static inline enum fbq_type fbq_classify_rq(struct rq *rq)
 {
 	return regular;
@@ -5999,6 +6011,7 @@ out_balanced:
 /*
  * find_busiest_queue - find the busiest runqueue among the cpus in group.
  */
+/*! 2017. 9.16 extra study -ing */
 static struct rq *find_busiest_queue(struct lb_env *env,
 				     struct sched_group *group)
 {
@@ -6011,6 +6024,7 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 		enum fbq_type rt;
 
 		rq = cpu_rq(i);
+        /*! 0 return */
 		rt = fbq_classify_rq(rq);
 
 		/*
@@ -6078,7 +6092,7 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 
 /* Working cpumask for load_balance and load_balance_newidle. */
 DEFINE_PER_CPU(cpumask_var_t, load_balance_mask);
-
+/*! 2017. 9.16 extra study -ing */
 static int need_active_balance(struct lb_env *env)
 {
 	struct sched_domain *sd = env->sd;
@@ -6180,7 +6194,9 @@ redo:
 
 	group = find_busiest_group(&env);
 	/*! 2017. 8.26 extra study end */
+    /*! 2017. 9.16 extra study start */
 	if (!group) {
+        /*! Do nothing */
 		schedstat_inc(sd, lb_nobusyg[idle]);
 		goto out_balanced;
 	}
@@ -6193,6 +6209,7 @@ redo:
 
 	BUG_ON(busiest == env.dst_rq);
 
+    /*! Do nothing */
 	schedstat_add(sd, lb_imbalance[idle], env.imbalance);
 
 	ld_moved = 0;
@@ -6294,6 +6311,7 @@ more_balance:
 	}
 
 	if (!ld_moved) {
+		/*! Do nothing */
 		schedstat_inc(sd, lb_failed[idle]);
 		/*
 		 * Increment the failure counter only on periodic balance.

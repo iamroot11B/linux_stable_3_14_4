@@ -447,6 +447,7 @@ static inline void unregister_kretprobe(struct kretprobe *rp)
 static inline void unregister_kretprobes(struct kretprobe **rps, int num)
 {
 }
+/*! 2017. 9.16 extra study -ing */
 static inline void kprobe_flush_task(struct task_struct *tk)
 {
 }

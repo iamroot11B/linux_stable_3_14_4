@@ -59,6 +59,7 @@ static inline void user_enter(void) { }
 static inline void user_exit(void) { }
 static inline enum ctx_state exception_enter(void) { return 0; }
 static inline void exception_exit(enum ctx_state prev_ctx) { }
+/*! 2017. 9.16 extra study -ing */
 static inline void context_tracking_task_switch(struct task_struct *prev,
 						struct task_struct *next) { }
 #endif /* !CONFIG_CONTEXT_TRACKING */

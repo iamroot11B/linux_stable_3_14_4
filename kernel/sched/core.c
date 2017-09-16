@@ -543,7 +543,7 @@ void resched_task(struct task_struct *p)
 	if (!tsk_is_polling(p))
 		smp_send_reschedule(cpu);
 }
-
+/*! 2017. 9.16 extra study -ing */
 void resched_cpu(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -2107,11 +2107,11 @@ fire_sched_out_preempt_notifiers(struct task_struct *curr,
 }
 
 #else /* !CONFIG_PREEMPT_NOTIFIERS */
-
+/*! 2017. 9.16 extra study -ing */
 static void fire_sched_in_preempt_notifiers(struct task_struct *curr)
 {
 }
-
+/*! 2017. 9.16 extra study -ing */
 static void
 fire_sched_out_preempt_notifiers(struct task_struct *curr,
 				 struct task_struct *next)
@@ -2133,15 +2133,20 @@ fire_sched_out_preempt_notifiers(struct task_struct *curr,
  * prepare_task_switch sets up locking and calls architecture specific
  * hooks.
  */
+/*! 2017. 9.16 extra study -ing */
 static inline void
 prepare_task_switch(struct rq *rq, struct task_struct *prev,
 		    struct task_struct *next)
 {
 	trace_sched_switch(prev, next);
+	/*! Do nothing */
 	sched_info_switch(rq, prev, next);
+	/*! Do nothing */
 	perf_event_task_sched_out(prev, next);
+	/*! Do nothing */
 	fire_sched_out_preempt_notifiers(prev, next);
 	prepare_lock_switch(rq, next);
+	/*! Do nothing */
 	prepare_arch_switch(next);
 }
 
@@ -2160,6 +2165,7 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
  * with the lock held can cause deadlocks; see schedule() for
  * details.)
  */
+/*! 2017. 9.16 extra study -ing */
 static void finish_task_switch(struct rq *rq, struct task_struct *prev)
 	__releases(rq->lock)
 {
@@ -2180,16 +2186,20 @@ static void finish_task_switch(struct rq *rq, struct task_struct *prev)
 	 *		Manfred Spraul <manfred@colorfullife.com>
 	 */
 	prev_state = prev->state;
+	/*! Do nothing */
 	vtime_task_switch(prev);
+	/*! Do nothing */
 	finish_arch_switch(prev);
+	/*! Do nothing */
 	perf_event_task_sched_in(prev, current);
 	finish_lock_switch(rq, prev);
 	finish_arch_post_lock_switch();
-
+	/*! Do nothing */
 	fire_sched_in_preempt_notifiers(current);
 	if (mm)
 		mmdrop(mm);
 	if (unlikely(prev_state == TASK_DEAD)) {
+		/*! Do nothing */
 		task_numa_free(prev);
 
 		if (prev->sched_class->task_dead)
@@ -2199,6 +2209,7 @@ static void finish_task_switch(struct rq *rq, struct task_struct *prev)
 		 * Remove function-return probe instances associated with this
 		 * task and put them back on the free list.
 		 */
+		/*! Do nothing */
 		kprobe_flush_task(prev);
 		put_task_struct(prev);
 	}
@@ -2216,6 +2227,7 @@ static inline void pre_schedule(struct rq *rq, struct task_struct *prev)
 }
 
 /* rq->lock is NOT held, but preemption is disabled */
+/*! 2017. 9.16 extra study -ing */
 static inline void post_schedule(struct rq *rq)
 {
 	if (rq->post_schedule) {
@@ -2271,6 +2283,7 @@ asmlinkage void schedule_tail(struct task_struct *prev)
  * context_switch - switch to the new MM and the new
  * thread's register state.
  */
+/*! 2017. 9.16 extra study -ing */
 static inline void
 context_switch(struct rq *rq, struct task_struct *prev,
 	       struct task_struct *next)
@@ -2286,6 +2299,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	 * combine the page table reload and the switch backend into
 	 * one hypercall.
 	 */
+	/*! Do nothing */
 	arch_start_context_switch(prev);
 
 	if (!mm) {
@@ -2309,6 +2323,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	spin_release(&rq->lock.dep_map, 1, _THIS_IP_);
 #endif
 
+	/*! Do nothing */
 	context_tracking_task_switch(prev, next);
 	/* Here we just switch the register state and the stack. */
 	switch_to(prev, next, prev);
@@ -2622,7 +2637,7 @@ static inline void schedule_debug(struct task_struct *prev)
 	/*! Do nothing */
 	schedstat_inc(this_rq(), sched_count);
 }
-
+/*! 2017. 9.16 extra study -ing */
 static void put_prev_task(struct rq *rq, struct task_struct *prev)
 {
 	if (prev->on_rq || rq->skip_clock_update < 0)
@@ -2633,6 +2648,7 @@ static void put_prev_task(struct rq *rq, struct task_struct *prev)
 /*
  * Pick up the highest-prio task:
  */
+/*! 2017. 9.16 extra study -ing */
 static inline struct task_struct *
 pick_next_task(struct rq *rq)
 {
@@ -2756,6 +2772,7 @@ need_resched:
 	put_prev_task(rq, prev);
 	next = pick_next_task(rq);
 	clear_tsk_need_resched(prev);
+	/*! Do nothing */
 	clear_preempt_need_resched();
 	rq->skip_clock_update = 0;
 
@@ -2781,7 +2798,10 @@ need_resched:
 	sched_preempt_enable_no_resched();
 	if (need_resched())
 		goto need_resched;
+
+	/*! 2017. 9.16 extra study end */
 }
+
 /*! 2016.10.15 study -ing */
 static inline void sched_submit_work(struct task_struct *tsk)
 {

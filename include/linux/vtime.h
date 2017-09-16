@@ -65,7 +65,7 @@ static inline void vtime_account_irq_enter(struct task_struct *tsk)
 #endif /* __ARCH_HAS_VTIME_ACCOUNT */
 
 #else /* !CONFIG_VIRT_CPU_ACCOUNTING */
-
+/*! 2017. 9.16 extra study -ing */
 static inline void vtime_task_switch(struct task_struct *prev) { }
 /*! 2017. 3.18 study -ing */
 static inline void vtime_account_system(struct task_struct *tsk) { }

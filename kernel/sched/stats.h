@@ -44,6 +44,7 @@ rq_sched_info_depart(struct rq *rq, unsigned long long delta)
 {}
 /*! 2017. 8.26 study -ing */
 # define schedstat_inc(rq, field)	do { } while (0)
+/*! 2017. 9.16 extra study -ing */
 # define schedstat_add(rq, field, amt)	do { } while (0)
 # define schedstat_set(var, val)	do { } while (0)
 #endif
@@ -156,6 +157,7 @@ sched_info_switch(struct rq *rq,
 #define sched_info_dequeued(rq, t)		do { } while (0)
 #define sched_info_depart(rq, t)		do { } while (0)
 #define sched_info_arrive(rq, next)		do { } while (0)
+/*! 2017. 9.16 extra study -ing */
 #define sched_info_switch(rq, t, next)		do { } while (0)
 #endif /* CONFIG_SCHEDSTATS || CONFIG_TASK_DELAY_ACCT */
 

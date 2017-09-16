@@ -61,7 +61,7 @@ static inline void check_and_switch_context(struct mm_struct *mm,
 	else
 		cpu_switch_mm(mm->pgd, mm);
 }
-
+/*! 2017. 9.16 extra study -ing */
 #define finish_arch_post_lock_switch \
 	finish_arch_post_lock_switch
 static inline void finish_arch_post_lock_switch(void)

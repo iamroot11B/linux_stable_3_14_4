@@ -39,7 +39,7 @@ static __always_inline void preempt_count_set(int pc)
 static __always_inline void set_preempt_need_resched(void)
 {
 }
-
+/*! 2017. 9.16 extra study -ing */
 static __always_inline void clear_preempt_need_resched(void)
 {
 }

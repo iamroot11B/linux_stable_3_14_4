@@ -266,7 +266,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 	raw_spin_trylock(lock) ? \
 	1 : ({ local_irq_enable(); 0;  }); \
 })
-
+/*! 2017. 9.16 extra study -ing */
 #define raw_spin_trylock_irqsave(lock, flags) \
 ({ \
 	local_irq_save(flags); \
